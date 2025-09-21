@@ -9,6 +9,7 @@ const plugins = require('../plugins');
 const privileges = require('../privileges');
 const translator = require('../translator');
 const utils = require('../utils');
+const helpfulness = require('../user/helpfulness');
 
 module.exports = function (Posts) {
 	const votesInProgress = {};
@@ -193,6 +194,18 @@ module.exports = function (Posts) {
 		const newReputation = await user.incrementUserReputationBy(postData.uid, type === 'upvote' ? 1 : -1);
 
 		await adjustPostVotes(postData, uid, type, unvote);
+
+		let delta = 0;
+    	if (unvote) {
+        	delta = voteStatus && voteStatus.upvoted ? -1
+          	: (voteStatus && voteStatus.downvoted ? +1 : 0);
+    	} else {
+        	delta = (type === 'upvote') ? +1 : -1;
+    	}
+    	if (delta !== 0) {
+        	await helpfulness.onPostVoteDelta({ authorUid: postData.uid, delta });
+    	}
+
 
 		await fireVoteHook(postData, uid, type, unvote, voteStatus);
 
