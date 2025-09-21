@@ -19,6 +19,7 @@ const events = require('../events');
 const translator = require('../translator');
 const sockets = require('../socket.io');
 const utils = require('../utils');
+const helpfulness = require('../user/helpfulness');
 
 const usersAPI = module.exports;
 
@@ -47,6 +48,28 @@ usersAPI.get = async (caller, { uid }) => {
 	const userData = await user.getUserData(uid);
 	return await user.hidePrivateData(userData, caller.uid);
 };
+
+usersAPI.getHelpfulnessScore = async (caller, { uid }) => {
+	const canView = await privileges.global.can('view:users', caller.uid);
+	if (!canView) {
+		throw new Error('[[error:no-privileges]]');
+	}
+	if (!(parseInt(uid, 10) > 0)) {
+		throw new Error('[[error:invalid-uid]]');
+	}
+	const score = await helpfulness.getScore(uid);
+	return { uid: String(uid), score };
+};
+
+usersAPI.getTopHelpfulness = async (caller, { limit = 20, start = 0 } = {}) => {
+	const canView = await privileges.global.can('view:users', caller.uid);
+	if (!canView) {
+		throw new Error('[[error:no-privileges]]');
+	}
+	const results = await helpfulness.getTop(limit, start);
+	return { start, limit, results };
+};
+
 
 usersAPI.update = async function (caller, data) {
 	if (!caller.uid) {
