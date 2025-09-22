@@ -18,20 +18,14 @@ module.exports = function (app, middleware, controllers) {
 	router.get('/user/username/:username', [...middlewares, middleware.canViewUsers], helpers.tryRoute(controllers.user.getUserByUsername));
 	router.get('/user/email/:email', [...middlewares, middleware.canViewUsers], helpers.tryRoute(controllers.user.getUserByEmail));
 
-	router.get(
-		'/users/:uid/helpfulness',
-		[...middlewares, middleware.canViewUsers],
-		helpers.tryRoute(async (req) => {
+	router.get('/users/:uid/helpfulness', [...middlewares, middleware.canViewUsers], helpers.tryRoute(async (req) => {
 			const caller = { uid: req.uid, ip: req.ip };
 			const params = { uid: parseInt(req.params.uid, 10) };
 			return await usersAPI.getHelpfulnessScore(caller, params);
 		})
 	);
 
-	router.get(
-		'/users/helpfulness/top',
-		[...middlewares, middleware.canViewUsers],
-		helpers.tryRoute(async (req) => {
+	router.get('/users/helpfulness/top', [...middlewares, middleware.canViewUsers], helpers.tryRoute(async (req) => {
 			const caller = { uid: req.uid, ip: req.ip };
 			const start = Number.isFinite(parseInt(req.query.start, 10)) ? parseInt(req.query.start, 10) : 0;
 			const limitRaw = Number.isFinite(parseInt(req.query.limit, 10)) ? parseInt(req.query.limit, 10) : 20;
