@@ -4,6 +4,7 @@ const express = require('express');
 
 const uploadsController = require('../controllers/uploads');
 const helpers = require('./helpers');
+const usersAPI = require('../api/users');
 
 module.exports = function (app, middleware, controllers) {
 	const middlewares = [middleware.autoLocale, middleware.authenticateRequest];
@@ -16,6 +17,29 @@ module.exports = function (app, middleware, controllers) {
 	router.get('/user/uid/:uid', [...middlewares, middleware.canViewUsers], helpers.tryRoute(controllers.user.getUserByUID));
 	router.get('/user/username/:username', [...middlewares, middleware.canViewUsers], helpers.tryRoute(controllers.user.getUserByUsername));
 	router.get('/user/email/:email', [...middlewares, middleware.canViewUsers], helpers.tryRoute(controllers.user.getUserByEmail));
+
+	router.get(
+		'/users/:uid/helpfulness',
+		[...middlewares, middleware.canViewUsers],
+		helpers.tryRoute(async (req) => {
+			const caller = { uid: req.uid, ip: req.ip };
+			const params = { uid: parseInt(req.params.uid, 10) };
+			return await usersAPI.getHelpfulnessScore(caller, params);
+		})
+	);
+
+	router.get(
+		'/users/helpfulness/top',
+		[...middlewares, middleware.canViewUsers],
+		helpers.tryRoute(async (req) => {
+			const caller = { uid: req.uid, ip: req.ip };
+			const start = Number.isFinite(parseInt(req.query.start, 10)) ? parseInt(req.query.start, 10) : 0;
+			const limitRaw = Number.isFinite(parseInt(req.query.limit, 10)) ? parseInt(req.query.limit, 10) : 20;
+			const limit = Math.max(1, Math.min(limitRaw, 100));
+			return await usersAPI.getTopHelpfulness(caller, { start, limit });
+		})
+	);
+
 
 	router.get('/categories/:cid/moderators', [...middlewares], helpers.tryRoute(controllers.api.getModerators));
 	router.get('/recent/posts/:term?', [...middlewares], helpers.tryRoute(controllers.posts.getRecentPosts));
