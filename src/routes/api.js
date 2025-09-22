@@ -17,7 +17,7 @@ module.exports = function (app, middleware, controllers) {
 	router.get('/user/uid/:uid', [...middlewares, middleware.canViewUsers], helpers.tryRoute(controllers.user.getUserByUID));
 	router.get('/user/username/:username', [...middlewares, middleware.canViewUsers], helpers.tryRoute(controllers.user.getUserByUsername));
 	router.get('/user/email/:email', [...middlewares, middleware.canViewUsers], helpers.tryRoute(controllers.user.getUserByEmail));
-	router.get('/user/uid/:uid/helpfulness', [...middlewares, middleware.canViewUsers], helpers.tryRoute(usersAPI.getHelpfulness));
+	router.get('/user/uid/:uid/helpfulness', [...middlewares, middleware.canViewUsers], helpers.tryRoute(usersAPI.getHelpfulness)); // Route to fetch a user's helpfulness score by uid
 
 
 	router.get('/categories/:cid/moderators', [...middlewares], helpers.tryRoute(controllers.api.getModerators));

@@ -172,6 +172,7 @@ module.exports = function (Posts) {
 		}
 	}
 
+	// Handles voting logic on a post: updates user reputation, post counts, and helpfulness s
 	async function vote(type, unvote, pid, uid, voteStatus) {
 		if (utils.isNumber(uid) && parseInt(uid, 10) <= 0) {
 			throw new Error('[[error:not-logged-in]]');
