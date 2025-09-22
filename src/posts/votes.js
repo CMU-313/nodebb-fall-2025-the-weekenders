@@ -193,18 +193,14 @@ module.exports = function (Posts) {
 		const postData = await Posts.getPostFields(pid, ['pid', 'uid', 'tid']);
 		const newReputation = await user.incrementUserReputationBy(postData.uid, type === 'upvote' ? 1 : -1);
 
-		await adjustPostVotes(postData, uid, type, unvote);
+		if (type === 'upvote' && !unvote && !voteStatus.upvoted && postData && postData.uid) {
+			try {
+				await helpfulness.increment(postData.uid, 1);
+			} catch (err) {
+			}
+		}
 
-		let delta = 0;
-    	if (unvote) {
-        	delta = voteStatus && voteStatus.upvoted ? -1
-          	: (voteStatus && voteStatus.downvoted ? +1 : 0);
-    	} else {
-        	delta = (type === 'upvote') ? +1 : -1;
-    	}
-    	if (delta !== 0) {
-        	await helpfulness.onPostVoteDelta({ authorUid: postData.uid, delta });
-    	}
+
 
 
 		await fireVoteHook(postData, uid, type, unvote, voteStatus);
