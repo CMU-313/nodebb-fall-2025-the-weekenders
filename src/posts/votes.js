@@ -197,6 +197,7 @@ module.exports = function (Posts) {
 			try {
 				await helpfulness.increment(postData.uid, 1);
 			} catch (err) {
+				// intentionally non-fatal; do not block voting if helpfulness write fails
 			}
 		}
 
@@ -204,6 +205,7 @@ module.exports = function (Posts) {
 
 
 		await fireVoteHook(postData, uid, type, unvote, voteStatus);
+		await adjustPostVotes(postData, uid, type, unvote);
 
 		return {
 			user: {
