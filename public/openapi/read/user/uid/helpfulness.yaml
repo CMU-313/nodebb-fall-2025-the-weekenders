@@ -1,0 +1,29 @@
+get:
+  summary: Get helpfulness score for a user
+  tags: [users]
+  parameters:
+    - name: uid
+      in: path
+      required: true
+      schema:
+        type: integer
+      example: 2         
+  responses:
+    '200':
+      description: A user’s helpfulness score
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              uid:
+                type: integer
+                example: 2
+              helpfulnessScore:
+                type: integer
+                example: 16
+          examples:        
+            sample:
+              value:
+                uid: 2
+                helpfulnessScore: 16

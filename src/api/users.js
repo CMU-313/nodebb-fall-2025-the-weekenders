@@ -49,35 +49,26 @@ usersAPI.get = async (caller, { uid }) => {
 	return await user.hidePrivateData(userData, caller.uid);
 };
 
-// Returns user's helpfulness score
-// usersAPI.getHelpfulness = async (caller, { uid }) => {
-// 	const canView = await privileges.global.can('view:users', caller.uid);
-// 	if (!canView) {
-// 		throw new Error('[[error:no-privileges]]');
-// 	}
-// 	const score = await helpfulness.get(uid);
-// 	return { uid: Number(uid), helpfulnessScore: score };
-// };
-
+// Core logic: checks privileges and fetches a user's helpfulness score
 async function getHelpfulnessCore(caller, { uid }) {
-  const canView = await privileges.global.can('view:users', caller.uid);
-  if (!canView) {
-    throw new Error('[[error:no-privileges]]');
-  }
-  const score = await helpfulness.get(uid);
-  return { uid: Number(uid), helpfulnessScore: score };
+	const canView = await privileges.global.can('view:users', caller.uid);
+	if (!canView) {
+		throw new Error('[[error:no-privileges]]');
+	}
+	const score = await helpfulness.get(uid);
+	return { uid: Number(uid), helpfulnessScore: score };
 }
 
-
+// API endpoint handler: wraps core logic and returns JSON response
 usersAPI.getHelpfulness = async function (req, res, next) {
-  try {
-    const caller = { uid: req.uid, ip: req.ip };
-    const data = { uid: req.params.uid };
-    const out = await getHelpfulnessCore(caller, data);
-    res.json(out);
-  } catch (err) {
-    next(err);
-  }
+	try {
+		const caller = { uid: req.uid, ip: req.ip };
+		const data = { uid: req.params.uid };
+		const out = await getHelpfulnessCore(caller, data);
+		res.json(out);
+	} catch (err) {
+		next(err);
+	}
 };
 
 

@@ -3,18 +3,21 @@
 const db = require('../database');
 const FIELD = 'helpfulnessScore';
 
+// Get a user's helpfulness score
 async function get(uid) {
 	if (!uid) return 0;
 	const v = await db.getObjectField(`user:${uid}`, FIELD);
 	return Number(v) || 0;
 }
 
+// Set a user's helpfulness score to a given value
 async function set(uid, value) {
 	if (!uid) return 0;
 	await db.setObjectField(`user:${uid}`, FIELD, String(Number(value) || 0));
 	return Number(value) || 0;
 }
 
+// Increment a user's helpfulness score by a given amount 
 async function increment(uid, by = 1) {
 	if (!uid) return 0;
 	const current = await get(uid);
