@@ -212,6 +212,8 @@ paths:
     $ref: 'read/user/username/username.yaml'
   "/api/user/email/{email}":
     $ref: 'read/user/email/email.yaml'
+  "/api/user/uid/{uid}/helpfulness":
+    $ref: 'read/user/uid/helpfulness.yaml'
   /api/categories:
     $ref: 'read/categories.yaml'
   "/api/categories/{cid}/moderators":
