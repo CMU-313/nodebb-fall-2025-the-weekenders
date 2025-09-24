@@ -49,7 +49,7 @@ usersAPI.get = async (caller, { uid }) => {
 	return await user.hidePrivateData(userData, caller.uid);
 };
 
-// Core logic: checks privileges and fetches a user's helpfulness score
+// Checks privileges and fetches a user's helpfulness score
 async function getHelpfulnessCore(caller, { uid }) {
 	const canView = await privileges.global.can('view:users', caller.uid);
 	if (!canView) {
@@ -59,7 +59,7 @@ async function getHelpfulnessCore(caller, { uid }) {
 	return { uid: Number(uid), helpfulnessScore: score };
 }
 
-// API endpoint handler: wraps core logic and returns JSON response
+// Wraps core logic and returns JSON response
 usersAPI.getHelpfulness = async function (req, res, next) {
 	try {
 		const caller = { uid: req.uid, ip: req.ip };
