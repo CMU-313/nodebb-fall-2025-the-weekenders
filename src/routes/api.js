@@ -4,6 +4,7 @@ const express = require('express');
 
 const uploadsController = require('../controllers/uploads');
 const helpers = require('./helpers');
+const usersAPI = require('../api/users');
 
 module.exports = function (app, middleware, controllers) {
 	const middlewares = [middleware.autoLocale, middleware.authenticateRequest];
@@ -16,6 +17,8 @@ module.exports = function (app, middleware, controllers) {
 	router.get('/user/uid/:uid', [...middlewares, middleware.canViewUsers], helpers.tryRoute(controllers.user.getUserByUID));
 	router.get('/user/username/:username', [...middlewares, middleware.canViewUsers], helpers.tryRoute(controllers.user.getUserByUsername));
 	router.get('/user/email/:email', [...middlewares, middleware.canViewUsers], helpers.tryRoute(controllers.user.getUserByEmail));
+	router.get('/user/uid/:uid/helpfulness', [...middlewares, middleware.canViewUsers], helpers.tryRoute(usersAPI.getHelpfulness)); //  This route fetches a user's helpfulness score by uid
+
 
 	router.get('/categories/:cid/moderators', [...middlewares], helpers.tryRoute(controllers.api.getModerators));
 	router.get('/recent/posts/:term?', [...middlewares], helpers.tryRoute(controllers.posts.getRecentPosts));

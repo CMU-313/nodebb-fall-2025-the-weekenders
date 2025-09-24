@@ -9,6 +9,7 @@ const plugins = require('../plugins');
 const privileges = require('../privileges');
 const translator = require('../translator');
 const utils = require('../utils');
+const helpfulness = require('../user/helpfulness');
 
 module.exports = function (Posts) {
 	const votesInProgress = {};
@@ -171,6 +172,7 @@ module.exports = function (Posts) {
 		}
 	}
 
+	//  This function handles voting logic on a post: updates user reputation, post counts, and helpfulness score
 	async function vote(type, unvote, pid, uid, voteStatus) {
 		if (utils.isNumber(uid) && parseInt(uid, 10) <= 0) {
 			throw new Error('[[error:not-logged-in]]');
@@ -192,9 +194,19 @@ module.exports = function (Posts) {
 		const postData = await Posts.getPostFields(pid, ['pid', 'uid', 'tid']);
 		const newReputation = await user.incrementUserReputationBy(postData.uid, type === 'upvote' ? 1 : -1);
 
-		await adjustPostVotes(postData, uid, type, unvote);
+		if (type === 'upvote' && !unvote && !voteStatus.upvoted && postData && postData.uid) {
+			try {
+				await helpfulness.increment(postData.uid, 1);
+			} catch (err) {
+				// intentionally non-fatal
+			}
+		}
+
+
+
 
 		await fireVoteHook(postData, uid, type, unvote, voteStatus);
+		await adjustPostVotes(postData, uid, type, unvote);
 
 		return {
 			user: {
