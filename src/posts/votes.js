@@ -172,7 +172,7 @@ module.exports = function (Posts) {
 		}
 	}
 
-	// Handles voting logic on a post: updates user reputation, post counts, and helpfulness s
+	//  This function handles voting logic on a post: updates user reputation, post counts, and helpfulness score
 	async function vote(type, unvote, pid, uid, voteStatus) {
 		if (utils.isNumber(uid) && parseInt(uid, 10) <= 0) {
 			throw new Error('[[error:not-logged-in]]');
@@ -198,7 +198,7 @@ module.exports = function (Posts) {
 			try {
 				await helpfulness.increment(postData.uid, 1);
 			} catch (err) {
-				// intentionally non-fatal; do not block voting if helpfulness write fails
+				// intentionally non-fatal
 			}
 		}
 
