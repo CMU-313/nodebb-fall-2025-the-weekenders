@@ -49,24 +49,6 @@ UserObject:
       description: A birthdate given in an ISO format parseable by the Date object
       example: 03/27/2020
       nullable: true
-    aboutme:
-      type: string
-      example: |
-        This is a paragraph all about how my life got twist-turned upside-down
-        and I'd like to take a minute and sit right here,
-        to tell you all about how I became the administrator of NodeBB
-      nullable: true
-    signature:
-      type: string
-      example: |
-        This is an example signature
-        It can span multiple lines.
-      nullable: true
-    uploadedpicture:
-      type: string
-      example: /assets/profile/1-profileimg.png
-      description: 'In almost all cases, defer to "picture" instead. Use this if you need to specifically reference the picture uploaded to the forum.'
-      nullable: true
     profileviews:
       type: number
       description: The number of times this user's profile has been viewed
@@ -81,6 +63,19 @@ UserObject:
     topiccount:
       type: number
       example: 50
+    aboutme:
+      type: string
+      example: |
+        This is a paragraph all about how my life got twist-turned upside-down
+        and I'd like to take a minute and sit right here,
+        to tell you all about how I became the administrator of NodeBB
+      nullable: true
+    signature:
+      type: string
+      example: |
+        This is an example signature
+        It can span multiple lines.
+      nullable: true
     lastposttime:
       type: number
       description: A UNIX timestamp representing the moment the user posted last
@@ -111,6 +106,15 @@ UserObject:
     followingCount:
       type: number
       example: 5
+    helpfulnessScore:
+      type: number
+      description: Aggregated helpfulness score, based on current upvotes received on the user's posts.
+      example: 12
+    uploadedpicture:
+      type: string
+      example: /assets/profile/1-profileimg.png
+      description: 'In almost all cases, defer to "picture" instead. Use this if you need to specifically reference the picture uploaded to the forum.'
+      nullable: true
     'cover:url':
       type: string
       example: /assets/profile/1-cover.png
@@ -163,7 +167,7 @@ UserObject:
     - uid
     - username
     - userslug
-    - 'email:confirmed'
+    - helpfulnessScore
     - joindate
     - lastonline
     - picture
@@ -305,6 +309,10 @@ UserObjectFull:
     followingCount:
       type: number
       example: 5
+    helpfulnessScore:
+      type: number
+      description: Aggregated helpfulness score, based on current upvotes received on the user's posts.
+      example: 12
     'cover:url':
       type: string
       example: /assets/profile/1-cover.png
@@ -551,6 +559,10 @@ UserObjectSlim:
       type: number
       description: The user's reputation score on the forum. Out-of-the-box, users gain/lose reputation points based on upvotes/downvotes, though plugins can alter the logic and criterion for awarding reputation points
       example: 100
+    helpfulnessScore:
+      type: number
+      description: Aggregated helpfulness score, based on current upvotes received on the user's posts.
+      example: 12
     'email:confirmed':
       type: number
       description: Whether the user has confirmed their email address or not

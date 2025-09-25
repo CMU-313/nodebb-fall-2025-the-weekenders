@@ -32,6 +32,22 @@
 			</div>
 		</div>
 		{{{ end }}}
+
+		{{{ if helpfulnessScore }}}
+		<div class="stat">
+			<div class="align-items-center justify-content-center card card-header p-3 border-0 rounded-1 h-100">
+				<span class="stat-label text-xs fw-semibold"><i class="text-muted fa-solid fa-thumbs-up"></i> <span>[[user:helpfulness]]</span></span>
+				<span class="fs-2 ff-secondary" title="{helpfulnessScore}">{humanReadableNumber(helpfulnessScore)}</span>
+			</div>
+		</div>
+		{{{ else }}}
+		<div class="stat">
+			<div class="align-items-center justify-content-center card card-header p-3 border-0 rounded-1 h-100">
+				<span class="stat-label text-xs fw-semibold"><i class="text-muted fa-solid fa-thumbs-up"></i> <span>[[user:helpfulness]]</span></span>
+				<span class="fs-2 ff-secondary" title="0">0</span>
+			</div>
+		</div>
+		{{{ end }}}
 		<div class="stat">
 			<div class="align-items-center justify-content-center card card-header p-3 border-0 rounded-1 h-100">
 				<span class="stat-label text-xs fw-semibold">[[user:profile-views]]</span>

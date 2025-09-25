@@ -130,3 +130,13 @@ body:not(.page-user) {
 .post-queue.posts-list .post-content {
 	a { text-decoration: underline;}
 }
+
+.helpfulness-badge {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.25rem;
+}
+
+.helpfulness-badge i {
+	font-size: 0.75rem;
+}

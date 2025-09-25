@@ -13,7 +13,7 @@ const utils = require('../utils');
 const relative_path = nconf.get('relative_path');
 
 const intFields = [
-	'uid', 'postcount', 'topiccount', 'reputation', 'profileviews',
+	'uid', 'postcount', 'topiccount', 'reputation', 'helpfulnessScore', 'profileviews',
 	'banned', 'banned:expire', 'email:confirmed', 'joindate', 'lastonline',
 	'lastqueuetime', 'lastposttime', 'followingCount', 'followerCount',
 	'blocksCount', 'passwordExpiry', 'mutedUntil',
@@ -23,7 +23,7 @@ module.exports = function (User) {
 	const fieldWhitelist = [
 		'uid', 'username', 'userslug', 'url', 'email', 'email:confirmed', 'joindate',
 		'lastonline', 'picture', 'icon:bgColor', 'fullname', 'birthday',
-		'aboutme', 'signature', 'uploadedpicture', 'profileviews', 'reputation',
+		'aboutme', 'signature', 'uploadedpicture', 'profileviews', 'reputation', 'helpfulnessScore',
 		'postcount', 'topiccount', 'lastposttime', 'banned', 'banned:expire',
 		'status', 'flags', 'followerCount', 'followingCount', 'cover:url',
 		'cover:position', 'groupTitle', 'mutedUntil', 'mutedReason',
@@ -44,6 +44,7 @@ module.exports = function (User) {
 		groupTitleArray: [],
 		status: 'offline',
 		reputation: 0,
+		helpfulnessScore: 0,
 		'email:confirmed': 0,
 	};
 

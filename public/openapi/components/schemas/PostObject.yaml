@@ -52,6 +52,9 @@ PostObject:
         displayname:
           type: string
           description: This is either username or fullname depending on forum and user settings
+        helpfulnessScore:
+          type: number
+          description: Aggregated helpfulness score, based on current upvotes received on the user's posts.
         userslug:
           type: string
           description: An URL-safe variant of the username (i.e. lower-cased, spaces
@@ -220,6 +223,9 @@ PostDataObject:
               type: number
             topiccount:
               type: number
+            helpfulnessScore:
+              type: number
+              description: Aggregated helpfulness score, based on current upvotes received on the user's posts.
             picture:
               type: string
               nullable: true
