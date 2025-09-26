@@ -181,12 +181,11 @@ module.exports = function (Topics) {
 
 				if (post.isAnonymous && !(isStaff || isSelf)) {
 					post.uid = 0;
+
 					post.user = post.user || {};
-					post.user.uid = 0;
-					post.user.username = 'Anonymous';
-					post.user.displayname = 'Anonymous';
-					post.user.userslug = null;
-					post.user.picture = null;
+					post.user = { uid: 0, username: 'Anonymous', displayname: 'Anonymous' };
+					delete post.userslug;
+					delete post.picture;
 				}
 			}
 		});
