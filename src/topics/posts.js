@@ -176,7 +176,7 @@ module.exports = function (Topics) {
 
 				posts.modifyPostByPrivilege(post, topicPrivileges);
 
-				const isStaff = !!topicsPrivileges.isAdminOrMod;
+				const isStaff = !!topicPrivileges.isAdminOrMod;
 				const isSelf = !!post.selfPost || (parseInt(topicPrivileges.uid, 10) === parseInt(post.uid, 10));
 
 				if (post.isAnonymous && !(isStaff || isSelf)) {
