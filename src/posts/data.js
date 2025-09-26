@@ -70,5 +70,7 @@ function modifyPost(post, fields) {
 		if (!fields.length || fields.includes('attachments')) {
 			post.attachments = (post.attachments || '').split(',').filter(Boolean);
 		}
+
+		if (post.hasOwnProperty('isAnonymous')) post.isAnonymous = !!post.isAnonymous;
 	}
 }
