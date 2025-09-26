@@ -7,6 +7,15 @@ const routeHelpers = require('../helpers');
 
 const { setupApiRoute } = routeHelpers;
 
+// Normalizes isAnonymous from req.body to a strict boolean when present
+function normalizeIsAnonymous(req, res, next) {
+	if (req.body && Object.prototype.hasOwnProperty.call(req.body, 'isAnonymous')) {
+		const v = req.body.isAnonymous;
+		req.body.isAnonymous = (v === true || v === 'true' || v === 1 || v === '1');
+	}
+	return next();
+}
+
 module.exports = function () {
 	const middlewares = [middleware.ensureLoggedIn];
 
@@ -15,7 +24,17 @@ module.exports = function () {
 
 	setupApiRoute(router, 'post', '/', [middleware.checkRequired.bind(null, ['cid', 'title', 'content'])], controllers.write.topics.create);
 	setupApiRoute(router, 'get', '/:tid', [], controllers.write.topics.get);
-	setupApiRoute(router, 'post', '/:tid', [middleware.checkRequired.bind(null, ['content']), middleware.assert.topic], controllers.write.topics.reply);
+	setupApiRoute(
+		router, 
+		'post', 
+		'/:tid', 
+		[
+			middleware.checkRequired.bind(null, ['content']), 
+			middleware.assert.topic,
+			normalizeIsAnonymous, // added
+		], 
+		controllers.write.topics.reply
+	);
 	setupApiRoute(router, 'delete', '/:tid', [...middlewares], controllers.write.topics.purge);
 
 	setupApiRoute(router, 'put', '/:tid/state', [...middlewares], controllers.write.topics.restore);
