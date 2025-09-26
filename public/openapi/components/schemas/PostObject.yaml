@@ -87,6 +87,9 @@ PostObject:
         cid:
           type: number
           description: A category identifier
+        isAnonymous:
+          type: boolean
+          description: Whether the post was made anonymously.
         slug:
           type: string
         deleted:
