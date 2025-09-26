@@ -99,6 +99,8 @@ topicsAPI.reply = async function (caller, data) {
 	}
 	const payload = { ...data };
 	delete payload.pid;
+
+	payload.isAnonymous = !!data.isAnonymous; // added for safet
 	apiHelpers.setDefaultPostData(caller, payload);
 
 	await meta.blacklist.test(caller.ip);
