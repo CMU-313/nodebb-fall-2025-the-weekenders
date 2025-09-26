@@ -128,6 +128,10 @@ postsAPI.edit = async function (caller, data) {
 	data.req = apiHelpers.buildReqObject(caller);
 	data.timestamp = parseInt(data.timestamp, 10) || Date.now();
 
+	if (Object.prototype.hasOwnProperty.call(data, 'isAnonymous')) {
+		data.isAnonymous = !!data.isAnonymous;
+	}
+
 	const editResult = await posts.edit(data);
 	if (editResult.topic.isMainPost) {
 		await topics.thumbs.migrate(data.uuid, editResult.topic.tid);
