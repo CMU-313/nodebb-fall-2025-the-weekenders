@@ -7,12 +7,31 @@ const routeHelpers = require('../helpers');
 
 const { setupApiRoute } = routeHelpers;
 
+//Normalizes isAnonymous from req.body to a strict boolean when its present.
+function normalizeIsAnonymous(req, res, next) {
+	if (req.body && Object.prototype.hasOwnProperty.call(req.body, 'isAnonymous')) {
+		const v = req.body.isAnonymous;
+		req.body.isAnonymous = (v === true || v === 'true' || v === 1 || v === '1');
+	}
+	return next();
+}
+
 module.exports = function () {
 	const middlewares = [middleware.ensureLoggedIn, middleware.assert.post];
 
 	setupApiRoute(router, 'get', '/:pid', [middleware.assert.post], controllers.write.posts.get);
 	// There is no POST route because you POST to a topic to create a new post. Intuitive, no?
-	setupApiRoute(router, 'put', '/:pid', [middleware.ensureLoggedIn, middleware.checkRequired.bind(null, ['content'])], controllers.write.posts.edit);
+	setupApiRoute(
+		router, 
+		'put', 
+		'/:pid', 
+		[
+			middleware.ensureLoggedIn, 
+			middleware.checkRequired.bind(null, ['content']),
+			normalizeIsAnonymous, // added
+		], 
+		controllers.write.posts.edit
+	);
 	setupApiRoute(router, 'delete', '/:pid', middlewares, controllers.write.posts.purge);
 
 	setupApiRoute(router, 'get', '/:pid/index', [middleware.assert.post], controllers.write.posts.getIndex);
