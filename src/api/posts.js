@@ -45,11 +45,9 @@ postsAPI.get = async function (caller, data) {
 		post.uid = 0;
 
 		post.user = post.user || {};
-		post.user.uid = 0;
-		post.user.username = 'Anonymous';
-		post.user.displayname = 'Anonymous';
-		post.user.userslug = null;
-		post.user.picture = null; //or generic avatar
+		post.user = { uid: 0, username: 'Anonymous', displayname: 'Anonymous' };
+		delete post.userslug;
+  		delete post.picture;
 	}
 	return post;
 };
