@@ -175,6 +175,19 @@ module.exports = function (Topics) {
 				post.ip = topicPrivileges.isAdminOrMod ? post.ip : undefined;
 
 				posts.modifyPostByPrivilege(post, topicPrivileges);
+
+				const isStaff = !!topicsPrivileges.isAdminOrMod;
+				const isSelf = !!post.selfPost || (parseInt(topicPrivileges.uid, 10) === parseInt(post.uid, 10));
+
+				if (post.isAnonymous && !(isStaff || isSelf)) {
+					post.uid = 0;
+					post.user = post.user || {};
+					post.user.uid = 0;
+					post.user.username = 'Anonymous';
+					post.user.displayname = 'Anonymous';
+					post.user.userslug = null;
+					post.user.picture = null;
+				}
 			}
 		});
 	};
