@@ -41,7 +41,16 @@ postsAPI.get = async function (caller, data) {
 	if (post.deleted && !(userPrivilege.isAdminOrMod || selfPost)) {
 		post.content = '[[topic:post-is-deleted]]';
 	}
+	if (post.isAnonymous && !(userPrivilege.isAdminOrMod || selfPost)) {
+		post.uid = 0;
 
+		post.user = post.user || {};
+		post.user.uid = 0;
+		post.user.username = 'Anonymous';
+		post.user.displayname = 'Anonymous';
+		post.user.userslug = null;
+		post.user.picture = null; //or generic avatar
+	}
 	return post;
 };
 
