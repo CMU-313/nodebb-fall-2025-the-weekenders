@@ -44,6 +44,12 @@
 					</div>
 
 					<a class="fw-bold text-nowrap text-truncate" href="{{{ if ./user.userslug }}}{config.relative_path}/user/{./user.userslug}{{{ else }}}#{{{ end }}}" data-username="{posts.user.username}" data-uid="{posts.user.uid}">{posts.user.displayname}</a>
+					{{{ if posts.user.helpfulnessScore }}}
+					<span class="helpfulness-badge badge bg-primary-subtle text-primary text-xs fw-semibold ms-1" title="[[user:helpfulness-title, {txEscape(formattedNumber(posts.user.helpfulnessScore))}]]">
+						<i class="fa-solid fa-thumbs-up"></i>
+						<span>{formattedNumber(posts.user.helpfulnessScore)}</span>
+					</span>
+					{{{ end }}}
 				</div>
 
 				{{{ each posts.user.selectedGroups }}}

@@ -85,6 +85,9 @@ get:
                                   type: number
                                 postcount:
                                   type: number
+                                helpfulnessScore:
+                                  type: number
+                                  description: Aggregated helpfulness score, based on current upvotes received on the user's posts.
                                 picture:
                                   nullable: true
                                   type: string
@@ -115,6 +118,7 @@ get:
                                 - userslug
                                 - reputation
                                 - postcount
+                                - helpfulnessScore
                                 - picture
                                 - signature
                                 - banned

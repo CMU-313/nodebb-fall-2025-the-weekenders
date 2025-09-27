@@ -78,6 +78,10 @@ TopicObject:
               example: "#f44336"
             banned_until_readable:
               type: string
+            helpfulnessScore:
+              type: number
+              description: Aggregated helpfulness score, based on current upvotes received on the user's posts.
+              example: 12
           required:
             - uid
             - username

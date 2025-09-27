@@ -57,6 +57,9 @@ get:
                           type: number
                         reputation:
                           type: number
+                        helpfulnessScore:
+                          type: number
+                          description: Aggregated helpfulness score, based on current upvotes received on the user's posts.
                         email:confirmed:
                           type: number
                           description: Whether the user has confirmed their email address or not

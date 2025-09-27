@@ -7,6 +7,8 @@
 	<a class="btn btn-ghost btn-sm ff-secondary fw-semibold" href="{config.relative_path}/users?section=sort-reputation">[[users:most-reputation]]</a>
 	{{{ end }}}
 
+	<a class="btn btn-ghost btn-sm ff-secondary fw-semibold" href="{config.relative_path}/users?section=sort-helpfulness">[[users:most-helpful]]</a>
+
 	{{{ if isAdminOrGlobalMod }}}
 	<a class="btn btn-ghost btn-sm ff-secondary fw-semibold" href="{config.relative_path}/users?section=flagged">[[users:most-flags]]</a>
 

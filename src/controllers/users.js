@@ -23,6 +23,7 @@ usersController.index = async function (req, res, next) {
 		online: usersController.getOnlineUsers,
 		'sort-posts': usersController.getUsersSortedByPosts,
 		'sort-reputation': usersController.getUsersSortedByReputation,
+		'sort-helpfulness': usersController.getUsersSortedByHelpfulness,
 		banned: usersController.getBannedUsers,
 		flagged: usersController.getFlaggedUsers,
 	};
@@ -80,6 +81,10 @@ usersController.getUsersSortedByReputation = async function (req, res, next) {
 	await usersController.renderUsersPage('users:reputation', req, res);
 };
 
+usersController.getUsersSortedByHelpfulness = async function (req, res) {
+	await usersController.renderUsersPage('users:helpfulness', req, res);
+};
+
 usersController.getUsersSortedByJoinDate = async function (req, res) {
 	await usersController.renderUsersPage('users:joindate', req, res);
 };
@@ -109,6 +114,7 @@ usersController.getUsers = async function (set, uid, query) {
 	const setToData = {
 		'users:postcount': { title: '[[pages:users/sort-posts]]', crumb: '[[users:top-posters]]' },
 		'users:reputation': { title: '[[pages:users/sort-reputation]]', crumb: '[[users:most-reputation]]' },
+		'users:helpfulness': { title: '[[pages:users/sort-helpfulness]]', crumb: '[[users:most-helpful]]' },
 		'users:joindate': { title: '[[pages:users/latest]]', crumb: '[[global:users]]' },
 		'users:online': { title: '[[pages:users/online]]', crumb: '[[global:online]]' },
 		'users:banned': { title: '[[pages:users/banned]]', crumb: '[[user:banned]]' },

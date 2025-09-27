@@ -32,7 +32,7 @@ module.exports = function (Posts) {
 		const tids = _.uniq(posts.map(p => p && p.tid));
 
 		const [users, topicsAndCategories] = await Promise.all([
-			user.getUsersFields(uids, ['uid', 'username', 'userslug', 'picture', 'status']),
+			user.getUsersFields(uids, ['uid', 'username', 'userslug', 'picture', 'status', 'helpfulnessScore']),
 			getTopicAndCategories(tids),
 		]);
 
@@ -51,6 +51,9 @@ module.exports = function (Posts) {
 			post.toPid = utils.isNumber(post.toPid) ? parseInt(post.toPid, 10) : post.toPid;
 
 			post.user = uidToUser[post.uid];
+			if (post.user && typeof post.user.helpfulnessScore === 'undefined') {
+				post.user.helpfulnessScore = 0;
+			}
 			Posts.overrideGuestHandle(post, post.handle);
 			post.handle = undefined;
 			post.topic = tidToTopic[post.tid];
