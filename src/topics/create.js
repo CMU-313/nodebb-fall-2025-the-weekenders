@@ -126,6 +126,7 @@ module.exports = function (Topics) {
 		postData.tid = tid;
 		postData.ip = data.req ? data.req.ip : null;
 		postData.isMain = true;
+		postData.isAnonymous = !!data.isAnonymous; 
 		postData = await posts.create(postData);
 		postData = await onNewPost(postData, data);
 
@@ -206,6 +207,7 @@ module.exports = function (Topics) {
 		}
 
 		data.ip = data.req ? data.req.ip : null;
+		data.isAnonymous = !!data.isAnonymous;
 		let postData = await posts.create(data);
 		postData = await onNewPost(postData, data);
 

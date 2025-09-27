@@ -35,7 +35,11 @@ Topics.create = async (req, res) => {
 Topics.reply = async (req, res) => {
 	const id = await lockPosting(req, '[[error:already-posting]]');
 	try {
-		const payload = await api.topics.reply(req, { ...req.body, tid: req.params.tid });
+		const payload = await api.topics.reply(req, {
+			...req.body, 
+			tid: req.params.tid,
+			isAnonymous: !!req.body.isAnonymous, // added
+		});
 		helpers.formatApiResponse(200, res, payload);
 	} finally {
 		await db.deleteObjectField('locks', id);

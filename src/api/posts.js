@@ -41,7 +41,14 @@ postsAPI.get = async function (caller, data) {
 	if (post.deleted && !(userPrivilege.isAdminOrMod || selfPost)) {
 		post.content = '[[topic:post-is-deleted]]';
 	}
+	if (post.isAnonymous && !(userPrivilege.isAdminOrMod || selfPost)) {
+		post.uid = 0;
 
+		post.user = post.user || {};
+		post.user = { uid: 0, username: 'Anonymous', displayname: 'Anonymous' };
+		delete post.userslug;
+		delete post.picture;
+	}
 	return post;
 };
 
@@ -118,6 +125,10 @@ postsAPI.edit = async function (caller, data) {
 	data.uid = caller.uid;
 	data.req = apiHelpers.buildReqObject(caller);
 	data.timestamp = parseInt(data.timestamp, 10) || Date.now();
+
+	if (Object.prototype.hasOwnProperty.call(data, 'isAnonymous')) {
+		data.isAnonymous = !!data.isAnonymous;
+	}
 
 	const editResult = await posts.edit(data);
 	if (editResult.topic.isMainPost) {
