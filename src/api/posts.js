@@ -19,8 +19,6 @@ const websockets = require('../socket.io');
 const socketHelpers = require('../socket.io/helpers');
 const translator = require('../translator');
 const notifications = require('../notifications');
-const privileges = require('../privileges');
-const posts = require('../posts');
 const endorsing = require('../posts/endorse');
 
 
@@ -389,9 +387,7 @@ postsAPI.unendorse = async function (caller, data) {
 	if (!post || !p || !p.moderate) return null;
 
 	return endorsing.unendorse(pid);
-}
-
-
+};
 
 
 postsAPI.getVoters = async function (caller, data) {
