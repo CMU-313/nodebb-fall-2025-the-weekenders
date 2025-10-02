@@ -5,6 +5,7 @@ const express = require('express');
 const uploadsController = require('../controllers/uploads');
 const helpers = require('./helpers');
 const usersAPI = require('../api/users');
+const postsAPI = require('../api/posts');
 
 module.exports = function (app, middleware, controllers) {
 	const middlewares = [middleware.autoLocale, middleware.authenticateRequest];
@@ -45,4 +46,19 @@ module.exports = function (app, middleware, controllers) {
 		middleware.canViewUsers,
 		middleware.checkAccountPermissions,
 	], helpers.tryRoute(controllers.accounts.edit.uploadPicture));
+
+	// Endorse / Unendorse a post
+	router.post('/post/:pid/endorse', [
+		...middlewares,
+		middleware.ensureLoggedIn,
+		middleware.applyCSRF,
+	], helpers.tryRoute(postsAPI.endorse));
+
+	router.post('/post/:pid/unendorse', [
+		...middlewares,
+		middleware.ensureLoggedIn,
+		middleware.applyCSRF,
+	], helpers.tryRoute(postsAPI.unendorse));
+
+
 };
