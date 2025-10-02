@@ -19,6 +19,10 @@ const websockets = require('../socket.io');
 const socketHelpers = require('../socket.io/helpers');
 const translator = require('../translator');
 const notifications = require('../notifications');
+const privileges = require('../privileges');
+const posts = require('../posts');
+const endorsing = require('../posts/endorse');
+
 
 const postsAPI = module.exports;
 
@@ -354,6 +358,41 @@ postsAPI.downvote = async function (caller, data) {
 postsAPI.unvote = async function (caller, data) {
 	return await apiHelpers.postCommand(caller, 'unvote', 'voted', '', data);
 };
+
+// Endorse a post (staff only)
+postsAPI.endorse = async function (caller, data) {
+	const pid = parseInt(data?.params?.pid || data.pid, 10);
+	if (!Number.isInteger(pid)) return null;
+
+	const [userPrivs, post] = await Promise.all([
+		privileges.posts.get([pid], caller.uid),
+		posts.getPostData(pid),
+	]);
+
+	const p = userPrivs && userPrivs[0];
+	if (!post || !p || !p.moderate) return null;
+	
+	return endorsing.endorse(pid);
+};
+
+// Remove endorsement (staff only)
+postsAPI.unendorse = async function (caller, data) {
+	const pid = parseInt(data?.params?.pid || data.pid, 10);
+	if (!Number.isInteger(pid)) return null;
+
+	const [userPrivs, post] = await Promise.all([
+		privileges.posts.get([pid], caller.uid),
+		posts.getPostData(pid),
+	]);
+
+	const p = userPrivs && userPrivs[0];
+	if (!post || !p || !p.moderate) return null;
+
+	return endorsing.unendorse(pid);
+}
+
+
+
 
 postsAPI.getVoters = async function (caller, data) {
 	if (!data || !data.pid) {
