@@ -50,12 +50,14 @@ module.exports = function (app, middleware, controllers) {
 	// Endorse / Unendorse a post
 	router.post('/post/:pid/endorse', [
 		...middlewares,
+		middleware.exposeUid,
 		middleware.ensureLoggedIn,
 		middleware.applyCSRF,
 	], helpers.tryRoute(postsAPI.endorse));
 
 	router.post('/post/:pid/unendorse', [
 		...middlewares,
+		middleware.exposeUid,
 		middleware.ensureLoggedIn,
 		middleware.applyCSRF,
 	], helpers.tryRoute(postsAPI.unendorse));
