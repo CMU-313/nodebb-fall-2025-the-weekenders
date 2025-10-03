@@ -358,48 +358,74 @@ postsAPI.unvote = async function (caller, data) {
 };
 
 // Endorse a post (staff/admin only)
-postsAPI.endorse = async function (req, res) {
-	const pid = parseInt(req.params.pid, 10);
-	const uid = req.uid || res.locals?.uid || req.user?.uid || 0;
-	if (!Number.isInteger(pid)) return res.status(400).json({ error: 'invalid-pid' });
-
-	const [[priv], post, isAdmin, isGlobalMod] = await Promise.all([
-		privileges.posts.get([pid], uid),
+postsAPI.endorse = async function (caller, data) {
+	if (!data || !data.pid) {
+		throw new Error('[[error:invalid-data]]');
+	}
+	
+	const { pid } = data;
+	const [post, isAdmin, isGlobalMod] = await Promise.all([
 		posts.getPostData(pid),
-		user.isAdministrator(uid),
-		user.isGlobalModerator(uid),
+		user.isAdministrator(caller.uid),
+		user.isGlobalModerator(caller.uid),
 	]);
 
-	if (!post) return res.status(404).json({ error: 'post-not-found' });
+	if (!post) {
+		throw new Error('[[error:no-post]]');
+	}
 
-	const allowed = isAdmin || isGlobalMod || (priv && priv.moderate);
-	if (!allowed) return res.status(403).json({ error: 'forbidden' });
+	// Check if user has permission (admin or global mod)
+	const allowed = isAdmin || isGlobalMod;
+	if (!allowed) {
+		throw new Error('[[error:no-privileges]]');
+	}
 
 	const result = await endorsing.endorse(pid);
-	return res.json(result);
+	
+	// Emit socket event to update the topic view
+	const tid = await posts.getPostField(pid, 'tid');
+	websockets.in(`topic_${tid}`).emit('event:post_endorsed', {
+		pid: pid,
+		endorsed: true,
+		endorsed_at: result.endorsed_at,
+	});
+
+	return result;
 };
 
 
 // Remove endorsement (staff/admin only)
-postsAPI.unendorse = async function (req, res) {
-	const pid = parseInt(req.params.pid, 10);
-	const uid = req.uid || res.locals?.uid || req.user?.uid || 0;
-	if (!Number.isInteger(pid)) return res.status(400).json({ error: 'invalid-pid' });
-
-	const [[priv], post, isAdmin, isGlobalMod] = await Promise.all([
-		privileges.posts.get([pid], uid),
+postsAPI.unendorse = async function (caller, data) {
+	if (!data || !data.pid) {
+		throw new Error('[[error:invalid-data]]');
+	}
+	
+	const { pid } = data;
+	const [post, isAdmin, isGlobalMod] = await Promise.all([
 		posts.getPostData(pid),
-		user.isAdministrator(uid),
-		user.isGlobalModerator(uid),
+		user.isAdministrator(caller.uid),
+		user.isGlobalModerator(caller.uid),
 	]);
 
-	if (!post) return res.status(404).json({ error: 'post-not-found' });
+	if (!post) {
+		throw new Error('[[error:no-post]]');
+	}
 
-	const allowed = isAdmin || isGlobalMod || (priv && priv.moderate);
-	if (!allowed) return res.status(403).json({ error: 'forbidden' });
+	// Check if user has permission 
+	const allowed = isAdmin || isGlobalMod;
+	if (!allowed) {
+		throw new Error('[[error:no-privileges]]');
+	}
 
 	const result = await endorsing.unendorse(pid);
-	return res.json(result);
+	
+	const tid = await posts.getPostField(pid, 'tid');
+	websockets.in(`topic_${tid}`).emit('event:post_unendorsed', {
+		pid: pid,
+		endorsed: false,
+	});
+
+	return result;
 };
 
 
