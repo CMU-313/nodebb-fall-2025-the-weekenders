@@ -357,36 +357,49 @@ postsAPI.unvote = async function (caller, data) {
 	return await apiHelpers.postCommand(caller, 'unvote', 'voted', '', data);
 };
 
-// Endorse a post (staff only)
-postsAPI.endorse = async function (caller, data) {
-	const pid = parseInt(data?.params?.pid || data.pid, 10);
-	if (!Number.isInteger(pid)) return null;
+// Endorse a post (staff/admin only)
+postsAPI.endorse = async function (req, res) {
+	const pid = parseInt(req.params.pid, 10);
+	const uid = req.uid || res.locals?.uid || req.user?.uid || 0;
+	if (!Number.isInteger(pid)) return res.status(400).json({ error: 'invalid-pid' });
 
-	const [userPrivs, post] = await Promise.all([
-		privileges.posts.get([pid], caller.uid),
+	const [[priv], post, isAdmin, isGlobalMod] = await Promise.all([
+		privileges.posts.get([pid], uid),
 		posts.getPostData(pid),
+		user.isAdministrator(uid),
+		user.isGlobalModerator(uid),
 	]);
 
-	const p = userPrivs && userPrivs[0];
-	if (!post || !p || !p.moderate) return null;
-	
-	return endorsing.endorse(pid);
+	if (!post) return res.status(404).json({ error: 'post-not-found' });
+
+	const allowed = isAdmin || isGlobalMod || (priv && priv.moderate);
+	if (!allowed) return res.status(403).json({ error: 'forbidden' });
+
+	const result = await endorsing.endorse(pid);
+	return res.json(result);
 };
 
-// Remove endorsement (staff only)
-postsAPI.unendorse = async function (caller, data) {
-	const pid = parseInt(data?.params?.pid || data.pid, 10);
-	if (!Number.isInteger(pid)) return null;
 
-	const [userPrivs, post] = await Promise.all([
-		privileges.posts.get([pid], caller.uid),
+// Remove endorsement (staff/admin only)
+postsAPI.unendorse = async function (req, res) {
+	const pid = parseInt(req.params.pid, 10);
+	const uid = req.uid || res.locals?.uid || req.user?.uid || 0;
+	if (!Number.isInteger(pid)) return res.status(400).json({ error: 'invalid-pid' });
+
+	const [[priv], post, isAdmin, isGlobalMod] = await Promise.all([
+		privileges.posts.get([pid], uid),
 		posts.getPostData(pid),
+		user.isAdministrator(uid),
+		user.isGlobalModerator(uid),
 	]);
 
-	const p = userPrivs && userPrivs[0];
-	if (!post || !p || !p.moderate) return null;
+	if (!post) return res.status(404).json({ error: 'post-not-found' });
 
-	return endorsing.unendorse(pid);
+	const allowed = isAdmin || isGlobalMod || (priv && priv.moderate);
+	if (!allowed) return res.status(403).json({ error: 'forbidden' });
+
+	const result = await endorsing.unendorse(pid);
+	return res.json(result);
 };
 
 
