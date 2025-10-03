@@ -7,7 +7,7 @@ const utils = require('../utils');
 const intFields = [
 	'uid', 'pid', 'tid', 'deleted', 'timestamp',
 	'upvotes', 'downvotes', 'deleterUid', 'edited',
-	'replies', 'bookmarks', 'announces', 'endorse', 'endorsed_at',
+	'replies', 'bookmarks', 'announces', 'endorsed', 'endorsed_at', 'endorsed_rank',
 ];
 
 module.exports = function (Posts) {
@@ -72,6 +72,10 @@ function modifyPost(post, fields) {
 		}
 
 		if (post.hasOwnProperty('isAnonymous')) post.isAnonymous = !!post.isAnonymous;
-		if (post.hasOwnProperty('endorsed')) post.endorsed = !!post.endorsed;
+		
+		// Always include endorsement fields with defaults
+		post.endorsed = post.hasOwnProperty('endorsed') ? !!post.endorsed : false;
+		post.endorsed_at = post.endorsed_at || null;
+		post.endorsed_rank = post.endorsed_rank || null;
 	}
 }
