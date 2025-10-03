@@ -7,7 +7,7 @@ const utils = require('../utils');
 const intFields = [
 	'uid', 'pid', 'tid', 'deleted', 'timestamp',
 	'upvotes', 'downvotes', 'deleterUid', 'edited',
-	'replies', 'bookmarks', 'announces',
+	'replies', 'bookmarks', 'announces', 'endorse', 'endorsed_at',
 ];
 
 module.exports = function (Posts) {
@@ -72,5 +72,6 @@ function modifyPost(post, fields) {
 		}
 
 		if (post.hasOwnProperty('isAnonymous')) post.isAnonymous = !!post.isAnonymous;
+		if (post.hasOwnProperty('endorsed')) post.endorsed = !!post.endorsed;
 	}
 }
