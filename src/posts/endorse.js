@@ -1,6 +1,7 @@
 'use strict';
 
 const db = require('../database');
+const utils = require('../utils');
 
 // Endorse a post by setting an endorsed flag and timestamp
 async function endorse(pid) {
@@ -15,7 +16,7 @@ async function endorse(pid) {
 	return {
 		pid: Number(pid),
 		endorsed: true,
-		endorsed_at: endorsedAt,
+		endorsed_at: utils.toISOString(endorsedAt),
 	};
 }
 
