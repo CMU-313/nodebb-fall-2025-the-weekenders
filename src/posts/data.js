@@ -67,6 +67,7 @@ function modifyPost(post, fields) {
 		if (post.hasOwnProperty('edited')) {
 			post.editedISO = post.edited !== 0 ? utils.toISOString(post.edited) : '';
 		}
+		
 		if (!fields.length || fields.includes('attachments')) {
 			post.attachments = (post.attachments || '').split(',').filter(Boolean);
 		}
@@ -77,5 +78,6 @@ function modifyPost(post, fields) {
 		post.endorsed = post.hasOwnProperty('endorsed') ? !!post.endorsed : false;
 		post.endorsed_at = post.endorsed_at || null;
 		post.endorsed_rank = post.endorsed_rank || null;
+		post.endorsed_atISO = (post.endorsed_at && utils.toISOString(post.endorsed_at)) || null;
 	}
 }

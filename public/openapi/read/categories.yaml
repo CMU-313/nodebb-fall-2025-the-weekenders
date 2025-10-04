@@ -97,6 +97,10 @@ get:
                                               type: number
                                               description: Rank/order of endorsement for sorting multiple endorsements.
                                               nullable: true
+                                            endorsed_atISO:
+                                              type: string
+                                              description: An ISO 8601 formatted date string for when post was endorsed
+                                              nullable: true
                                             user:
                                               type: object
                                               properties:
@@ -171,6 +175,10 @@ get:
                                   endorsed_rank:
                                     type: number
                                     description: Rank/order of endorsement for sorting multiple endorsements.
+                                    nullable: true
+                                  endorsed_atISO:
+                                    type: string
+                                    description: An ISO 8601 formatted date string for when post was endorsed
                                     nullable: true
                                   user:
                                     type: object

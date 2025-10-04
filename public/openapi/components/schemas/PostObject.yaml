@@ -173,6 +173,10 @@ PostObject:
       type: number
       description: Rank/order of endorsement for sorting multiple endorsements.
       nullable: true
+    endorsed_atISO:
+      type: string
+      description: An ISO 8601 formatted date string (complementing `endorsed_at`)
+      nullable: true
 PostDataObject:
   description: The output as returned from `Posts.getPostsData`
   allOf:
@@ -404,6 +408,10 @@ PostDataObject:
         endorsed_rank:
           type: number
           description: Rank/order of endorsement for sorting multiple endorsements.
+          nullable: true
+        endorsed_atISO:
+          type: string
+          description: An ISO 8601 formatted date string (complementing `endorsed_at`)
           nullable: true
     - type: object
       description: Optional properties that may or may not be present (except for `pid`, which is always present, and is only here as a hack to pass validation)
