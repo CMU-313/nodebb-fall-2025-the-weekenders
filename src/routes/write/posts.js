@@ -54,7 +54,6 @@ module.exports = function () {
 	setupApiRoute(router, 'delete', '/:pid/bookmark', middlewares, controllers.write.posts.unbookmark);
 	setupApiRoute(router, 'put', '/:pid/endorse', middlewares, controllers.write.posts.endorse);
 	setupApiRoute(router, 'delete', '/:pid/endorse', middlewares, controllers.write.posts.unendorse);
-	console.log('ENDORSE ROUTES REGISTERED');
 
 	setupApiRoute(router, 'get', '/:pid/diffs', [middleware.assert.post], controllers.write.posts.getDiffs);
 	setupApiRoute(router, 'get', '/:pid/diffs/:since', [middleware.assert.post], controllers.write.posts.loadDiff);
