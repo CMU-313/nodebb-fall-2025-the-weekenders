@@ -85,6 +85,18 @@ get:
                                             timestampISO:
                                               type: string
                                               description: An ISO 8601 formatted date string (complementing `timestamp`)
+                                            endorsed:
+                                              type: boolean
+                                              description: Whether or not this post has been endorsed by a moderator or administrator.
+                                              nullable: true
+                                            endorsed_at:
+                                              type: number
+                                              description: A UNIX timestamp representing the moment this post was endorsed.
+                                              nullable: true
+                                            endorsed_rank:
+                                              type: number
+                                              description: Rank/order of endorsement for sorting multiple endorsements.
+                                              nullable: true
                                             user:
                                               type: object
                                               properties:
@@ -148,6 +160,18 @@ get:
                                   timestampISO:
                                     type: string
                                     description: An ISO 8601 formatted date string (complementing `timestamp`)
+                                  endorsed:
+                                    type: boolean
+                                    description: Whether or not this post has been endorsed by a moderator or administrator.
+                                    nullable: true
+                                  endorsed_at:
+                                    type: number
+                                    description: A UNIX timestamp representing the moment this post was endorsed.
+                                    nullable: true
+                                  endorsed_rank:
+                                    type: number
+                                    description: Rank/order of endorsement for sorting multiple endorsements.
+                                    nullable: true
                                   user:
                                     type: object
                                     properties:
