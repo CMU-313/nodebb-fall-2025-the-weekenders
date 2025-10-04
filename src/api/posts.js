@@ -19,7 +19,6 @@ const websockets = require('../socket.io');
 const socketHelpers = require('../socket.io/helpers');
 const translator = require('../translator');
 const notifications = require('../notifications');
-const endorsing = require('../posts/endorse');
 
 
 const postsAPI = module.exports;
@@ -380,7 +379,7 @@ postsAPI.endorse = async function (caller, data) {
 		throw new Error('[[error:no-privileges]]');
 	}
 
-	const result = await endorsing.endorse(pid);
+	const result = await posts.endorse(pid);
 	
 	// Emit socket event to update the topic view
 	const tid = await posts.getPostField(pid, 'tid');
@@ -417,7 +416,7 @@ postsAPI.unendorse = async function (caller, data) {
 		throw new Error('[[error:no-privileges]]');
 	}
 
-	const result = await endorsing.unendorse(pid);
+	const result = await posts.unendorse(pid);
 	
 	const tid = await posts.getPostField(pid, 'tid');
 	websockets.in(`topic_${tid}`).emit('event:post_unendorsed', {
