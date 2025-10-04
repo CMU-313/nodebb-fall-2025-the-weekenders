@@ -161,6 +161,18 @@ PostObject:
       type: boolean
     replies:
       type: number
+    endorsed:
+      type: boolean
+      description: Whether or not this post has been endorsed by a moderator or administrator.
+      nullable: true
+    endorsed_at:
+      type: number
+      description: A UNIX timestamp representing the moment this post was endorsed.
+      nullable: true
+    endorsed_rank:
+      type: number
+      description: Rank/order of endorsement for sorting multiple endorsements.
+      nullable: true
 PostDataObject:
   description: The output as returned from `Posts.getPostsData`
   allOf:
@@ -381,6 +393,18 @@ PostDataObject:
         flagId:
           type: number
           description: The flag identifier, if this particular post has been flagged before
+        endorsed:
+          type: boolean
+          description: Whether or not this post has been endorsed by a moderator or administrator.
+          nullable: true
+        endorsed_at:
+          type: number
+          description: A UNIX timestamp representing the moment this post was endorsed.
+          nullable: true
+        endorsed_rank:
+          type: number
+          description: Rank/order of endorsement for sorting multiple endorsements.
+          nullable: true
     - type: object
       description: Optional properties that may or may not be present (except for `pid`, which is always present, and is only here as a hack to pass validation)
       properties:
