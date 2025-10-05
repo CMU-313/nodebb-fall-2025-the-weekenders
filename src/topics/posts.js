@@ -13,6 +13,7 @@ const activitypub = require('../activitypub');
 const plugins = require('../plugins');
 const utils = require('../utils');
 const privileges = require('../privileges');
+const { applyAnonymousMask } = require('./anonymous');
 
 const backlinkRegex = new RegExp(`(?:${nconf.get('url').replace('/', '\\/')}|\b|\\s)\\/topic\\/(\\d+)(?:\\/\\w+)?`, 'g');
 
@@ -176,17 +177,7 @@ module.exports = function (Topics) {
 
 				posts.modifyPostByPrivilege(post, topicPrivileges);
 
-				const isStaff = !!topicPrivileges.isAdminOrMod;
-				const isSelf = !!post.selfPost || (parseInt(topicPrivileges.uid, 10) === parseInt(post.uid, 10));
-
-				if (post.isAnonymous && !(isStaff || isSelf)) {
-					post.uid = 0;
-
-					post.user = post.user || {};
-					post.user = { uid: 0, username: 'Anonymous', displayname: 'Anonymous' };
-					delete post.userslug;
-					delete post.picture;
-				}
+				applyAnonymousMask(post, topicPrivileges.uid, !!topicPrivileges.isAdminOrMod);
 			}
 		});
 	};

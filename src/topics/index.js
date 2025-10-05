@@ -13,6 +13,7 @@ const categories = require('../categories');
 const activitypub = require('../activitypub');
 const privileges = require('../privileges');
 const social = require('../social');
+const { applyAnonymousMask, toBoolean } = require('./anonymous');
 
 const Topics = module.exports;
 
@@ -76,11 +77,28 @@ Topics.getTopicsByTids = async function (tids, options) {
 		const cids = _.uniq(topics
 			.map(t => t && t.cid && t.cid.toString()));
 		const guestTopics = topics.filter(t => t && t.uid === 0);
+ 		const mainPids = topics
+			.map(t => t && t.mainPid)
+			.filter(pid => utils.isNumber(pid));
 
 		async function loadGuestHandles() {
 			const mainPids = guestTopics.map(t => t.mainPid);
 			const postData = await posts.getPostsFields(mainPids, ['handle']);
 			return postData.map(p => p.handle);
+		}
+
+		async function loadMainAnonMap() {
+			if (!mainPids.length) {
+				return {};
+			}
+			const postData = await posts.getPostsFields(mainPids, ['pid', 'isAnonymous']);
+			const map = {};
+			postData.forEach((post) => {
+				if (post && post.pid) {
+					map[post.pid] = post.isAnonymous;
+				}
+			});
+			return map;
 		}
 
 		async function loadShowfullnameSettings() {
@@ -94,13 +112,14 @@ Topics.getTopicsByTids = async function (tids, options) {
 			return data;
 		}
 
-		const [teasers, users, userSettings, categoriesData, guestHandles, thumbs] = await Promise.all([
+		const [teasers, users, userSettings, categoriesData, guestHandles, thumbs, mainAnonMap] = await Promise.all([
 			Topics.getTeasers(topics, options),
-			user.getUsersFields(uids, ['uid', 'username', 'fullname', 'userslug', 'reputation', 'helpfulnessScore', 'postcount', 'picture', 'signature', 'banned', 'status']),
+			user.getUsersFields(uids, ['uid', 'username', 'fullname', 'userslug', 'reputation', 'helpfulnessScore', 'postcount', 'picture', 'signature', 'banned', 'status', 'icon:bgColor', 'icon:text']),
 			loadShowfullnameSettings(),
 			categories.getCategoriesFields(cids, ['cid', 'name', 'slug', 'icon', 'backgroundImage', 'imageClass', 'bgColor', 'color', 'disabled']),
 			loadGuestHandles(),
 			Topics.thumbs.load(topics),
+			loadMainAnonMap(),
 		]);
 
 		users.forEach((userObj, idx) => {
@@ -117,15 +136,18 @@ Topics.getTopicsByTids = async function (tids, options) {
 			categoriesMap: _.zipObject(cids, categoriesData),
 			tidToGuestHandle: _.zipObject(guestTopics.map(t => t.tid), guestHandles),
 			thumbs,
+			mainAnonMap,
 		};
 	}
 
-	const [result, hasRead, followData, bookmarks, callerSettings] = await Promise.all([
+	const viewerUid = parseInt(uid, 10) || 0;
+	const [result, hasRead, followData, bookmarks, callerSettings, isStaffViewer] = await Promise.all([
 		loadTopics(),
 		Topics.hasReadTopics(tids, uid),
 		Topics.getFollowData(tids, uid),
 		Topics.getUserBookmarks(tids, uid),
 		user.getSettings(uid),
+		viewerUid > 0 ? user.isPrivileged(viewerUid) : false,
 	]);
 
 	const sortNewToOld = callerSettings.topicPostSort === 'newest_to_oldest';
@@ -133,8 +155,20 @@ Topics.getTopicsByTids = async function (tids, options) {
 		if (topic) {
 			topic.thumbs = result.thumbs[i];
 			topic.category = result.categoriesMap[topic.cid];
-			topic.user = topic.uid ? result.usersMap[topic.uid] : { ...result.usersMap[topic.uid] };
-			if (result.tidToGuestHandle[topic.tid]) {
+			const baseUser = result.usersMap[topic.uid];
+			topic.user = topic.uid ? baseUser : (baseUser ? { ...baseUser } : baseUser);
+			const topicForMask = {
+				uid: topic.uid,
+				user: topic.user,
+				isAnonymous: result.mainAnonMap[topic.mainPid],
+			};
+			applyAnonymousMask(topicForMask, uid, !!isStaffViewer);
+			topic.uid = topicForMask.uid;
+			topic.user = topicForMask.user;
+			topic['icon:bgColor'] = topic.user ? topic.user['icon:bgColor'] : undefined;
+			topic['icon:text'] = topic.user ? topic.user['icon:text'] : undefined;
+			const topicIsAnonymous = toBoolean(result.mainAnonMap[topic.mainPid]);
+			if (!topicIsAnonymous && result.tidToGuestHandle[topic.tid] && topic.user) {
 				topic.user.username = validator.escape(result.tidToGuestHandle[topic.tid]);
 				topic.user.displayname = topic.user.username;
 			}

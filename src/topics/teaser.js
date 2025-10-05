@@ -9,6 +9,7 @@ const user = require('../user');
 const posts = require('../posts');
 const plugins = require('../plugins');
 const utils = require('../utils');
+const { applyAnonymousMask } = require('./anonymous');
 
 module.exports = function (Topics) {
 	Topics.getTeasers = async function (topics, options) {
@@ -42,16 +43,17 @@ module.exports = function (Topics) {
 			}
 		});
 
-		const [allPostData, callerSettings] = await Promise.all([
-			posts.getPostsFields(teaserPids, ['pid', 'uid', 'timestamp', 'tid', 'content', 'sourceContent']),
+		const [allPostData, callerSettings, isStaffViewer] = await Promise.all([
+			posts.getPostsFields(teaserPids, ['pid', 'uid', 'timestamp', 'tid', 'content', 'sourceContent', 'isAnonymous']),
 			user.getSettings(uid),
+			uid ? user.isPrivileged(uid) : false,
 		]);
 		let postData = allPostData.filter(post => post && post.pid);
 		postData = await handleBlocks(uid, postData);
 		postData = postData.filter(Boolean);
 		const uids = _.uniq(postData.map(post => post.uid));
 		const sortNewToOld = callerSettings.topicPostSort === 'newest_to_oldest';
-		const usersData = await user.getUsersFields(uids, ['uid', 'username', 'userslug', 'picture']);
+		const usersData = await user.getUsersFields(uids, ['uid', 'username', 'userslug', 'picture', 'icon:bgColor', 'icon:text']);
 
 		const users = {};
 		usersData.forEach((user) => {
@@ -65,6 +67,10 @@ module.exports = function (Topics) {
 			}
 
 			post.user = users[post.uid];
+			applyAnonymousMask(post, uid, !!isStaffViewer);
+			if (post.user && post.user.uid === 0) {
+				delete post.user.userslug;
+			}
 			post.timestampISO = utils.toISOString(post.timestamp);
 			tidToPost[post.tid] = post;
 		});
