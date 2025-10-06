@@ -77,7 +77,7 @@ Topics.getTopicsByTids = async function (tids, options) {
 		const cids = _.uniq(topics
 			.map(t => t && t.cid && t.cid.toString()));
 		const guestTopics = topics.filter(t => t && t.uid === 0);
- 		const mainPids = topics
+		const mainPids = topics
 			.map(t => t && t.mainPid)
 			.filter(pid => utils.isNumber(pid));
 
