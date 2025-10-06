@@ -80,6 +80,9 @@ get:
                                             timestampISO:
                                               type: string
                                               description: An ISO 8601 formatted date string (complementing `timestamp`)
+                                            isAnonymous:
+                                              type: boolean
+                                              description: Whether the post author is hidden from non-staff viewers.
                                             user:
                                               type: object
                                               properties:
@@ -150,6 +153,9 @@ get:
                                   timestampISO:
                                     type: string
                                     description: An ISO 8601 formatted date string (complementing `timestamp`)
+                                  isAnonymous:
+                                    type: boolean
+                                    description: Whether the post author is hidden from non-staff viewers.
                                   user:
                                     type: object
                                     properties:

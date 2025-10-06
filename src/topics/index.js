@@ -121,6 +121,13 @@ Topics.getTopicsByTids = async function (tids, options) {
 			Topics.thumbs.load(topics),
 			loadMainAnonMap(),
 		]);
+		// DEBUG: log maps used for anonymous masking
+		try {
+			console.error('[DEBUG] Topics.getTopicsByTids - mainAnonMap:', JSON.stringify(mainAnonMap));
+			console.error('[DEBUG] Topics.getTopicsByTids - tidToGuestHandle:', JSON.stringify(_.zipObject(guestTopics.map(t => t.tid), guestHandles)));
+		} catch (err) {
+			console.error('[DEBUG] Topics.getTopicsByTids - logging error', err && err.stack ? err.stack : err);
+		}
 
 		users.forEach((userObj, idx) => {
 			// Hide fullname if needed
@@ -173,7 +180,8 @@ Topics.getTopicsByTids = async function (tids, options) {
 				topic.user.displayname = topic.user.username;
 			}
 			topic.teaser = result.teasers[i] || null;
-			topic.isOwner = topic.uid === parseInt(uid, 10);
+			// Only consider viewer as owner if viewer is a logged-in user (uid > 0)
+			topic.isOwner = viewerUid > 0 && topic.uid === viewerUid;
 			topic.ignored = followData[i].ignoring;
 			topic.followed = followData[i].following;
 			topic.unread = parseInt(uid, 10) <= 0 || (!hasRead[i] && !topic.ignored);

@@ -71,6 +71,9 @@ function modifyPost(post, fields) {
 			post.attachments = (post.attachments || '').split(',').filter(Boolean);
 		}
 
-		if (post.hasOwnProperty('isAnonymous')) post.isAnonymous = !!post.isAnonymous;
+		if (post.hasOwnProperty('isAnonymous')) {
+			const v = post.isAnonymous;
+			post.isAnonymous = (v === true || v === 1 || v === '1' || v === 'true');
+		}
 	}
 }

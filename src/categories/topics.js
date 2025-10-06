@@ -162,12 +162,16 @@ module.exports = function (Categories) {
 	};
 
 	Categories.modifyTopicsByPrivilege = function (topics, privileges) {
+		// No-op if topics not an array, or viewer can view deleted topics
 		if (!Array.isArray(topics) || !topics.length || privileges.view_deleted) {
 			return;
 		}
 
 		topics.forEach((topic) => {
-			if (!topic.scheduled && topic.deleted && !topic.isOwner) {
+			// ...existing code...
+			// Coerce isOwner to boolean to avoid edge cases where it's a string/number
+			const isOwner = !!topic.isOwner;
+			if (!topic.scheduled && topic.deleted && !isOwner) {
 				topic.title = '[[topic:topic-is-deleted]]';
 				if (topic.hasOwnProperty('titleRaw')) {
 					topic.titleRaw = '[[topic:topic-is-deleted]]';

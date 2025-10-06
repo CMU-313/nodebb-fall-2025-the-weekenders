@@ -5,6 +5,14 @@ TopicObject:
       properties:
         lastposttime:
           type: number
+        'icon:bgColor':
+          type: string
+          description: A six-character hexadecimal colour code assigned to the topic's user icon (copied from the user)
+          example: "#f44336"
+        'icon:text':
+          type: string
+          description: A single-letter representation of the topic's user icon (copied from the user)
+          example: "D"
         category:
           type: object
           properties:
@@ -50,6 +58,7 @@ TopicObject:
               type: string
               description: An URL-safe variant of the username (i.e. lower-cased, spaces
                 removed, etc.)
+              nullable: true
             reputation:
               type: number
             postcount:
@@ -85,16 +94,8 @@ TopicObject:
           required:
             - uid
             - username
-            - userslug
-            - reputation
-            - postcount
-            - picture
-            - signature
-            - banned
-            - status
             - icon:text
             - icon:bgColor
-            - banned_until_readable
         teaser:
           type: object
           properties:
