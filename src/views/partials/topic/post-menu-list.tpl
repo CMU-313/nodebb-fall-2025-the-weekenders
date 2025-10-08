@@ -48,6 +48,25 @@
 </li>
 {{{ end }}}
 
+<!-- Endorse / Unendorse -->
+<li class="{{{ if posts.endorsed }}}hidden{{{ end }}}">
+	<a class="dropdown-item rounded-1 d-flex align-items-center gap-2"
+	   component="post/endorse" role="menuitem" href="#"
+	   data-pid="{posts.pid}">
+		<span class="menu-icon"><i class="fa fa-fw text-secondary fa-check-circle-o"></i></span>
+		Endorse
+	</a>
+</li>
+<li class="{{{ if !posts.endorsed }}}hidden{{{ end }}}">
+	<a class="dropdown-item rounded-1 d-flex align-items-center gap-2"
+	   component="post/unendorse" role="menuitem" href="#"
+	   data-pid="{posts.pid}">
+		<span class="menu-icon"><i class="fa fa-fw text-secondary fa-times-circle-o"></i></span>
+		Unendorse
+	</a>
+</li>
+
+
 {{{ if posts.ip }}}
 <li>
 	<a class="dropdown-item rounded-1 d-flex align-items-center gap-2" component="post/copy-ip" role="menuitem" href="#" data-clipboard-text="{posts.ip}">
