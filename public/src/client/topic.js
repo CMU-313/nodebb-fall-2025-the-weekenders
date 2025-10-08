@@ -56,6 +56,45 @@ define('forum/topic', [
 		threadTools.init(tid, $('.topic'));
 		events.init();
 
+		// Live updates for endorse/unendorse (no reload)
+		function onPostEndorsed(data) {
+			const $post = $('[component="topic"] [component="post"][data-pid="' + data.pid + '"]');
+			if (!$post.length) { return; }
+
+			// mark DOM so reorder function can read it
+			$post.attr('data-endorsed', '1').attr('data-endorsed-at', data.endorsed_at || Date.now());
+
+			// add badge if missing
+			if (!$post.find('[component="post/endorsed"]').length) {
+				$post.find('[component="post/content"]')
+					.prepend('<span component="post/endorsed" class="badge bg-success me-2 align-middle">Endorsed</span>');
+			}
+
+			reorderEndorsedPosts();
+		}
+
+		function onPostUnendorsed(data) {
+			const $post = $('[component="topic"] [component="post"][data-pid="' + data.pid + '"]');
+			if (!$post.length) { return; }
+
+			// clear markers and badge
+			$post.removeAttr('data-endorsed').removeAttr('data-endorsed-at');
+			$post.find('[component="post/endorsed"]').remove();
+
+			reorderEndorsedPosts();
+		}
+
+		// subscribe
+		socket.on('event:post_endorsed', onPostEndorsed);
+		socket.on('event:post_unendorsed', onPostUnendorsed);
+
+		// clean up on page change
+		$(window).one('action:ajaxify.cleanup', function () {
+			socket.off('event:post_endorsed', onPostEndorsed);
+			socket.off('event:post_unendorsed', onPostUnendorsed);
+		});
+
+
 		// show badges for posts already endorsed when page loads
 		renderEndorsedBadgesFromData();
 
