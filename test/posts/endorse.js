@@ -39,4 +39,12 @@ describe('Post Endorsement', () => {
 		assert(result.endorsed_at, 'should have timestamp');
 		assert.strictEqual(result.pid, Number(pid));
 	});
+
+	it('should unendorse a post', async () => {
+		await posts.endorse(pid); 
+		const result = await posts.unendorse(pid);
+
+		assert.strictEqual(result.endorsed, false);
+		assert.strictEqual(result.endorsed_at, null);
+	});
 });
