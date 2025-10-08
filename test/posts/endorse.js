@@ -41,7 +41,7 @@ describe('Post Endorsement', () => {
 	});
 
 	it('should unendorse a post', async () => {
-		await posts.endorse(pid); // ensure it's endorsed first
+		await posts.endorse(pid);
 		const result = await posts.unendorse(pid);
 
 		assert.strictEqual(result.endorsed, false);
@@ -58,14 +58,14 @@ describe('Post Endorsement', () => {
 	});
 
 	it('should allow admins to endorse posts', async () => {
-		await posts.unendorse(pid); // reset state
+		await posts.unendorse(pid); 
 		const result = await api.posts.endorse({ uid: adminUid }, { pid });
 
 		assert.strictEqual(result.endorsed, true);
 	});
 
 	it('should allow admins to unendorse posts', async () => {
-		await posts.endorse(pid); // ensure it's endorsed
+		await posts.endorse(pid); 
 		const result = await api.posts.unendorse({ uid: adminUid }, { pid });
 
 		assert.strictEqual(result.endorsed, false);
@@ -86,6 +86,15 @@ describe('Post Endorsement', () => {
 			assert.fail('Should have thrown error');
 		} catch (err) {
 			assert.strictEqual(err.message, '[[error:no-post]]');
+		}
+	});
+
+	it('should handle missing pid', async () => {
+		try {
+			await api.posts.endorse({ uid: adminUid }, {});
+			assert.fail('Should have thrown error');
+		} catch (err) {
+			assert.strictEqual(err.message, '[[error:invalid-data]]');
 		}
 	});
 });
