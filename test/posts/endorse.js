@@ -56,4 +56,11 @@ describe('Post Endorsement', () => {
 		assert(post.hasOwnProperty('endorsed_at'));
 		assert(post.hasOwnProperty('endorsed_atISO'));
 	});
+
+	it('should allow admins to endorse posts', async () => {
+		await posts.unendorse(pid);
+		const result = await api.posts.endorse({ uid: adminUid }, { pid });
+
+		assert.strictEqual(result.endorsed, true);
+	});
 });
