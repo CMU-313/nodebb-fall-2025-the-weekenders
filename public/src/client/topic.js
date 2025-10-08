@@ -499,7 +499,7 @@ define('forum/topic', [
 			$a.closest('li').addClass('hidden');
 			$a.closest('ul,.dropdown-menu').find('[component="post/unendorse"]').closest('li').removeClass('hidden');
 		}).fail(function () {
-			app.alertError('Could not endorse post.');
+			alerts.error('Could not endorse post.');
 		});
 	});
 
@@ -518,7 +518,7 @@ define('forum/topic', [
 			$a.closest('li').addClass('hidden');
 			$a.closest('ul,.dropdown-menu').find('[component="post/endorse"]').closest('li').removeClass('hidden');
 		}).fail(function () {
-			app.alertError('Could not unendorse post.');
+			alerts.error('Could not unendorse post.');
 		});
 	});
 
