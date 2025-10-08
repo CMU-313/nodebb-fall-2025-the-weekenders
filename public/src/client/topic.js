@@ -520,6 +520,25 @@ define('forum/topic', [
 		});
 	});
 
+	/* Realtime updates for Endorse / Unendorse */
+	if (window.socket && socket.on) {
+		socket.on('event:post_endorsed', function (data) {
+			var pid = data && data.pid;
+			if (!pid) { return; }
+			var $post = $('[component="post"][data-pid="' + pid + '"]');
+			$post.find('[component="post/endorse"]').closest('li').addClass('hidden');
+			$post.find('[component="post/unendorse"]').closest('li').removeClass('hidden');
+		});
+
+		socket.on('event:post_unendorsed', function (data) {
+			var pid = data && data.pid;
+			if (!pid) { return; }
+			var $post = $('[component="post"][data-pid="' + pid + '"]');
+			$post.find('[component="post/unendorse"]').closest('li').addClass('hidden');
+			$post.find('[component="post/endorse"]').closest('li').removeClass('hidden');
+		});
+	}
+
 
 	return Topic;
 });
