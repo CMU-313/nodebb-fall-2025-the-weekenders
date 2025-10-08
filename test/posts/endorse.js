@@ -58,9 +58,16 @@ describe('Post Endorsement', () => {
 	});
 
 	it('should allow admins to endorse posts', async () => {
-		await posts.unendorse(pid);
+		await posts.unendorse(pid); 
 		const result = await api.posts.endorse({ uid: adminUid }, { pid });
 
 		assert.strictEqual(result.endorsed, true);
+	});
+
+	it('should allow admins to unendorse posts', async () => {
+		await posts.endorse(pid); 
+		const result = await api.posts.unendorse({ uid: adminUid }, { pid });
+
+		assert.strictEqual(result.endorsed, false);
 	});
 });
