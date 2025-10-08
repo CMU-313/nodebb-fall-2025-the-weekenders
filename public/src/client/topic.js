@@ -489,7 +489,7 @@ define('forum/topic', [
 		var pid = $a.data('pid');
 		if (!pid) { return; }
 
-		api.put('/posts/' + pid + '/endorse').then(function () {
+		api.put('/v3/posts/' + pid + '/endorse').then(function () {
 			alerts.success('Post endorsed.');
 			// hide "Endorse", show "Unendorse" in the same dropdown
 			$a.closest('li').addClass('hidden');
@@ -505,12 +505,12 @@ define('forum/topic', [
 		var pid = $a.data('pid');
 		if (!pid) { return; }
 
-		api.del('/posts/' + pid + '/endorse').then(function () {
+		api.del('/v3/posts/' + pid + '/endorse').then(function () {
 			alerts.success('Post unendorsed.');
 			$a.closest('li').addClass('hidden');
 			$a.closest('ul,.dropdown-menu').find('[component="post/endorse"]').closest('li').removeClass('hidden');
 		}).catch(function (err) {
-			alerts.error('Could not unendorse post.');
+			alerts.error((err && err.message) || 'Could not unendorse post.');
 		});
 	});
 
