@@ -56,7 +56,29 @@ describe('User Helpfulness', () => {
 		
 		assert.strictEqual(newScore, 8); 
 		
-	
+		
+		const retrieved = await helpfulness.get(testUid);
+		assert.strictEqual(retrieved, 8);
+	});
+
+	it('should recompute helpfulness score from user\'s posts', async () => {
+		
+		const result2 = await topics.reply({
+			uid: testUid,
+			tid: topic.tid,
+			content: 'Another helpful post',
+		});
+		
+		
+		await db.setObjectField(`post:${pid}`, 'upvotes', 5);
+		await db.setObjectField(`post:${result2.pid}`, 'upvotes', 3);
+		
+		
+		const score = await helpfulness.recompute(testUid);
+		
+		assert.strictEqual(score, 8);
+		
+		
 		const retrieved = await helpfulness.get(testUid);
 		assert.strictEqual(retrieved, 8);
 	});
