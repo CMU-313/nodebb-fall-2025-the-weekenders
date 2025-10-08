@@ -489,17 +489,13 @@ define('forum/topic', [
 		var pid = $a.data('pid');
 		if (!pid) { return; }
 
-		$.ajax({
-			url: config.relative_path + '/api/v3/posts/' + pid + '/endorse',
-			type: 'PUT',
-			headers: { 'x-csrf-token': config.csrf_token },
-		}).done(function () {
+		api.put('/posts/' + pid + '/endorse').then(function () {
 			alerts.success('Post endorsed.');
 			// hide "Endorse", show "Unendorse" in the same dropdown
 			$a.closest('li').addClass('hidden');
 			$a.closest('ul,.dropdown-menu').find('[component="post/unendorse"]').closest('li').removeClass('hidden');
-		}).fail(function () {
-			alerts.error('Could not endorse post.');
+		}).catch(function (err) {
+			alerts.error((err && err.message) || 'Could not endorse post.');
 		});
 	});
 
@@ -509,15 +505,11 @@ define('forum/topic', [
 		var pid = $a.data('pid');
 		if (!pid) { return; }
 
-		$.ajax({
-			url: config.relative_path + '/api/v3/posts/' + pid + '/endorse',
-			type: 'DELETE',
-			headers: { 'x-csrf-token': config.csrf_token },
-		}).done(function () {
+		api.del('/posts/' + pid + '/endorse').then(function () {
 			alerts.success('Post unendorsed.');
 			$a.closest('li').addClass('hidden');
 			$a.closest('ul,.dropdown-menu').find('[component="post/endorse"]').closest('li').removeClass('hidden');
-		}).fail(function () {
+		}).catch(function (err) {
 			alerts.error('Could not unendorse post.');
 		});
 	});
