@@ -41,10 +41,19 @@ describe('Post Endorsement', () => {
 	});
 
 	it('should unendorse a post', async () => {
-		await posts.endorse(pid); 
+		await posts.endorse(pid); // ensure it's endorsed first
 		const result = await posts.unendorse(pid);
 
 		assert.strictEqual(result.endorsed, false);
 		assert.strictEqual(result.endorsed_at, null);
+	});
+
+	it('should include endorsement data in post', async () => {
+		await posts.endorse(pid);
+		const post = await posts.getPostData(pid);
+
+		assert(post.hasOwnProperty('endorsed'));
+		assert(post.hasOwnProperty('endorsed_at'));
+		assert(post.hasOwnProperty('endorsed_atISO'));
 	});
 });
