@@ -58,16 +58,34 @@ describe('Post Endorsement', () => {
 	});
 
 	it('should allow admins to endorse posts', async () => {
-		await posts.unendorse(pid); 
+		await posts.unendorse(pid); // reset state
 		const result = await api.posts.endorse({ uid: adminUid }, { pid });
 
 		assert.strictEqual(result.endorsed, true);
 	});
 
 	it('should allow admins to unendorse posts', async () => {
-		await posts.endorse(pid); 
+		await posts.endorse(pid); // ensure it's endorsed
 		const result = await api.posts.unendorse({ uid: adminUid }, { pid });
 
 		assert.strictEqual(result.endorsed, false);
+	});
+
+	it('should deny regular users from endorsing', async () => {
+		try {
+			await api.posts.endorse({ uid: regularUid }, { pid });
+			assert.fail('Should have thrown error');
+		} catch (err) {
+			assert.strictEqual(err.message, '[[error:no-privileges]]');
+		}
+	});
+
+	it('should handle non-existent post', async () => {
+		try {
+			await api.posts.endorse({ uid: adminUid }, { pid: 99999 });
+			assert.fail('Should have thrown error');
+		} catch (err) {
+			assert.strictEqual(err.message, '[[error:no-post]]');
+		}
 	});
 });
