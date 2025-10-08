@@ -481,5 +481,45 @@ define('forum/topic', [
 	}
 
 
+	/* Endorse / Unendorse (minimal) */
+	/* global $, config */
+	$(document).on('click', '[component="post/endorse"]', function (ev) {
+		ev.preventDefault();
+		var $a = $(this);
+		var pid = $a.data('pid');
+		if (!pid) { return; }
+
+		$.ajax({
+			url: config.relative_path + '/api/v3/posts/' + pid + '/endorse',
+			type: 'PUT',
+			headers: { 'x-csrf-token': config.csrf_token },
+		}).done(function () {
+			// hide "Endorse", show "Unendorse" in the same dropdown
+			$a.closest('li').addClass('hidden');
+			$a.closest('ul,.dropdown-menu').find('[component="post/unendorse"]').closest('li').removeClass('hidden');
+		}).fail(function () {
+			app.alertError('Could not endorse post.');
+		});
+	});
+
+	$(document).on('click', '[component="post/unendorse"]', function (ev) {
+		ev.preventDefault();
+		var $a = $(this);
+		var pid = $a.data('pid');
+		if (!pid) { return; }
+
+		$.ajax({
+			url: config.relative_path + '/api/v3/posts/' + pid + '/endorse',
+			type: 'DELETE',
+			headers: { 'x-csrf-token': config.csrf_token },
+		}).done(function () {
+			$a.closest('li').addClass('hidden');
+			$a.closest('ul,.dropdown-menu').find('[component="post/endorse"]').closest('li').removeClass('hidden');
+		}).fail(function () {
+			app.alertError('Could not unendorse post.');
+		});
+	});
+
+
 	return Topic;
 });
