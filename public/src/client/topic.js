@@ -55,6 +55,14 @@ define('forum/topic', [
 		threadTools.init(tid, $('.topic'));
 		events.init();
 
+		// show badges for posts already endorsed when page loads
+		renderEndorsedBadgesFromData();
+
+		// live updates from backend socket events
+		socket.on('event:post_endorsed', (payload) => updateEndorsedBadge(payload.pid, true));
+		socket.on('event:post_unendorsed', (payload) => updateEndorsedBadge(payload.pid, false));
+
+
 		sort.handleSort('topicPostSort', 'topic/' + ajaxify.data.slug);
 
 		if (!config.usePagination) {
@@ -66,6 +74,32 @@ define('forum/topic', [
 		addParentHandler();
 		addRepliesHandler();
 		addPostsPreviewHandler();
+		// --- Endorsement badge helpers ---
+		function updateEndorsedBadgeByEl($post, show) {
+			if (!$post || !$post.length) return;
+			let $badge = $post.find('[component="post/endorsed/badge"]');
+			if (!$badge.length) {
+				const $header = $post.find('[component="post/header"]').first();
+				$badge = $('<span component="post/endorsed/badge" class="badge bg-success ms-2">Endorsed</span>');
+				($header.length ? $header : $post.find('.post-info, .post-header').first()).append($badge);
+			}
+			$badge.toggleClass('hidden', !show);
+		}
+
+		function updateEndorsedBadge(pid, show) {
+			const $post = $(`[component="post"][data-pid="${pid}"]`);
+			updateEndorsedBadgeByEl($post, show);
+		}
+
+		function renderEndorsedBadgesFromData() {
+			if (!ajaxify?.data?.posts) return;
+			ajaxify.data.posts.forEach(p => {
+				const $post = $(`[component="post"][data-pid="${p.pid}"]`);
+				updateEndorsedBadgeByEl($post, !!p.endorsed);
+			});
+		}
+		// --- /Endorsement badge helpers ---
+
 		setupQuickReply();
 		handleBookmark(tid);
 		handleThumbs();
