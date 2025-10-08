@@ -554,40 +554,6 @@ define('forum/topic', [
 		}
 	}
 
-
-	/* Endorse / Unendorse (minimal) */
-	/* global $, config */
-	$(document).on('click', '[component="post/endorse"]', function (ev) {
-		ev.preventDefault();
-		var $a = $(this);
-		var pid = $a.data('pid');
-		if (!pid) { return; }
-
-		api.put('/posts/' + pid + '/endorse').then(function () {
-			alerts.success('Post endorsed.');
-			// hide "Endorse", show "Unendorse" in the same dropdown
-			$a.closest('li').addClass('hidden');
-			$a.closest('ul,.dropdown-menu').find('[component="post/unendorse"]').closest('li').removeClass('hidden');
-		}).catch(function (err) {
-			alerts.error((err && err.message) || 'Could not endorse post.');
-		});
-	});
-
-	$(document).on('click', '[component="post/unendorse"]', function (ev) {
-		ev.preventDefault();
-		var $a = $(this);
-		var pid = $a.data('pid');
-		if (!pid) { return; }
-
-		api.del('/posts/' + pid + '/endorse').then(function () {
-			alerts.success('Post unendorsed.');
-			$a.closest('li').addClass('hidden');
-			$a.closest('ul,.dropdown-menu').find('[component="post/endorse"]').closest('li').removeClass('hidden');
-		}).catch(function (err) {
-			alerts.error((err && err.message) || 'Could not unendorse post.');
-		});
-	});
-
 	/* Realtime updates for Endorse / Unendorse */
 	if (window.socket && socket.on) {
 		socket.on('event:post_endorsed', function (data) {
