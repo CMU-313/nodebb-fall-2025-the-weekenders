@@ -494,6 +494,7 @@ define('forum/topic', [
 			type: 'PUT',
 			headers: { 'x-csrf-token': config.csrf_token },
 		}).done(function () {
+			alerts.success('Post endorsed.');
 			// hide "Endorse", show "Unendorse" in the same dropdown
 			$a.closest('li').addClass('hidden');
 			$a.closest('ul,.dropdown-menu').find('[component="post/unendorse"]').closest('li').removeClass('hidden');
@@ -513,6 +514,7 @@ define('forum/topic', [
 			type: 'DELETE',
 			headers: { 'x-csrf-token': config.csrf_token },
 		}).done(function () {
+			alerts.success('Post unendorsed.');
 			$a.closest('li').addClass('hidden');
 			$a.closest('ul,.dropdown-menu').find('[component="post/endorse"]').closest('li').removeClass('hidden');
 		}).fail(function () {
