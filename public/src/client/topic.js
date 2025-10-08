@@ -603,7 +603,12 @@ define('forum/topic', [
 				</div>
 			</div>
 		`);
-		topicEl.prepend(block);
+		const firstPost = topicEl.find('> [component="post"]').first();
+		if (firstPost.length) {
+			block.insertAfter(firstPost);
+		} else {
+			topicEl.append(block);
+        }
 	}
 
 	// Move each endorsed post into the block (this reorders in the DOM)
