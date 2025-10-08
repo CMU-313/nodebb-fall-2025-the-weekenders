@@ -50,7 +50,7 @@ describe('User Helpfulness', () => {
 	});
 
 	it('should increment a user\'s helpfulness score', async () => {
-		await helpfulness.set(testUid, 5); 
+		await helpfulness.set(testUid, 5);
 		
 		const newScore = await helpfulness.increment(testUid, 3);
 		
@@ -81,5 +81,20 @@ describe('User Helpfulness', () => {
 		
 		const retrieved = await helpfulness.get(testUid);
 		assert.strictEqual(retrieved, 8);
+	});
+
+	it('should update helpfulness when post is upvoted', async () => {
+		
+		const voterUid = await user.create({ username: 'voter', password: '123456' });
+		
+		
+		await helpfulness.set(testUid, 0);
+		
+		
+		await posts.upvote(pid, voterUid);
+		
+		
+		const score = await helpfulness.get(testUid);
+		assert(score > 0, 'helpfulness score should be greater than 0 after upvote');
 	});
 });
