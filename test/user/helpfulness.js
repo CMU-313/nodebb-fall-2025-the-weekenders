@@ -48,4 +48,16 @@ describe('User Helpfulness', () => {
 		const retrieved = await helpfulness.get(testUid);
 		assert.strictEqual(retrieved, 10);
 	});
+
+	it('should increment a user\'s helpfulness score', async () => {
+		await helpfulness.set(testUid, 5); 
+		
+		const newScore = await helpfulness.increment(testUid, 3);
+		
+		assert.strictEqual(newScore, 8); 
+		
+	
+		const retrieved = await helpfulness.get(testUid);
+		assert.strictEqual(retrieved, 8);
+	});
 });
