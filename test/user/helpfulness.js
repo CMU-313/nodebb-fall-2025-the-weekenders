@@ -89,4 +89,12 @@ describe('User Helpfulness', () => {
 		const userData = await user.getUserData(testUid);
 		assert(userData.hasOwnProperty('helpfulnessScore'));
 	});
+
+	it('should reset score to 0 for user with no posts', async () => {
+		// Create a new user with no posts
+		const newUid = await user.create({ username: 'nopostsuser', password: '123456' });
+		await helpfulness.set(newUid, 50);
+		const score = await helpfulness.recompute(newUid);
+		assert.strictEqual(score, 0);
+	});
 });
