@@ -36,6 +36,16 @@ describe('User Helpfulness', () => {
 		const score = await helpfulness.get(testUid);
 		
 		assert.strictEqual(typeof score, 'number');
-		assert.strictEqual(score, 0);
+		assert.strictEqual(score, 0); 
+	});
+
+	it('should set a user\'s helpfulness score', async () => {
+		const newScore = await helpfulness.set(testUid, 10);
+		
+		assert.strictEqual(newScore, 10);
+		
+		
+		const retrieved = await helpfulness.get(testUid);
+		assert.strictEqual(retrieved, 10);
 	});
 });
