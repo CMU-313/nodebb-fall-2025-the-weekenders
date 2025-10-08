@@ -49,6 +49,7 @@ define('forum/topic', [
 			posts.signaturesShown = {};
 		}
 		await posts.onTopicPageLoad(components.get('post'));
+		reorderEndorsedPosts();
 		navigator.init('[component="topic"]>[component="post"]', ajaxify.data.postcount, Topic.toTop, Topic.toBottom, Topic.navigatorCallback);
 
 		postTools.init(tid);
@@ -566,6 +567,53 @@ define('forum/topic', [
 			$post.find('[component="post/endorse"]').closest('li').removeClass('hidden');
 		});
 	}
+
+	function reorderEndorsedPosts() {
+	const topicEl = $('[component="topic"]');
+	const postList = (ajaxify && ajaxify.data && Array.isArray(ajaxify.data.posts)) ? ajaxify.data.posts : [];
+	if (!topicEl.length || !postList.length) { return; }
+
+	// Sort endorsed posts by rank asc, then endorsed_at desc
+	const endorsed = postList
+		.filter(p => p.endorsed)
+		.sort((a, b) => {
+			const ra = Number(a.endorsed_rank || 0);
+			const rb = Number(b.endorsed_rank || 0);
+			if (ra !== rb) { return ra - rb; }
+			const ta = Number(a.endorsed_at || 0);
+			const tb = Number(b.endorsed_at || 0);
+			return tb - ta;
+		});
+
+	let block = $('[component="topic/endorsed"]');
+
+	// If none endorsed, remove block if it exists and bail
+	if (!endorsed.length) {
+		if (block.length) { block.remove(); }
+		return;
+	}
+
+	// Ensure the endorsed block exists
+	if (!block.length) {
+		block = $(`
+			<div component="topic/endorsed" class="mb-3">
+				<div class="d-flex align-items-center gap-2 mb-2">
+					<i class="fa fa-check-circle text-success"></i>
+					<span class="fw-semibold">Endorsed</span>
+				</div>
+			</div>
+		`);
+		topicEl.prepend(block);
+	}
+
+	// Move each endorsed post into the block (this reorders in the DOM)
+	endorsed.forEach(p => {
+		const postEl = topicEl.find('[component="post"][data-pid="' + p.pid + '"]');
+		if (postEl.length) {
+			block.append(postEl);
+		}
+	});
+}
 
 
 	return Topic;
