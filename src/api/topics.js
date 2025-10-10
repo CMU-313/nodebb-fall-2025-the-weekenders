@@ -81,6 +81,13 @@ topicsAPI.create = async function (caller, data) {
 
 	const result = await topics.post(payload);
 	await topics.thumbs.migrate(data.uuid, result.topicData.tid);
+	// DEBUG: log the username returned by topics.post before emitting
+	try {
+		console.error('[DEBUG] api.topics.create - result.postData.user:', result && result.postData && result.postData.user);
+		console.error('[DEBUG] api.topics.create - result.topicData.user:', result && result.topicData && result.topicData.user);
+	} catch (err) {
+		console.error('[DEBUG] api.topics.create - logging error', err && err.stack ? err.stack : err);
+	}
 
 	socketHelpers.emitToUids('event:new_post', { posts: [result.postData] }, [caller.uid]);
 	socketHelpers.emitToUids('event:new_topic', result.topicData, [caller.uid]);

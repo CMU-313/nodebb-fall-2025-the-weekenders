@@ -58,23 +58,30 @@ module.exports = function (Posts) {
 function modifyPost(post, fields) {
 	if (post) {
 		db.parseIntFields(post, intFields, fields);
+
 		if (post.hasOwnProperty('upvotes') && post.hasOwnProperty('downvotes')) {
 			post.votes = post.upvotes - post.downvotes;
 		}
+
 		if (post.hasOwnProperty('timestamp')) {
 			post.timestampISO = utils.toISOString(post.timestamp);
 		}
+
 		if (post.hasOwnProperty('edited')) {
 			post.editedISO = post.edited !== 0 ? utils.toISOString(post.edited) : '';
 		}
-		
+
 		if (!fields.length || fields.includes('attachments')) {
 			post.attachments = (post.attachments || '').split(',').filter(Boolean);
 		}
 
-		if (post.hasOwnProperty('isAnonymous')) post.isAnonymous = !!post.isAnonymous;
-		
-		// Always include endorsement fields with defaults
+		// normalize anonymous flag (keep my logic)
+		if (post.hasOwnProperty('isAnonymous')) {
+			const v = post.isAnonymous;
+			post.isAnonymous = (v === true || v === 1 || v === '1' || v === 'true');
+		}
+
+		// endorsement defaults (keep main’s logic)
 		post.endorsed = post.hasOwnProperty('endorsed') ? !!post.endorsed : false;
 		post.endorsed_at = post.endorsed_at || null;
 		post.endorsed_rank = post.endorsed_rank || null;

@@ -80,6 +80,9 @@ get:
                                             timestampISO:
                                               type: string
                                               description: An ISO 8601 formatted date string (complementing `timestamp`)
+                                            isAnonymous:
+                                              type: boolean
+                                              description: Whether the post author is hidden from non-staff viewers.
                                             endorsed:
                                               type: boolean
                                               description: Whether or not this post has been endorsed by a moderator or administrator.
@@ -166,6 +169,9 @@ get:
                                   timestampISO:
                                     type: string
                                     description: An ISO 8601 formatted date string (complementing `timestamp`)
+                                  isAnonymous:
+                                    type: boolean
+                                    description: Whether the post author is hidden from non-staff viewers.
                                   endorsed:
                                     type: boolean
                                     description: Whether or not this post has been endorsed by a moderator or administrator.

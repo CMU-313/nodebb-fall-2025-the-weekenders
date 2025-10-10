@@ -37,6 +37,12 @@ get:
                               nullable: true
                             titleRaw:
                               type: string
+                            'icon:bgColor':
+                              type: string
+                              description: A six-character hexadecimal colour code assigned to the topic's user icon
+                            'icon:text':
+                              type: string
+                              description: A single-letter representation of the topic's user icon
                             category:
                               type: object
                               properties:

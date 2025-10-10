@@ -1,6 +1,8 @@
 PostObject:
   description: A single post in the array returned from `Posts.getPostSummaryByPids`
   type: object
+  required:
+    - pid
   properties:
     pid:
       type: number
@@ -24,6 +26,9 @@ PostObject:
     uid:
       type: number
       description: A user identifier
+    isAnonymous:
+      type: boolean
+      description: Whether this post was authored anonymously for non-staff viewers.
     timestamp:
       type: number
     deleted:
@@ -181,6 +186,8 @@ PostDataObject:
   description: The output as returned from `Posts.getPostsData`
   allOf:
     - type: object
+      required:
+        - pid
       properties:
         pid:
           type: number
