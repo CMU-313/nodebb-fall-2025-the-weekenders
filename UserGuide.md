@@ -1,10 +1,10 @@
 # Anonymous Posting Feature
 
-This feature lets users mark their post as Anonymous. When enabled, regular viewers see the post attributed to an anonymous user with a neutral avatar, while the author and staff can still see the original identity.
+this feature lets users mark their post as Anonymous! whent this iss enabled regular viewers see the post attributed to an anonymous user with a neutral avatar(a question mark) while the author and staff can still see the original identity.
 
 How to use
-- When composing a post, toggle the Anonymous option.
-- Submit the post as usual. Others will see it from “Anonymous”; you and staff still see the true author.
+- when you compose a post toggle the Anonymous option if you want it to be anonymous.
+- then submit the post as usual. Others will see it from “Anonymous”; you and staff still see the true author.
 
 Automated tests
 - Location: `test/topics/anonymous.test.js`
@@ -20,4 +20,4 @@ Running tests
 - Ensure NodeBB test runner is set up; then run: `npm test`
 
 Limitations
-- The integration test focuses on masking outputs rather than full browser E2E. Add E2E later if required by your team.
+- The integration test focuses on masking outputs rather than full browser E2E. 
