@@ -573,5 +573,90 @@ define('forum/topic/postTools', [
 		}
 	}
 
+	// --- Endorse / Unendorse (inline) ---
+	// Uses existing dependencies imported by this module: api, alerts, components
+	(function attachEndorseHandlers () {
+		const $doc = $(document);
+		if ($doc.data('endorse-bound')) return; // avoid double-binding on ajaxify
+		$doc.data('endorse-bound', 1);
+
+		// Endorse
+		$(document)
+			.off('click.postEndorse')
+			.on('click.postEndorse', '[component="post/endorse"]', function (ev) {
+				ev.preventDefault();
+				const $a = $(this);
+				const pid = $a.closest('[data-pid]').data('pid');
+				if (!pid) return;
+
+				api.put(`/posts/${encodeURIComponent(pid)}/endorse`).then(function () {
+					alerts.success('Post endorsed.');
+					const $post = $a.closest('[component="post"]');
+
+					// mark + badge
+					$post.attr('data-endorsed', '1').attr('data-endorsed-at', Date.now());
+					if (!$post.find('[component="post/endorsed"]').length) {
+						$post.find('[component="post/content"]')
+							.prepend('<span component="post/endorsed" class="badge bg-success me-2 align-middle">Endorsed</span>');
+					}
+
+					// move into endorsed group (right after OP)
+					(function moveIntoEndorsedGroup() {
+						const $topic = $('[component="topic"]');
+						let $group = $topic.children('[data-endorsed-group="1"]');
+						if (!$group.length) {
+							const $first = $topic.children('[component="post"]').first();
+							$group = $('<div data-endorsed-group="1"></div>');
+							$first.after($group);
+						}
+						$post.detach().appendTo($group);
+					}());
+
+					// toggle menu items
+					$a.closest('li').addClass('hidden');
+					$a.closest('ul,.dropdown-menu').find('[component="post/unendorse"]').closest('li').removeClass('hidden');
+				}).catch(function (err) {
+					alerts.error((err && err.message) || 'Could not endorse post.');
+				});
+			});
+
+		// Unendorse
+		$(document)
+			.off('click.postUnendorse')
+			.on('click.postUnendorse', '[component="post/unendorse"]', function (ev) {
+				ev.preventDefault();
+				const $a = $(this);
+				const pid = $a.closest('[data-pid]').data('pid');
+				if (!pid) return;
+
+				api.del(`/posts/${encodeURIComponent(pid)}/endorse`).then(function () {
+					alerts.success('Post unendorsed.');
+					const $post = $a.closest('[component="post"]');
+
+					// clear mark + badge
+					$post.removeAttr('data-endorsed data-endorsed-at');
+					$post.find('[component="post/endorsed"]').remove();
+
+					// move back after the endorsed group (and remove group if empty)
+					(function moveOutOfEndorsedGroup() {
+						const $topic = $('[component="topic"]');
+						const $group = $topic.children('[data-endorsed-group="1"]');
+						if ($group.length) {
+							$post.detach().insertAfter($group);
+							if (!$group.children('[component="post"]').length) $group.remove();
+						}
+					}());
+
+					// toggle menu items
+					$a.closest('li').addClass('hidden');
+					$a.closest('ul,.dropdown-menu').find('[component="post/endorse"]').closest('li').removeClass('hidden');
+				}).catch(function (err) {
+					alerts.error((err && err.message) || 'Could not unendorse post.');
+				});
+			});
+
+	})();
+
+
 	return PostTools;
 });

@@ -1,0 +1,138 @@
+put:
+  tags:
+    - posts
+  summary: Endorse a post
+  description: |
+    Endorse a post to mark it as endorsed by an instructor or moderator.
+    Only administrators and global moderators can endorse posts.
+  parameters:
+    - in: path
+      name: pid
+      schema:
+        type: string
+      required: true
+      description: Post ID to endorse
+      example: "1"
+  responses:
+    '200':
+      description: Post successfully endorsed
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              status:
+                $ref: ../../../components/schemas/Status.yaml#/Status
+              response:
+                type: object
+                properties:
+                  pid:
+                    type: number
+                    description: The post identifier
+                  endorsed:
+                    type: boolean
+                    description: Whether the post is endorsed
+                  endorsed_at:
+                    type: number
+                    description: Unix timestamp when the post was endorsed
+                  endorsed_rank:
+                    type: number
+                    description: Rank/order of endorsement
+    '403':
+      description: Forbidden - User does not have permission to endorse posts
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              status:
+                type: object
+                properties:
+                  code:
+                    type: string
+                  message:
+                    type: string
+    '404':
+      description: Not Found - Post does not exist
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              status:
+                type: object
+                properties:
+                  code:
+                    type: string
+                  message:
+                    type: string
+delete:
+  tags:
+    - posts
+  summary: Remove endorsement from a post
+  description: |
+    Remove endorsement from a post.
+    Only administrators and global moderators can unendorse posts.
+  parameters:
+    - in: path
+      name: pid
+      schema:
+        type: string
+      required: true
+      description: Post ID to unendorse
+      example: "1"
+  responses:
+    '200':
+      description: Post endorsement successfully removed
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              status:
+                $ref: ../../../components/schemas/Status.yaml#/Status
+              response:
+                type: object
+                properties:
+                  pid:
+                    type: number
+                    description: The post identifier
+                  endorsed:
+                    type: boolean
+                    description: Whether the post is endorsed
+                  endorsed_at:
+                    type: number
+                    nullable: true
+                    description: Unix timestamp when the post was endorsed
+                  endorsed_rank:
+                    type: number
+                    nullable: true
+                    description: Rank/order of endorsement
+    '403':
+      description: Forbidden - User does not have permission to unendorse posts
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              status:
+                type: object
+                properties:
+                  code:
+                    type: string
+                  message:
+                    type: string
+    '404':
+      description: Not Found - Post does not exist
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              status:
+                type: object
+                properties:
+                  code:
+                    type: string
+                  message:
+                    type: string
