@@ -126,6 +126,7 @@ module.exports = function (Topics) {
 		postData.tid = tid;
 		postData.ip = data.req ? data.req.ip : null;
 		postData.isMain = true;
+		postData.isAnonymous = !!data.isAnonymous; 
 		postData = await posts.create(postData);
 		postData = await onNewPost(postData, data);
 
@@ -146,6 +147,13 @@ module.exports = function (Topics) {
 		topicData.mainPost = postData;
 		topicData.index = 0;
 		postData.index = 0;
+		// DEBUG: trace usernames at topic/post boundary
+		try {
+			console.error('[DEBUG] Topics.post - postData.user.username:', postData && postData.user && postData.user.username);
+			console.error('[DEBUG] Topics.post - topicData.user && topicData.user.username:', topicData && topicData.user && topicData.user.username);
+		} catch (err) {
+			console.error('[DEBUG] Topics.post - logging error', err && err.stack ? err.stack : err);
+		}
 
 		if (topicData.scheduled) {
 			await Topics.delete(tid);
@@ -206,6 +214,7 @@ module.exports = function (Topics) {
 		}
 
 		data.ip = data.req ? data.req.ip : null;
+		data.isAnonymous = !!data.isAnonymous;
 		let postData = await posts.create(data);
 		postData = await onNewPost(postData, data);
 
@@ -252,6 +261,8 @@ module.exports = function (Topics) {
 
 		// Returned data is a superset of post summary data
 		postData.user = userInfo;
+		// DEBUG: trace user info arriving into onNewPost
+		console.error('[DEBUG] onNewPost - postData.user before overrideGuestHandle:', JSON.stringify(postData.user));
 		postData.index = postData.topic.postcount - 1;
 		postData.bookmarked = false;
 		postData.display_edit_tools = true;
@@ -260,6 +271,8 @@ module.exports = function (Topics) {
 		postData.display_move_tools = true;
 		postData.selfPost = false;
 		posts.overrideGuestHandle(postData, handle);
+		// DEBUG: trace user info after possible overrideGuestHandle
+		console.error('[DEBUG] onNewPost - postData.user after overrideGuestHandle:', JSON.stringify(postData.user));
 		return postData;
 	}
 

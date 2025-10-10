@@ -28,7 +28,10 @@ module.exports = function (Posts) {
 		}
 
 		const pid = data.pid || await db.incrObjectField('global', 'nextPid');
-		let postData = { pid, uid, tid, content, sourceContent, timestamp };
+		let postData = { 
+			pid, uid, tid, content, sourceContent, timestamp,
+			isAnonymous: !!data.isAnonymous, // added
+		};
 
 		if (data.toPid) {
 			postData.toPid = data.toPid;
@@ -67,6 +70,8 @@ module.exports = function (Posts) {
 
 		({ post: postData } = await plugins.hooks.fire('filter:post.create', { post: postData, data: data }));
 		await db.setObject(`post:${postData.pid}`, postData);
+		// DEBUG: log saved postData for guest username tracing
+		console.error('[DEBUG] Posts.create - saved postData:', JSON.stringify({ pid: postData.pid, uid: postData.uid, isAnonymous: postData.isAnonymous, user: postData.user || null }));
 
 		const topicData = await topics.getTopicFields(tid, ['cid', 'pinned']);
 		postData.cid = topicData.cid;

@@ -94,6 +94,13 @@ describe('API', async () => {
 					example: '', // to be defined later...
 				},
 			],
+			'/posts/{pid}/endorse': [
+				{
+					in: 'path',
+					name: 'pid',
+					example: '', // to be defined later...
+				},
+			],
 		},
 		patch: {},
 		delete: {
@@ -161,6 +168,13 @@ describe('API', async () => {
 				{
 					in: 'path',
 					name: 'token',
+					example: '', // to be defined later...
+				},
+			],
+			'/posts/{pid}/endorse': [
+				{
+					in: 'path',
+					name: 'pid',
 					example: '', // to be defined later...
 				},
 			],
@@ -276,6 +290,9 @@ describe('API', async () => {
 		});
 		mocks.delete['/posts/{pid}/diffs/{timestamp}'][0].example = unprivTopic.postData.pid;
 		mocks.delete['/posts/{pid}/diffs/{timestamp}'][1].example = (await posts.diffs.list(unprivTopic.postData.pid))[0];
+
+		mocks.put['/posts/{pid}/endorse'][0].example = unprivTopic.postData.pid;
+		mocks.delete['/posts/{pid}/endorse'][0].example = unprivTopic.postData.pid;
 
 		// Create a sample flag
 		const { flagId } = await flags.create('post', 1, unprivUid, 'sample reasons', Date.now()); // deleted in DELETE /api/v3/flags/1

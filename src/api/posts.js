@@ -20,6 +20,7 @@ const socketHelpers = require('../socket.io/helpers');
 const translator = require('../translator');
 const notifications = require('../notifications');
 
+
 const postsAPI = module.exports;
 
 postsAPI.get = async function (caller, data) {
@@ -41,7 +42,14 @@ postsAPI.get = async function (caller, data) {
 	if (post.deleted && !(userPrivilege.isAdminOrMod || selfPost)) {
 		post.content = '[[topic:post-is-deleted]]';
 	}
+	if (post.isAnonymous && !(userPrivilege.isAdminOrMod || selfPost)) {
+		post.uid = 0;
 
+		post.user = post.user || {};
+		post.user = { uid: 0, username: 'Anonymous', displayname: 'Anonymous' };
+		delete post.userslug;
+		delete post.picture;
+	}
 	return post;
 };
 
@@ -118,6 +126,10 @@ postsAPI.edit = async function (caller, data) {
 	data.uid = caller.uid;
 	data.req = apiHelpers.buildReqObject(caller);
 	data.timestamp = parseInt(data.timestamp, 10) || Date.now();
+
+	if (Object.prototype.hasOwnProperty.call(data, 'isAnonymous')) {
+		data.isAnonymous = !!data.isAnonymous;
+	}
 
 	const editResult = await posts.edit(data);
 	if (editResult.topic.isMainPost) {
@@ -343,6 +355,78 @@ postsAPI.downvote = async function (caller, data) {
 postsAPI.unvote = async function (caller, data) {
 	return await apiHelpers.postCommand(caller, 'unvote', 'voted', '', data);
 };
+
+// Endorse a post (staff/admin only)
+postsAPI.endorse = async function (caller, data) {
+	if (!data || !data.pid) {
+		throw new Error('[[error:invalid-data]]');
+	}
+	
+	const { pid } = data;
+	const [post, isAdmin, isGlobalMod] = await Promise.all([
+		posts.getPostData(pid),
+		user.isAdministrator(caller.uid),
+		user.isGlobalModerator(caller.uid),
+	]);
+
+	if (!post) {
+		throw new Error('[[error:no-post]]');
+	}
+
+	// Check if user has permission (admin or global mod)
+	const allowed = isAdmin || isGlobalMod;
+	if (!allowed) {
+		throw new Error('[[error:no-privileges]]');
+	}
+
+	const result = await posts.endorse(pid);
+	
+	// Emit socket event to update the topic view
+	const tid = await posts.getPostField(pid, 'tid');
+	websockets.in(`topic_${tid}`).emit('event:post_endorsed', {
+		pid: pid,
+		endorsed: true,
+		endorsed_at: result.endorsed_at,
+	});
+
+	return result;
+};
+
+
+// Remove endorsement (staff/admin only)
+postsAPI.unendorse = async function (caller, data) {
+	if (!data || !data.pid) {
+		throw new Error('[[error:invalid-data]]');
+	}
+	
+	const { pid } = data;
+	const [post, isAdmin, isGlobalMod] = await Promise.all([
+		posts.getPostData(pid),
+		user.isAdministrator(caller.uid),
+		user.isGlobalModerator(caller.uid),
+	]);
+
+	if (!post) {
+		throw new Error('[[error:no-post]]');
+	}
+
+	// Check if user has permission 
+	const allowed = isAdmin || isGlobalMod;
+	if (!allowed) {
+		throw new Error('[[error:no-privileges]]');
+	}
+
+	const result = await posts.unendorse(pid);
+	
+	const tid = await posts.getPostField(pid, 'tid');
+	websockets.in(`topic_${tid}`).emit('event:post_unendorsed', {
+		pid: pid,
+		endorsed: false,
+	});
+
+	return result;
+};
+
 
 postsAPI.getVoters = async function (caller, data) {
 	if (!data || !data.pid) {

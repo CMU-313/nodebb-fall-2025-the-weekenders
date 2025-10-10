@@ -56,6 +56,18 @@ module.exports = function (Posts) {
 		return hookResult.users;
 	};
 
+	// DEBUG: wrap and log the output of getUserInfoForPosts for tracing
+	const _origGetUserInfoForPosts = Posts.getUserInfoForPosts;
+	Posts.getUserInfoForPosts = async function (uids, uid) {
+		const res = await _origGetUserInfoForPosts.call(this, uids, uid);
+		try {
+			console.error('[DEBUG] Posts.getUserInfoForPosts - uids:', JSON.stringify(uids), 'callerUid:', uid, 'result:', JSON.stringify(res));
+		} catch (err) {
+			console.error('[DEBUG] Posts.getUserInfoForPosts - JSON error', err && err.stack ? err.stack : err);
+		}
+		return res;
+	};
+
 	Posts.overrideGuestHandle = function (postData, handle) {
 		if (meta.config.allowGuestHandles && postData && postData.user && parseInt(postData.uid, 10) === 0 && handle) {
 			postData.user.username = validator.escape(String(handle));
