@@ -21,3 +21,4 @@ Running tests
 
 Limitations
 - The integration test focuses on masking outputs rather than full browser E2E. 
+
