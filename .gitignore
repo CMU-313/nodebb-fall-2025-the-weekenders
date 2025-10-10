@@ -1,6 +1,7 @@
 dump.rdb
 
 dist/
+#! keep yarn.lock ignored
 yarn.lock
 npm-debug.log
 node_modules/
@@ -67,7 +68,8 @@ coverage
 *.log
 test/files/normalise.jpg.png
 test/files/normalise-resized.jpg
-package-lock.json
+#! allow committing lockfile for CI
+!package-lock.json
 /package.json
 *.mongodb
 link-plugins.sh
