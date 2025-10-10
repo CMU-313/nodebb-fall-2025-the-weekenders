@@ -70,6 +70,9 @@ describe('Messaging Library', () => {
 
 		chatMessageDelay = meta.config.chatMessageDelay;
 		meta.config.chatMessageDelay = 0;
+
+		// Small stabilization to avoid race conditions in CI between user creation/login
+		await sleep(50);
 	});
 
 	after(() => {
