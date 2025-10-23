@@ -1,0 +1,98 @@
+name: artillery dynamic analysis
+
+on:
+  push:
+    branches:
+      - dyn-artillery
+  pull_request:
+    branches:
+      - main
+      - master
+      - develop
+
+defaults:
+  run:
+    shell: bash
+
+permissions:
+  contents: read
+
+jobs:
+  artillery:
+    runs-on: ubuntu-latest
+
+    services:
+      redis:
+        image: 'redis:8.0.1'
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 6379:6379
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - run: cp install/package.json package.json
+
+      - name: setup node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: npm install
+        uses: bahmutov/npm-install@v1
+        with:
+          useLockFile: false
+
+      - name: setup nodebb on redis
+        env:
+          SETUP: >-
+            {
+              "url": "http://127.0.0.1:4567/forum",
+              "secret": "abcdef",
+              "admin:username": "admin",
+              "admin:email": "test@example.org",
+              "admin:password": "hAN3Eg8W",
+              "admin:password:confirm": "hAN3Eg8W",
+              "database": "redis",
+              "redis:host": "127.0.0.1",
+              "redis:port": 6379,
+              "redis:password": "",
+              "redis:database": 0
+            }
+          CI: >-
+            {
+              "host": "127.0.0.1",
+              "database": 1,
+              "port": 6379
+            }
+        run: |
+          node app --setup="${SETUP}" --ci="${CI}"
+
+      - name: start nodebb
+        run: |
+          nohup node loader.js --daemon false >/dev/null 2>&1 &
+
+      - name: wait for health
+        run: |
+          for i in {1..30}; do
+            curl -sf http://127.0.0.1:4567/forum/sping && break
+            sleep 2
+          done
+          curl -sS http://127.0.0.1:4567/forum/ping
+
+      - name: run artillery
+        env:
+          ARTILLERY_ENV: ci
+        run: |
+          npm run test:artillery --silent
+
+      - name: upload results
+        uses: actions/upload-artifact@v4
+        with:
+          name: artillery-results
+          path: artillery/results
+

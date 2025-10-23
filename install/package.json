@@ -9,13 +9,14 @@
         "url": "https://github.com/NodeBB/NodeBB/"
     },
     "main": "app.js",
-    "scripts": {
-        "start": "node loader.js",
-        "lint": "eslint --cache ./nodebb .",
-        "test": "nyc --reporter=html --reporter=text-summary mocha",
-        "coverage": "nyc report --reporter=text-lcov > ./coverage/lcov.info",
-        "coveralls": "nyc report --reporter=text-lcov | coveralls && rm -r coverage"
-    },
+  "scripts": {
+    "start": "node loader.js",
+    "lint": "eslint --cache ./nodebb .",
+    "test": "nyc --reporter=html --reporter=text-summary mocha",
+    "coverage": "nyc report --reporter=text-lcov > ./coverage/lcov.info",
+    "test:artillery": "mkdir -p artillery/results && artillery run -o artillery/results/smoke.json artillery/artillery-smoke.yml && artillery report artillery/results/smoke.json -o artillery/results/smoke.html",
+    "coveralls": "nyc report --reporter=text-lcov | coveralls && rm -r coverage"
+  },
     "nyc": {
         "exclude": [
             "src/upgrades/*",
@@ -155,12 +156,13 @@
         "yargs": "17.7.2",
         "zxcvbn": "4.4.2"
     },
-    "devDependencies": {
-        "@apidevtools/swagger-parser": "10.1.0",
-        "@commitlint/cli": "19.8.1",
-        "@commitlint/config-angular": "19.8.1",
-        "coveralls": "3.1.1",
-        "@eslint/js": "9.26.0",
+  "devDependencies": {
+    "artillery": "^2.0.11",
+    "@apidevtools/swagger-parser": "10.1.0",
+    "@commitlint/cli": "19.8.1",
+    "@commitlint/config-angular": "19.8.1",
+    "coveralls": "3.1.1",
+    "@eslint/js": "9.26.0",
         "@stylistic/eslint-plugin-js": "4.4.0",
         "eslint-config-nodebb": "1.1.5",
         "eslint-plugin-import": "2.31.0",
