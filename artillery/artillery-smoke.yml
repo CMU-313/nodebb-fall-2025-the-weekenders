@@ -1,0 +1,21 @@
+config:
+  target: "http://127.0.0.1:4567"
+  phases:
+    - duration: 15
+      arrivalRate: 2
+  variables:
+    prefix: ""
+  environments:
+    ci:
+      variables:
+        prefix: "/forum"
+  ensure:
+    maxErrorRate: 1
+scenarios:
+  - name: "smoke: health"
+    flow:
+      - get:
+          url: "{{ prefix }}/sping"
+      - get:
+          url: "{{ prefix }}/ping"
+
