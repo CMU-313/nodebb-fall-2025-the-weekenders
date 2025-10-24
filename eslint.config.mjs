@@ -9,6 +9,9 @@ import stylisticJs from '@stylistic/eslint-plugin-js'
 import js from '@eslint/js';
 import globals from 'globals';
 
+import sonarjs from 'eslint-plugin-sonarjs';
+
+
 export default defineConfig([
 	{
 		ignores: [
@@ -60,6 +63,14 @@ export default defineConfig([
 		}
 	},
 	...publicConfig,
-	...serverConfig
+	...serverConfig,
+
+	// SonarJS analysis for maintainability and code smell detection
+	{
+		files: ['src/**/*.js'],
+		plugins: { sonarjs },
+		rules: sonarjs.configs.recommended.rules,
+	}
+
 ]);
 

@@ -1,0 +1,648 @@
+[@stylistic/eslint-plugin-js] This package is deprecated in favor of the unified @stylistic/eslint-plugin, please consider migrating to the main package
+
+/workspaces/nodebb-fall-2025-the-weekenders/src/activitypub/actors.js
+  125:52  error  Refactor this function to reduce its Cognitive Complexity from 30 to the 15 allowed  sonarjs/cognitive-complexity
+  165:6   error  Handle this exception or don't catch it at all                                       sonarjs/no-ignored-exceptions
+  191:8   error  Handle this exception or don't catch it at all                                       sonarjs/no-ignored-exceptions
+  303:52  error  Refactor this function to reduce its Cognitive Complexity from 16 to the 15 allowed  sonarjs/cognitive-complexity
+
+/workspaces/nodebb-fall-2025-the-weekenders/src/activitypub/contexts.js
+   56:46  error  Refactor this function to reduce its Cognitive Complexity from 23 to the 15 allowed  sonarjs/cognitive-complexity
+   69:5   error  Handle this exception or don't catch it at all                                       sonarjs/no-ignored-exceptions
+  104:48  error  This always evaluates to truthy. Consider refactoring this code                      sonarjs/no-gratuitous-expressions
+  107:23  error  This always evaluates to truthy. Consider refactoring this code                      sonarjs/no-gratuitous-expressions
+  147:4   error  Handle this exception or don't catch it at all                                       sonarjs/no-ignored-exceptions
+
+/workspaces/nodebb-fall-2025-the-weekenders/src/activitypub/helpers.js
+  116:4   error  Handle this exception or don't catch it at all                                                                                    sonarjs/no-ignored-exceptions
+  215:42  error  Refactor this code to not use nested template literals                                                                            sonarjs/no-nested-template-literals
+  357:11  error  Replace this alternation with a character class                                                                                   sonarjs/single-character-alternation
+  383:17  error  Make sure the regex used here, which is vulnerable to super-linear runtime due to backtracking, cannot lead to denial of service  sonarjs/slow-regex
+  385:17  error  Make sure the regex used here, which is vulnerable to super-linear runtime due to backtracking, cannot lead to denial of service  sonarjs/slow-regex
+  450:3   error  Extract this nested ternary operation into an independent statement                                                               sonarjs/no-nested-conditional
+  455:81  error  Refactor this function to reduce its Cognitive Complexity from 19 to the 15 allowed                                               sonarjs/cognitive-complexity
+
+/workspaces/nodebb-fall-2025-the-weekenders/src/activitypub/inbox.js
+   77:28  error  Refactor this function to reduce its Cognitive Complexity from 26 to the 15 allowed  sonarjs/cognitive-complexity
+  141:6   error  Handle this exception or don't catch it at all                                       sonarjs/no-ignored-exceptions
+  200:4   error  Handle this exception or don't catch it at all                                       sonarjs/no-ignored-exceptions
+  217:2   error  Replace this "switch" statement by "if" statements to increase readability           sonarjs/no-small-switch
+  264:30  error  Refactor this function to reduce its Cognitive Complexity from 34 to the 15 allowed  sonarjs/cognitive-complexity
+  302:7   error  Handle this exception or don't catch it at all                                       sonarjs/no-ignored-exceptions
+  331:5   error  Remove this useless assignment to variable "tid"                                     sonarjs/no-dead-store
+  452:28  error  Refactor this function to reduce its Cognitive Complexity from 20 to the 15 allowed  sonarjs/cognitive-complexity
+  495:26  error  Refactor this function to reduce its Cognitive Complexity from 21 to the 15 allowed  sonarjs/cognitive-complexity
+  496:5   error  Complete the task associated to this "TODO" comment                                  sonarjs/todo-tag
+  511:72  error  Refactor this code to not use nested template literals                               sonarjs/no-nested-template-literals
+  586:7   error  Handle this exception or don't catch it at all                                       sonarjs/no-ignored-exceptions
+  607:5   error  Handle this exception or don't catch it at all                                       sonarjs/no-ignored-exceptions
+
+/workspaces/nodebb-fall-2025-the-weekenders/src/activitypub/index.js
+   69:2   error  Either remove this useless object instantiation of "CronJob" or use it  sonarjs/constructor-for-side-effects
+   81:2   error  Either remove this useless object instantiation of "CronJob" or use it  sonarjs/constructor-for-side-effects
+  105:4   error  Handle this exception or don't catch it at all                          sonarjs/no-ignored-exceptions
+  157:4   error  Handle this exception or don't catch it at all                          sonarjs/no-ignored-exceptions
+  174:4   error  Handle this exception or don't catch it at all                          sonarjs/no-ignored-exceptions
+  180:42  error  Refactor this code to not use nested template literals                  sonarjs/no-nested-template-literals
+  251:4   error  Remove this useless assignment to variable "algorithm"                  sonarjs/no-dead-store
+  291:4   error  Handle this exception or don't catch it at all                          sonarjs/no-ignored-exceptions
+
+/workspaces/nodebb-fall-2025-the-weekenders/src/activitypub/mocks.js
+   22:29  error  Replace this character class by the character itself                                 sonarjs/single-char-in-character-classes
+   43:35  error  Refactor this function to reduce its Cognitive Complexity from 25 to the 15 allowed  sonarjs/cognitive-complexity
+  183:5   error  Handle this exception or don't catch it at all                                       sonarjs/no-ignored-exceptions
+  291:5   error  Handle this exception or don't catch it at all                                       sonarjs/no-ignored-exceptions
+  564:16  error  Complete the task associated to this "TODO" comment                                  sonarjs/todo-tag
+  581:35  error  Refactor this function to reduce its Cognitive Complexity from 29 to the 15 allowed  sonarjs/cognitive-complexity
+  667:62  error  Refactor this code to not use nested template literals                               sonarjs/no-nested-template-literals
+  694:3   error  Replace this "switch" statement by "if" statements to increase readability           sonarjs/no-small-switch
+  876:25  error  Complete the task associated to this "TODO" comment                                  sonarjs/todo-tag
+  877:35  error  Complete the task associated to this "TODO" comment                                  sonarjs/todo-tag
+
+/workspaces/nodebb-fall-2025-the-weekenders/src/activitypub/notes.js
+   48:68  error  Refactor this function to reduce its Cognitive Complexity from 41 to the 15 allowed  sonarjs/cognitive-complexity
+   59:27  error  This function expects 1 argument, but 2 were provided                                sonarjs/no-extra-arguments
+  138:5   error  Handle this exception or don't catch it at all                                       sonarjs/no-ignored-exceptions
+  260:5   error  Complete the task associated to this "TODO" comment                                  sonarjs/todo-tag
+  266:8   error  Either use this collection's contents or remove the collection                       sonarjs/no-unused-collection
+  311:4   error  Handle this exception or don't catch it at all                                       sonarjs/no-ignored-exceptions
+  319:4   error  Handle this exception or don't catch it at all                                       sonarjs/no-ignored-exceptions
+  418:35  error  Refactor this function to reduce its Cognitive Complexity from 22 to the 15 allowed  sonarjs/cognitive-complexity
+  453:6   error  Handle this exception or don't catch it at all                                       sonarjs/no-ignored-exceptions
+
+/workspaces/nodebb-fall-2025-the-weekenders/src/admin/search.js
+   48:12  error  Make sure the regex used here, which is vulnerable to super-linear runtime due to backtracking, cannot lead to denial of service  sonarjs/slow-regex
+   50:12  error  Make sure the regex used here, which is vulnerable to super-linear runtime due to backtracking, cannot lead to denial of service  sonarjs/slow-regex
+  104:23  error  Make sure the regex used here, which is vulnerable to super-linear runtime due to backtracking, cannot lead to denial of service  sonarjs/slow-regex
+  107:20  error  Refactor this code to not use nested template literals                                                                            sonarjs/no-nested-template-literals
+
+/workspaces/nodebb-fall-2025-the-weekenders/src/analytics.js
+  34:2  error  Either remove this useless object instantiation of "cronJob" or use it  sonarjs/constructor-for-side-effects
+  44:3  error  Either remove this useless object instantiation of "cronJob" or use it  sonarjs/constructor-for-side-effects
+
+/workspaces/nodebb-fall-2025-the-weekenders/src/api/groups.js
+  122:24  error  Refactor this function to reduce its Cognitive Complexity from 16 to the 15 allowed  sonarjs/cognitive-complexity
+
+/workspaces/nodebb-fall-2025-the-weekenders/src/api/posts.js
+  96:23  error  Refactor this function to reduce its Cognitive Complexity from 20 to the 15 allowed  sonarjs/cognitive-complexity
+
+/workspaces/nodebb-fall-2025-the-weekenders/src/api/users.js
+  652:13  error  Review this redundant assignment: "picture" already holds the assigned value along all execution paths  sonarjs/no-redundant-assignments
+  690:4   error  Handle this exception or don't catch it at all                                                          sonarjs/no-ignored-exceptions
+  714:30  error  Use the opposite operator (<=) instead                                                                  sonarjs/no-inverted-boolean-check
+
+/workspaces/nodebb-fall-2025-the-weekenders/src/batch.js
+  13:34  error  Refactor this function to reduce its Cognitive Complexity from 37 to the 15 allowed  sonarjs/cognitive-complexity
+
+/workspaces/nodebb-fall-2025-the-weekenders/src/categories/create.js
+  157:5   error  Handle this exception or don't catch it at all          sonarjs/no-ignored-exceptions
+  170:29  error  Refactor this code to not use nested template literals  sonarjs/no-nested-template-literals
+
+/workspaces/nodebb-fall-2025-the-weekenders/src/categories/data.js
+  29:16  error  Complete the task associated to this "TODO" comment  sonarjs/todo-tag
+
+/workspaces/nodebb-fall-2025-the-weekenders/src/categories/icon.js
+  30:4  error  Handle this exception or don't catch it at all  sonarjs/no-ignored-exceptions
+
+/workspaces/nodebb-fall-2025-the-weekenders/src/categories/index.js
+  268:2  error  Remove this useless assignment to variable "childrenCids"  sonarjs/no-dead-store
+
+/workspaces/nodebb-fall-2025-the-weekenders/src/categories/watch.js
+  17:7   error  Use the opposite operator (<=) instead  sonarjs/no-inverted-boolean-check
+  25:42  error  Use the opposite operator (<=) instead  sonarjs/no-inverted-boolean-check
+
+/workspaces/nodebb-fall-2025-the-weekenders/src/cli/colors.js
+  3:4  error  Complete the task associated to this "TODO" comment  sonarjs/todo-tag
+
+/workspaces/nodebb-fall-2025-the-weekenders/src/cli/manage.js
+  121:60   error  Refactor this code to not use nested template literals                      sonarjs/no-nested-template-literals
+  140:113  error  Refactor this code to not use nested template literals                      sonarjs/no-nested-template-literals
+  152:37   error  Make sure the "PATH" variable only contains fixed, unwriteable directories  sonarjs/no-os-command-from-path
+
+/workspaces/nodebb-fall-2025-the-weekenders/src/cli/package-install.js
+   90:4  error  Handle this exception or don't catch it at all         sonarjs/no-ignored-exceptions
+  101:5  error  Handle this exception or don't catch it at all         sonarjs/no-ignored-exceptions
+  129:3  error  Make sure that executing this OS command is safe here  sonarjs/os-command
+  146:4  error  Handle this exception or don't catch it at all         sonarjs/no-ignored-exceptions
+
+/workspaces/nodebb-fall-2025-the-weekenders/src/cli/reset.js
+  100:4  error  Handle this exception or don't catch it at all  sonarjs/no-ignored-exceptions
+
+/workspaces/nodebb-fall-2025-the-weekenders/src/cli/running.js
+   63:22  error  Make sure the "PATH" variable only contains fixed, unwriteable directories  sonarjs/no-os-command-from-path
+  115:21  error  Make sure the "PATH" variable only contains fixed, unwriteable directories  sonarjs/no-os-command-from-path
+
+/workspaces/nodebb-fall-2025-the-weekenders/src/cli/upgrade-plugins.js
+  62:5  error  Handle this exception or don't catch it at all  sonarjs/no-ignored-exceptions
+
+/workspaces/nodebb-fall-2025-the-weekenders/src/cli/upgrade.js
+  53:42  error  Refactor this code to not use nested template literals  sonarjs/no-nested-template-literals
+
+/workspaces/nodebb-fall-2025-the-weekenders/src/cli/user.js
+   96:54  error  Refactor this code to not use nested template literals  sonarjs/no-nested-template-literals
+  196:17  error  Refactor this code to not use nested template literals  sonarjs/no-nested-template-literals
+  225:93  error  Refactor this code to not use nested template literals  sonarjs/no-nested-template-literals
+
+/workspaces/nodebb-fall-2025-the-weekenders/src/controllers/404.js
+  32:6  error  Complete the task associated to this "TODO" comment  sonarjs/todo-tag
+
+/workspaces/nodebb-fall-2025-the-weekenders/src/controllers/accounts/chats.js
+   91:59  error  Refactor this code to not use nested template literals  sonarjs/no-nested-template-literals
+   91:87  error  Refactor this code to not use nested template literals  sonarjs/no-nested-template-literals
+  107:6   error  Use the opposite operator (<) instead                   sonarjs/no-inverted-boolean-check
+  111:68  error  Refactor this code to not use nested template literals  sonarjs/no-nested-template-literals
+
+/workspaces/nodebb-fall-2025-the-weekenders/src/controllers/accounts/edit.js
+  89:8  error  This function expects 3 arguments, but 4 were provided  sonarjs/no-extra-arguments
+  93:8  error  This function expects 3 arguments, but 4 were provided  sonarjs/no-extra-arguments
+
+/workspaces/nodebb-fall-2025-the-weekenders/src/controllers/accounts/helpers.js
+  25:39  error  Refactor this function to reduce its Cognitive Complexity from 20 to the 15 allowed  sonarjs/cognitive-complexity
+
+/workspaces/nodebb-fall-2025-the-weekenders/src/controllers/accounts/posts.js
+  161:8  error  This function expects 3 arguments, but 4 were provided  sonarjs/no-extra-arguments
+  165:8  error  This function expects 3 arguments, but 4 were provided  sonarjs/no-extra-arguments
+  169:8  error  This function expects 3 arguments, but 4 were provided  sonarjs/no-extra-arguments
+  173:8  error  This function expects 3 arguments, but 4 were provided  sonarjs/no-extra-arguments
+  177:8  error  This function expects 3 arguments, but 4 were provided  sonarjs/no-extra-arguments
+  181:8  error  This function expects 3 arguments, but 4 were provided  sonarjs/no-extra-arguments
+  185:8  error  This function expects 3 arguments, but 4 were provided  sonarjs/no-extra-arguments
+  189:8  error  This function expects 3 arguments, but 4 were provided  sonarjs/no-extra-arguments
+  193:8  error  This function expects 3 arguments, but 4 were provided  sonarjs/no-extra-arguments
+  197:8  error  This function expects 3 arguments, but 4 were provided  sonarjs/no-extra-arguments
+  201:8  error  This function expects 3 arguments, but 4 were provided  sonarjs/no-extra-arguments
+
+/workspaces/nodebb-fall-2025-the-weekenders/src/controllers/accounts/settings.js
+  156:4  error  Handle this exception or don't catch it at all  sonarjs/no-ignored-exceptions
+
+/workspaces/nodebb-fall-2025-the-weekenders/src/controllers/activitypub/actors.js
+   45:5   error  Complete the task associated to this "TODO" comment     sonarjs/todo-tag
+  103:4   error  Handle this exception or don't catch it at all          sonarjs/no-ignored-exceptions
+  114:91  error  Refactor this code to not use nested template literals  sonarjs/no-nested-template-literals
+  149:5   error  Handle this exception or don't catch it at all          sonarjs/no-ignored-exceptions
+  182:88  error  Refactor this code to not use nested template literals  sonarjs/no-nested-template-literals
+
+/workspaces/nodebb-fall-2025-the-weekenders/src/controllers/activitypub/index.js
+  52:4  error  Handle this exception or don't catch it at all  sonarjs/no-ignored-exceptions
+
+/workspaces/nodebb-fall-2025-the-weekenders/src/controllers/admin/events.js
+  46:80  error  Refactor this code to not use nested template literals  sonarjs/no-nested-template-literals
+
+/workspaces/nodebb-fall-2025-the-weekenders/src/controllers/admin/info.js
+  132:3  error  Make sure that executing this OS command is safe here  sonarjs/os-command
+
+/workspaces/nodebb-fall-2025-the-weekenders/src/controllers/admin/uploads.js
+  154:4  error  Handle this exception or don't catch it at all  sonarjs/no-ignored-exceptions
+  226:4  error  Handle this exception or don't catch it at all  sonarjs/no-ignored-exceptions
+
+/workspaces/nodebb-fall-2025-the-weekenders/src/controllers/api.js
+  27:34  error  Refactor this function to reduce its Cognitive Complexity from 17 to the 15 allowed  sonarjs/cognitive-complexity
+
+/workspaces/nodebb-fall-2025-the-weekenders/src/controllers/authentication.js
+  278:62  error  Refactor this function to reduce its Cognitive Complexity from 18 to the 15 allowed  sonarjs/cognitive-complexity
+
+/workspaces/nodebb-fall-2025-the-weekenders/src/controllers/category.js
+  28:32  error  Refactor this function to reduce its Cognitive Complexity from 33 to the 15 allowed  sonarjs/cognitive-complexity
+
+/workspaces/nodebb-fall-2025-the-weekenders/src/controllers/helpers.js
+  231:53  error  Refactor this code to not use nested template literals                               sonarjs/no-nested-template-literals
+  450:62  error  Refactor this function to reduce its Cognitive Complexity from 18 to the 15 allowed  sonarjs/cognitive-complexity
+
+/workspaces/nodebb-fall-2025-the-weekenders/src/controllers/home.js
+  30:17  error  This function expects 1 argument, but 2 were provided  sonarjs/no-extra-arguments
+
+/workspaces/nodebb-fall-2025-the-weekenders/src/controllers/osd.js
+  23:19  error  Using http protocol is insecure. Use https instead  sonarjs/no-clear-text-protocols
+
+/workspaces/nodebb-fall-2025-the-weekenders/src/controllers/search.js
+  22:33  error  Refactor this function to reduce its Cognitive Complexity from 20 to the 15 allowed  sonarjs/cognitive-complexity
+
+/workspaces/nodebb-fall-2025-the-weekenders/src/controllers/service-worker.js
+  40:7  error  Handle this exception or don't catch it at all  sonarjs/no-ignored-exceptions
+
+/workspaces/nodebb-fall-2025-the-weekenders/src/controllers/topics.js
+   25:30   error  Refactor this function to reduce its Cognitive Complexity from 34 to the 15 allowed  sonarjs/cognitive-complexity
+   68:71   error  Refactor this code to not use nested template literals                               sonarjs/no-nested-template-literals
+   72:101  error  Refactor this code to not use nested template literals                               sonarjs/no-nested-template-literals
+  211:16   error  Refactor this function to reduce its Cognitive Complexity from 16 to the 15 allowed  sonarjs/cognitive-complexity
+
+/workspaces/nodebb-fall-2025-the-weekenders/src/controllers/uploads.js
+  22:4  error  Handle this exception or don't catch it at all  sonarjs/no-ignored-exceptions
+
+/workspaces/nodebb-fall-2025-the-weekenders/src/controllers/well-known.js
+  42:4  error  Handle this exception or don't catch it at all      sonarjs/no-ignored-exceptions
+  76:9  error  Using http protocol is insecure. Use https instead  sonarjs/no-clear-text-protocols
+
+/workspaces/nodebb-fall-2025-the-weekenders/src/controllers/write/topics.js
+  140:5  error  Complete the task associated to this "TODO" comment  sonarjs/todo-tag
+
+/workspaces/nodebb-fall-2025-the-weekenders/src/controllers/write/users.js
+  211:22  error  Make sure this weak hash algorithm is not used in a sensitive context here  sonarjs/hashing
+
+/workspaces/nodebb-fall-2025-the-weekenders/src/database/helpers.js
+  22:10  error  This function expects no arguments, but 1 was provided  sonarjs/no-extra-arguments
+
+/workspaces/nodebb-fall-2025-the-weekenders/src/database/mongo/sorted.js
+   34:17  error  Refactor this function to reduce its Cognitive Complexity from 27 to the 15 allowed  sonarjs/cognitive-complexity
+  550:5   error  Handle this exception or don't catch it at all                                       sonarjs/no-ignored-exceptions
+  569:34  error  Refactor this function to reduce its Cognitive Complexity from 22 to the 15 allowed  sonarjs/cognitive-complexity
+
+/workspaces/nodebb-fall-2025-the-weekenders/src/database/mongo/transaction.js
+  4:5  error  Complete the task associated to this "TODO" comment  sonarjs/todo-tag
+
+/workspaces/nodebb-fall-2025-the-weekenders/src/database/postgres/helpers.js
+  16:4  error  Remove this assignment of "i"  sonarjs/updated-loop-counter
+
+/workspaces/nodebb-fall-2025-the-weekenders/src/database/postgres/main.js
+  40:41  error  Refactor this code to not nest functions more than 4 levels deep  sonarjs/no-nested-functions
+
+/workspaces/nodebb-fall-2025-the-weekenders/src/database/postgres/sorted.js
+  720:34  error  Refactor this function to reduce its Cognitive Complexity from 18 to the 15 allowed  sonarjs/cognitive-complexity
+
+/workspaces/nodebb-fall-2025-the-weekenders/src/database/redis/connection.js
+  42:7  error  Use the opposite operator (<) instead  sonarjs/no-inverted-boolean-check
+
+/workspaces/nodebb-fall-2025-the-weekenders/src/database/redis/sorted.js
+  278:29  error  Arguments 'max' and 'min' have the same names but not the same order as the function parameters  sonarjs/arguments-order
+  313:34  error  Refactor this function to reduce its Cognitive Complexity from 16 to the 15 allowed              sonarjs/cognitive-complexity
+
+/workspaces/nodebb-fall-2025-the-weekenders/src/database/redis/transaction.js
+  4:5  error  Complete the task associated to this "TODO" comment  sonarjs/todo-tag
+
+/workspaces/nodebb-fall-2025-the-weekenders/src/emailer.js
+   32:12  error  Using http protocol is insecure. Use https instead                                   sonarjs/no-clear-text-protocols
+  161:29  error  Using http protocol is insecure. Use https instead                                   sonarjs/no-clear-text-protocols
+  221:46  error  Refactor this function to reduce its Cognitive Complexity from 21 to the 15 allowed  sonarjs/cognitive-complexity
+
+/workspaces/nodebb-fall-2025-the-weekenders/src/events.js
+  156:27  error  Refactor this code to not use nested template literals  sonarjs/no-nested-template-literals
+  195:56  error  Refactor this code to not use nested template literals  sonarjs/no-nested-template-literals
+
+/workspaces/nodebb-fall-2025-the-weekenders/src/file.js
+  37:36  error  Refactor this code to not use nested template literals  sonarjs/no-nested-template-literals
+
+/workspaces/nodebb-fall-2025-the-weekenders/src/flags.js
+  277:24  error  Refactor this function to reduce its Cognitive Complexity from 17 to the 15 allowed  sonarjs/cognitive-complexity
+  712:6   error  Handle this exception or don't catch it at all                                       sonarjs/no-ignored-exceptions
+  739:22  error  Refactor this function to reduce its Cognitive Complexity from 26 to the 15 allowed  sonarjs/cognitive-complexity
+
+/workspaces/nodebb-fall-2025-the-weekenders/src/groups/data.js
+  68:10  error  Refactor this function to reduce its Cognitive Complexity from 17 to the 15 allowed  sonarjs/cognitive-complexity
+
+/workspaces/nodebb-fall-2025-the-weekenders/src/groups/ownership.js
+  11:7  error  Use the opposite operator (<=) instead  sonarjs/no-inverted-boolean-check
+
+/workspaces/nodebb-fall-2025-the-weekenders/src/groups/update.js
+   16:24  error  Refactor this function to reduce its Cognitive Complexity from 21 to the 15 allowed  sonarjs/cognitive-complexity
+  227:68  error  Refactor this code to not nest functions more than 4 levels deep                     sonarjs/no-nested-functions
+
+/workspaces/nodebb-fall-2025-the-weekenders/src/image.js
+  147:19  error  Make sure this weak hash algorithm is not used in a sensitive context here  sonarjs/hashing
+
+/workspaces/nodebb-fall-2025-the-weekenders/src/install.js
+   50:10  error  Refactor this function to reduce its Cognitive Complexity from 22 to the 15 allowed                                               sonarjs/cognitive-complexity
+   59:26  error  Review this potentially hard-coded password                                                                                       sonarjs/no-hardcoded-passwords
+   65:23  error  Review this potentially hard-coded password                                                                                       sonarjs/no-hardcoded-passwords
+   88:5   error  Complete the task associated to this "TODO" comment                                                                               sonarjs/todo-tag
+   95:4   error  Handle this exception or don't catch it at all                                                                                    sonarjs/no-ignored-exceptions
+  125:10  error  Refactor this function to reduce its Cognitive Complexity from 16 to the 15 allowed                                               sonarjs/cognitive-complexity
+  129:4   error  Handle this exception or don't catch it at all                                                                                    sonarjs/no-ignored-exceptions
+  323:12  error  Make sure the regex used here, which is vulnerable to super-linear runtime due to backtracking, cannot lead to denial of service  sonarjs/slow-regex
+  545:5   error  Handle this exception or don't catch it at all                                                                                    sonarjs/no-ignored-exceptions
+
+/workspaces/nodebb-fall-2025-the-weekenders/src/messaging/data.js
+  87:78  error  This branch's code block is the same as the block for the branch on line 84  sonarjs/no-duplicated-branches
+  90:57  error  This branch's code block is the same as the block for the branch on line 87  sonarjs/no-duplicated-branches
+  92:46  error  This branch's code block is the same as the block for the branch on line 90  sonarjs/no-duplicated-branches
+
+/workspaces/nodebb-fall-2025-the-weekenders/src/messaging/index.js
+  337:47  error  Refactor this function to reduce its Cognitive Complexity from 16 to the 15 allowed  sonarjs/cognitive-complexity
+
+/workspaces/nodebb-fall-2025-the-weekenders/src/messaging/rooms.js
+  237:7  error  Use the opposite operator (<=) instead  sonarjs/no-inverted-boolean-check
+
+/workspaces/nodebb-fall-2025-the-weekenders/src/messaging/unread.js
+  9:7  error  Use the opposite operator (<=) instead  sonarjs/no-inverted-boolean-check
+
+/workspaces/nodebb-fall-2025-the-weekenders/src/meta/aliases.js
+  34:49  error  Refactor this code to not use nested template literals  sonarjs/no-nested-template-literals
+  37:18  error  Refactor this code to not use nested template literals  sonarjs/no-nested-template-literals
+
+/workspaces/nodebb-fall-2025-the-weekenders/src/meta/blacklist.js
+   20:112  error  Refactor this code to not use nested template literals                                                                            sonarjs/no-nested-template-literals
+  114:29   error  Make sure the regex used here, which is vulnerable to super-linear runtime due to backtracking, cannot lead to denial of service  sonarjs/slow-regex
+  135:5    error  Handle this exception or don't catch it at all                                                                                    sonarjs/no-ignored-exceptions
+  142:5    error  Handle this exception or don't catch it at all                                                                                    sonarjs/no-ignored-exceptions
+
+/workspaces/nodebb-fall-2025-the-weekenders/src/meta/configs.js
+   21:36  error  Refactor this function to reduce its Cognitive Complexity from 18 to the 15 allowed  sonarjs/cognitive-complexity
+  192:7   error  Use the opposite operator (<) instead                                                sonarjs/no-inverted-boolean-check
+
+/workspaces/nodebb-fall-2025-the-weekenders/src/meta/dependencies.js
+  51:4  error  Handle this exception or don't catch it at all  sonarjs/no-ignored-exceptions
+
+/workspaces/nodebb-fall-2025-the-weekenders/src/meta/errors.js
+  22:2  error  Either remove this useless object instantiation of "cronJob" or use it  sonarjs/constructor-for-side-effects
+
+/workspaces/nodebb-fall-2025-the-weekenders/src/meta/tags.js
+  61:55  error  Refactor this code to not use nested template literals  sonarjs/no-nested-template-literals
+
+/workspaces/nodebb-fall-2025-the-weekenders/src/meta/themes.js
+  88:27  error  Refactor this function to reduce its Cognitive Complexity from 16 to the 15 allowed  sonarjs/cognitive-complexity
+
+/workspaces/nodebb-fall-2025-the-weekenders/src/middleware/activitypub.js
+   48:49  error  Make sure the regex used here, which is vulnerable to super-linear runtime due to backtracking, cannot lead to denial of service  sonarjs/slow-regex
+  137:5   error  Handle this exception or don't catch it at all                                                                                    sonarjs/no-ignored-exceptions
+  146:4   error  Complete the task associated to this "TODO" comment                                                                               sonarjs/todo-tag
+
+/workspaces/nodebb-fall-2025-the-weekenders/src/middleware/admin.js
+  29:65  error  Refactor this function to reduce its Cognitive Complexity from 18 to the 15 allowed  sonarjs/cognitive-complexity
+
+/workspaces/nodebb-fall-2025-the-weekenders/src/middleware/headers.js
+  13:55  error  Refactor this function to reduce its Cognitive Complexity from 17 to the 15 allowed  sonarjs/cognitive-complexity
+  45:7   error  Handle this exception or don't catch it at all                                       sonarjs/no-ignored-exceptions
+
+/workspaces/nodebb-fall-2025-the-weekenders/src/middleware/helpers.js
+  31:56  error  Group parts of the regex together to make the intended operator precedence explicit  sonarjs/anchor-precedence
+
+/workspaces/nodebb-fall-2025-the-weekenders/src/middleware/index.js
+  230:25  error  Remove this useless assignment to variable "timesSeen"      sonarjs/no-dead-store
+  230:35  error  Extract the assignment of "timesSeen" from this expression  sonarjs/no-nested-assignment
+
+/workspaces/nodebb-fall-2025-the-weekenders/src/middleware/render.js
+  331:41  error  Complete the task associated to this "TODO" comment               sonarjs/todo-tag
+  343:41  error  Complete the task associated to this "TODO" comment               sonarjs/todo-tag
+  363:41  error  Complete the task associated to this "TODO" comment               sonarjs/todo-tag
+  375:41  error  Complete the task associated to this "TODO" comment               sonarjs/todo-tag
+  459:89  error  Refactor this code to not nest functions more than 4 levels deep  sonarjs/no-nested-functions
+
+/workspaces/nodebb-fall-2025-the-weekenders/src/notifications.js
+   69:2   error  Either remove this useless object instantiation of "cron" or use it                                                               sonarjs/constructor-for-side-effects
+  110:62  error  Make sure the regex used here, which is vulnerable to super-linear runtime due to backtracking, cannot lead to denial of service  sonarjs/slow-regex
+  345:6   error  Use the opposite operator (<=) instead                                                                                            sonarjs/no-inverted-boolean-check
+  362:46  error  Use the opposite operator (<=) instead                                                                                            sonarjs/no-inverted-boolean-check
+
+/workspaces/nodebb-fall-2025-the-weekenders/src/plugins/data.js
+  76:4   error  Handle this exception or don't catch it at all  sonarjs/no-ignored-exceptions
+  89:29  error  Remove duplicates in this character class       sonarjs/duplicates-in-character-class
+
+/workspaces/nodebb-fall-2025-the-weekenders/src/plugins/index.js
+  171:110  error  Refactor this code to not use nested template literals  sonarjs/no-nested-template-literals
+
+/workspaces/nodebb-fall-2025-the-weekenders/src/plugins/install.js
+  154:5  error  Handle this exception or don't catch it at all  sonarjs/no-ignored-exceptions
+  164:5  error  Handle this exception or don't catch it at all  sonarjs/no-ignored-exceptions
+
+/workspaces/nodebb-fall-2025-the-weekenders/src/plugins/usage.js
+  15:3  error  Either remove this useless object instantiation of "cronJob" or use it  sonarjs/constructor-for-side-effects
+
+/workspaces/nodebb-fall-2025-the-weekenders/src/posts/create.js
+  15:23  error  Refactor this function to reduce its Cognitive Complexity from 16 to the 15 allowed  sonarjs/cognitive-complexity
+
+/workspaces/nodebb-fall-2025-the-weekenders/src/posts/data.js
+  58:10  error  Refactor this function to reduce its Cognitive Complexity from 18 to the 15 allowed  sonarjs/cognitive-complexity
+
+/workspaces/nodebb-fall-2025-the-weekenders/src/posts/parse.js
+  41:26  error  Make sure the regex used here, which is vulnerable to super-linear runtime due to backtracking, cannot lead to denial of service  sonarjs/slow-regex
+
+/workspaces/nodebb-fall-2025-the-weekenders/src/posts/uploads.js
+  23:26  error  Make sure this weak hash algorithm is not used in a sensitive context here  sonarjs/hashing
+  25:61  error  Replace this character class by the character itself                        sonarjs/single-char-in-character-classes
+  35:3   error  Either remove this useless object instantiation of "cronJob" or use it      sonarjs/constructor-for-side-effects
+
+/workspaces/nodebb-fall-2025-the-weekenders/src/posts/votes.js
+  159:77  error  Refactor this code to not use nested template literals  sonarjs/no-nested-template-literals
+  206:6   error  Handle this exception or don't catch it at all          sonarjs/no-ignored-exceptions
+
+/workspaces/nodebb-fall-2025-the-weekenders/src/prestart.js
+  98:80  error  Make sure the regex used here, which is vulnerable to super-linear runtime due to backtracking, cannot lead to denial of service  sonarjs/slow-regex
+
+/workspaces/nodebb-fall-2025-the-weekenders/src/privileges/admin.js
+  107:39  error  Review this potentially hard-coded password  sonarjs/no-hardcoded-passwords
+  108:35  error  Review this potentially hard-coded password  sonarjs/no-hardcoded-passwords
+
+/workspaces/nodebb-fall-2025-the-weekenders/src/request.js
+  61:5  error  Handle this exception or don't catch it at all  sonarjs/no-ignored-exceptions
+
+/workspaces/nodebb-fall-2025-the-weekenders/src/routes/index.js
+  135:70  error  Refactor this code to not use nested template literals  sonarjs/no-nested-template-literals
+  136:62  error  Refactor this code to not use nested template literals  sonarjs/no-nested-template-literals
+
+/workspaces/nodebb-fall-2025-the-weekenders/src/routes/well-known.js
+  22:11  error  Using http protocol is insecure. Use https instead  sonarjs/no-clear-text-protocols
+
+/workspaces/nodebb-fall-2025-the-weekenders/src/routes/write/users.js
+  11:10  error  Remove unused function 'guestRoutes'  sonarjs/no-unused-vars
+
+/workspaces/nodebb-fall-2025-the-weekenders/src/search.js
+   56:16  error  Refactor this function to reduce its Cognitive Complexity from 23 to the 15 allowed  sonarjs/cognitive-complexity
+   81:61  error  Replace this character class by the character itself                                 sonarjs/single-char-in-character-classes
+  100:7   error  Handle this exception or don't catch it at all                                       sonarjs/no-ignored-exceptions
+  185:4   error  Handle this exception or don't catch it at all                                       sonarjs/no-ignored-exceptions
+
+/workspaces/nodebb-fall-2025-the-weekenders/src/settings.js
+  75:5  error  Handle this exception or don't catch it at all  sonarjs/no-ignored-exceptions
+  95:5  error  Handle this exception or don't catch it at all  sonarjs/no-ignored-exceptions
+
+/workspaces/nodebb-fall-2025-the-weekenders/src/socket.io/admin/rooms.js
+  18:28  error  Refactor this function to reduce its Cognitive Complexity from 16 to the 15 allowed  sonarjs/cognitive-complexity
+
+/workspaces/nodebb-fall-2025-the-weekenders/src/socket.io/categories.js
+  145:28  error  Use the opposite operator (<) instead  sonarjs/no-inverted-boolean-check
+
+/workspaces/nodebb-fall-2025-the-weekenders/src/socket.io/index.js
+  336:26  error  Refactor this code to not use nested template literals  sonarjs/no-nested-template-literals
+
+/workspaces/nodebb-fall-2025-the-weekenders/src/socket.io/meta.js
+  30:32  error  Refactor this function to reduce its Cognitive Complexity from 16 to the 15 allowed  sonarjs/cognitive-complexity
+
+/workspaces/nodebb-fall-2025-the-weekenders/src/socket.io/modules.js
+  115:6  error  Use the opposite operator (<=) instead  sonarjs/no-inverted-boolean-check
+
+/workspaces/nodebb-fall-2025-the-weekenders/src/start.js
+  91:45  error  Extract this nested ternary operation into an independent statement  sonarjs/no-nested-conditional
+  91:67  error  Refactor this code to not use nested template literals               sonarjs/no-nested-template-literals
+  91:81  error  Refactor this code to not use nested template literals               sonarjs/no-nested-template-literals
+
+/workspaces/nodebb-fall-2025-the-weekenders/src/topics/create.js
+  83:22  error  Refactor this function to reduce its Cognitive Complexity from 22 to the 15 allowed  sonarjs/cognitive-complexity
+
+/workspaces/nodebb-fall-2025-the-weekenders/src/topics/events.js
+  132:2  error  Remove this useless assignment to variable "eventIds"  sonarjs/no-dead-store
+
+/workspaces/nodebb-fall-2025-the-weekenders/src/topics/follow.js
+  38:7  error  Use the opposite operator (<=) instead  sonarjs/no-inverted-boolean-check
+
+/workspaces/nodebb-fall-2025-the-weekenders/src/topics/index.js
+  161:35  error  Refactor this function to reduce its Cognitive Complexity from 18 to the 15 allowed  sonarjs/cognitive-complexity
+  166:41  error  Extract this nested ternary operation into an independent statement                  sonarjs/no-nested-conditional
+
+/workspaces/nodebb-fall-2025-the-weekenders/src/topics/posts.js
+  81:17  error  Refactor this function to reduce its Cognitive Complexity from 23 to the 15 allowed  sonarjs/cognitive-complexity
+
+/workspaces/nodebb-fall-2025-the-weekenders/src/topics/scheduled.js
+  21:2  error  Either remove this useless object instantiation of "CronJob" or use it                       sonarjs/constructor-for-side-effects
+  59:3  error  Remove this use of the output from "federatePosts"; "federatePosts" doesn't return anything  sonarjs/no-use-of-empty-return-value
+
+/workspaces/nodebb-fall-2025-the-weekenders/src/topics/sorted.js
+  161:47  error  Refactor this code to not use nested template literals            sonarjs/no-nested-template-literals
+  282:60  error  Refactor this code to not nest functions more than 4 levels deep  sonarjs/no-nested-functions
+
+/workspaces/nodebb-fall-2025-the-weekenders/src/topics/tags.js
+  161:41  error  Refactor this code to not nest functions more than 4 levels deep  sonarjs/no-nested-functions
+  256:44  error  Refactor this code to not nest functions more than 4 levels deep  sonarjs/no-nested-functions
+  572:7   error  Use the opposite operator (<=) instead                            sonarjs/no-inverted-boolean-check
+  584:7   error  Use the opposite operator (<=) instead                            sonarjs/no-inverted-boolean-check
+
+/workspaces/nodebb-fall-2025-the-weekenders/src/topics/tools.js
+  26:17  error  Refactor this function to reduce its Cognitive Complexity from 16 to the 15 allowed  sonarjs/cognitive-complexity
+
+/workspaces/nodebb-fall-2025-the-weekenders/src/topics/unread.js
+  157:70  error  Refactor this code to not nest functions more than 4 levels deep  sonarjs/no-nested-functions
+  206:7   error  Use the opposite operator (<=) instead                            sonarjs/no-inverted-boolean-check
+  344:6   error  Complete the task associated to this "TODO" comment               sonarjs/todo-tag
+  351:7   error  Use the opposite operator (<=) instead                            sonarjs/no-inverted-boolean-check
+
+/workspaces/nodebb-fall-2025-the-weekenders/src/upgrade.js
+  122:51   error  Refactor this code to not use nested template literals  sonarjs/no-nested-template-literals
+  122:115  error  Refactor this code to not use nested template literals  sonarjs/no-nested-template-literals
+  142:60   error  Refactor this code to not use nested template literals  sonarjs/no-nested-template-literals
+
+/workspaces/nodebb-fall-2025-the-weekenders/src/upgrades/1.0.0/chat_room_hashes.js
+  28:106  error  Refactor this code to not nest functions more than 4 levels deep  sonarjs/no-nested-functions
+
+/workspaces/nodebb-fall-2025-the-weekenders/src/upgrades/1.0.0/chat_upgrade.js
+  34:15  error  Refactor this code to not nest functions more than 4 levels deep  sonarjs/no-nested-functions
+  47:45  error  Refactor this code to not nest functions more than 4 levels deep  sonarjs/no-nested-functions
+  57:8   error  Refactor this code to not nest functions more than 4 levels deep  sonarjs/no-nested-functions
+  60:8   error  Refactor this code to not nest functions more than 4 levels deep  sonarjs/no-nested-functions
+  63:8   error  Refactor this code to not nest functions more than 4 levels deep  sonarjs/no-nested-functions
+  66:8   error  Refactor this code to not nest functions more than 4 levels deep  sonarjs/no-nested-functions
+  69:16  error  Refactor this code to not nest functions more than 4 levels deep  sonarjs/no-nested-functions
+
+/workspaces/nodebb-fall-2025-the-weekenders/src/upgrades/1.1.0/user_post_count_per_tid.js
+  23:38  error  Refactor this code to not nest functions more than 4 levels deep  sonarjs/no-nested-functions
+
+/workspaces/nodebb-fall-2025-the-weekenders/src/upgrades/1.1.1/upload_privileges.js
+  24:50  error  Refactor this code to not nest functions more than 4 levels deep  sonarjs/no-nested-functions
+
+/workspaces/nodebb-fall-2025-the-weekenders/src/upgrades/1.10.0/hash_recent_ip_addresses.js
+  26:12  error  Make sure this weak hash algorithm is not used in a sensitive context here  sonarjs/hashing
+
+/workspaces/nodebb-fall-2025-the-weekenders/src/upgrades/1.12.1/clear_username_email_history.js
+  31:88  error  Refactor this code to not nest functions more than 4 levels deep  sonarjs/no-nested-functions
+
+/workspaces/nodebb-fall-2025-the-weekenders/src/upgrades/1.15.0/add_target_uid_to_flags.js
+  13:66  error  Refactor this function to reduce its Cognitive Complexity from 16 to the 15 allowed  sonarjs/cognitive-complexity
+
+/workspaces/nodebb-fall-2025-the-weekenders/src/upgrades/1.19.3/fix_user_uploads_zset.js
+  8:25  error  Make sure this weak hash algorithm is not used in a sensitive context here  sonarjs/hashing
+
+/workspaces/nodebb-fall-2025-the-weekenders/src/upgrades/1.19.3/rename_post_upload_hashes.js
+  10:25  error  Make sure this weak hash algorithm is not used in a sensitive context here  sonarjs/hashing
+
+/workspaces/nodebb-fall-2025-the-weekenders/src/upgrades/1.2.0/category_recent_tids.js
+  21:78  error  Refactor this code to not nest functions more than 4 levels deep  sonarjs/no-nested-functions
+
+/workspaces/nodebb-fall-2025-the-weekenders/src/upgrades/1.2.0/edit_delete_deletetopic_privileges.js
+  11:2  error  Refactor this function to reduce its Cognitive Complexity from 17 to the 15 allowed  sonarjs/cognitive-complexity
+
+/workspaces/nodebb-fall-2025-the-weekenders/src/upgrades/1.4.4/sound_settings.js
+  43:60  error  Refactor this code to not nest functions more than 4 levels deep  sonarjs/no-nested-functions
+
+/workspaces/nodebb-fall-2025-the-weekenders/src/upgrades/1.4.6/delete_sessions.js
+  14:5  error  Handle this exception or don't catch it at all  sonarjs/no-ignored-exceptions
+
+/workspaces/nodebb-fall-2025-the-weekenders/src/upgrades/1.6.0/clear-stale-digest-template.js
+  16:50  error  Make sure this weak hash algorithm is not used in a sensitive context here  sonarjs/hashing
+
+/workspaces/nodebb-fall-2025-the-weekenders/src/upgrades/1.7.0/generate-custom-html.js
+  18:36  error  Rework this part of the regex to not match the empty string  sonarjs/empty-string-repetition
+
+/workspaces/nodebb-fall-2025-the-weekenders/src/upgrades/1.7.3/key_value_schema_change.js
+  14:5  error  Handle this exception or don't catch it at all  sonarjs/no-ignored-exceptions
+
+/workspaces/nodebb-fall-2025-the-weekenders/src/upgrades/1.8.1/diffs_zset_to_listhash.js
+  27:37  error  Refactor this code to not nest functions more than 4 levels deep  sonarjs/no-nested-functions
+  36:15  error  Refactor this code to not nest functions more than 4 levels deep  sonarjs/no-nested-functions
+
+/workspaces/nodebb-fall-2025-the-weekenders/src/upgrades/3.2.0/migrate_api_tokens.js
+  34:5  error  Handle this exception or don't catch it at all  sonarjs/no-ignored-exceptions
+
+/workspaces/nodebb-fall-2025-the-weekenders/src/upgrades/4.3.0/fix_duplicate_handles.js
+  53:8  error  Handle this exception or don't catch it at all  sonarjs/no-ignored-exceptions
+
+/workspaces/nodebb-fall-2025-the-weekenders/src/upgrades/4.3.0/normalize_thumbs_uploads.js
+  28:27  error  Make sure this weak hash algorithm is not used in a sensitive context here  sonarjs/hashing
+
+/workspaces/nodebb-fall-2025-the-weekenders/src/user/admin.js
+  17:7   error  Use the opposite operator (<=) instead                            sonarjs/no-inverted-boolean-check
+  43:38  error  Refactor this code to not nest functions more than 4 levels deep  sonarjs/no-nested-functions
+  66:49  error  Refactor this code to not use nested template literals            sonarjs/no-nested-template-literals
+
+/workspaces/nodebb-fall-2025-the-weekenders/src/user/approval.js
+  17:2  error  Either remove this useless object instantiation of "cronJob" or use it  sonarjs/constructor-for-side-effects
+
+/workspaces/nodebb-fall-2025-the-weekenders/src/user/auth.js
+   15:7  error  Use the opposite operator (<=) instead  sonarjs/no-inverted-boolean-check
+   41:7  error  Use the opposite operator (<=) instead  sonarjs/no-inverted-boolean-check
+  103:7  error  Use the opposite operator (<=) instead  sonarjs/no-inverted-boolean-check
+
+/workspaces/nodebb-fall-2025-the-weekenders/src/user/categories.js
+  47:7  error  Use the opposite operator (<=) instead  sonarjs/no-inverted-boolean-check
+  57:7  error  Use the opposite operator (<=) instead  sonarjs/no-inverted-boolean-check
+  69:7  error  Use the opposite operator (<=) instead  sonarjs/no-inverted-boolean-check
+  88:7  error  Use the opposite operator (<=) instead  sonarjs/no-inverted-boolean-check
+
+/workspaces/nodebb-fall-2025-the-weekenders/src/user/data.js
+  227:24  error  Refactor this function to reduce its Cognitive Complexity from 42 to the 15 allowed  sonarjs/cognitive-complexity
+  345:5   error  Handle this exception or don't catch it at all                                       sonarjs/no-ignored-exceptions
+
+/workspaces/nodebb-fall-2025-the-weekenders/src/user/delete.js
+  218:57  error  Refactor this code to not nest functions more than 4 levels deep  sonarjs/no-nested-functions
+  220:21  error  Refactor this code to not nest functions more than 4 levels deep  sonarjs/no-nested-functions
+
+/workspaces/nodebb-fall-2025-the-weekenders/src/user/email.js
+  219:6  error  Use the opposite operator (<=) instead  sonarjs/no-inverted-boolean-check
+
+/workspaces/nodebb-fall-2025-the-weekenders/src/user/index.js
+  213:6  error  Use the opposite operator (<=) instead  sonarjs/no-inverted-boolean-check
+
+/workspaces/nodebb-fall-2025-the-weekenders/src/user/interstitials.js
+  49:40  error  Refactor this function to reduce its Cognitive Complexity from 49 to the 15 allowed  sonarjs/cognitive-complexity
+
+/workspaces/nodebb-fall-2025-the-weekenders/src/user/jobs/export-uploads.js
+  41:4  error  Replace this "switch" statement by "if" statements to increase readability  sonarjs/no-small-switch
+  56:4  error  Replace this "switch" statement by "if" statements to increase readability  sonarjs/no-small-switch
+
+/workspaces/nodebb-fall-2025-the-weekenders/src/user/online.js
+  11:30  error  Use the opposite operator (<=) instead  sonarjs/no-inverted-boolean-check
+  23:7   error  Use the opposite operator (<=) instead  sonarjs/no-inverted-boolean-check
+
+/workspaces/nodebb-fall-2025-the-weekenders/src/user/password.js
+  31:5  error  Handle this exception or don't catch it at all  sonarjs/no-ignored-exceptions
+
+/workspaces/nodebb-fall-2025-the-weekenders/src/user/posts.js
+   33:17  error  Refactor this function to reduce its Cognitive Complexity from 16 to the 15 allowed  sonarjs/cognitive-complexity
+  154:27  error  Use the opposite operator (<=) instead                                               sonarjs/no-inverted-boolean-check
+
+/workspaces/nodebb-fall-2025-the-weekenders/src/user/profile.js
+  95:26  error  Refactor this function to reduce its Cognitive Complexity from 25 to the 15 allowed  sonarjs/cognitive-complexity
+
+/workspaces/nodebb-fall-2025-the-weekenders/src/user/search.js
+  29:22  error  Refactor this function to reduce its Cognitive Complexity from 38 to the 15 allowed  sonarjs/cognitive-complexity
+
+/workspaces/nodebb-fall-2025-the-weekenders/src/user/settings.js
+  100:5  error  Handle this exception or don't catch it at all  sonarjs/no-ignored-exceptions
+
+/workspaces/nodebb-fall-2025-the-weekenders/src/user/uploads.js
+  13:25  error  Make sure this weak hash algorithm is not used in a sensitive context here  sonarjs/hashing
+  78:24  error  Refactor this code to not nest functions more than 4 levels deep            sonarjs/no-nested-functions
+
+/workspaces/nodebb-fall-2025-the-weekenders/src/webserver.js
+  260:16  error  Refactor this function to reduce its Cognitive Complexity from 16 to the 15 allowed  sonarjs/cognitive-complexity
+  294:28  error  Make sure this permission is safe                                                    sonarjs/file-permissions
+  305:46  error  Refactor this code to not use nested template literals                               sonarjs/no-nested-template-literals
+
+✖ 328 problems (328 errors, 0 warnings)
+
