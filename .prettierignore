@@ -4,4 +4,27 @@ coverage
 node_modules
 .docker
 public/vendor
+vendor
 *.min.js
+
+# Logs
+logs
+
+# Generated files
+dump.rdb
+
+# Config files (often auto-generated)
+webpack.*.js
+commitlint.config.js
+eslint.config.mjs
+
+# Test output files from previous runs
+prettier-check-output.txt
+prettier-files-to-format.txt
+
+# Other artifacts
+cookies.txt
+*.pid
+
+# GitHub directory
+.github

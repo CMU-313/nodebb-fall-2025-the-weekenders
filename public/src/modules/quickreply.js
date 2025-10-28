@@ -1,66 +1,84 @@
-'use strict';
+"use strict";
 
-define('quickreply', [
-	'components', 'autocomplete', 'api',
-	'alerts', 'uploadHelpers', 'mousetrap', 'storage', 'hooks',
+define("quickreply", [
+	"components",
+	"autocomplete",
+	"api",
+	"alerts",
+	"uploadHelpers",
+	"mousetrap",
+	"storage",
+	"hooks",
 ], function (
-	components, autocomplete, api,
-	alerts, uploadHelpers, mousetrap, storage, hooks
+	components,
+	autocomplete,
+	api,
+	alerts,
+	uploadHelpers,
+	mousetrap,
+	storage,
+	hooks,
 ) {
 	const QuickReply = {
 		_autocomplete: null,
 	};
 
 	QuickReply.init = function () {
-		const element = components.get('topic/quickreply/text');
+		const element = components.get("topic/quickreply/text");
 		const qrDraftId = `qr:draft:tid:${ajaxify.data.tid}`;
 		const data = {
 			element: element,
 			strategies: [],
 			options: {
 				style: {
-					'z-index': 100,
+					"z-index": 100,
 				},
 			},
 		};
 
 		destroyAutoComplete();
-		$(window).one('action:ajaxify.start', () => {
+		$(window).one("action:ajaxify.start", () => {
 			destroyAutoComplete();
 		});
-		$(window).trigger('composer:autocomplete:init', data);
+		$(window).trigger("composer:autocomplete:init", data);
 		QuickReply._autocomplete = autocomplete.setup(data);
 
-		mousetrap.bind('ctrl+return', (e) => {
+		mousetrap.bind("ctrl+return", (e) => {
 			if (e.target === element.get(0)) {
-				components.get('topic/quickreply/button').get(0).click();
+				components.get("topic/quickreply/button").get(0).click();
 			}
 		});
 
 		uploadHelpers.init({
 			uploadBtnEl: $('[component="topic/quickreply/upload/button"]'),
-			dragDropAreaEl: $('[component="topic/quickreply/container"] .quickreply-message'),
+			dragDropAreaEl: $(
+				'[component="topic/quickreply/container"] .quickreply-message',
+			),
 			pasteEl: element,
 			uploadFormEl: $('[component="topic/quickreply/upload"]'),
 			inputEl: element,
-			route: '/api/post/upload',
+			route: "/api/post/upload",
 			callback: function (uploads) {
 				let text = element.val();
 				uploads.forEach((upload) => {
-					text = text + (text ? '\n' : '') + (upload.isImage ? '!' : '') + `[${upload.filename}](${upload.url})`;
+					text =
+						text +
+						(text ? "\n" : "") +
+						(upload.isImage ? "!" : "") +
+						`[${upload.filename}](${upload.url})`;
 				});
 				element.val(text);
 			},
 		});
 
 		let ready = true;
-		components.get('topic/quickreply/button').on('click', function (e) {
+		components.get("topic/quickreply/button").on("click", function (e) {
 			e.preventDefault();
 			if (!ready) {
 				return;
 			}
 
-			const replyMsg = components.get('topic/quickreply/text').val();
+			const replyMsg = components.get("topic/quickreply/text").val();
 			const replyData = {
 				tid: ajaxify.data.tid,
 				handle: undefined,
@@ -68,9 +86,13 @@ define('quickreply', [
 			};
 			const replyLen = replyMsg.length;
 			if (replyLen < parseInt(config.minimumPostLength, 10)) {
-				return alerts.error('[[error:content-too-short, ' + config.minimumPostLength + ']]');
+				return alerts.error(
+					"[[error:content-too-short, " + config.minimumPostLength + "]]",
+				);
 			} else if (replyLen > parseInt(config.maximumPostLength, 10)) {
-				return alerts.error('[[error:content-too-long, ' + config.maximumPostLength + ']]');
+				return alerts.error(
+					"[[error:content-too-long, " + config.maximumPostLength + "]]",
+				);
 			}
 
 			ready = false;
@@ -81,8 +103,8 @@ define('quickreply', [
 				}
 				if (data && data.queued) {
 					alerts.alert({
-						type: 'success',
-						title: '[[global:alert.success]]',
+						type: "success",
+						title: "[[global:alert.success]]",
 						message: data.message,
 						timeout: 10000,
 						clickfn: function () {
@@ -91,10 +113,10 @@ define('quickreply', [
 					});
 				}
 
-				components.get('topic/quickreply/text').val('');
+				components.get("topic/quickreply/text").val("");
 				storage.removeItem(qrDraftId);
 				QuickReply._autocomplete.hide();
-				hooks.fire('action:quickreply.success', { data });
+				hooks.fire("action:quickreply.success", { data });
 			});
 		});
 
@@ -103,25 +125,28 @@ define('quickreply', [
 			element.val(draft);
 		}
 
-		element.on('keyup', utils.debounce(function () {
-			const text = element.val();
-			if (text) {
-				storage.setItem(qrDraftId, text);
-			} else {
-				storage.removeItem(qrDraftId);
-			}
-		}, 1000));
+		element.on(
+			"keyup",
+			utils.debounce(function () {
+				const text = element.val();
+				if (text) {
+					storage.setItem(qrDraftId, text);
+				} else {
+					storage.removeItem(qrDraftId);
+				}
+			}, 1000),
+		);
 
-		components.get('topic/quickreply/expand').on('click', (e) => {
+		components.get("topic/quickreply/expand").on("click", (e) => {
 			e.preventDefault();
 			storage.removeItem(qrDraftId);
-			const textEl = components.get('topic/quickreply/text');
-			hooks.fire('action:composer.post.new', {
+			const textEl = components.get("topic/quickreply/text");
+			hooks.fire("action:composer.post.new", {
 				tid: ajaxify.data.tid,
 				title: ajaxify.data.titleRaw,
 				body: textEl.val(),
 			});
-			textEl.val('');
+			textEl.val("");
 		});
 	};
 

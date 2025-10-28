@@ -1,6 +1,6 @@
-'use strict';
+"use strict";
 
-const db = require('../database');
+const db = require("../database");
 
 module.exports = function (Posts) {
 	// Endorse a post by setting an endorsed flag and timestamp
@@ -9,7 +9,7 @@ module.exports = function (Posts) {
 		const endorsedAt = Date.now();
 
 		await db.setObject(key, {
-			endorsed: 1,             
+			endorsed: 1,
 			endorsed_at: endorsedAt,
 			endorsed_rank: rank || 0,
 		});
