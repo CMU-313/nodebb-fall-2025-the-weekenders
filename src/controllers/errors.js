@@ -45,6 +45,7 @@ exports.handleURIErrors = async function handleURIErrors(err, req, res, next) {
 
 // this needs to have four arguments or express treats it as `(req, res, next)`
 // don't remove `next`!
+// eslint-disable-next-line no-unused-vars
 exports.handleErrors = async function handleErrors(err, req, res, next) {
 	const cases = {
 		EBADCSRFTOKEN: function () {

@@ -8,6 +8,7 @@ import { defineConfig } from 'eslint/config';
 import stylisticJs from '@stylistic/eslint-plugin-js'
 import js from '@eslint/js';
 import globals from 'globals';
+import prettierConfig from 'eslint-config-prettier';
 
 export default defineConfig([
 	{
@@ -60,6 +61,6 @@ export default defineConfig([
 		}
 	},
 	...publicConfig,
-	...serverConfig
+	...serverConfig,
+	prettierConfig, 
 ]);
-
