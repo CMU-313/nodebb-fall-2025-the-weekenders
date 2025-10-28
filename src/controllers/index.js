@@ -139,7 +139,7 @@ Controllers.login = async function (req, res) {
 		'groups:local:login',
 	]);
 	const hasLoginPrivilege = !!loginPrivileges.find(
-		(privilege) => privilege.privileges['groups:local:login']
+		privilege => privilege.privileges['groups:local:login']
 	);
 	data.allowLocalLogin =
 		hasLoginPrivilege || parseInt(req.query.local, 10) === 1;
@@ -238,7 +238,7 @@ Controllers.registerInterstitial = async function (req, res, next) {
 		}
 
 		const errors = req.flash('errors');
-		const renders = data.interstitials.map((interstitial) =>
+		const renders = data.interstitials.map(interstitial =>
 			req.app.renderAsync(interstitial.template, {
 				...(interstitial.data || {}),
 				errors,

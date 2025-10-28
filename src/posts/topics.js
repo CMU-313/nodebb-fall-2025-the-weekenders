@@ -16,7 +16,7 @@ module.exports = function (Posts) {
 		pids = isArray ? pids : [pids];
 		const postData = await Posts.getPostsFields(pids, ['tid']);
 		const topicData = await topics.getTopicsFields(
-			postData.map((t) => t.tid),
+			postData.map(t => t.tid),
 			['mainPid']
 		);
 		const result = pids.map(
@@ -37,7 +37,7 @@ module.exports = function (Posts) {
 
 	Posts.generatePostPaths = async function (pids, uid) {
 		const postData = await Posts.getPostsFields(pids, ['pid', 'tid']);
-		const tids = postData.map((post) => post && post.tid);
+		const tids = postData.map(post => post && post.tid);
 		const [indices, topicData] = await Promise.all([
 			Posts.getPostIndices(postData, uid),
 			topics.getTopicsFields(tids, ['slug']),

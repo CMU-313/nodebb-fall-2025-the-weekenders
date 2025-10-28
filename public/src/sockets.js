@@ -115,7 +115,7 @@ app = window.app || {};
 				alerts.alert(params);
 			});
 		});
-		socket.on('event:deprecated_call', (data) => {
+		socket.on('event:deprecated_call', data => {
 			console.warn(
 				'[socket.io]',
 				data.eventName,
@@ -206,7 +206,7 @@ app = window.app || {};
 			if (ajaxify.data.publicRooms) {
 				socket.emit(
 					'modules.chats.enterPublic',
-					ajaxify.data.publicRooms.map((r) => r.roomId)
+					ajaxify.data.publicRooms.map(r => r.roomId)
 				);
 			}
 		}

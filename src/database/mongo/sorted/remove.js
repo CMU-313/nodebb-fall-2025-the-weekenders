@@ -61,7 +61,7 @@ module.exports = function (module) {
 		const bulk = module.client
 			.collection('objects')
 			.initializeUnorderedBulkOp();
-		data.forEach((item) =>
+		data.forEach(item =>
 			bulk.find({ _key: item[0], value: String(item[1]) }).delete()
 		);
 		await bulk.execute();

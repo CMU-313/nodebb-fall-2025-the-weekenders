@@ -20,7 +20,7 @@ Dependencies.check = async function () {
 
 	winston.verbose('Checking dependencies for outdated modules');
 
-	await Promise.all(modules.map((module) => Dependencies.checkModule(module)));
+	await Promise.all(modules.map(module => Dependencies.checkModule(module)));
 
 	if (depsMissing) {
 		throw new Error('dependencies-missing');

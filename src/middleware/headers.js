@@ -34,7 +34,7 @@ module.exports = function (middleware) {
 
 		if (meta.config['access-control-allow-origin']) {
 			let origins = meta.config['access-control-allow-origin'].split(',');
-			origins = origins.map((origin) => origin && origin.trim());
+			origins = origins.map(origin => origin && origin.trim());
 
 			if (origins.includes(req.get('origin'))) {
 				headers['Access-Control-Allow-Origin'] = encodeURI(req.get('origin'));
@@ -45,7 +45,7 @@ module.exports = function (middleware) {
 		if (meta.config['access-control-allow-origin-regex']) {
 			let originsRegex =
 				meta.config['access-control-allow-origin-regex'].split(',');
-			originsRegex = originsRegex.map((origin) => {
+			originsRegex = originsRegex.map(origin => {
 				try {
 					origin = new RegExp(origin.trim());
 				} catch (err) {
@@ -57,7 +57,7 @@ module.exports = function (middleware) {
 				return origin;
 			});
 
-			originsRegex.forEach((regex) => {
+			originsRegex.forEach(regex => {
 				if (regex && regex.test(req.get('origin'))) {
 					headers['Access-Control-Allow-Origin'] = encodeURI(req.get('origin'));
 					headers.Vary = headers.Vary ? `${headers.Vary}, Origin` : 'Origin';

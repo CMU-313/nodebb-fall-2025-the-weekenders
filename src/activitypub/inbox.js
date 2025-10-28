@@ -31,10 +31,10 @@ function reject(type, object, target, senderType = 'uid', id = 0) {
 				object,
 			},
 		})
-		.catch((err) => winston.error(err.stack));
+		.catch(err => winston.error(err.stack));
 }
 
-inbox.create = async (req) => {
+inbox.create = async req => {
 	const { object, actor } = req.body;
 
 	// Alternative logic for non-public objects
@@ -59,7 +59,7 @@ inbox.create = async (req) => {
 	}
 };
 
-inbox.add = async (req) => {
+inbox.add = async req => {
 	const { actor, object, target } = req.body;
 
 	// Only react on Adds pertaining to local posts
@@ -80,7 +80,7 @@ inbox.add = async (req) => {
 	}
 };
 
-inbox.update = async (req) => {
+inbox.update = async req => {
 	const { actor, object } = req.body;
 	const isPublic = [...(object.to || []), ...(object.cc || [])].includes(
 		activitypub._constants.publicAddress
@@ -204,7 +204,7 @@ inbox.update = async (req) => {
 	}
 };
 
-inbox.delete = async (req) => {
+inbox.delete = async req => {
 	const { actor, object } = req.body;
 	if (typeof object !== 'string') {
 		const { id } = object;
@@ -274,7 +274,7 @@ inbox.delete = async (req) => {
 	}
 };
 
-inbox.like = async (req) => {
+inbox.like = async req => {
 	const { actor, object } = req.body;
 	const { type, id } = await activitypub.helpers.resolveLocalId(object.id);
 
@@ -301,7 +301,7 @@ inbox.like = async (req) => {
 	socketHelpers.upvote(result, 'notifications:upvoted-your-post-in');
 };
 
-inbox.announce = async (req) => {
+inbox.announce = async req => {
 	let { actor, object, published, to, cc } = req.body;
 	activitypub.helpers.log(
 		`[activitypub/inbox/announce] Parsing Announce(${object.type}) from ${actor}`
@@ -424,7 +424,7 @@ inbox.announce = async (req) => {
 	}
 };
 
-inbox.follow = async (req) => {
+inbox.follow = async req => {
 	const { actor, object, id: followId } = req.body;
 	// Sanity checks
 	const { type, id } = await helpers.resolveLocalId(object.id);
@@ -472,7 +472,7 @@ inbox.follow = async (req) => {
 					object: object.id,
 				},
 			})
-			.catch((err) => winston.error(err.stack));
+			.catch(err => winston.error(err.stack));
 	} else if (type === 'category') {
 		const [exists, allowed] = await Promise.all([
 			categories.exists(id),
@@ -505,7 +505,7 @@ inbox.follow = async (req) => {
 					object: object.id,
 				},
 			})
-			.catch((err) => winston.error(err.stack));
+			.catch(err => winston.error(err.stack));
 	}
 };
 
@@ -516,7 +516,7 @@ inbox.isFollowed = async (actorId, uid) => {
 	return await db.isSortedSetMember(`followersRemote:${uid}`, actorId);
 };
 
-inbox.accept = async (req) => {
+inbox.accept = async req => {
 	const { actor, object } = req.body;
 	const { type } = object;
 
@@ -567,7 +567,7 @@ inbox.accept = async (req) => {
 	}
 };
 
-inbox.undo = async (req) => {
+inbox.undo = async req => {
 	// todo: "actor" in this case should be the one in object, no?
 	const { actor, object } = req.body;
 	const { type } = object;
@@ -675,7 +675,7 @@ inbox.undo = async (req) => {
 				object.object = [object.object];
 			}
 			await Promise.all(
-				object.object.map(async (subject) => {
+				object.object.map(async subject => {
 					const { type, id } = await activitypub.helpers.resolveLocalId(
 						subject.id
 					);
@@ -690,7 +690,7 @@ inbox.undo = async (req) => {
 		}
 	}
 };
-inbox.flag = async (req) => {
+inbox.flag = async req => {
 	const { actor, object, content } = req.body;
 	const objects = Array.isArray(object) ? object : [object];
 
@@ -716,7 +716,7 @@ inbox.flag = async (req) => {
 	);
 };
 
-inbox.reject = async (req) => {
+inbox.reject = async req => {
 	const { actor, object } = req.body;
 	const { type, id } = object;
 	const { hostname } = new URL(actor);

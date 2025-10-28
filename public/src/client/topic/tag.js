@@ -50,7 +50,7 @@ define('forum/topic/tag', [
 					const input = tagsinputEl[0].$input;
 
 					const topic = topics[index];
-					topic.tags.forEach((tag) => tagEl.tagsinput('add', tag.value));
+					topic.tags.forEach(tag => tagEl.tagsinput('add', tag.value));
 
 					tagEl.on('itemAdded', function (event) {
 						if (tagWhitelist.length && !tagWhitelist.includes(event.item)) {
@@ -110,7 +110,7 @@ define('forum/topic/tag', [
 	}
 
 	Tag.updateTopicTags = function (topics) {
-		topics.forEach((topic) => {
+		topics.forEach(topic => {
 			// render "partials/category/tags" or "partials/topic/tags"
 			const tpl = ajaxify.data.template.topic
 				? 'partials/topic/tags'

@@ -24,9 +24,9 @@ async function getModuleVersions(modules) {
 	const batch = require('../batch');
 	await batch.processArray(
 		modules,
-		async (moduleNames) => {
+		async moduleNames => {
 			await Promise.all(
-				moduleNames.map(async (module) => {
+				moduleNames.map(async module => {
 					let pkg = await fs.promises.readFile(
 						path.join(paths.nodeModules, module, 'package.json'),
 						{ encoding: 'utf-8' }
@@ -50,15 +50,15 @@ async function getInstalledPlugins() {
 		fs.promises.readFile(paths.installPackage, { encoding: 'utf-8' }),
 	]);
 
-	deps = Object.keys(JSON.parse(deps).dependencies).filter((pkgName) =>
+	deps = Object.keys(JSON.parse(deps).dependencies).filter(pkgName =>
 		pluginNamePattern.test(pkgName)
 	);
-	bundled = Object.keys(JSON.parse(bundled).dependencies).filter((pkgName) =>
+	bundled = Object.keys(JSON.parse(bundled).dependencies).filter(pkgName =>
 		pluginNamePattern.test(pkgName)
 	);
 
 	// Whittle down deps to send back only extraneously installed plugins/themes/etc
-	const checklist = deps.filter((pkgName) => {
+	const checklist = deps.filter(pkgName => {
 		if (bundled.includes(pkgName)) {
 			return false;
 		}
@@ -118,7 +118,7 @@ async function checkPlugins() {
 	let current;
 	let suggested;
 	const upgradable = suggestedModules
-		.map((suggestObj) => {
+		.map(suggestObj => {
 			current = plugins[suggestObj.package];
 			suggested = suggestObj.version;
 
@@ -148,7 +148,7 @@ async function upgradePlugins(unattended = false) {
 			process.stdout.write(
 				`\n\nA total of ${chalk.bold(String(found.length))} package(s) can be upgraded:\n\n`
 			);
-			found.forEach((suggestObj) => {
+			found.forEach(suggestObj => {
 				process.stdout.write(
 					`${chalk.yellow('  * ') + suggestObj.name} (${chalk.yellow(suggestObj.current)} -> ${chalk.green(suggestObj.suggested)})\n`
 				);
@@ -173,7 +173,7 @@ async function upgradePlugins(unattended = false) {
 		if (['y', 'Y', 'yes', 'YES'].includes(result.upgrade)) {
 			console.log('\nUpgrading packages...');
 			const args = packageManagerInstallArgs.concat(
-				found.map((suggestObj) => `${suggestObj.name}@${suggestObj.suggested}`)
+				found.map(suggestObj => `${suggestObj.name}@${suggestObj.suggested}`)
 			);
 
 			cproc.execFileSync(packageManagerExecutable, args, { stdio: 'ignore' });

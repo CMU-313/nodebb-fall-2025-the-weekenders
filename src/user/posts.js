@@ -153,13 +153,13 @@ module.exports = function (User) {
 		await User.updatePostCount(postData.uid);
 	};
 
-	User.updatePostCount = async (uids) => {
+	User.updatePostCount = async uids => {
 		uids = Array.isArray(uids) ? uids : [uids];
 		const exists = await User.exists(uids);
 		uids = uids.filter((uid, index) => exists[index]);
 		if (uids.length) {
 			const counts = await db.sortedSetsCard(
-				uids.map((uid) => `uid:${uid}:posts`)
+				uids.map(uid => `uid:${uid}:posts`)
 			);
 			await Promise.all([
 				db.setObjectBulk(

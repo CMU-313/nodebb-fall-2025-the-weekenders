@@ -91,7 +91,7 @@ describe('ActivityPub integration', () => {
 			assert(body && body.links && Array.isArray(body.links));
 			assert(
 				!body.links.some(
-					(obj) => obj.type && obj.type === 'application/activity+json'
+					obj => obj.type && obj.type === 'application/activity+json'
 				)
 			);
 		});
@@ -597,7 +597,7 @@ describe('ActivityPub integration', () => {
 				it('should still contain contextual information (context, audience, attributedTo)', () => {
 					assert(
 						['context', 'audience', 'attributedTo'].every(
-							(prop) => body.hasOwnProperty(prop) && body[prop]
+							prop => body.hasOwnProperty(prop) && body[prop]
 						)
 					);
 				});
@@ -613,7 +613,7 @@ describe('ActivityPub integration', () => {
 		});
 
 		it('subfolder tests', () => {
-			files.forEach((filePath) => {
+			files.forEach(filePath => {
 				require(filePath);
 			});
 		});

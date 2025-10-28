@@ -113,17 +113,17 @@ function printStartupInfo() {
 }
 
 function addProcessHandlers() {
-	['SIGTERM', 'SIGINT', 'SIGQUIT'].forEach((signal) => {
+	['SIGTERM', 'SIGINT', 'SIGQUIT'].forEach(signal => {
 		process.on(signal, () => shutdown());
 	});
 	process.on('SIGHUP', restart);
-	process.on('uncaughtException', (err) => {
+	process.on('uncaughtException', err => {
 		winston.error(err.stack);
 
 		require('./meta').js.killMinifier();
 		shutdown(1);
 	});
-	process.on('message', (msg) => {
+	process.on('message', msg => {
 		if (msg) {
 			if (Array.isArray(msg.compiling)) {
 				if (msg.compiling.includes('tpl')) {

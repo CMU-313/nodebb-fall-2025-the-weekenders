@@ -160,7 +160,7 @@ module.exports = function (Categories) {
 
 		children = children[0];
 
-		children.forEach((child) => {
+		children.forEach(child => {
 			child.parentCid = parentCid;
 			child.cloneFromCid = child.cid;
 			child.cloneChildren = true;
@@ -280,8 +280,8 @@ module.exports = function (Categories) {
 		await db.delete(`cid:${toCid}:tag:whitelist`);
 		await db.sortedSetAdd(
 			`cid:${toCid}:tag:whitelist`,
-			data.map((item) => item.score),
-			data.map((item) => item.value)
+			data.map(item => item.score),
+			data.map(item => item.value)
 		);
 		cache.del(`cid:${toCid}:tag:whitelist`);
 	}
@@ -296,10 +296,10 @@ module.exports = function (Categories) {
 		let privsToCopy = privileges.categories.getPrivilegesByFilter(filter);
 
 		if (group) {
-			privsToCopy = privsToCopy.map((priv) => `groups:${priv}`);
+			privsToCopy = privsToCopy.map(priv => `groups:${priv}`);
 		} else {
 			privsToCopy = privsToCopy.concat(
-				privsToCopy.map((priv) => `groups:${priv}`)
+				privsToCopy.map(priv => `groups:${priv}`)
 			);
 		}
 
@@ -326,27 +326,27 @@ module.exports = function (Categories) {
 
 	async function copyPrivileges(privileges, fromCid, toCid) {
 		const toGroups = privileges.map(
-			(privilege) => `group:cid:${toCid}:privileges:${privilege}:members`
+			privilege => `group:cid:${toCid}:privileges:${privilege}:members`
 		);
 		const fromGroups = privileges.map(
-			(privilege) => `group:cid:${fromCid}:privileges:${privilege}:members`
+			privilege => `group:cid:${fromCid}:privileges:${privilege}:members`
 		);
 
 		const currentMembers = await db.getSortedSetsMembers(
 			toGroups.concat(fromGroups)
 		);
 		const copyGroups = _.uniq(_.flatten(currentMembers));
-		await async.each(copyGroups, async (group) => {
+		await async.each(copyGroups, async group => {
 			await copyPrivilegesByGroup(privileges, fromCid, toCid, group);
 		});
 	}
 
 	async function copyPrivilegesByGroup(privilegeList, fromCid, toCid, group) {
 		const fromGroups = privilegeList.map(
-			(privilege) => `group:cid:${fromCid}:privileges:${privilege}:members`
+			privilege => `group:cid:${fromCid}:privileges:${privilege}:members`
 		);
 		const toGroups = privilegeList.map(
-			(privilege) => `group:cid:${toCid}:privileges:${privilege}:members`
+			privilege => `group:cid:${toCid}:privileges:${privilege}:members`
 		);
 		const [fromChecks, toChecks] = await Promise.all([
 			db.isMemberOfSortedSets(fromGroups, group),

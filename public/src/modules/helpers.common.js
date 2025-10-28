@@ -98,7 +98,7 @@ module.exports = function (utils, Benchpress, relative_path) {
 			'crossorigin',
 		];
 		const [link, rel, as, type, href, sizes, title, crossorigin] =
-			attributes.map((attr) => (tag[attr] ? `${attr}="${tag[attr]}" ` : ''));
+			attributes.map(attr => (tag[attr] ? `${attr}="${tag[attr]}" ` : ''));
 
 		return (
 			'<link ' +
@@ -209,7 +209,7 @@ module.exports = function (utils, Benchpress, relative_path) {
 
 	function generateTopicClass(topic) {
 		const fields = ['locked', 'pinned', 'deleted', 'unread', 'scheduled'];
-		return fields.filter((field) => !!topic[field]).join(' ');
+		return fields.filter(field => !!topic[field]).join(' ');
 	}
 
 	// Groups helpers
@@ -432,7 +432,7 @@ module.exports = function (utils, Benchpress, relative_path) {
 			['class', `avatar ${classNames}${rounded ? ' avatar-rounded' : ''}`],
 		]);
 		const styles = [`--avatar-size: ${size};`];
-		const attr2String = (attributes) =>
+		const attr2String = attributes =>
 			Array.from(attributes).reduce((output, [prop, value]) => {
 				output += ` ${prop}="${value}"`;
 				return output;
@@ -510,7 +510,7 @@ module.exports = function (utils, Benchpress, relative_path) {
 	}
 
 	function generatePlaceholderWave(items) {
-		const html = items.map((i) => {
+		const html = items.map(i => {
 			if (i === 'divider') {
 				return '<li class="dropdown-divider"></li>';
 			}

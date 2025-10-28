@@ -106,7 +106,7 @@ define('forum/topic/threadTools', [
 		topicContainer.on('click', '[component="topic/event/delete"]', function () {
 			const eventId = $(this).attr('data-topic-event-id');
 			const eventEl = $(this).parents('[data-topic-event-id]');
-			bootbox.confirm('[[topic:delete-event-confirm]]', (ok) => {
+			bootbox.confirm('[[topic:delete-event-confirm]]', ok => {
 				if (ok) {
 					api
 						.del(`/topics/${tid}/events/${eventId}`, {})

@@ -17,7 +17,7 @@ module.exports = {
 
 		// Build list of duplicate remote user handles
 		let handles = await db.getSortedSetMembers('ap.preferredUsername:sorted');
-		handles = handles.map((handle) => handle.split(':https://')[0]);
+		handles = handles.map(handle => handle.split(':https://')[0]);
 		const duplicateUsers = new Set();
 		handles.forEach((handle, idx) => {
 			if (handles.indexOf(handle) !== idx) {
@@ -28,8 +28,8 @@ module.exports = {
 		// Build list of duplicate remote category handles
 		handles = await db.getSortedSetMembers('categories:name');
 		handles = handles
-			.filter((handle) => handle.indexOf('@') !== -1) // zset contains category names too
-			.map((handle) => handle.split(':https://')[0]);
+			.filter(handle => handle.indexOf('@') !== -1) // zset contains category names too
+			.map(handle => handle.split(':https://')[0]);
 		const duplicateCategories = new Set();
 		handles.forEach((handle, idx) => {
 			if (handles.indexOf(handle) !== idx) {
@@ -41,7 +41,7 @@ module.exports = {
 
 		// Find real user, fix handle reference, delete the rest
 		await Promise.all(
-			Array.from(duplicateUsers).map(async (handle) => {
+			Array.from(duplicateUsers).map(async handle => {
 				const max =
 					'(' +
 					handle.substr(0, handle.length - 1) +
@@ -51,12 +51,12 @@ module.exports = {
 					`[${handle}`,
 					max
 				);
-				ids = ids.map((id) => id.slice(handle.length + 1));
+				ids = ids.map(id => id.slice(handle.length + 1));
 				const { actorUri: canonicalId } =
 					await activitypub.helpers.query(handle);
 
 				await Promise.all(
-					ids.map(async (id) => {
+					ids.map(async id => {
 						if (id !== canonicalId) {
 							try {
 								await user.deleteAccount(id);
@@ -82,7 +82,7 @@ module.exports = {
 
 		// Find real category, fix handle reference, delete the rest
 		await Promise.all(
-			Array.from(duplicateCategories).map(async (handle) => {
+			Array.from(duplicateCategories).map(async handle => {
 				const max =
 					'(' +
 					handle.substr(0, handle.length - 1) +
@@ -92,12 +92,12 @@ module.exports = {
 					`[${handle}`,
 					max
 				);
-				ids = ids.map((id) => id.slice(handle.length + 1));
+				ids = ids.map(id => id.slice(handle.length + 1));
 				const { actorUri: canonicalId } =
 					await activitypub.helpers.query(handle);
 
 				await Promise.all(
-					ids.map(async (id) => {
+					ids.map(async id => {
 						if (id !== canonicalId) {
 							await categories.purge(id, 0);
 						}

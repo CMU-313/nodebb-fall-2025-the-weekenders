@@ -16,7 +16,7 @@ const plugins = require('../plugins');
 module.exports = function (User) {
 	User.getInvites = async function (uid) {
 		const emails = await db.getSetMembers(`invitation:uid:${uid}`);
-		return emails.map((email) => validator.escape(String(email)));
+		return emails.map(email => validator.escape(String(email)));
 	};
 
 	User.getInvitesNumber = async function (uid) {
@@ -132,14 +132,14 @@ module.exports = function (User) {
 		if (registrationEmail) {
 			const uids = await User.getInvitingUsers();
 			await Promise.all(
-				uids.map((uid) => deleteFromReferenceList(uid, registrationEmail))
+				uids.map(uid => deleteFromReferenceList(uid, registrationEmail))
 			);
 			// Delete all invites to an email address if it has joined
 			const tokens = await db.getSetMembers(
 				`invitation:invited:${registrationEmail}`
 			);
 			const keysToDelete = [`invitation:invited:${registrationEmail}`].concat(
-				tokens.map((token) => `invitation:token:${token}`)
+				tokens.map(token => `invitation:token:${token}`)
 			);
 			await db.deleteAll(keysToDelete);
 		}

@@ -66,7 +66,7 @@ module.exports = function (module) {
 		const isArrayOfScores = Array.isArray(scores);
 		if (
 			(!isArrayOfScores && !utils.isNumber(scores)) ||
-			(isArrayOfScores && scores.map((s) => utils.isNumber(s)).includes(false))
+			(isArrayOfScores && scores.map(s => utils.isNumber(s)).includes(false))
 		) {
 			throw new Error(`[[error:invalid-score, ${scores}]]`);
 		}
@@ -98,7 +98,7 @@ module.exports = function (module) {
 		const bulk = module.client
 			.collection('objects')
 			.initializeUnorderedBulkOp();
-		data.forEach((item) => {
+		data.forEach(item => {
 			if (!utils.isNumber(item[1])) {
 				throw new Error(`[[error:invalid-score, ${item[1]}]]`);
 			}

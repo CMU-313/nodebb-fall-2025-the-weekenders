@@ -138,7 +138,7 @@ define('admin/manage/users', [
 					selected: false,
 				},
 			].concat(
-				ajaxify.data.customUserFields.map((field) => ({
+				ajaxify.data.customUserFields.map(field => ({
 					label: field.name,
 					field: field.key,
 					selected: false,
@@ -333,7 +333,7 @@ define('admin/manage/users', [
 			let currentValue = '';
 			if (uids.length === 1) {
 				const user = ajaxify.data.users.find(
-					(u) => u && u.uid === parseInt(uids[0], 10)
+					u => u && u.uid === parseInt(uids[0], 10)
 				);
 				if (user) {
 					currentValue = String(user.reputation);
@@ -358,12 +358,12 @@ define('admin/manage/users', [
 									uids: uids,
 								})
 								.then(() => {
-									uids.forEach((uid) => {
+									uids.forEach(uid => {
 										$(`[component="user/reputation"][data-uid="${uid}"]`).text(
 											helpers.formattedNumber(newReputation)
 										);
 										const user = ajaxify.data.users.find(
-											(u) => u && u.uid === parseInt(uid, 10)
+											u => u && u.uid === parseInt(uid, 10)
 										);
 										if (user) {
 											user.reputation = newReputation;
@@ -621,7 +621,7 @@ define('admin/manage/users', [
 					throw new Error('[[[user:change-password-error-match]]');
 				}
 				await Promise.all(
-					uids.map((uid) =>
+					uids.map(uid =>
 						api.put('/users/' + uid + '/password', {
 							currentPassword: '',
 							newPassword: newPassword,
@@ -719,7 +719,7 @@ define('admin/manage/users', [
 
 		const tableEl = document.querySelector('.users-table');
 		const actionBtn = document.getElementById('action-dropdown');
-		tableEl.addEventListener('change', (e) => {
+		tableEl.addEventListener('change', e => {
 			const subselector =
 				e.target.closest('[component="user/select/single"]') ||
 				e.target.closest('[component="user/select/all"]');
@@ -742,7 +742,7 @@ define('admin/manage/users', [
 			bootbox.confirm(confirmMsg, function (confirm) {
 				if (confirm) {
 					Promise.all(
-						uids.map((uid) =>
+						uids.map(uid =>
 							api
 								.del(`/users/${encodeURIComponent(uid)}${path}`, {})
 								.then(() => {
@@ -836,7 +836,7 @@ define('admin/manage/users', [
 					});
 					alerts.success('[[admin/manage/users:alerts.create-success]]');
 				})
-				.catch((err) =>
+				.catch(err =>
 					errorEl
 						.translateHtml(
 							'[[admin/manage/users:alerts.error-x, ' + err.message + ']]'

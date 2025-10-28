@@ -21,9 +21,9 @@ module.exports = {
 		// calculate user count and set progress.total
 		await batch.processArray(
 			allRoomIds,
-			async (roomIds) => {
+			async roomIds => {
 				const arrayOfRoomData = await db.getObjects(
-					roomIds.map((roomId) => `chat:room:${roomId}`)
+					roomIds.map(roomId => `chat:room:${roomId}`)
 				);
 				await Promise.all(
 					roomIds.map(async (roomId, idx) => {
@@ -44,9 +44,9 @@ module.exports = {
 
 		await batch.processArray(
 			allRoomIds,
-			async (roomIds) => {
+			async roomIds => {
 				const arrayOfRoomData = await db.getObjects(
-					roomIds.map((roomId) => `chat:room:${roomId}`)
+					roomIds.map(roomId => `chat:room:${roomId}`)
 				);
 				for (const roomData of arrayOfRoomData) {
 					if (roomData) {
@@ -60,17 +60,17 @@ module.exports = {
 						for (const uid of uids) {
 							await batch.processSortedSet(
 								`uid:${uid}:chat:room:${roomId}:mids`,
-								async (userMessageData) => {
+								async userMessageData => {
 									const uniqMessages = userMessageData.filter(
-										(m) => !midsSeen.hasOwnProperty(m.value)
+										m => !midsSeen.hasOwnProperty(m.value)
 									);
-									const uniqMids = uniqMessages.map((m) => m.value);
+									const uniqMids = uniqMessages.map(m => m.value);
 									if (!uniqMids.length) {
 										return;
 									}
 
 									let messageData = await db.getObjects(
-										uniqMids.map((mid) => `message:${mid}`)
+										uniqMids.map(mid => `message:${mid}`)
 									);
 									messageData.forEach((m, idx) => {
 										if (m && uniqMessages[idx]) {
@@ -80,7 +80,7 @@ module.exports = {
 									});
 									messageData = messageData.filter(Boolean);
 
-									const bulkSet = messageData.map((msg) => [
+									const bulkSet = messageData.map(msg => [
 										`message:${msg.mid}`,
 										{
 											roomId: roomId,
@@ -91,10 +91,10 @@ module.exports = {
 									await db.setObjectBulk(bulkSet);
 									await db.sortedSetAdd(
 										`chat:room:${roomId}:mids`,
-										messageData.map((m) => m.timestamp),
-										messageData.map((m) => m.mid)
+										messageData.map(m => m.timestamp),
+										messageData.map(m => m.mid)
 									);
-									uniqMids.forEach((mid) => {
+									uniqMids.forEach(mid => {
 										midsSeen[mid] = 1;
 									});
 								},

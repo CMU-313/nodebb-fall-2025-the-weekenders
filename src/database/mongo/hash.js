@@ -22,7 +22,7 @@ module.exports = function (module) {
 				const bulk = module.client
 					.collection('objects')
 					.initializeUnorderedBulkOp();
-				key.forEach((key) =>
+				key.forEach(key =>
 					bulk.find({ _key: key }).upsert().updateOne({ $set: writeData })
 				);
 				await bulk.execute();
@@ -57,7 +57,7 @@ module.exports = function (module) {
 
 		try {
 			let bulk;
-			data.forEach((item) => {
+			data.forEach(item => {
 				const writeData = helpers.serializeData(item[1]);
 				if (Object.keys(writeData).length) {
 					if (!bulk) {
@@ -79,7 +79,7 @@ module.exports = function (module) {
 			throw err;
 		}
 
-		cache.del(data.map((item) => item[0]));
+		cache.del(data.map(item => item[0]));
 	};
 
 	module.setObjectField = async function (key, field, value) {
@@ -156,21 +156,19 @@ module.exports = function (module) {
 			data = data.map(helpers.deserializeData);
 
 			const map = helpers.toMap(data);
-			unCachedKeys.forEach((key) => {
+			unCachedKeys.forEach(key => {
 				cachedData[key] = map[key] || null;
 				cache.set(key, cachedData[key]);
 			});
 		}
 
 		if (!Array.isArray(fields) || !fields.length) {
-			return keys.map((key) =>
-				cachedData[key] ? { ...cachedData[key] } : null
-			);
+			return keys.map(key => (cachedData[key] ? { ...cachedData[key] } : null));
 		}
-		return keys.map((key) => {
+		return keys.map(key => {
 			const item = cachedData[key] || {};
 			const result = {};
-			fields.forEach((field) => {
+			fields.forEach(field => {
 				result[field] = item[field] !== undefined ? item[field] : null;
 			});
 			return result;
@@ -198,7 +196,7 @@ module.exports = function (module) {
 		}
 
 		const data = {};
-		fields = fields.map((field) => {
+		fields = fields.map(field => {
 			field = helpers.fieldToString(field);
 			if (field) {
 				data[field] = 1;
@@ -210,7 +208,7 @@ module.exports = function (module) {
 			.collection('objects')
 			.findOne({ _key: key }, { projection: data });
 		const results = fields.map(
-			(f) => !!item && item[f] !== undefined && item[f] !== null
+			f => !!item && item[f] !== undefined && item[f] !== null
 		);
 		return results;
 	};
@@ -237,7 +235,7 @@ module.exports = function (module) {
 		}
 
 		const data = {};
-		fields.forEach((field) => {
+		fields.forEach(field => {
 			data[field] = '';
 		});
 		if (Array.isArray(key)) {
@@ -275,13 +273,13 @@ module.exports = function (module) {
 			const bulk = module.client
 				.collection('objects')
 				.initializeUnorderedBulkOp();
-			key.forEach((key) => {
+			key.forEach(key => {
 				bulk.find({ _key: key }).upsert().update({ $inc: increment });
 			});
 			await bulk.execute();
 			cache.del(key);
 			const result = await module.getObjectsFields(key, [field]);
-			return result.map((data) => data && data[field]);
+			return result.map(data => data && data[field]);
 		}
 		try {
 			const result = await module.client.collection('objects').findOneAndUpdate(
@@ -321,7 +319,7 @@ module.exports = function (module) {
 			.collection('objects')
 			.initializeUnorderedBulkOp();
 
-		data.forEach((item) => {
+		data.forEach(item => {
 			const increment = {};
 			for (const [field, value] of Object.entries(item[1])) {
 				increment[helpers.fieldToString(field)] = value;
@@ -329,6 +327,6 @@ module.exports = function (module) {
 			bulk.find({ _key: item[0] }).upsert().update({ $inc: increment });
 		});
 		await bulk.execute();
-		cache.del(data.map((item) => item[0]));
+		cache.del(data.map(item => item[0]));
 	};
 };

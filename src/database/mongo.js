@@ -155,7 +155,7 @@ mongoModule.info = async function (db) {
 	stats.serverStatusError = serverStatusError;
 	const scale = 1024 * 1024 * 1024;
 
-	listCollections = listCollections.map((collectionInfo) => ({
+	listCollections = listCollections.map(collectionInfo => ({
 		name: collectionInfo.ns,
 		count: collectionInfo.count,
 		size: collectionInfo.storageStats && collectionInfo.storageStats.size,
@@ -201,7 +201,7 @@ mongoModule.info = async function (db) {
 async function getCollectionStats(db) {
 	const items = await db.listCollections().toArray();
 	const cols = await Promise.all(
-		items.map((collection) =>
+		items.map(collection =>
 			db
 				.collection(collection.name)
 				.aggregate([
@@ -210,7 +210,7 @@ async function getCollectionStats(db) {
 				.toArray()
 		)
 	);
-	return cols.map((col) => col[0]);
+	return cols.map(col => col[0]);
 }
 
 mongoModule.close = async function () {

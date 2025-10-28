@@ -50,7 +50,7 @@ UserEmail.remove = async function (uid, sessionId) {
 	]);
 };
 
-UserEmail.getEmailForValidation = async (uid) => {
+UserEmail.getEmailForValidation = async uid => {
 	let email = '';
 	// check email from confirmObj
 	const code = await db.get(`confirm:byUid:${uid}`);
@@ -79,13 +79,13 @@ UserEmail.isValidationPending = async (uid, email) => {
 	);
 };
 
-UserEmail.getValidationExpiry = async (uid) => {
+UserEmail.getValidationExpiry = async uid => {
 	const code = await db.get(`confirm:byUid:${uid}`);
 	const confirmObj = await db.getObject(`confirm:${code}`);
 	return confirmObj ? Math.max(0, confirmObj.expires - Date.now()) : null;
 };
 
-UserEmail.expireValidation = async (uid) => {
+UserEmail.expireValidation = async uid => {
 	const keys = [`confirm:byUid:${uid}`];
 	const code = await db.get(`confirm:byUid:${uid}`);
 	if (code) {
@@ -262,7 +262,7 @@ UserEmail.confirmByUid = async function (uid, callerUid = 0) {
 		// remove old email of user by uid
 		await db.sortedSetsRemoveRangeByScore([`email:uid`], uid, uid);
 		await db.sortedSetRemoveBulk(
-			confirmedEmails.map((email) => [
+			confirmedEmails.map(email => [
 				`email:sorted`,
 				`${email.toLowerCase()}:${uid}`,
 			])

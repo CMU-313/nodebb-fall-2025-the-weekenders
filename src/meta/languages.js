@@ -18,7 +18,7 @@ async function getTranslationMetadata() {
 	let languages = [];
 	let namespaces = [];
 
-	paths.forEach((p) => {
+	paths.forEach(p => {
 		if (!p.endsWith('.json')) {
 			return;
 		}
@@ -81,13 +81,13 @@ async function buildTranslations(ref) {
 	const { namespaces } = ref;
 	const { languages } = ref;
 	const plugins = _.values(Plugins.pluginsData).filter(
-		(plugin) => typeof plugin.languages === 'string'
+		plugin => typeof plugin.languages === 'string'
 	);
 
 	const promises = [];
 
-	namespaces.forEach((namespace) => {
-		languages.forEach((language) => {
+	namespaces.forEach(namespace => {
+		languages.forEach(language => {
 			promises.push(buildNamespaceLanguage(language, namespace, plugins));
 		});
 	});
@@ -104,7 +104,7 @@ async function buildNamespaceLanguage(lang, namespace, plugins) {
 	);
 
 	await Promise.all(
-		plugins.map((pluginData) =>
+		plugins.map(pluginData =>
 			addPlugin(translations, pluginData, lang, namespace)
 		)
 	);

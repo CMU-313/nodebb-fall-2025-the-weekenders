@@ -25,9 +25,9 @@ module.exports = {
 
 		await batch.processArray(
 			allUids,
-			async (uids) => {
+			async uids => {
 				progress.incr(uids.length);
-				const userData = await db.getObjects(uids.map((id) => `user:${id}`));
+				const userData = await db.getObjects(uids.map(id => `user:${id}`));
 
 				await Promise.all(
 					userData.map(async (userData, index) => {

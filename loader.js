@@ -83,7 +83,7 @@ Loader.addWorkerEvents = function (worker) {
 		}
 	});
 
-	worker.on('message', (message) => {
+	worker.on('message', message => {
 		if (message && typeof message === 'object' && message.action) {
 			switch (message.action) {
 				case 'restart':
@@ -91,12 +91,12 @@ Loader.addWorkerEvents = function (worker) {
 					Loader.restart();
 					break;
 				case 'pubsub':
-					workers.forEach((w) => {
+					workers.forEach(w => {
 						w.send(message);
 					});
 					break;
 				case 'socket.io':
-					workers.forEach((w) => {
+					workers.forEach(w => {
 						if (w !== worker) {
 							w.send(message);
 						}
@@ -209,13 +209,13 @@ Loader.stop = function () {
 };
 
 function killWorkers() {
-	workers.forEach((worker) => {
+	workers.forEach(worker => {
 		worker.suicide = true;
 		worker.kill();
 	});
 }
 
-fs.open(pathToConfig, 'r', (err) => {
+fs.open(pathToConfig, 'r', err => {
 	if (err) {
 		// No config detected, kickstart web installer
 		fork('app');

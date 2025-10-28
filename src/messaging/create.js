@@ -9,7 +9,7 @@ const user = require('../user');
 const utils = require('../utils');
 
 module.exports = function (Messaging) {
-	Messaging.sendMessage = async (data) => {
+	Messaging.sendMessage = async data => {
 		await Messaging.checkContent(data.content, utils.isNumber(data.uid));
 		const inRoom = await Messaging.isUserInRoom(data.uid, data.roomId);
 		if (!inRoom) {
@@ -42,7 +42,7 @@ module.exports = function (Messaging) {
 		}
 	};
 
-	Messaging.addMessage = async (data) => {
+	Messaging.addMessage = async data => {
 		const { uid, roomId } = data;
 		const roomData = await Messaging.getRoomData(roomId);
 		if (!roomData) {
@@ -99,7 +99,7 @@ module.exports = function (Messaging) {
 			tasks.push(
 				Messaging.addRoomToUsers(roomId, uids, timestamp),
 				Messaging.markUnread(
-					uids.filter((uid) => uid !== String(data.uid)),
+					uids.filter(uid => uid !== String(data.uid)),
 					roomId
 				)
 			);
@@ -133,7 +133,7 @@ module.exports = function (Messaging) {
 		if (!uids.length) {
 			return;
 		}
-		const keys = _.uniq(uids).map((uid) => `uid:${uid}:chat:rooms`);
+		const keys = _.uniq(uids).map(uid => `uid:${uid}:chat:rooms`);
 		await db.sortedSetsAdd(keys, timestamp, roomId);
 	};
 

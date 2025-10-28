@@ -23,15 +23,15 @@ module.exports = function (Posts) {
 		let postData = _.cloneDeep(cache.get('post-queue'));
 		if (!postData) {
 			const ids = await db.getSortedSetRange('post:queue', 0, -1);
-			const keys = ids.map((id) => `post:queue:${id}`);
+			const keys = ids.map(id => `post:queue:${id}`);
 			postData = await db.getObjects(keys);
-			postData.forEach((data) => {
+			postData.forEach(data => {
 				if (data) {
 					data.data = JSON.parse(data.data);
 					data.data.timestampISO = utils.toISOString(data.data.timestamp);
 				}
 			});
-			const uids = postData.map((data) => data && data.uid);
+			const uids = postData.map(data => data && data.uid);
 			const userData = await user.getUsersFields(uids, [
 				'username',
 				'userslug',
@@ -61,7 +61,7 @@ module.exports = function (Posts) {
 			cache.set('post-queue', _.cloneDeep(postData));
 		}
 		if (filter.id) {
-			postData = postData.filter((p) => p.id === filter.id);
+			postData = postData.filter(p => p.id === filter.id);
 		}
 		if (options.metadata) {
 			await Promise.all(postData.map(addMetaData));
@@ -71,12 +71,12 @@ module.exports = function (Posts) {
 		if (filter.tid) {
 			const tid = String(filter.tid);
 			postData = postData.filter(
-				(item) => item.data.tid && String(item.data.tid) === tid
+				item => item.data.tid && String(item.data.tid) === tid
 			);
 		} else if (Array.isArray(filter.tid)) {
 			const tids = filter.tid.map(String);
 			postData = postData.filter(
-				(item) => item.data.tid && tids.includes(String(item.data.tid))
+				item => item.data.tid && tids.includes(String(item.data.tid))
 			);
 		}
 
@@ -190,7 +190,7 @@ module.exports = function (Posts) {
 		}
 		const cid = await getCid(data.type, data);
 		const uids = await getNotificationUids(cid);
-		uids.forEach((uid) => user.notifications.pushCount(uid));
+		uids.forEach(uid => user.notifications.pushCount(uid));
 	}
 
 	async function getNotificationUids(cid) {
@@ -451,11 +451,11 @@ module.exports = function (Posts) {
 			{ metadata: false }
 		);
 		if (postData.length) {
-			postData.forEach((post) => {
+			postData.forEach(post => {
 				post.data.tid = newTid;
 			});
 			await db.setObjectBulk(
-				postData.map((p) => [
+				postData.map(p => [
 					`post:queue:${p.id}`,
 					{ data: JSON.stringify(p.data) },
 				])

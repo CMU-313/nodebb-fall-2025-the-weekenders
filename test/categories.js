@@ -22,7 +22,7 @@ describe('Categories', () => {
 		await groups.join('administrators', adminUid);
 	});
 
-	it('should create a new category', (done) => {
+	it('should create a new category', done => {
 		Categories.create(
 			{
 				name: 'Test Category & NodeBB',
@@ -40,7 +40,7 @@ describe('Categories', () => {
 		);
 	});
 
-	it('should retrieve a newly created category by its ID', (done) => {
+	it('should retrieve a newly created category by its ID', done => {
 		Categories.getCategoryById(
 			{
 				cid: categoryObj.cid,
@@ -60,7 +60,7 @@ describe('Categories', () => {
 		);
 	});
 
-	it('should return null if category does not exist', (done) => {
+	it('should return null if category does not exist', done => {
 		Categories.getCategoryById(
 			{
 				cid: 123123123,
@@ -75,7 +75,7 @@ describe('Categories', () => {
 		);
 	});
 
-	it('should get all categories', (done) => {
+	it('should get all categories', done => {
 		Categories.getAllCategories((err, data) => {
 			assert.ifError(err);
 			assert(Array.isArray(data));
@@ -94,7 +94,7 @@ describe('Categories', () => {
 	});
 
 	describe('Categories.getRecentTopicReplies', () => {
-		it('should not throw', (done) => {
+		it('should not throw', done => {
 			Categories.getCategoryById(
 				{
 					cid: categoryObj.cid,
@@ -106,7 +106,7 @@ describe('Categories', () => {
 				},
 				(err, categoryData) => {
 					assert.ifError(err);
-					Categories.getRecentTopicReplies(categoryData, 0, {}, (err) => {
+					Categories.getRecentTopicReplies(categoryData, 0, {}, err => {
 						assert.ifError(err);
 						done();
 					});
@@ -116,7 +116,7 @@ describe('Categories', () => {
 	});
 
 	describe('.getCategoryTopics', () => {
-		it('should return a list of topics', (done) => {
+		it('should return a list of topics', done => {
 			Categories.getCategoryTopics(
 				{
 					cid: categoryObj.cid,
@@ -129,14 +129,14 @@ describe('Categories', () => {
 					assert.equal(err, null);
 
 					assert(Array.isArray(result.topics));
-					assert(result.topics.every((topic) => topic instanceof Object));
+					assert(result.topics.every(topic => topic instanceof Object));
 
 					done();
 				}
 			);
 		});
 
-		it('should return a list of topics by a specific user', (done) => {
+		it('should return a list of topics by a specific user', done => {
 			Categories.getCategoryTopics(
 				{
 					cid: categoryObj.cid,
@@ -151,7 +151,7 @@ describe('Categories', () => {
 					assert(Array.isArray(result.topics));
 					assert(
 						result.topics.every(
-							(topic) => topic instanceof Object && topic.uid === '1'
+							topic => topic instanceof Object && topic.uid === '1'
 						)
 					);
 
@@ -186,8 +186,8 @@ describe('Categories', () => {
 			});
 		});
 
-		it('should move posts from one category to another', (done) => {
-			Categories.moveRecentReplies(moveTid, categoryObj.cid, moveCid, (err) => {
+		it('should move posts from one category to another', done => {
+			Categories.moveRecentReplies(moveTid, categoryObj.cid, moveCid, err => {
 				assert.ifError(err);
 				db.getSortedSetRange(
 					`cid:${categoryObj.cid}:pids`,
@@ -227,7 +227,7 @@ describe('Categories', () => {
 			await Topics.delete(data.topicData.tid, adminUid);
 		});
 
-		it('should get recent replies in category', (done) => {
+		it('should get recent replies in category', done => {
 			socketCategories.getRecentReplies(
 				{ uid: posterUid },
 				categoryObj.cid,
@@ -239,7 +239,7 @@ describe('Categories', () => {
 			);
 		});
 
-		it('should get categories', (done) => {
+		it('should get categories', done => {
 			socketCategories.get({ uid: posterUid }, {}, (err, data) => {
 				assert.ifError(err);
 				assert(Array.isArray(data));
@@ -247,7 +247,7 @@ describe('Categories', () => {
 			});
 		});
 
-		it('should get watched categories', (done) => {
+		it('should get watched categories', done => {
 			socketCategories.getWatchedCategories(
 				{ uid: posterUid },
 				{},
@@ -259,7 +259,7 @@ describe('Categories', () => {
 			);
 		});
 
-		it('should load more topics', (done) => {
+		it('should load more topics', done => {
 			socketCategories.loadMore(
 				{ uid: posterUid },
 				{
@@ -291,12 +291,12 @@ describe('Categories', () => {
 			);
 
 			assert.deepStrictEqual(
-				data.topics.map((t) => t.title),
+				data.topics.map(t => t.title),
 				['[[topic:topic-is-deleted]]', 'Test Topic Title', 'Test Topic Title']
 			);
 		});
 
-		it('should load topic count', (done) => {
+		it('should load topic count', done => {
 			socketCategories.getTopicCount(
 				{ uid: posterUid },
 				categoryObj.cid,
@@ -308,7 +308,7 @@ describe('Categories', () => {
 			);
 		});
 
-		it('should load category by privilege', (done) => {
+		it('should load category by privilege', done => {
 			socketCategories.getCategoriesByPrivilege(
 				{ uid: posterUid },
 				'find',
@@ -320,7 +320,7 @@ describe('Categories', () => {
 			);
 		});
 
-		it('should get move categories', (done) => {
+		it('should get move categories', done => {
 			socketCategories.getMoveCategories(
 				{ uid: posterUid },
 				{},
@@ -332,11 +332,11 @@ describe('Categories', () => {
 			);
 		});
 
-		it('should ignore category', (done) => {
+		it('should ignore category', done => {
 			socketCategories.ignore(
 				{ uid: posterUid },
 				{ cid: categoryObj.cid },
-				(err) => {
+				err => {
 					assert.ifError(err);
 					Categories.isIgnored(
 						[categoryObj.cid],
@@ -360,11 +360,11 @@ describe('Categories', () => {
 			);
 		});
 
-		it('should watch category', (done) => {
+		it('should watch category', done => {
 			socketCategories.watch(
 				{ uid: posterUid },
 				{ cid: categoryObj.cid },
-				(err) => {
+				err => {
 					assert.ifError(err);
 					Categories.isIgnored(
 						[categoryObj.cid],
@@ -379,18 +379,18 @@ describe('Categories', () => {
 			);
 		});
 
-		it('should error if watch state does not exist', (done) => {
+		it('should error if watch state does not exist', done => {
 			socketCategories.setWatchState(
 				{ uid: posterUid },
 				{ cid: categoryObj.cid, state: 'invalid-state' },
-				(err) => {
+				err => {
 					assert.equal(err.message, '[[error:invalid-watch-state]]');
 					done();
 				}
 			);
 		});
 
-		it('should check if user is moderator', (done) => {
+		it('should check if user is moderator', done => {
 			socketCategories.isModerator(
 				{ uid: posterUid },
 				{},
@@ -592,7 +592,7 @@ describe('Categories', () => {
 			assert.strictEqual(data, null);
 		});
 
-		it('should get all category names', (done) => {
+		it('should get all category names', done => {
 			socketCategories.getNames({ uid: adminUid }, {}, (err, data) => {
 				assert.ifError(err);
 				assert(Array.isArray(data));
@@ -770,7 +770,7 @@ describe('Categories', () => {
 		});
 	});
 
-	it('should get active users', (done) => {
+	it('should get active users', done => {
 		Categories.create(
 			{
 				name: 'test',
@@ -784,7 +784,7 @@ describe('Categories', () => {
 						title: 'Test Topic Title',
 						content: 'The content of test topic',
 					},
-					(err) => {
+					err => {
 						assert.ifError(err);
 						Categories.getActiveUsers(category.cid, (err, uids) => {
 							assert.ifError(err);
@@ -800,7 +800,7 @@ describe('Categories', () => {
 	describe('tag whitelist', () => {
 		let cid;
 		const socketTopics = require('../src/socket.io/topics');
-		before((done) => {
+		before(done => {
 			Categories.create(
 				{
 					name: 'test',
@@ -813,14 +813,14 @@ describe('Categories', () => {
 			);
 		});
 
-		it('should error if data is invalid', (done) => {
-			socketTopics.isTagAllowed({ uid: posterUid }, null, (err) => {
+		it('should error if data is invalid', done => {
+			socketTopics.isTagAllowed({ uid: posterUid }, null, err => {
 				assert.equal(err.message, '[[error:invalid-data]]');
 				done();
 			});
 		});
 
-		it('should return true if category whitelist is empty', (done) => {
+		it('should return true if category whitelist is empty', done => {
 			socketTopics.isTagAllowed(
 				{ uid: posterUid },
 				{ tag: 'notallowed', cid: cid },
@@ -832,12 +832,12 @@ describe('Categories', () => {
 			);
 		});
 
-		it('should add tags to category whitelist', (done) => {
+		it('should add tags to category whitelist', done => {
 			const data = {};
 			data[cid] = {
 				tagWhitelist: 'nodebb,jquery,javascript',
 			};
-			Categories.update(data, (err) => {
+			Categories.update(data, err => {
 				assert.ifError(err);
 				db.getSortedSetRange(
 					`cid:${cid}:tag:whitelist`,
@@ -852,7 +852,7 @@ describe('Categories', () => {
 			});
 		});
 
-		it('should return false if category whitelist does not have tag', (done) => {
+		it('should return false if category whitelist does not have tag', done => {
 			socketTopics.isTagAllowed(
 				{ uid: posterUid },
 				{ tag: 'notallowed', cid: cid },
@@ -864,7 +864,7 @@ describe('Categories', () => {
 			);
 		});
 
-		it('should return true if category whitelist has tag', (done) => {
+		it('should return true if category whitelist has tag', done => {
 			socketTopics.isTagAllowed(
 				{ uid: posterUid },
 				{ tag: 'nodebb', cid: cid },
@@ -876,7 +876,7 @@ describe('Categories', () => {
 			);
 		});
 
-		it('should post a topic with only allowed tags', (done) => {
+		it('should post a topic with only allowed tags', done => {
 			Topics.post(
 				{
 					uid: posterUid,
@@ -897,7 +897,7 @@ describe('Categories', () => {
 	describe('privileges', () => {
 		const privileges = require('../src/privileges');
 
-		it('should return empty array if uids is empty array', (done) => {
+		it('should return empty array if uids is empty array', done => {
 			privileges.categories.filterUids(
 				'find',
 				categoryObj.cid,
@@ -910,7 +910,7 @@ describe('Categories', () => {
 			);
 		});
 
-		it('should filter uids by privilege', (done) => {
+		it('should filter uids by privilege', done => {
 			privileges.categories.filterUids(
 				'find',
 				categoryObj.cid,
@@ -923,7 +923,7 @@ describe('Categories', () => {
 			);
 		});
 
-		it('should load category user privileges', (done) => {
+		it('should load category user privileges', done => {
 			privileges.categories.userPrivileges(categoryObj.cid, 1, (err, data) => {
 				assert.ifError(err);
 				assert.deepEqual(data, {
@@ -949,7 +949,7 @@ describe('Categories', () => {
 			});
 		});
 
-		it('should load global user privileges', (done) => {
+		it('should load global user privileges', done => {
 			privileges.global.userPrivileges(1, (err, data) => {
 				assert.ifError(err);
 				assert.deepEqual(data, {
@@ -976,7 +976,7 @@ describe('Categories', () => {
 			});
 		});
 
-		it('should load category group privileges', (done) => {
+		it('should load category group privileges', done => {
 			privileges.categories.groupPrivileges(
 				categoryObj.cid,
 				'registered-users',
@@ -1006,7 +1006,7 @@ describe('Categories', () => {
 			);
 		});
 
-		it('should load global group privileges', (done) => {
+		it('should load global group privileges', done => {
 			privileges.global.groupPrivileges('registered-users', (err, data) => {
 				assert.ifError(err);
 				assert.deepEqual(data, {
@@ -1033,7 +1033,7 @@ describe('Categories', () => {
 			});
 		});
 
-		it('should return false if cid is falsy', (done) => {
+		it('should return false if cid is falsy', done => {
 			privileges.categories.isUserAllowedTo(
 				'find',
 				null,
@@ -1056,7 +1056,7 @@ describe('Categories', () => {
 				await groups.join('testGroup', 1);
 			});
 
-			it('should retrieve all users with moderator bit in category privilege', (done) => {
+			it('should retrieve all users with moderator bit in category privilege', done => {
 				Categories.getModeratorUids([cid, 2], (err, uids) => {
 					assert.ifError(err);
 					assert.strictEqual(uids.length, 2);
@@ -1099,7 +1099,7 @@ describe('Categories', () => {
 
 	describe('getTopicIds', () => {
 		const plugins = require('../src/plugins');
-		it('should get topic ids with filter', (done) => {
+		it('should get topic ids with filter', done => {
 			function method(data, callback) {
 				data.tids = [1, 2, 3];
 				callback(null, data);

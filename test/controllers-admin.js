@@ -24,7 +24,7 @@ describe('Admin Controllers', () => {
 	let moderatorUid;
 	let jar;
 
-	before((done) => {
+	before(done => {
 		async.series(
 			{
 				category: function (next) {
@@ -106,7 +106,7 @@ describe('Admin Controllers', () => {
 			'/admin/dashboard/searches',
 			`/admin/dashboard/searches?start=${start}&end=${end}`,
 		];
-		await async.each(dashboards, async (url) => {
+		await async.each(dashboards, async url => {
 			const { response, body } = await request.get(
 				`${nconf.get('url')}${url}`,
 				{ jar: jar }
@@ -361,9 +361,9 @@ describe('Admin Controllers', () => {
 		assert(body);
 	});
 
-	it('should load /admin/users/csv', (done) => {
+	it('should load /admin/users/csv', done => {
 		const socketAdmin = require('../src/socket.io/admin');
-		socketAdmin.user.exportUsersCSV({ uid: adminUid }, {}, (err) => {
+		socketAdmin.user.exportUsersCSV({ uid: adminUid }, {}, err => {
 			assert.ifError(err);
 			setTimeout(async () => {
 				const { response, body } = await request.get(
@@ -855,7 +855,7 @@ describe('Admin Controllers', () => {
 					'uploadDefaultAvatar',
 				];
 				const adminRoutes = Object.keys(privileges.admin.routeMap).filter(
-					(route) => !uploadRoutes.includes(route)
+					route => !uploadRoutes.includes(route)
 				);
 				for (const route of adminRoutes) {
 					/* eslint-disable no-await-in-loop */

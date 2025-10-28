@@ -60,7 +60,7 @@ describe('API tokens', () => {
 			const tokens = await api.utils.tokens.get([token, second]);
 
 			assert(Array.isArray(tokens));
-			tokens.forEach((t) => {
+			tokens.forEach(t => {
 				assert(t);
 				assert.strictEqual(parseInt(t.uid, 10), 0);
 			});

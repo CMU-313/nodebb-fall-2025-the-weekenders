@@ -144,7 +144,7 @@ usersAPI.deleteMany = async function (caller, data) {
 
 	if (await canDeleteUids(data.uids)) {
 		await Promise.all(
-			data.uids.map((uid) => processDeletion({ uid, method: 'delete', caller }))
+			data.uids.map(uid => processDeletion({ uid, method: 'delete', caller }))
 		);
 	}
 };
@@ -438,10 +438,10 @@ usersAPI.invite = async (caller, { emails, groupsToJoin, uid }) => {
 	}
 
 	const inviteGroups = (await groups.getUserInviteGroups(caller.uid)).map(
-		(group) => group.name
+		group => group.name
 	);
 	const cannotInvite = groupsToJoin.some(
-		(group) => !inviteGroups.includes(group)
+		group => !inviteGroups.includes(group)
 	);
 	if (groupsToJoin.length > 0 && cannotInvite) {
 		throw new Error('[[error:no-privileges]]');
@@ -450,7 +450,7 @@ usersAPI.invite = async (caller, { emails, groupsToJoin, uid }) => {
 	const max = meta.config.maximumInvites;
 	const emailsArr = emails
 		.split(',')
-		.map((email) => email.trim())
+		.map(email => email.trim())
 		.filter(Boolean);
 
 	for (const email of emailsArr) {
@@ -474,7 +474,7 @@ usersAPI.getInviteGroups = async (caller, { uid }) => {
 	}
 
 	const userInviteGroups = await groups.getUserInviteGroups(uid);
-	return userInviteGroups.map((group) => group.displayName);
+	return userInviteGroups.map(group => group.displayName);
 };
 
 usersAPI.addEmail = async (caller, { email, skipConfirmation, uid }) => {
@@ -774,7 +774,7 @@ usersAPI.generateExport = async (caller, { uid, type }) => {
 		}
 	);
 	child.send({ uid });
-	child.on('error', async (err) => {
+	child.on('error', async err => {
 		winston.error(err.stack);
 		await db.deleteObjectField('locks', `export:${uid}${type}`);
 	});

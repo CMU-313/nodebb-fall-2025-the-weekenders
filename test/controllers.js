@@ -267,7 +267,7 @@ describe('Controllers', () => {
 			{ it: 'should return osd data', url: `/osd.xml` },
 			{ it: 'should load service worker', url: '/service-worker.js' },
 		];
-		testRoutes.forEach((route) => {
+		testRoutes.forEach(route => {
 			it(route.it, async () => {
 				const { response, body } = await request.get(`${baseUrl}/${route.url}`);
 				assert.equal(response.statusCode, route.status || 200);
@@ -324,7 +324,7 @@ describe('Controllers', () => {
 		describe('email update', () => {
 			let jar;
 			let token;
-			const dummyEmailerHook = async (data) => {};
+			const dummyEmailerHook = async data => {};
 
 			before(async () => {
 				// Attach an emailer hook so related requests do not error
@@ -1101,11 +1101,11 @@ describe('Controllers', () => {
 	});
 
 	describe('maintenance mode', () => {
-		before((done) => {
+		before(done => {
 			meta.config.maintenanceMode = 1;
 			done();
 		});
-		after((done) => {
+		after(done => {
 			meta.config.maintenanceMode = 0;
 			done();
 		});
@@ -1411,7 +1411,7 @@ describe('Controllers', () => {
 			before(async () => {
 				const types = ['profile', 'uploads', 'posts'];
 				await Promise.all(
-					types.map(async (type) => {
+					types.map(async type => {
 						await api.users.generateExport(
 							{ uid: fooUid, ip: '127.0.0.1' },
 							{ uid: fooUid, type }
@@ -1666,7 +1666,7 @@ describe('Controllers', () => {
 				`${nconf.get('url')}/api/user/foo`
 			);
 			assert.equal(response.statusCode, 200);
-			const contents = body.posts.map((p) => p.content);
+			const contents = body.posts.map(p => p.content);
 			assert(!contents.includes('1st reply'));
 		});
 
@@ -1847,7 +1847,7 @@ describe('Controllers', () => {
 
 	describe('handle errors', () => {
 		const plugins = require('../src/plugins');
-		after((done) => {
+		after(done => {
 			plugins.loadedHooks['filter:router.page'] = undefined;
 			done();
 		});
@@ -2577,7 +2577,7 @@ describe('Controllers', () => {
 				);
 				assert.strictEqual(response.statusCode, 200);
 				assert(
-					['subject', 'aliases', 'links'].every((prop) =>
+					['subject', 'aliases', 'links'].every(prop =>
 						body.hasOwnProperty(prop)
 					)
 				);
@@ -2589,7 +2589,7 @@ describe('Controllers', () => {
 		});
 	});
 
-	after((done) => {
+	after(done => {
 		const analytics = require('../src/analytics');
 		analytics.writeData(done);
 	});

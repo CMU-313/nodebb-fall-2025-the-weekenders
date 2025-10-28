@@ -54,7 +54,7 @@ module.exports = {
 											next
 										);
 									},
-									(err) => {
+									err => {
 										if (err) {
 											return next(err);
 										}
@@ -66,7 +66,7 @@ module.exports = {
 							}
 						);
 					},
-					(err) => {
+					err => {
 						if (err) {
 							// Probably type error, ok to incr and continue
 							progress.incr();

@@ -17,7 +17,7 @@ module.exports = function (Groups) {
 			return;
 		}
 		const keys = [];
-		groupNames.forEach((groupName) => {
+		groupNames.forEach(groupName => {
 			keys.push(
 				`group:${groupName}`,
 				`group:${groupName}:members`,
@@ -28,11 +28,11 @@ module.exports = function (Groups) {
 			);
 		});
 		const sets = groupNames.map(
-			(groupName) => `${groupName.toLowerCase()}:${groupName}`
+			groupName => `${groupName.toLowerCase()}:${groupName}`
 		);
 		const groupSlugs = groupNames
-			.filter((groupName) => !Groups.isPrivilegeGroup(groupName))
-			.map((groupName) => slugify(groupName));
+			.filter(groupName => !Groups.isPrivilegeGroup(groupName))
+			.map(groupName => slugify(groupName));
 
 		await Promise.all([
 			db.deleteAll(keys),
@@ -55,11 +55,11 @@ module.exports = function (Groups) {
 	async function removeGroupsFromPrivilegeGroups(groupNames) {
 		await batch.processSortedSet(
 			'groups:createtime',
-			async (otherGroups) => {
-				const privilegeGroups = otherGroups.filter((group) =>
+			async otherGroups => {
+				const privilegeGroups = otherGroups.filter(group =>
 					Groups.isPrivilegeGroup(group)
 				);
-				const keys = privilegeGroups.map((group) => `group:${group}:members`);
+				const keys = privilegeGroups.map(group => `group:${group}:members`);
 				await db.sortedSetRemove(keys, groupNames);
 			},
 			{

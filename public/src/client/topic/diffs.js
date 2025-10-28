@@ -22,8 +22,8 @@ define('forum/topic/diffs', [
 
 		api
 			.get(`/posts/${encodeURIComponent(pid)}/diffs`, {})
-			.then((data) => {
-				parsePostHistory(data).then(($html) => {
+			.then(data => {
+				parsePostHistory(data).then($html => {
 					const $modal = bootbox.dialog({
 						title: '[[topic:diffs.title]]',
 						message: $html,
@@ -79,7 +79,7 @@ define('forum/topic/diffs', [
 
 		api
 			.get(`/posts/${encodeURIComponent(pid)}/diffs/${since}`, {})
-			.then((data) => {
+			.then(data => {
 				data.deleted = !!parseInt(data.deleted, 10);
 
 				app.parseAndTranslate(
@@ -114,8 +114,8 @@ define('forum/topic/diffs', [
 	Diffs.delete = function (pid, timestamp, $selectEl, $numberOfDiffCon) {
 		api
 			.del(`/posts/${encodeURIComponent(pid)}/diffs/${timestamp}`)
-			.then((data) => {
-				parsePostHistory(data, 'diffs').then(($html) => {
+			.then(data => {
+				parsePostHistory(data, 'diffs').then($html => {
 					$selectEl.empty().append($html);
 					$selectEl.trigger('change');
 					const numberOfDiffs = $selectEl.find('option').length;
@@ -127,7 +127,7 @@ define('forum/topic/diffs', [
 	};
 
 	function parsePostHistory(data, blockName) {
-		return new Promise((resolve) => {
+		return new Promise(resolve => {
 			const params = [
 				{
 					diffs: data.revisions.map(function (revision) {

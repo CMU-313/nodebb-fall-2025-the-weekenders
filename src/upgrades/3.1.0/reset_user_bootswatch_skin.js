@@ -11,19 +11,19 @@ module.exports = {
 
 		batch.processSortedSet(
 			'users:joindate',
-			async (uids) => {
+			async uids => {
 				let settings = await db.getObjects(
-					uids.map((uid) => `user:${uid}:settings`)
+					uids.map(uid => `user:${uid}:settings`)
 				);
 				settings = settings.filter(
-					(s) =>
+					s =>
 						s &&
 						s.bootswatchSkin &&
 						!css.supportedSkins.includes(s.bootswatchSkin)
 				);
 
 				await db.setObjectBulk(
-					settings.map((s) => [`user:${s.uid}`, { bootswatchSkin: '' }])
+					settings.map(s => [`user:${s.uid}`, { bootswatchSkin: '' }])
 				);
 			},
 			{

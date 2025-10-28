@@ -48,7 +48,7 @@ define('categorySelector', [
 			.find('[component="category-selector-selected"]')
 			.html();
 
-		translator.translate(defaultSelectHtml, (translated) => {
+		translator.translate(defaultSelectHtml, translated => {
 			defaultSelectHtml = translated;
 		});
 		selector.selectCategory = function (cid) {

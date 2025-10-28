@@ -103,19 +103,19 @@ define('forum/groups/memberlist', [
 	}
 
 	async function addUsersToGroup(users) {
-		const uids = users.map((u) => u.uid);
+		const uids = users.map(u => u.uid);
 		if (ajaxify.data.group.name === 'administrators') {
 			await socket.emit('admin.user.makeAdmins', uids).catch(alerts.error);
 		} else {
 			await Promise.all(
-				uids.map((uid) =>
+				uids.map(uid =>
 					api.put('/groups/' + ajaxify.data.group.slug + '/membership/' + uid)
 				)
 			).catch(alerts.error);
 		}
 
 		users = users.filter(
-			(user) =>
+			user =>
 				!$('[component="groups/members"] [data-uid="' + user.uid + '"]').length
 		);
 		const html = await parseAndTranslate(users);

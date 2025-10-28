@@ -148,7 +148,7 @@ topicsController.get = async function getTopic(req, res, next) {
 
 	topicData.postIndex = postIndex;
 	const postAtIndex = topicData.posts.find(
-		(p) => parseInt(p.index, 10) === parseInt(Math.max(0, postIndex - 1), 10)
+		p => parseInt(p.index, 10) === parseInt(Math.max(0, postIndex - 1), 10)
 	);
 
 	const [author] = await Promise.all([
@@ -163,7 +163,7 @@ topicsController.get = async function getTopic(req, res, next) {
 
 	topicData.author = author;
 	topicData.pagination = pagination.create(currentPage, pageCount, req.query);
-	topicData.pagination.rel.forEach((rel) => {
+	topicData.pagination.rel.forEach(rel => {
 		rel.href = `${url}/topic/${topicData.slug}${rel.href}`;
 		res.locals.linkTags.push(rel);
 	});
@@ -255,7 +255,7 @@ async function addTags(topicData, req, res, currentPage, postAtIndex) {
 	}
 	description = description.replace(/\n/g, ' ').trim();
 
-	let mainPost = topicData.posts.find((p) => parseInt(p.index, 10) === 0);
+	let mainPost = topicData.posts.find(p => parseInt(p.index, 10) === 0);
 	if (!mainPost) {
 		mainPost = await posts.getPostData(topicData.mainPid);
 	}
@@ -349,20 +349,20 @@ async function addOGImageTags(res, topicData, postAtIndex) {
 	const uploads = postAtIndex
 		? await posts.uploads.listWithSizes(postAtIndex.pid)
 		: [];
-	const images = uploads.map((upload) => {
+	const images = uploads.map(upload => {
 		upload.name = `${url + upload_url}/${upload.name}`;
 		return upload;
 	});
 	if (topicData.thumbs) {
 		const path = require('path');
 		const thumbs = topicData.thumbs.filter(
-			(t) =>
+			t =>
 				t &&
 				images.every(
-					(img) => path.normalize(img.name) !== path.normalize(url + t.url)
+					img => path.normalize(img.name) !== path.normalize(url + t.url)
 				)
 		);
-		images.push(...thumbs.map((thumbObj) => ({ name: url + thumbObj.url })));
+		images.push(...thumbs.map(thumbObj => ({ name: url + thumbObj.url })));
 	}
 	if (
 		topicData.category.backgroundImage &&
@@ -373,7 +373,7 @@ async function addOGImageTags(res, topicData, postAtIndex) {
 	if (postAtIndex && postAtIndex.user && postAtIndex.user.picture) {
 		images.push(postAtIndex.user.picture);
 	}
-	images.forEach((path) => addOGImageTag(res, path));
+	images.forEach(path => addOGImageTag(res, path));
 }
 
 function addOGImageTag(res, image) {
@@ -462,7 +462,7 @@ topicsController.pagination = async function (req, res, next) {
 	const pageCount = Math.max(1, Math.ceil(postCount / settings.postsPerPage));
 
 	const paginationData = pagination.create(currentPage, pageCount);
-	paginationData.rel.forEach((rel) => {
+	paginationData.rel.forEach(rel => {
 		rel.href = `${url}/topic/${topic.slug}${rel.href}`;
 	});
 

@@ -160,7 +160,7 @@ async function generateForTopic(req, res, next) {
 			).toUTCString();
 		}
 		const replies = topicData.posts.slice(1);
-		replies.forEach((postData) => {
+		replies.forEach(postData => {
 			if (!postData.deleted) {
 				const dateStamp = new Date(
 					parseInt(
@@ -473,7 +473,7 @@ function generateForPostsFeed(feedOptions, posts) {
 		feed.pubDate = new Date(parseInt(posts[0].timestamp, 10)).toUTCString();
 	}
 
-	posts.forEach((postData) => {
+	posts.forEach(postData => {
 		feed.item({
 			title: postData.topic ? postData.topic.title : '',
 			description: postData.content,

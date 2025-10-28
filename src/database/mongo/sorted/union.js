@@ -68,7 +68,7 @@ module.exports = function (module) {
 			.aggregate(pipeline)
 			.toArray();
 		if (!params.withScores) {
-			data = data.map((item) => item.value);
+			data = data.map(item => item.value);
 		}
 		return data;
 	}

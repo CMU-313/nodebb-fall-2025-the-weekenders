@@ -586,7 +586,7 @@ define('settings', ['hooks', 'alerts'], function (hooks, alerts) {
 			}
 		},
 		check: function (controls) {
-			const onTrigger = (e) => {
+			const onTrigger = e => {
 				const wrapper = e.target.closest('.form-group');
 				if (wrapper) {
 					wrapper.classList.add('has-error');
@@ -596,7 +596,7 @@ define('settings', ['hooks', 'alerts'], function (hooks, alerts) {
 			};
 
 			return Array.prototype.map
-				.call(controls, (controlEl) => {
+				.call(controls, controlEl => {
 					const wrapper = controlEl.closest('.form-group');
 					if (wrapper) {
 						wrapper.classList.remove('has-error');

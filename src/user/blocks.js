@@ -55,21 +55,21 @@ module.exports = function (User) {
 
 	User.blocks.list = async function (uids) {
 		const isArray = Array.isArray(uids);
-		uids = (isArray ? uids : [uids]).map((uid) => String(uid));
+		uids = (isArray ? uids : [uids]).map(uid => String(uid));
 		const cachedData = {};
 		const unCachedUids = User.blocks._cache.getUnCachedKeys(uids, cachedData);
 		if (unCachedUids.length) {
 			const unCachedData = await db.getSortedSetsMembers(
-				unCachedUids.map((uid) => `uid:${uid}:blocked_uids`)
+				unCachedUids.map(uid => `uid:${uid}:blocked_uids`)
 			);
 			unCachedUids.forEach((uid, index) => {
-				cachedData[uid] = (unCachedData[index] || []).map((uid) =>
+				cachedData[uid] = (unCachedData[index] || []).map(uid =>
 					utils.isNumber(uid) ? parseInt(uid, 10) : uid
 				);
 				User.blocks._cache.set(String(uid), cachedData[uid]);
 			});
 		}
-		const result = uids.map((uid) => cachedData[uid] || []);
+		const result = uids.map(uid => cachedData[uid] || []);
 		return isArray ? result.slice() : result[0];
 	};
 
@@ -125,7 +125,7 @@ module.exports = function (User) {
 		const blocked_uids = await User.blocks.list(uid);
 		const blockedSet = new Set(blocked_uids);
 
-		set = set.filter((item) => {
+		set = set.filter(item => {
 			let uid = isPlain ? item : item && item[property];
 			uid = utils.isNumber(uid) ? parseInt(uid, 10) : uid;
 			return !blockedSet.has(uid);

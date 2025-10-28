@@ -100,7 +100,7 @@ Helpers.mocks.note = (override = {}) => {
 	return { id, note };
 };
 
-Helpers.mocks.create = (object) => {
+Helpers.mocks.create = object => {
 	// object is optional, will generate a public note if undefined
 	const uuid = utils.generateUUID();
 	const id = `${Helpers.mocks._baseUrl}/activity/${uuid}`;

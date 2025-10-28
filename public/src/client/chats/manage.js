@@ -18,13 +18,13 @@ define('forum/chats/manage', [
 				({ groups } = await api.get('/admin/groups'));
 				groups
 					.sort((a, b) => b.system - a.system)
-					.map((g) => {
+					.map(g => {
 						const { name, displayName } = g;
 						return { name, displayName };
 					});
 
 				if (Array.isArray(ajaxify.data.groups)) {
-					groups.forEach((g) => {
+					groups.forEach(g => {
 						g.selected = ajaxify.data.groups.includes(g.name);
 					});
 				}
@@ -52,7 +52,7 @@ define('forum/chats/manage', [
 			const userListElSearch = modal.find(
 				'[component="chat/manage/user/list/search"]'
 			);
-			userList.addSearchHandler(roomId, userListElSearch, async (data) => {
+			userList.addSearchHandler(roomId, userListElSearch, async data => {
 				if (userListElSearch.val()) {
 					userListEl.html(
 						await app.parseAndTranslate(
@@ -88,11 +88,11 @@ define('forum/chats/manage', [
 					.post(`/chats/${roomId}/users`, {
 						uids: [selected.item.user.uid],
 					})
-					.then((body) => {
+					.then(body => {
 						refreshParticipantsList(roomId, modal, body);
 						searchInput.val('');
 					})
-					.catch((err) => {
+					.catch(err => {
 						translator.translate(err.message, function (translated) {
 							errorEl.text(translated);
 						});
@@ -108,7 +108,7 @@ define('forum/chats/manage', [
 						groups: modal.find('[component="chat/room/groups"]').val(),
 						notificationSetting: notifSettingEl.val(),
 					})
-					.then((payload) => {
+					.then(payload => {
 						ajaxify.data.groups = payload.groups;
 						ajaxify.data.notificationSetting = payload.notificationSetting;
 						const roomDefaultOption = payload.notificationOptions[0];
@@ -138,7 +138,7 @@ define('forum/chats/manage', [
 
 			api
 				.del(`/chats/${roomId}/users/${uid}`, {})
-				.then((body) => {
+				.then(body => {
 					refreshParticipantsList(roomId, modal, body);
 				})
 				.catch(alerts.error);

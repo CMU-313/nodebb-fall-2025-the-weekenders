@@ -32,13 +32,11 @@ module.exports = function (Topics) {
 	async function resolveTopicPostFlags(pids, uid) {
 		await batch.processArray(
 			pids,
-			async (pids) => {
+			async pids => {
 				const postData = await posts.getPostsFields(pids, ['pid', 'flagId']);
-				const flaggedPosts = postData.filter(
-					(p) => p && parseInt(p.flagId, 10)
-				);
+				const flaggedPosts = postData.filter(p => p && parseInt(p.flagId, 10));
 				await Promise.all(
-					flaggedPosts.map((p) =>
+					flaggedPosts.map(p =>
 						flags.update(p.flagId, uid, { state: 'resolved' })
 					)
 				);
@@ -56,9 +54,9 @@ module.exports = function (Topics) {
 			'timestamp',
 			'deleted',
 		]);
-		postData = postData.filter((post) => post && !post.deleted);
-		const pidsToAdd = postData.map((post) => post.pid);
-		const scores = postData.map((post) => post.timestamp);
+		postData = postData.filter(post => post && !post.deleted);
+		const pidsToAdd = postData.map(post => post.pid);
+		const scores = postData.map(post => post.timestamp);
 		await db.sortedSetAdd(`cid:${cid}:pids`, scores, pidsToAdd);
 	}
 
@@ -76,7 +74,7 @@ module.exports = function (Topics) {
 		const mainPid = await Topics.getTopicField(tid, 'mainPid');
 		await batch.processSortedSet(
 			`tid:${tid}:posts`,
-			async (pids) => {
+			async pids => {
 				await posts.purge(pids, uid);
 				await db.sortedSetRemove(`tid:${tid}:posts`, pids); // Guard against infinite loop if pid already does not exist in db
 			},
@@ -112,7 +110,7 @@ module.exports = function (Topics) {
 			),
 			db.sortedSetsRemove(
 				['views', 'posts', 'votes'].map(
-					(prop) => `${utils.isNumber(tid) ? 'topics' : 'topicsRemote'}:${prop}`
+					prop => `${utils.isNumber(tid) ? 'topics' : 'topicsRemote'}:${prop}`
 				),
 				tid
 			),
@@ -131,8 +129,8 @@ module.exports = function (Topics) {
 			db.getSetMembers(`tid:${tid}:followers`),
 			db.getSetMembers(`tid:${tid}:ignorers`),
 		]);
-		const followerKeys = followers.map((uid) => `uid:${uid}:followed_tids`);
-		const ignorerKeys = ignorers.map((uid) => `uid:${uid}ignored_tids`);
+		const followerKeys = followers.map(uid => `uid:${uid}:followed_tids`);
+		const ignorerKeys = ignorers.map(uid => `uid:${uid}ignored_tids`);
 		await db.sortedSetsRemove(followerKeys.concat(ignorerKeys), tid);
 	}
 

@@ -35,7 +35,7 @@ module.exports = {
 						return setImmediate(next);
 					}
 
-					fs.access(sourcePath, (err) => {
+					fs.access(sourcePath, err => {
 						if (err || path.extname(sourcePath) === '.svg') {
 							skip = true;
 							return setImmediate(next);

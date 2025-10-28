@@ -58,9 +58,9 @@ module.exports = function (User) {
 		}
 		const keys = usernames
 			.filter(Boolean)
-			.map((username) => `registration:queue:name:${username}`);
+			.map(username => `registration:queue:name:${username}`);
 		const data = await db.getObjectsFields(keys, ['email']);
-		const emails = data.map((data) => data && data.email).filter(Boolean);
+		const emails = data.map(data => data && data.email).filter(Boolean);
 		if (userData.email && emails.includes(userData.email)) {
 			throw new Error('[[error:email-taken]]');
 		}
@@ -101,7 +101,7 @@ module.exports = function (User) {
 				template: 'registration_accepted',
 				uid: uid,
 			})
-			.catch((err) => winston.error(`[emailer.send] ${err.stack}`));
+			.catch(err => winston.error(`[emailer.send] ${err.stack}`));
 		const total = await db.incrObjectFieldBy(
 			'registration:queue:approval:times',
 			'totalTime',
@@ -122,7 +122,7 @@ module.exports = function (User) {
 	async function markNotificationRead(username) {
 		const nid = `new-register:${username}`;
 		const uids = await groups.getMembers('administrators', 0, -1);
-		const promises = uids.map((uid) => notifications.markRead(nid, uid));
+		const promises = uids.map(uid => notifications.markRead(nid, uid));
 		await Promise.all(promises);
 	}
 
@@ -157,7 +157,7 @@ module.exports = function (User) {
 		);
 		const keys = data
 			.filter(Boolean)
-			.map((user) => `registration:queue:name:${user.value}`);
+			.map(user => `registration:queue:name:${user.value}`);
 		let users = await db.getObjects(keys);
 		users = users.filter(Boolean).map((user, index) => {
 			user.timestampISO = utils.toISOString(data[index].score);
@@ -167,7 +167,7 @@ module.exports = function (User) {
 			return user;
 		});
 		await Promise.all(
-			users.map(async (user) => {
+			users.map(async user => {
 				// temporary: see http://www.stopforumspam.com/forum/viewtopic.php?id=6392
 				// need to keep this for getIPMatchedUsers
 				user.ip = user.ip.replace('::ffff:', '');
@@ -212,7 +212,7 @@ module.exports = function (User) {
 		);
 		const now = Date.now();
 		for (const user of users.filter(
-			(user) => now - user.score >= meta.config.autoApproveTime * 3600000
+			user => now - user.score >= meta.config.autoApproveTime * 3600000
 		)) {
 			try {
 				// eslint-disable-next-line no-await-in-loop

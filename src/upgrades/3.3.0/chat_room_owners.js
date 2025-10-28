@@ -15,14 +15,14 @@ module.exports = {
 
 		await batch.processSortedSet(
 			'chat:rooms',
-			async (roomIds) => {
+			async roomIds => {
 				progress.incr(roomIds.length);
 				const roomData = await db.getObjects(
-					roomIds.map((id) => `chat:room:${id}`)
+					roomIds.map(id => `chat:room:${id}`)
 				);
 
 				const arrayOfUids = await Promise.all(
-					roomIds.map((roomId) =>
+					roomIds.map(roomId =>
 						db.getSortedSetRangeWithScores(`chat:room:${roomId}:uids`, 0, 0)
 					)
 				);

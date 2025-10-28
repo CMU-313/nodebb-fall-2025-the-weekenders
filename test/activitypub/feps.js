@@ -73,7 +73,7 @@ describe.skip('FEPs', () => {
 				it('should have federated out both Announce(Create(Article)) and Announce(Article)', () => {
 					const activities = Array.from(activitypub._sent);
 
-					const test1 = activities.some((activity) => {
+					const test1 = activities.some(activity => {
 						[, activity] = activity;
 						return (
 							activity.type === 'Announce' &&
@@ -84,7 +84,7 @@ describe.skip('FEPs', () => {
 						);
 					});
 
-					const test2 = activities.some((activity) => {
+					const test2 = activities.some(activity => {
 						[, activity] = activity;
 						return (
 							activity.type === 'Announce' &&
@@ -108,7 +108,7 @@ describe.skip('FEPs', () => {
 					const activities = Array.from(activitypub._sent);
 
 					assert(
-						activities.some((activity) => {
+						activities.some(activity => {
 							[, activity] = activity;
 							return (
 								activity.type === 'Announce' &&
@@ -133,7 +133,7 @@ describe.skip('FEPs', () => {
 					const activities = Array.from(activitypub._sent);
 
 					assert(
-						activities.every((activity) => {
+						activities.every(activity => {
 							[, activity] = activity;
 							if (
 								activity.type === 'Announce' &&
@@ -157,7 +157,7 @@ describe.skip('FEPs', () => {
 					const activities = Array.from(activitypub._sent);
 
 					assert(
-						activities.some((activity) => {
+						activities.some(activity => {
 							[, activity] = activity;
 							return (
 								activity.type === 'Announce' &&
@@ -211,7 +211,7 @@ describe.skip('FEPs', () => {
 
 					const activities = Array.from(activitypub._sent);
 
-					const test1 = activities.some((activity) => {
+					const test1 = activities.some(activity => {
 						[, activity] = activity;
 						return (
 							activity.type === 'Announce' &&
@@ -222,7 +222,7 @@ describe.skip('FEPs', () => {
 						);
 					});
 
-					const test2 = activities.some((activity) => {
+					const test2 = activities.some(activity => {
 						[, activity] = activity;
 						return (
 							activity.type === 'Announce' &&
@@ -246,7 +246,7 @@ describe.skip('FEPs', () => {
 					const activities = Array.from(activitypub._sent);
 
 					assert(
-						activities.some((activity) => {
+						activities.some(activity => {
 							[, activity] = activity;
 							return (
 								activity.type === 'Announce' &&
@@ -269,7 +269,7 @@ describe.skip('FEPs', () => {
 
 					const activities = Array.from(activitypub._sent);
 					assert(
-						activities.some((activity) => {
+						activities.some(activity => {
 							[, activity] = activity;
 							return (
 								activity.type === 'Announce' &&
@@ -386,7 +386,7 @@ describe.skip('FEPs', () => {
 					await api.posts.move({ uid: adminUid }, { pid, tid: topic2.tid });
 
 					assert.strictEqual(activitypub._sent.size, 1);
-					const activities = Array.from(activitypub._sent.keys()).map((key) =>
+					const activities = Array.from(activitypub._sent.keys()).map(key =>
 						activitypub._sent.get(key)
 					);
 

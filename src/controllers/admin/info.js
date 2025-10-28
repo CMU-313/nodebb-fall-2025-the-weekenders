@@ -20,7 +20,7 @@ infoController.get = function (req, res) {
 	const timeoutMS = 1000;
 	setTimeout(() => {
 		const data = [];
-		Object.keys(info).forEach((key) => data.push(info[key]));
+		Object.keys(info).forEach(key => data.push(info[key]));
 		data.sort((a, b) => {
 			if (a.id < b.id) {
 				return -1;
@@ -58,7 +58,7 @@ pubsub.on('sync:node:info:start', async () => {
 	}
 });
 
-pubsub.on('sync:node:info:end', (data) => {
+pubsub.on('sync:node:info:end', data => {
 	info[data.id] = data.data;
 });
 
@@ -81,7 +81,7 @@ async function getNodeInfo() {
 			release: os.release(),
 			load: os
 				.loadavg()
-				.map((load) => load.toFixed(2))
+				.map(load => load.toFixed(2))
 				.join(', '),
 			freemem: os.freemem(),
 			totalmem: os.totalmem(),

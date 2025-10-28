@@ -32,7 +32,7 @@ Posts.attachments = require('./attachments');
 
 Posts.exists = async function (pids) {
 	return await db.exists(
-		Array.isArray(pids) ? pids.map((pid) => `post:${pid}`) : `post:${pids}`
+		Array.isArray(pids) ? pids.map(pid => `post:${pid}`) : `post:${pids}`
 	);
 };
 
@@ -97,7 +97,7 @@ Posts.getPostIndices = async function (posts, uid) {
 	const settings = await user.getSettings(uid);
 
 	const byVotes = settings.topicPostSort === 'most_votes';
-	let sets = posts.map((p) =>
+	let sets = posts.map(p =>
 		byVotes ? `tid:${p.tid}:posts:votes` : `tid:${p.tid}:posts`
 	);
 	const reverse =
@@ -111,9 +111,9 @@ Posts.getPostIndices = async function (posts, uid) {
 		sets = uniqueSets[0];
 	}
 
-	const pids = posts.map((post) => post.pid);
+	const pids = posts.map(post => post.pid);
 	const indices = await db[method](sets, pids);
-	return indices.map((index) =>
+	return indices.map(index =>
 		utils.isNumber(index) ? parseInt(index, 10) + 1 : 0
 	);
 };

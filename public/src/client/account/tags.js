@@ -45,7 +45,7 @@ define('forum/account/tags', [
 						type: 'follow',
 					});
 				})
-				.catch((err) => alerts.error(err));
+				.catch(err => alerts.error(err));
 		});
 
 		tagEl.on('itemRemoved', function (event) {
@@ -64,7 +64,7 @@ define('forum/account/tags', [
 						type: 'unfollow',
 					});
 				})
-				.catch((err) => alerts.error(err));
+				.catch(err => alerts.error(err));
 		});
 	};
 

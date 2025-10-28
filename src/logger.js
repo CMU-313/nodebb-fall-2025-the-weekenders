@@ -88,7 +88,7 @@ Logger.open = function (value) {
 		}
 
 		if (stream) {
-			stream.on('error', (err) => {
+			stream.on('error', err => {
 				winston.error(err.stack);
 			});
 		}

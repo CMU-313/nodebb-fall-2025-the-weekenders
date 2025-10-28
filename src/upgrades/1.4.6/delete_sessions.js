@@ -28,9 +28,9 @@ module.exports = {
 
 			await batch.processArray(
 				sessionKeys,
-				async (keys) => {
+				async keys => {
 					const multi = client.multi();
-					keys.forEach((key) => {
+					keys.forEach(key => {
 						progress.incr();
 						multi.del(key);
 					});

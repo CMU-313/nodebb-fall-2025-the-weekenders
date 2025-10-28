@@ -16,7 +16,7 @@ module.exports = function (module) {
 			delete data[''];
 		}
 
-		Object.keys(data).forEach((key) => {
+		Object.keys(data).forEach(key => {
 			if (data[key] === undefined || data[key] === null) {
 				delete data[key];
 			}
@@ -27,7 +27,7 @@ module.exports = function (module) {
 		}
 		if (Array.isArray(key)) {
 			const batch = module.client.batch();
-			key.forEach((k) => batch.hmset(k, data));
+			key.forEach(k => batch.hmset(k, data));
 			await helpers.execBatch(batch);
 		} else {
 			await module.client.hmset(key, data);
@@ -50,13 +50,13 @@ module.exports = function (module) {
 		}
 
 		const batch = module.client.batch();
-		data.forEach((item) => {
+		data.forEach(item => {
 			if (Object.keys(item[1]).length) {
 				batch.hmset(item[0], item[1]);
 			}
 		});
 		await helpers.execBatch(batch);
-		cache.del(data.map((item) => item[0]));
+		cache.del(data.map(item => item[0]));
 	};
 
 	module.setObjectField = async function (key, field, value) {
@@ -65,7 +65,7 @@ module.exports = function (module) {
 		}
 		if (Array.isArray(key)) {
 			const batch = module.client.batch();
-			key.forEach((k) => batch.hset(k, field, value));
+			key.forEach(k => batch.hset(k, field, value));
 			await helpers.execBatch(batch);
 		} else {
 			await module.client.hset(key, field, value);
@@ -120,14 +120,14 @@ module.exports = function (module) {
 		let data = [];
 		if (unCachedKeys.length > 1) {
 			const batch = module.client.batch();
-			unCachedKeys.forEach((k) => batch.hgetall(k));
+			unCachedKeys.forEach(k => batch.hgetall(k));
 			data = await helpers.execBatch(batch);
 		} else if (unCachedKeys.length === 1) {
 			data = [await module.client.hgetall(unCachedKeys[0])];
 		}
 
 		// convert empty objects into null for back-compat with node_redis
-		data = data.map((elem) => {
+		data = data.map(elem => {
 			if (!Object.keys(elem).length) {
 				return null;
 			}
@@ -140,14 +140,12 @@ module.exports = function (module) {
 		});
 
 		if (!Array.isArray(fields) || !fields.length) {
-			return keys.map((key) =>
-				cachedData[key] ? { ...cachedData[key] } : null
-			);
+			return keys.map(key => (cachedData[key] ? { ...cachedData[key] } : null));
 		}
-		return keys.map((key) => {
+		return keys.map(key => {
 			const item = cachedData[key] || {};
 			const result = {};
-			fields.forEach((field) => {
+			fields.forEach(field => {
 				result[field] = item[field] !== undefined ? item[field] : null;
 			});
 			return result;
@@ -169,7 +167,7 @@ module.exports = function (module) {
 
 	module.isObjectFields = async function (key, fields) {
 		const batch = module.client.batch();
-		fields.forEach((f) => batch.hexists(String(key), String(f)));
+		fields.forEach(f => batch.hexists(String(key), String(f)));
 		const results = await helpers.execBatch(batch);
 		return Array.isArray(results) ? helpers.resultsToBool(results) : null;
 	};
@@ -205,7 +203,7 @@ module.exports = function (module) {
 		}
 		if (Array.isArray(key)) {
 			const batch = module.client.batch();
-			key.forEach((k) => batch.hdel(k, fields));
+			key.forEach(k => batch.hdel(k, fields));
 			await helpers.execBatch(batch);
 		} else {
 			await module.client.hdel(key, fields);
@@ -230,14 +228,14 @@ module.exports = function (module) {
 		let result;
 		if (Array.isArray(key)) {
 			const batch = module.client.batch();
-			key.forEach((k) => batch.hincrby(k, field, value));
+			key.forEach(k => batch.hincrby(k, field, value));
 			result = await helpers.execBatch(batch);
 		} else {
 			result = await module.client.hincrby(key, field, value);
 		}
 		cache.del(key);
 		return Array.isArray(result)
-			? result.map((value) => parseInt(value, 10))
+			? result.map(value => parseInt(value, 10))
 			: parseInt(result, 10);
 	};
 
@@ -247,12 +245,12 @@ module.exports = function (module) {
 		}
 
 		const batch = module.client.batch();
-		data.forEach((item) => {
+		data.forEach(item => {
 			for (const [field, value] of Object.entries(item[1])) {
 				batch.hincrby(item[0], field, value);
 			}
 		});
 		await helpers.execBatch(batch);
-		cache.del(data.map((item) => item[0]));
+		cache.del(data.map(item => item[0]));
 	};
 };

@@ -39,7 +39,7 @@ Topics.events = require('./events');
 
 Topics.exists = async function (tids) {
 	return await db.exists(
-		Array.isArray(tids) ? tids.map((tid) => `topic:${tid}`) : `topic:${tids}`
+		Array.isArray(tids) ? tids.map(tid => `topic:${tid}`) : `topic:${tids}`
 	);
 };
 
@@ -73,19 +73,19 @@ Topics.getTopicsByTids = async function (tids, options) {
 		const topics = await Topics.getTopicsData(tids);
 		const uids = _.uniq(
 			topics
-				.map((t) => t && t.uid && t.uid.toString())
-				.filter((v) => utils.isNumber(v) || activitypub.helpers.isUri(v))
+				.map(t => t && t.uid && t.uid.toString())
+				.filter(v => utils.isNumber(v) || activitypub.helpers.isUri(v))
 		);
-		const cids = _.uniq(topics.map((t) => t && t.cid && t.cid.toString()));
-		const guestTopics = topics.filter((t) => t && t.uid === 0);
+		const cids = _.uniq(topics.map(t => t && t.cid && t.cid.toString()));
+		const guestTopics = topics.filter(t => t && t.uid === 0);
 		const mainPids = topics
-			.map((t) => t && t.mainPid)
-			.filter((pid) => utils.isNumber(pid));
+			.map(t => t && t.mainPid)
+			.filter(pid => utils.isNumber(pid));
 
 		async function loadGuestHandles() {
-			const mainPids = guestTopics.map((t) => t.mainPid);
+			const mainPids = guestTopics.map(t => t.mainPid);
 			const postData = await posts.getPostsFields(mainPids, ['handle']);
-			return postData.map((p) => p.handle);
+			return postData.map(p => p.handle);
 		}
 
 		async function loadMainAnonMap() {
@@ -97,7 +97,7 @@ Topics.getTopicsByTids = async function (tids, options) {
 				'isAnonymous',
 			]);
 			const map = {};
-			postData.forEach((post) => {
+			postData.forEach(post => {
 				if (post && post.pid) {
 					map[post.pid] = post.isAnonymous;
 				}
@@ -110,10 +110,10 @@ Topics.getTopicsByTids = async function (tids, options) {
 				return uids.map(() => ({ showfullname: false }));
 			}
 			const data = await db.getObjectsFields(
-				uids.map((uid) => `user:${uid}:settings`),
+				uids.map(uid => `user:${uid}:settings`),
 				['showfullname']
 			);
-			data.forEach((settings) => {
+			data.forEach(settings => {
 				settings.showfullname = parseInt(settings.showfullname, 10) === 1;
 			});
 			return data;
@@ -170,7 +170,7 @@ Topics.getTopicsByTids = async function (tids, options) {
 				'[DEBUG] Topics.getTopicsByTids - tidToGuestHandle:',
 				JSON.stringify(
 					_.zipObject(
-						guestTopics.map((t) => t.tid),
+						guestTopics.map(t => t.tid),
 						guestHandles
 					)
 				)
@@ -195,7 +195,7 @@ Topics.getTopicsByTids = async function (tids, options) {
 			usersMap: _.zipObject(uids, users),
 			categoriesMap: _.zipObject(cids, categoriesData),
 			tidToGuestHandle: _.zipObject(
-				guestTopics.map((t) => t.tid),
+				guestTopics.map(t => t.tid),
 				guestHandles
 			),
 			thumbs,
@@ -268,7 +268,7 @@ Topics.getTopicsByTids = async function (tids, options) {
 	});
 
 	const filteredTopics = result.topics.filter(
-		(topic) => topic && topic.category && !topic.category.disabled
+		topic => topic && topic.category && !topic.category.disabled
 	);
 
 	const hookResult = await plugins.hooks.fire('filter:topics.get', {
@@ -322,9 +322,9 @@ Topics.getTopicWithPosts = async function (
 
 	topicData.thumbs = thumbs[0];
 	topicData.posts = posts;
-	topicData.posts.forEach((p) => {
+	topicData.posts.forEach(p => {
 		p.events = events.filter(
-			(event) => event.timestamp >= p.eventStart && event.timestamp < p.eventEnd
+			event => event.timestamp >= p.eventStart && event.timestamp < p.eventEnd
 		);
 		p.eventStart = undefined;
 		p.eventEnd = undefined;
@@ -374,7 +374,7 @@ function mergeConsecutiveShareEvents(arr) {
 			if (!last.items) {
 				last.items = [{ ...last }];
 				['user', 'text', 'timestamp', 'timestampISO'].forEach(
-					(field) => delete last[field]
+					field => delete last[field]
 				);
 			}
 			last.items.push(curr);
@@ -438,7 +438,7 @@ Topics.getMainPids = async function (tids) {
 		return [];
 	}
 	const topicData = await Topics.getTopicsFields(tids, ['mainPid']);
-	return topicData.map((topic) => topic && topic.mainPid);
+	return topicData.map(topic => topic && topic.mainPid);
 };
 
 Topics.getMainPosts = async function (tids, uid) {
@@ -449,7 +449,7 @@ Topics.getMainPosts = async function (tids, uid) {
 async function getMainPosts(mainPids, uid) {
 	let postData = await posts.getPostsByPids(mainPids, uid);
 	postData = await user.blocks.filter(uid, postData);
-	postData.forEach((post) => {
+	postData.forEach(post => {
 		if (post) {
 			post.index = 0;
 		}

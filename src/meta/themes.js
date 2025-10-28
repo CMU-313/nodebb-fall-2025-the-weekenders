@@ -24,7 +24,7 @@ Themes.get = async () => {
 	let themes = await getThemes(themePath);
 	themes = _.flatten(themes).filter(Boolean);
 	themes = await Promise.all(
-		themes.map(async (theme) => {
+		themes.map(async theme => {
 			const config = path.join(themePath, theme, 'theme.json');
 			const pack = path.join(themePath, theme, 'package.json');
 			try {
@@ -62,11 +62,9 @@ Themes.get = async () => {
 
 async function getThemes(themePath) {
 	let dirs = await fs.promises.readdir(themePath);
-	dirs = dirs.filter(
-		(dir) => themeNamePattern.test(dir) || dir.startsWith('@')
-	);
+	dirs = dirs.filter(dir => themeNamePattern.test(dir) || dir.startsWith('@'));
 	return await Promise.all(
-		dirs.map(async (dir) => {
+		dirs.map(async dir => {
 			try {
 				const dirpath = path.join(themePath, dir);
 				const stat = await fs.promises.stat(dirpath);
@@ -79,7 +77,7 @@ async function getThemes(themePath) {
 				}
 
 				const themes = await getThemes(path.join(themePath, dir));
-				return themes.map((theme) => path.join(dir, theme));
+				return themes.map(theme => path.join(dir, theme));
 			} catch (err) {
 				if (err.code === 'ENOENT') {
 					return false;
@@ -91,7 +89,7 @@ async function getThemes(themePath) {
 	);
 }
 
-Themes.set = async (data) => {
+Themes.set = async data => {
 	switch (data.type) {
 		case 'local': {
 			const current = await Meta.configs.get('theme:id');
@@ -168,7 +166,7 @@ Themes.setupPaths = async () => {
 		winston.info(`[themes] Using theme ${themeId}`);
 	}
 
-	const themeObj = data.themesData.find((themeObj) => themeObj.id === themeId);
+	const themeObj = data.themesData.find(themeObj => themeObj.id === themeId);
 
 	if (!themeObj) {
 		throw new Error('theme-not-found');

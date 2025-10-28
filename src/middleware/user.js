@@ -188,9 +188,7 @@ module.exports = function (middleware) {
 			return controllers.helpers.notAllowed(req, res);
 		}
 
-		if (
-			!['uid', 'userslug'].some((param) => req.params.hasOwnProperty(param))
-		) {
+		if (!['uid', 'userslug'].some(param => req.params.hasOwnProperty(param))) {
 			return controllers.helpers.notAllowed(req, res);
 		}
 
@@ -336,7 +334,7 @@ module.exports = function (middleware) {
 				allowed: ['/register/complete', '/confirm/'],
 			}
 		);
-		if (allowed.includes(path) || allowed.some((p) => path.startsWith(p))) {
+		if (allowed.includes(path) || allowed.some(p => path.startsWith(p))) {
 			return setImmediate(next);
 		}
 

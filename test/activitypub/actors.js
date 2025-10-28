@@ -597,7 +597,7 @@ describe.skip('Controllers', () => {
 			);
 
 			['id', 'url', 'followers', 'following', 'inbox', 'outbox'].forEach(
-				(prop) => {
+				prop => {
 					assert(body.hasOwnProperty(prop));
 					assert(body[prop]);
 				}
@@ -620,7 +620,7 @@ describe.skip('Controllers', () => {
 
 			assert(body.hasOwnProperty('publicKey'));
 			assert(
-				['id', 'owner', 'publicKeyPem'].every((prop) =>
+				['id', 'owner', 'publicKeyPem'].every(prop =>
 					body.publicKey.hasOwnProperty(prop)
 				)
 			);
@@ -660,7 +660,7 @@ describe.skip('Controllers', () => {
 			);
 
 			['id', 'url', /* 'followers', 'following', */ 'inbox', 'outbox'].forEach(
-				(prop) => {
+				prop => {
 					assert(body.hasOwnProperty(prop));
 					assert(body[prop]);
 				}
@@ -689,7 +689,7 @@ describe.skip('Controllers', () => {
 
 			assert(body.hasOwnProperty('publicKey'));
 			assert(
-				['id', 'owner', 'publicKeyPem'].every((prop) =>
+				['id', 'owner', 'publicKeyPem'].every(prop =>
 					body.publicKey.hasOwnProperty(prop)
 				)
 			);
@@ -745,7 +745,7 @@ describe.skip('Controllers', () => {
 			);
 
 			['id', 'url', 'inbox', 'outbox', 'name', 'preferredUsername'].forEach(
-				(prop) => {
+				prop => {
 					assert(body.hasOwnProperty(prop));
 					assert(body[prop]);
 				}
@@ -763,7 +763,7 @@ describe.skip('Controllers', () => {
 		it('should contain a `publicKey` property with a public key', async () => {
 			assert(body.hasOwnProperty('publicKey'));
 			assert(
-				['id', 'owner', 'publicKeyPem'].every((prop) =>
+				['id', 'owner', 'publicKeyPem'].every(prop =>
 					body.publicKey.hasOwnProperty(prop)
 				)
 			);
@@ -779,7 +779,7 @@ describe.skip('Controllers', () => {
 			assert(body2.aliases.includes(nconf.get('url')));
 			assert(
 				body2.links.some(
-					(item) =>
+					item =>
 						item.rel === 'self' &&
 						item.type === 'application/activity+json' &&
 						item.href === `${nconf.get('url')}/actor`

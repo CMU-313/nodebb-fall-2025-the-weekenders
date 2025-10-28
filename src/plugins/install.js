@@ -42,13 +42,13 @@ if (process.platform === 'win32') {
 
 module.exports = function (Plugins) {
 	if (nconf.get('isPrimary')) {
-		pubsub.on('plugins:toggleInstall', (data) => {
+		pubsub.on('plugins:toggleInstall', data => {
 			if (data.hostname !== os.hostname()) {
 				toggleInstall(data.id, data.version);
 			}
 		});
 
-		pubsub.on('plugins:upgrade', (data) => {
+		pubsub.on('plugins:upgrade', data => {
 			if (data.hostname !== os.hostname()) {
 				upgrade(data.id, data.version);
 			}
@@ -203,9 +203,9 @@ module.exports = function (Plugins) {
 		return await db.getSortedSetRange('plugins:active', 0, -1);
 	};
 
-	Plugins.autocomplete = async (fragment) => {
+	Plugins.autocomplete = async fragment => {
 		const pluginDir = paths.nodeModules;
-		const plugins = (await fs.readdir(pluginDir)).filter((filename) =>
+		const plugins = (await fs.readdir(pluginDir)).filter(filename =>
 			filename.startsWith(fragment)
 		);
 

@@ -37,7 +37,7 @@ module.exports = function (User) {
 
 		// Leaving all other system groups to have privileges constrained to the "banned-users" group
 		const systemGroups = groups.systemGroups.filter(
-			(group) => group !== groups.BANNED_USERS
+			group => group !== groups.BANNED_USERS
 		);
 		await groups.leave(systemGroups, uid);
 		await groups.join(groups.BANNED_USERS, uid);
@@ -66,7 +66,7 @@ module.exports = function (User) {
 		};
 		await emailer
 			.send('banned', uid, data)
-			.catch((err) => winston.error(`[emailer.send] ${err.stack}`));
+			.catch(err => winston.error(`[emailer.send] ${err.stack}`));
 
 		return banData;
 	};
@@ -77,7 +77,7 @@ module.exports = function (User) {
 		const userData = await User.getUsersFields(uids, ['email:confirmed']);
 
 		await db.setObject(
-			uids.map((uid) => `user:${uid}`),
+			uids.map(uid => `user:${uid}`),
 			{ banned: 0, 'banned:expire': 0 }
 		);
 		const now = Date.now();
@@ -115,7 +115,7 @@ module.exports = function (User) {
 		const isArray = Array.isArray(uids);
 		uids = isArray ? uids : [uids];
 		const result = await User.bans.unbanIfExpired(uids);
-		return isArray ? result.map((r) => r.banned) : result[0].banned;
+		return isArray ? result.map(r => r.banned) : result[0].banned;
 	};
 
 	User.bans.canLoginIfBanned = async function (uid) {
@@ -149,7 +149,7 @@ module.exports = function (User) {
 	User.bans.calcExpiredFromUserData = function (userData) {
 		const isArray = Array.isArray(userData);
 		userData = isArray ? userData : [userData];
-		userData = userData.map((userData) => ({
+		userData = userData.map(userData => ({
 			banned: !!(userData && userData.banned),
 			'banned:expire': userData && userData['banned:expire'],
 			banExpired:

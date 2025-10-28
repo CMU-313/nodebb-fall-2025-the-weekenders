@@ -95,7 +95,7 @@ define('forum/search', [
 		if (selectedTags.length) {
 			labelText = translator.compile(
 				'search:tags-x',
-				selectedTags.map((u) => u.value).join(', ')
+				selectedTags.map(u => u.value).join(', ')
 			);
 		}
 		$('[component="tag/filter/button"]')
@@ -153,12 +153,12 @@ define('forum/search', [
 		) {
 			searchData.matchWords = form.find('#match-words-filter').val();
 			searchData.by = selectedUsers.length
-				? selectedUsers.map((u) => u.username)
+				? selectedUsers.map(u => u.username)
 				: undefined;
 			searchData.categories = selectedCids.length ? selectedCids : undefined;
 			searchData.searchChildren = form.find('#search-children').is(':checked');
 			searchData.hasTags = selectedTags.length
-				? selectedTags.map((t) => t.value)
+				? selectedTags.map(t => t.value)
 				: undefined;
 			searchData.replies = form.find('#reply-count').val();
 			searchData.repliesFilter = form.find('#reply-count-filter').val();
@@ -178,8 +178,8 @@ define('forum/search', [
 	}
 
 	function updateFormItemVisiblity(searchIn) {
-		const hideTitlePostFilters = !['posts', 'titles', 'bookmarks'].some(
-			(token) => searchIn.includes(token)
+		const hideTitlePostFilters = !['posts', 'titles', 'bookmarks'].some(token =>
+			searchIn.includes(token)
 		);
 		$('.post-search-item').toggleClass('hidden', hideTitlePostFilters);
 	}
@@ -270,7 +270,7 @@ define('forum/search', [
 				'sortDirection',
 			];
 			const saveData = {};
-			fieldsToSave.forEach((key) => {
+			fieldsToSave.forEach(key => {
 				saveData[key] = data[key];
 			});
 			storage.setItem('search-preferences', JSON.stringify(saveData));
@@ -359,7 +359,7 @@ define('forum/search', [
 				if (isActive) {
 					labelText = translator.compile(
 						'search:posted-by-usernames',
-						selectedUsers.map((u) => u.username).join(', ')
+						selectedUsers.map(u => u.username).join(', ')
 					);
 				}
 				el.find('[component="user/filter/button"]')
@@ -415,7 +415,7 @@ define('forum/search', [
 			}
 			result.tags = result.tags.slice(0, 20);
 			const tagMap = {};
-			result.tags.forEach((tag) => {
+			result.tags.forEach(tag => {
 				tagMap[tag.value] = tag;
 			});
 
@@ -447,14 +447,14 @@ define('forum/search', [
 
 		el.on('click', '[component="tag/filter/delete"]', function () {
 			const deleteTag = $(this).attr('data-tag');
-			selectedTags = selectedTags.filter((tag) => tag.value !== deleteTag);
+			selectedTags = selectedTags.filter(tag => tag.value !== deleteTag);
 			renderSelectedTags();
 		});
 
-		el.find('[component="tag/filter/search"]').on('keyup', (e) => {
+		el.find('[component="tag/filter/search"]').on('keyup', e => {
 			if (e.key === 'Enter' && !app.user.privileges['search:tags']) {
 				const value = el.find('[component="tag/filter/search"]').val();
-				if (value && selectedTags.every((tag) => tag.value !== value)) {
+				if (value && selectedTags.every(tag => tag.value !== value)) {
 					selectedTags.push(tagValueToObject(value));
 					renderSelectedTags();
 				}

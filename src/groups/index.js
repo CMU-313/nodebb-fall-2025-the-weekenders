@@ -75,7 +75,7 @@ Groups.getGroupsFromSet = async function (set, start, stop) {
 		groupNames = await db.getSortedSetRevRange(set, start, stop);
 	}
 	if (set === 'groups:visible:name') {
-		groupNames = groupNames.map((name) => name.split(':')[1]);
+		groupNames = groupNames.map(name => name.split(':')[1]);
 	}
 
 	return await Groups.getGroupsAndMembers(groupNames);
@@ -108,7 +108,7 @@ Groups.getNonPrivilegeGroups = async function (set, start, stop, flags) {
 
 	let groupNames = await db.getSortedSetRevRange(set, start, stop);
 	groupNames = groupNames.filter(
-		(groupName) => !Groups.isPrivilegeGroup(groupName)
+		groupName => !Groups.isPrivilegeGroup(groupName)
 	);
 	if (flags.ephemeral) {
 		groupNames = groupNames.concat(Groups.ephemeralGroups);
@@ -207,7 +207,7 @@ Groups.getOwnersAndMembers = async function (groupName, uid, start, stop) {
 		stop !== -1 ? stop + 1 : undefined
 	);
 	const owners = await user.getUsers(ownerUidsOnPage, uid);
-	owners.forEach((user) => {
+	owners.forEach(user => {
 		if (user) {
 			user.isOwner = true;
 		}
@@ -230,7 +230,7 @@ Groups.getOwnersAndMembers = async function (groupName, uid, start, stop) {
 			done = true;
 		}
 		batch = batch.filter(
-			(user) => user && user.uid && !ownerUids.includes(user.uid.toString())
+			user => user && user.uid && !ownerUids.includes(user.uid.toString())
 		);
 		returnUsers = returnUsers.concat(batch);
 	}
@@ -284,12 +284,12 @@ async function isFieldOn(groupName, field) {
 
 Groups.exists = async function (name) {
 	if (Array.isArray(name)) {
-		const slugs = name.map((groupName) => slugify(groupName));
+		const slugs = name.map(groupName => slugify(groupName));
 		const isMembersOfRealGroups = await db.isSortedSetMembers(
 			'groups:createtime',
 			name
 		);
-		const isMembersOfEphemeralGroups = slugs.map((slug) =>
+		const isMembersOfEphemeralGroups = slugs.map(slug =>
 			Groups.ephemeralGroups.includes(slug)
 		);
 		return name.map(

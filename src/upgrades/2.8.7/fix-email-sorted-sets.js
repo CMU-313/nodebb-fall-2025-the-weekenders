@@ -11,11 +11,9 @@ module.exports = {
 		const bulkRemove = [];
 		await batch.processSortedSet(
 			'email:uid',
-			async (data) => {
+			async data => {
 				progress.incr(data.length);
-				const usersData = await db.getObjects(
-					data.map((d) => `user:${d.score}`)
-				);
+				const usersData = await db.getObjects(data.map(d => `user:${d.score}`));
 				data.forEach((emailData, index) => {
 					const { score: uid, value: email } = emailData;
 					const userData = usersData[index];
@@ -46,7 +44,7 @@ module.exports = {
 
 		await batch.processArray(
 			bulkRemove,
-			async (bulk) => {
+			async bulk => {
 				await db.sortedSetRemoveBulk(bulk);
 			},
 			{

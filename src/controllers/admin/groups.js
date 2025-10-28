@@ -22,7 +22,7 @@ groupsController.list = async function (req, res) {
 	const stop = start + groupsPerPage - 1;
 	groupNames = groupNames.slice(start, stop + 1);
 
-	const groupData = await groups.getGroupsData(groupNames.map((g) => g.name));
+	const groupData = await groups.getGroupsData(groupNames.map(g => g.name));
 	res.render('admin/manage/groups', {
 		groups: groupData,
 		pagination: pagination.create(page, pageCount),
@@ -59,7 +59,7 @@ groupsController.get = async function (req, res, next) {
 		return next();
 	}
 
-	const groupNameData = groupNames.map((g) => ({
+	const groupNameData = groupNames.map(g => ({
 		encodedName: encodeURIComponent(g.name),
 		displayName: validator.escape(String(g.name)),
 		slug: g.slug,
@@ -77,10 +77,10 @@ groupsController.get = async function (req, res, next) {
 
 async function getGroupNames() {
 	let groupEntries = Object.entries(await db.getObject('groupslug:groupname'));
-	groupEntries = groupEntries.map((g) => ({ slug: g[0], name: g[1] }));
+	groupEntries = groupEntries.map(g => ({ slug: g[0], name: g[1] }));
 	return groupEntries
 		.filter(
-			(g) =>
+			g =>
 				g.name !== 'registered-users' &&
 				g.name !== 'verified-users' &&
 				g.name !== 'unverified-users' &&

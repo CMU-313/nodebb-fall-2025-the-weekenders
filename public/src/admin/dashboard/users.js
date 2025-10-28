@@ -22,7 +22,7 @@ define('admin/dashboard/users', [
 			fetch(
 				`${config.relative_path}/api${ajaxify.data.url}${window.location.search}`,
 				{ credentials: 'include' }
-			).then((response) => {
+			).then(response => {
 				if (response.ok) {
 					response.json().then(function (payload) {
 						app.parseAndTranslate(

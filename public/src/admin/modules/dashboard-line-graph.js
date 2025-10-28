@@ -44,11 +44,11 @@ export function init({ set, dataset }) {
 	handleUpdateControls({ set });
 
 	const t = translator.Translator.create();
-	return new Promise((resolve) => {
+	return new Promise(resolve => {
 		t.translateKey(
 			`admin/menu:${ajaxify.data.template.name.replace('admin/', '')}`,
 			[]
-		).then((key) => {
+		).then(key => {
 			const data = {
 				labels: trafficLabels,
 				datasets: [
@@ -215,10 +215,10 @@ function update(
 		return Promise.reject(new Error('[[error:invalid-data]]'));
 	}
 
-	return new Promise((resolve) => {
+	return new Promise(resolve => {
 		api
 			.get(`/admin/analytics/${set}`, { units, until, amount })
-			.then((dataset) => {
+			.then(dataset => {
 				if (units === 'days') {
 					_current.data.xLabels = utils.getDaysArray(until, amount);
 				} else {

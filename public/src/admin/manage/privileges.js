@@ -126,10 +126,10 @@ define('admin/manage/privileges', [
 	};
 
 	Privileges.applyDeltaState = (checkboxEl, delta) => {
-		['bg-success', 'bg-opacity-75', 'border-success'].forEach((className) => {
+		['bg-success', 'bg-opacity-75', 'border-success'].forEach(className => {
 			checkboxEl.classList.toggle(className, delta === true);
 		});
-		['bg-danger', 'bg-opacity-50', 'border-danger'].forEach((className) => {
+		['bg-danger', 'bg-opacity-50', 'border-danger'].forEach(className => {
 			checkboxEl.classList.toggle(className, delta === false);
 		});
 	};
@@ -145,7 +145,7 @@ define('admin/manage/privileges', [
 
 		// Expose discard button as necessary
 		const containerEl = document.querySelector('.privilege-table-container');
-		containerEl.addEventListener('change', (e) => {
+		containerEl.addEventListener('change', e => {
 			const subselector = e.target.closest('td[data-privilege] input');
 			if (subselector) {
 				document.getElementById('discard').style.display =
@@ -256,12 +256,12 @@ define('admin/manage/privileges', [
 			}
 		);
 
-		Promise.allSettled(requests).then((results) => {
+		Promise.allSettled(requests).then(results => {
 			Privileges.refreshPrivilegeTable();
 
-			const rejects = results.filter((r) => r.status === 'rejected');
+			const rejects = results.filter(r => r.status === 'rejected');
 			if (rejects.length) {
-				rejects.forEach((result) => {
+				rejects.forEach(result => {
 					alerts.error(result.reason);
 				});
 			} else {
@@ -278,7 +278,7 @@ define('admin/manage/privileges', [
 	Privileges.refreshPrivilegeTable = function (groupToHighlight) {
 		api
 			.get(`/categories/${cid}/privileges`, {})
-			.then((privileges) => {
+			.then(privileges => {
 				ajaxify.data.privileges = { ...ajaxify.data.privileges, ...privileges };
 				const tpl = parseInt(cid, 10)
 					? 'admin/partials/privileges/category'
@@ -288,7 +288,7 @@ define('admin/manage/privileges', [
 				);
 				app
 					.parseAndTranslate(tpl, { cid, privileges, isAdminPriv })
-					.then((html) => {
+					.then(html => {
 						// Get currently selected filters
 						const btnIndices = $('.privilege-filters button.btn-warning')
 							.map((idx, el) => $(el).index())

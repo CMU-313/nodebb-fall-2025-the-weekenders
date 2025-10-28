@@ -163,7 +163,7 @@ categoryController.get = async function (req, res, next) {
 		buildBreadcrumbs(req, categoryData),
 		categories.setUnread(
 			[categoryData],
-			allCategories.map((c) => c.cid).concat(cid),
+			allCategories.map(c => c.cid).concat(cid),
 			req.uid
 		),
 	]);
@@ -181,7 +181,7 @@ categoryController.get = async function (req, res, next) {
 			0,
 			categoryData.subCategoriesPerPage
 		);
-		categoryData.children.forEach((child) => {
+		categoryData.children.forEach(child => {
 			if (child) {
 				helpers.trimChildren(child);
 				helpers.setCategoryTeaser(child);
@@ -216,7 +216,7 @@ categoryController.get = async function (req, res, next) {
 		pageCount,
 		req.query
 	);
-	categoryData.pagination.rel.forEach((rel) => {
+	categoryData.pagination.rel.forEach(rel => {
 		rel.href = `${url}/category/${categoryData.slug}${rel.href}`;
 		res.locals.linkTags.push(rel);
 	});

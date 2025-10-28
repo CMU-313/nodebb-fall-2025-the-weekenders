@@ -23,10 +23,10 @@ module.exports = {
 
 		await batch.processSortedSet(
 			'users:joindate',
-			async (uids) => {
+			async uids => {
 				progress.incr(uids.length);
 				const usersSettings = await db.getObjects(
-					uids.map((uid) => `user:${uid}:settings`)
+					uids.map(uid => `user:${uid}:settings`)
 				);
 				const bulkSet = [];
 				usersSettings.forEach((userSetting, i) => {

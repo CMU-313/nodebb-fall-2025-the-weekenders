@@ -19,14 +19,14 @@ module.exports = {
 
 		await batch.processArray(
 			allRoomIds,
-			async (roomIds) => {
+			async roomIds => {
 				progress.incr(roomIds.length);
-				const keys = roomIds.map((id) => `chat:room:${id}`);
+				const keys = roomIds.map(id => `chat:room:${id}`);
 				const exists = await db.exists(keys);
 				roomIds = roomIds.filter((_, idx) => exists[idx]);
 				// get timestamp from uids, if no users use the timestamp of first user
 				const arrayOfUids = await Promise.all(
-					roomIds.map((roomId) =>
+					roomIds.map(roomId =>
 						db.getSortedSetRangeWithScores(`chat:room:${roomId}:uids`, 0, 0)
 					)
 				);

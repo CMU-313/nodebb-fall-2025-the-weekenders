@@ -90,11 +90,9 @@ recentController.getData = async function (req, url, sort) {
 	}
 
 	data.filters = helpers.buildFilters(baseUrl, filter, query);
-	data.selectedFilter = data.filters.find(
-		(filter) => filter && filter.selected
-	);
+	data.selectedFilter = data.filters.find(filter => filter && filter.selected);
 	data.terms = helpers.buildTerms(baseUrl, term, query);
-	data.selectedTerm = data.terms.find((term) => term && term.selected);
+	data.selectedTerm = data.terms.find(term => term && term.selected);
 
 	const pageCount = Math.max(
 		1,

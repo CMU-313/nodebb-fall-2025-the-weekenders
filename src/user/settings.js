@@ -36,14 +36,14 @@ module.exports = function (User) {
 			return [];
 		}
 
-		const keys = uids.map((uid) => `user:${uid}:settings`);
+		const keys = uids.map(uid => `user:${uid}:settings`);
 		let settings = await db.getObjects(keys);
 		settings = settings.map((userSettings, index) => {
 			userSettings = userSettings || {};
 			userSettings.uid = uids[index];
 			return userSettings;
 		});
-		return await Promise.all(settings.map((s) => onSettingsLoaded(s.uid, s)));
+		return await Promise.all(settings.map(s => onSettingsLoaded(s.uid, s)));
 	};
 
 	async function onSettingsLoaded(uid, settings) {
@@ -117,7 +117,7 @@ module.exports = function (User) {
 		);
 
 		const notificationTypes = await notifications.getAllNotificationTypes();
-		notificationTypes.forEach((notificationType) => {
+		notificationTypes.forEach(notificationType => {
 			settings[notificationType] = getSetting(
 				settings,
 				notificationType,
@@ -231,7 +231,7 @@ module.exports = function (User) {
 			chatDenyList: data.chatDenyList,
 		};
 		const notificationTypes = await notifications.getAllNotificationTypes();
-		notificationTypes.forEach((notificationType) => {
+		notificationTypes.forEach(notificationType => {
 			if (data[notificationType]) {
 				settings[notificationType] = data[notificationType];
 			}

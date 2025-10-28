@@ -160,7 +160,7 @@ define('forum/topic/move-post', [
 		}
 
 		Promise.all(
-			data.pids.map((pid) =>
+			data.pids.map(pid =>
 				api.put(`/posts/${encodeURIComponent(pid)}/move`, {
 					tid: data.tid,
 				})

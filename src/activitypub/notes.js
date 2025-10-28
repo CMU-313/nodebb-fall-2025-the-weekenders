@@ -31,12 +31,12 @@ Notes._normalizeTags = async (tag, cid) => {
 	const systemTags = (meta.config.systemTags || '').split(',');
 	const maxTags = await categories.getCategoryField(cid, 'maxTags');
 	const tags = (tag || [])
-		.map((tag) => {
+		.map(tag => {
 			tag.name = tag.name.startsWith('#') ? tag.name.slice(1) : tag.name;
 			return tag;
 		})
-		.filter((o) => o.type === 'Hashtag' && !systemTags.includes(o.name))
-		.map((t) => t.name);
+		.filter(o => o.type === 'Hashtag' && !systemTags.includes(o.name))
+		.map(t => t.name);
 
 	if (tags.length > maxTags) {
 		tags.length = maxTags;
@@ -119,7 +119,7 @@ Notes.assert = async (uid, input, options = { skipChecks: false }) => {
 
 	const members = await db.isSortedSetMembers(
 		`tid:${tid}:posts`,
-		chain.slice(1).map((p) => p.pid)
+		chain.slice(1).map(p => p.pid)
 	);
 	members.unshift(await posts.exists(mainPid));
 	if (tid && members.every(Boolean)) {
@@ -143,13 +143,13 @@ Notes.assert = async (uid, input, options = { skipChecks: false }) => {
 		// Local
 		const resolved = await Promise.all(
 			Array.from(set).map(
-				async (id) => await activitypub.helpers.resolveLocalId(id)
+				async id => await activitypub.helpers.resolveLocalId(id)
 			)
 		);
 		const recipientCids = resolved
 			.filter(Boolean)
 			.filter(({ type }) => type === 'category')
-			.map((obj) => obj.id);
+			.map(obj => obj.id);
 
 		// Remote
 		let remoteCid;
@@ -181,8 +181,8 @@ Notes.assert = async (uid, input, options = { skipChecks: false }) => {
 		// Remove any custom emoji from title
 		if (_activitypub && _activitypub.tag && Array.isArray(_activitypub.tag)) {
 			_activitypub.tag
-				.filter((tag) => tag.type === 'Emoji')
-				.forEach((tag) => {
+				.filter(tag => tag.type === 'Emoji')
+				.forEach(tag => {
 					title = title.replace(new RegExp(tag.name, 'g'), '');
 				});
 		}
@@ -190,7 +190,7 @@ Notes.assert = async (uid, input, options = { skipChecks: false }) => {
 	mainPid = utils.isNumber(mainPid) ? parseInt(mainPid, 10) : mainPid;
 
 	// Relation & privilege check for local categories
-	const inputIndex = chain.map((n) => n.pid).indexOf(id);
+	const inputIndex = chain.map(n => n.pid).indexOf(id);
 	const hasRelation =
 		uid ||
 		hasTid ||
@@ -222,7 +222,7 @@ Notes.assert = async (uid, input, options = { skipChecks: false }) => {
 		new Map()
 	);
 	const unprocessed = chain
-		.map((post) => {
+		.map(post => {
 			post.tid = tid; // add tid to post hash
 
 			// Ensure toPids in replies are ids
@@ -304,7 +304,7 @@ Notes.assert = async (uid, input, options = { skipChecks: false }) => {
 	return { tid, count };
 };
 
-Notes.assertPrivate = async (object) => {
+Notes.assertPrivate = async object => {
 	// Given an object, adds it to an existing chat or creates a new chat otherwise
 	// todo: context stuff
 
@@ -315,7 +315,7 @@ Notes.assertPrivate = async (object) => {
 	const localUids = [];
 	const recipients = new Set([...(object.to || []), ...(object.cc || [])]);
 	await Promise.all(
-		Array.from(recipients).map(async (value) => {
+		Array.from(recipients).map(async value => {
 			const { type, id } = await activitypub.helpers.resolveLocalId(value);
 			if (type === 'user') {
 				localUids.push(id);
@@ -350,9 +350,9 @@ Notes.assertPrivate = async (object) => {
 
 	// Compare room members with object recipients; if someone in-room is omitted, start new chat
 	const participants = await messaging.getUsersInRoom(roomId, 0, -1);
-	const participantUids = participants.map((user) => user.uid);
+	const participantUids = participants.map(user => user.uid);
 	if (roomId) {
-		const omitted = participants.filter((user) => {
+		const omitted = participants.filter(user => {
 			const { uid } = user;
 			return !recipients.has(uid) && uid !== object.attributedTo;
 		});
@@ -386,7 +386,7 @@ Notes.assertPrivate = async (object) => {
 		});
 		notifications.push(
 			notification,
-			Array.from(recipients).filter((uid) => utils.isNumber(uid))
+			Array.from(recipients).filter(uid => utils.isNumber(uid))
 		);
 		return null;
 	}
@@ -397,7 +397,7 @@ Notes.assertPrivate = async (object) => {
 
 	// Add any new members to the chat
 	const added = Array.from(recipients).filter(
-		(uid) => !participantUids.includes(uid)
+		uid => !participantUids.includes(uid)
 	);
 	const assertion = await activitypub.actors.assert(added);
 	if (assertion) {
@@ -453,7 +453,7 @@ Notes.updateLocalRecipients = async (id, { to, cc }) => {
 	const recipients = new Set([...(to || []), ...(cc || [])]);
 	const uids = new Set();
 	await Promise.all(
-		Array.from(recipients).map(async (recipient) => {
+		Array.from(recipients).map(async recipient => {
 			const { type, id } = await activitypub.helpers.resolveLocalId(recipient);
 			if (type === 'user' && (await user.exists(id))) {
 				uids.add(parseInt(id, 10));
@@ -468,7 +468,7 @@ Notes.updateLocalRecipients = async (id, { to, cc }) => {
 				const { uids: followers } =
 					await activitypub.actors.getLocalFollowers(followedUid);
 				if (followers.size > 0) {
-					followers.forEach((uid) => {
+					followers.forEach(uid => {
 						uids.add(uid);
 					});
 				}
@@ -545,10 +545,10 @@ Notes.syncUserInboxes = async function (tid, uid) {
 	pids.unshift(mainPid);
 
 	const recipients = await db.getSetsMembers(
-		pids.map((id) => `post:${id}:recipients`)
+		pids.map(id => `post:${id}:recipients`)
 	);
 	const uids = recipients.reduce(
-		(set, uids) => new Set([...set, ...uids.map((u) => parseInt(u, 10))]),
+		(set, uids) => new Set([...set, ...uids.map(u => parseInt(u, 10))]),
 		new Set()
 	);
 	if (uid) {
@@ -557,24 +557,24 @@ Notes.syncUserInboxes = async function (tid, uid) {
 
 	// Tag followers
 	const tagsFollowers = await topics.getTagsFollowers(
-		tags.map((tag) => tag.value)
+		tags.map(tag => tag.value)
 	);
-	new Set(tagsFollowers.flat()).forEach((uid) => {
+	new Set(tagsFollowers.flat()).forEach(uid => {
 		uids.add(uid);
 	});
 
 	// Category followers
 	const categoryFollowers = await activitypub.actors.getLocalFollowers(cid);
-	categoryFollowers.uids.forEach((uid) => {
+	categoryFollowers.uids.forEach(uid => {
 		uids.add(uid);
 	});
 
-	const keys = Array.from(uids).map((uid) => `uid:${uid}:inbox`);
+	const keys = Array.from(uids).map(uid => `uid:${uid}:inbox`);
 	const score = await db.sortedSetScore(`cid:${cid}:tids`, tid);
 
 	const removeKeys = (await db.getSetMembers(`tid:${tid}:recipients`))
-		.filter((uid) => !uids.has(parseInt(uid, 10)))
-		.map((uid) => `uid:${uid}:inbox`);
+		.filter(uid => !uids.has(parseInt(uid, 10)))
+		.map(uid => `uid:${uid}:inbox`);
 
 	activitypub.helpers.log(
 		`[activitypub/syncUserInboxes] Syncing tid ${tid} with ${uids.size} inboxes`
@@ -590,7 +590,7 @@ Notes.syncUserInboxes = async function (tid, uid) {
 	]);
 };
 
-Notes.getCategoryFollowers = async (cid) => {
+Notes.getCategoryFollowers = async cid => {
 	// Retrieves remote users who have followed a category; used to build recipient list
 	let uids = await db.getSortedSetRangeByScore(
 		`cid:${cid}:uid:watch:state`,
@@ -599,7 +599,7 @@ Notes.getCategoryFollowers = async (cid) => {
 		categories.watchStates.tracking,
 		categories.watchStates.tracking
 	);
-	uids = uids.filter((uid) => !utils.isNumber(uid));
+	uids = uids.filter(uid => !utils.isNumber(uid));
 
 	return uids;
 };
@@ -623,7 +623,7 @@ Notes.announce.list = async ({ pid, tid }) => {
 		return [];
 	}
 
-	const keys = pids.map((pid) => `pid:${pid}:announces`);
+	const keys = pids.map(pid => `pid:${pid}:announces`);
 	let announces = await db.getSortedSetsMembersWithScores(keys);
 	announces = announces.reduce((memo, cur, idx) => {
 		if (cur.length) {
@@ -663,14 +663,14 @@ Notes.announce.remove = async (pid, actor) => {
 	}
 };
 
-Notes.announce.removeAll = async (pid) => {
+Notes.announce.removeAll = async pid => {
 	await Promise.all([
 		db.delete(`pid:${pid}:announces`),
 		db.deleteObjectField(`post:${pid}`, 'announces'),
 	]);
 };
 
-Notes.delete = async (pids) => {
+Notes.delete = async pids => {
 	if (!Array.isArray(pids)) {
 		pids = [pids];
 	}
@@ -679,14 +679,14 @@ Notes.delete = async (pids) => {
 	pids = pids.filter((_, idx) => exists[idx]);
 
 	let tids = await posts.getPostsFields(pids, ['tid']);
-	tids = new Set(tids.map((obj) => obj.tid));
+	tids = new Set(tids.map(obj => obj.tid));
 
-	const recipientSets = pids.map((id) => `post:${id}:recipients`);
-	const announcerSets = pids.map((id) => `pid:${id}:announces`);
+	const recipientSets = pids.map(id => `post:${id}:recipients`);
+	const announcerSets = pids.map(id => `pid:${id}:announces`);
 
 	await db.deleteAll([...recipientSets, ...announcerSets]);
 	await Promise.all(
-		Array.from(tids).map(async (tid) => Notes.syncUserInboxes(tid))
+		Array.from(tids).map(async tid => Notes.syncUserInboxes(tid))
 	);
 };
 
@@ -714,10 +714,10 @@ Notes.prune = async () => {
 	);
 
 	const posters = await db.getSortedSetsMembers(
-		tids.map((tid) => `tid:${tid}:posters`)
+		tids.map(tid => `tid:${tid}:posters`)
 	);
 	const hasLocalVoter = await Promise.all(
-		tids.map(async (tid) => {
+		tids.map(async tid => {
 			const mainPid = await db.getObjectField(`topic:${tid}`, 'mainPid');
 			const pids = await db.getSortedSetMembers(`tid:${tid}:posts`);
 			pids.unshift(mainPid);
@@ -725,22 +725,22 @@ Notes.prune = async () => {
 			// Check voters of each pid for a local uid
 			const voters = new Set();
 			await Promise.all(
-				pids.map(async (pid) => {
+				pids.map(async pid => {
 					const [upvoters, downvoters] = await db.getSetsMembers([
 						`pid:${pid}:upvote`,
 						`pid:${pid}:downvote`,
 					]);
-					upvoters.forEach((uid) => voters.add(uid));
-					downvoters.forEach((uid) => voters.add(uid));
+					upvoters.forEach(uid => voters.add(uid));
+					downvoters.forEach(uid => voters.add(uid));
 				})
 			);
 
-			return Array.from(voters).some((uid) => utils.isNumber(uid));
+			return Array.from(voters).some(uid => utils.isNumber(uid));
 		})
 	);
 
 	tids = tids.filter((_, idx) => {
-		const localPoster = posters[idx].some((uid) => utils.isNumber(uid));
+		const localPoster = posters[idx].some(uid => utils.isNumber(uid));
 		const localVoter = hasLocalVoter[idx];
 
 		return !localPoster && !localVoter;
@@ -750,9 +750,9 @@ Notes.prune = async () => {
 
 	await batch.processArray(
 		tids,
-		async (tids) => {
+		async tids => {
 			await Promise.all(
-				tids.map(async (tid) => await topics.purgePostsAndTopic(tid, 0))
+				tids.map(async tid => await topics.purgePostsAndTopic(tid, 0))
 			);
 		},
 		{ batch: 100 }

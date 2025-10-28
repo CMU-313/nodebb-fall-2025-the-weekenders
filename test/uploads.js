@@ -23,7 +23,7 @@ const request = require('../src/request');
 const emptyUploadsFolder = async () => {
 	const files = await fs.readdir(`${nconf.get('upload_path')}/files`);
 	await Promise.all(
-		files.map(async (filename) => {
+		files.map(async filename => {
 			await file.delete(`${nconf.get('upload_path')}/files/${filename}`);
 		})
 	);
@@ -37,7 +37,7 @@ describe('Upload Controllers', () => {
 	let regularUid;
 	let maliciousUid;
 
-	before((done) => {
+	before(done => {
 		async.series(
 			{
 				category: function (next) {
@@ -191,22 +191,22 @@ describe('Upload Controllers', () => {
 			assert.equal(uploads.includes(name), false);
 		});
 
-		it('should not allow deleting if path is not correct', (done) => {
+		it('should not allow deleting if path is not correct', done => {
 			socketUser.deleteUpload(
 				{ uid: adminUid },
 				{ uid: regularUid, name: '../../bkconfig.json' },
-				(err) => {
+				err => {
 					assert.equal(err.message, '[[error:invalid-path]]');
 					done();
 				}
 			);
 		});
 
-		it('should not allow deleting if path is not correct', (done) => {
+		it('should not allow deleting if path is not correct', done => {
 			socketUser.deleteUpload(
 				{ uid: adminUid },
 				{ uid: regularUid, name: '/files/../../bkconfig.json' },
-				(err) => {
+				err => {
 					assert.equal(err.message, '[[error:invalid-path]]');
 					done();
 				}
@@ -313,10 +313,10 @@ describe('Upload Controllers', () => {
 			);
 		});
 
-		it('should fail if file is not an image', (done) => {
+		it('should fail if file is not an image', done => {
 			image.isFileTypeAllowed(
 				path.join(__dirname, '../test/files/notanimage.png'),
-				(err) => {
+				err => {
 					assert.strictEqual(
 						err.message,
 						'Input file contains unsupported image format'
@@ -326,10 +326,10 @@ describe('Upload Controllers', () => {
 			);
 		});
 
-		it('should fail if file is not an image', (done) => {
+		it('should fail if file is not an image', done => {
 			image.isFileTypeAllowed(
 				path.join(__dirname, '../test/files/notanimage.png'),
-				(err) => {
+				err => {
 					assert.strictEqual(
 						err.message,
 						'Input file contains unsupported image format'
@@ -339,101 +339,98 @@ describe('Upload Controllers', () => {
 			);
 		});
 
-		it('should fail if file is not an image', (done) => {
-			image.size(
-				path.join(__dirname, '../test/files/notanimage.png'),
-				(err) => {
-					assert.strictEqual(
-						err.message,
-						'Input file contains unsupported image format'
-					);
-					done();
-				}
-			);
+		it('should fail if file is not an image', done => {
+			image.size(path.join(__dirname, '../test/files/notanimage.png'), err => {
+				assert.strictEqual(
+					err.message,
+					'Input file contains unsupported image format'
+				);
+				done();
+			});
 		});
 
-		it('should fail if file is missing', (done) => {
+		it('should fail if file is missing', done => {
 			image.size(
 				path.join(__dirname, '../test/files/doesnotexist.png'),
-				(err) => {
+				err => {
 					assert(err.message.startsWith('Input file is missing'));
 					done();
 				}
 			);
 		});
 
-		it('should not allow non image uploads', (done) => {
+		it('should not allow non image uploads', done => {
 			socketUser.updateCover(
 				{ uid: 1 },
 				{ uid: 1, file: { path: '../../text.txt' } },
-				(err) => {
+				err => {
 					assert.equal(err.message, '[[error:invalid-data]]');
 					done();
 				}
 			);
 		});
 
-		it('should not allow non image uploads', (done) => {
+		it('should not allow non image uploads', done => {
 			socketUser.updateCover(
 				{ uid: 1 },
 				{
 					uid: 1,
 					imageData: 'data:text/html;base64,PHN2Zy9vbmxvYWQ9YWxlcnQoMik+',
 				},
-				(err) => {
+				err => {
 					assert.equal(err.message, '[[error:invalid-image]]');
 					done();
 				}
 			);
 		});
 
-		it('should not allow svg uploads', (done) => {
+		it('should not allow svg uploads', done => {
 			socketUser.updateCover(
 				{ uid: 1 },
 				{
 					uid: 1,
 					imageData: 'data:image/svg;base64,PHN2Zy9vbmxvYWQ9YWxlcnQoMik+',
 				},
-				(err) => {
+				err => {
 					assert.equal(err.message, '[[error:invalid-image]]');
 					done();
 				}
 			);
 		});
 
-		it('should not allow non image uploads', (done) => {
+		it('should not allow non image uploads', done => {
 			socketUser.uploadCroppedPicture(
 				{ uid: 1 },
 				{ uid: 1, file: { path: '../../text.txt' } },
-				(err) => {
+				err => {
 					assert.equal(err.message, '[[error:invalid-data]]');
 					done();
 				}
 			);
 		});
 
-		it('should not allow non image uploads', (done) => {
+		it('should not allow non image uploads', done => {
 			socketUser.uploadCroppedPicture(
 				{ uid: 1 },
 				{
 					uid: 1,
 					imageData: 'data:text/html;base64,PHN2Zy9vbmxvYWQ9YWxlcnQoMik+',
 				},
-				(err) => {
+				err => {
 					assert.equal(err.message, '[[error:invalid-image]]');
 					done();
 				}
 			);
 		});
 
-		it('should not allow svg uploads', (done) => {
+		it('should not allow svg uploads', done => {
 			socketUser.uploadCroppedPicture(
 				{ uid: 1 },
 				{
 					uid: 1,
 					imageData: 'data:image/svg;base64,PHN2Zy9vbmxvYWQ9YWxlcnQoMik+',
 				},
-				(err) => {
+				err => {
 					assert.equal(err.message, '[[error:invalid-image]]');
 					done();
 				}
@@ -803,7 +800,7 @@ describe('Upload Controllers', () => {
 				const orphans = await posts.uploads.getOrphans();
 
 				assert.strictEqual(orphans.length, 1);
-				orphans.forEach((relPath) => {
+				orphans.forEach(relPath => {
 					assert(relPath.startsWith('/files/'));
 					assert(relPath.endsWith('test.png'));
 				});
@@ -832,7 +829,7 @@ describe('Upload Controllers', () => {
 				const files = await fs.readdir(`${nconf.get('upload_path')}/files`);
 				const p30d = (Date.now() - 1000 * 60 * 60 * 24 * 30) / 1000;
 				await Promise.all(
-					files.map(async (filename) => {
+					files.map(async filename => {
 						await fs.utimes(
 							`${nconf.get('upload_path')}/files/${filename}`,
 							p30d,

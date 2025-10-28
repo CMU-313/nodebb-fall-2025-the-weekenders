@@ -86,7 +86,7 @@ describe('Search', () => {
 		await privileges.global.rescind(['groups:search:content'], 'guests');
 	});
 
-	it('should search for a user', (done) => {
+	it('should search for a user', done => {
 		search.search(
 			{
 				query: 'gin',
@@ -104,7 +104,7 @@ describe('Search', () => {
 		);
 	});
 
-	it('should search for a tag', (done) => {
+	it('should search for a tag', done => {
 		search.search(
 			{
 				query: 'plug',
@@ -153,20 +153,20 @@ describe('Search', () => {
 		assert.strictEqual(data.length, 5);
 	});
 
-	it('should fail if searchIn is wrong', (done) => {
+	it('should fail if searchIn is wrong', done => {
 		search.search(
 			{
 				query: 'plug',
 				searchIn: '',
 			},
-			(err) => {
+			err => {
 				assert.equal(err.message, '[[error:unknown-search-filter]]');
 				done();
 			}
 		);
 	});
 
-	it('should search with tags filter', (done) => {
+	it('should search with tags filter', done => {
 		search.search(
 			{
 				query: 'mongodb',
@@ -181,7 +181,7 @@ describe('Search', () => {
 		);
 	});
 
-	it('should not crash if tags is not an array', (done) => {
+	it('should not crash if tags is not an array', done => {
 		search.search(
 			{
 				query: 'mongodb',
@@ -195,7 +195,7 @@ describe('Search', () => {
 		);
 	});
 
-	it('should not find anything', (done) => {
+	it('should not find anything', done => {
 		search.search(
 			{
 				query: 'xxxxxxxxxxxxxx',

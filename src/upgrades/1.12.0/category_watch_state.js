@@ -13,11 +13,11 @@ module.exports = {
 		const { progress } = this;
 
 		const cids = await db.getSortedSetRange('categories:cid', 0, -1);
-		const keys = cids.map((cid) => `cid:${cid}:ignorers`);
+		const keys = cids.map(cid => `cid:${cid}:ignorers`);
 
 		await batch.processSortedSet(
 			'users:joindate',
-			async (uids) => {
+			async uids => {
 				progress.incr(uids.length);
 				for (const cid of cids) {
 					const isMembers = await db.isSortedSetMembers(

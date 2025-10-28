@@ -68,7 +68,7 @@ try {
 			'lodash',
 			'lru-cache',
 		];
-		packages.forEach((packageName) => {
+		packages.forEach(packageName => {
 			const resolvedModule = require.resolve(packageName);
 			if (require.cache[resolvedModule]) {
 				delete require.cache[resolvedModule];
@@ -197,7 +197,7 @@ program
 	.command('setup [config]')
 	.description('Run the NodeBB setup script, or setup with an initial config')
 	.option('--skip-build', 'Run setup without building assets')
-	.action((initConfig) => {
+	.action(initConfig => {
 		if (initConfig) {
 			try {
 				initConfig = JSON.parse(initConfig);
@@ -252,7 +252,7 @@ program
 	.description(
 		'Activate a plugin for the next startup of NodeBB (nodebb-plugin- prefix is optional)'
 	)
-	.action((plugin) => {
+	.action(plugin => {
 		require('./manage').activate(plugin);
 	});
 program
@@ -266,7 +266,7 @@ program
 	.description(
 		'Outputs the most recent administrative events recorded by NodeBB'
 	)
-	.action((count) => {
+	.action(count => {
 		require('./manage').listEvents(count);
 	});
 program
@@ -278,7 +278,7 @@ program
 program
 	.command('maintenance <toggle>')
 	.description('Toggle maintenance mode true/false')
-	.action((toggle) => {
+	.action(toggle => {
 		require('./manage').maintenance(toggle);
 	});
 
@@ -292,9 +292,9 @@ resetCommand
 	.option('-w, --widgets', 'Disable all widgets')
 	.option('-s, --settings', 'Reset settings to their default values')
 	.option('-a, --all', 'All of the above')
-	.action((options) => {
+	.action(options => {
 		const valid = ['theme', 'plugin', 'widgets', 'settings', 'all'].some(
-			(x) => options[x]
+			x => options[x]
 		);
 		if (!valid) {
 			console.warn(
@@ -303,7 +303,7 @@ resetCommand
 			resetCommand.help();
 		}
 
-		require('./reset').reset(options, (err) => {
+		require('./reset').reset(options, err => {
 			if (err) {
 				return process.exit(1);
 			}
@@ -354,7 +354,7 @@ program
 	.description('Upgrade plugins')
 	.action(() => {
 		const { unattended } = program.opts();
-		require('./upgrade-plugins').upgradePlugins(unattended, (err) => {
+		require('./upgrade-plugins').upgradePlugins(unattended, err => {
 			if (err) {
 				throw err;
 			}
@@ -366,12 +366,12 @@ program
 program
 	.command('help [command]')
 	.description('Display help for [command]')
-	.action((name) => {
+	.action(name => {
 		if (!name) {
 			return program.help();
 		}
 
-		const command = program.commands.find((command) => command._name === name);
+		const command = program.commands.find(command => command._name === name);
 		if (command) {
 			command.help();
 		} else {

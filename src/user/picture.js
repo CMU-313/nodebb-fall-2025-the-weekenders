@@ -12,7 +12,7 @@ const meta = require('../meta');
 
 module.exports = function (User) {
 	User.getAllowedProfileImageExtensions = function () {
-		const exts = User.getAllowedImageTypes().map((type) =>
+		const exts = User.getAllowedImageTypes().map(type =>
 			mime.getExtension(type)
 		);
 		if (exts.includes('jpeg')) {

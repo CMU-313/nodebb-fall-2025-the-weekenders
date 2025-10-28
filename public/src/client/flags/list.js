@@ -56,7 +56,7 @@ export function init() {
 		},
 	});
 
-	['assignee', 'targetUid', 'reporterId'].forEach((filter) => {
+	['assignee', 'targetUid', 'reporterId'].forEach(filter => {
 		if (ajaxify.data.filters.hasOwnProperty('filter')) {
 			selected.set(filter, ajaxify.data.selected[filter]);
 		}
@@ -104,7 +104,7 @@ export function enableFilterForm() {
 		const filtersEl = $filtersEl.get(0);
 		const formEl = filtersEl.querySelector('form');
 
-		filtersEl.addEventListener('click', (e) => {
+		filtersEl.addEventListener('click', e => {
 			const subselector = e.target.closest('[data-value]');
 			if (!subselector) {
 				return;
@@ -130,7 +130,7 @@ export function enableFilterForm() {
 				applyFilters();
 			});
 
-		$filtersEl.find('button[data-target="#more-filters"]').click((ev) => {
+		$filtersEl.find('button[data-target="#more-filters"]').click(ev => {
 			const textVariant = ev.target.getAttribute('data-text-variant');
 			if (!textVariant) {
 				return;
@@ -158,7 +158,7 @@ function applyFilters() {
 	});
 
 	// these three fields are special; comes from userFilter module
-	['assignee', 'targetUid', 'reporterId'].forEach((filter) => {
+	['assignee', 'targetUid', 'reporterId'].forEach(filter => {
 		selected.get(filter).forEach(({ uid }) => {
 			payload.append(filter, uid);
 		});
@@ -242,7 +242,7 @@ export function handleBulkActions() {
 				let confirmed;
 				if (action === 'bulk-purge') {
 					confirmed = new Promise((resolve, reject) => {
-						bootbox.confirm('[[flags:confirm-purge]]', (confirmed) => {
+						bootbox.confirm('[[flags:confirm-purge]]', confirmed => {
 							if (confirmed) {
 								resolve();
 							} else {
@@ -252,7 +252,7 @@ export function handleBulkActions() {
 					});
 				}
 				const flagIds = getSelected();
-				const promises = flagIds.map(async (flagId) => {
+				const promises = flagIds.map(async flagId => {
 					const data = {};
 					switch (action) {
 						case 'bulk-assign': {

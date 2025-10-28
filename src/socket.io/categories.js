@@ -34,7 +34,7 @@ SocketCategories.getWatchedCategories = async function (socket) {
 		user.getIgnoredCategories(socket.uid),
 	]);
 	return categoriesData.filter(
-		(category) => category && !ignoredCids.includes(String(category.cid))
+		category => category && !ignoredCids.includes(String(category.cid))
 	);
 };
 
@@ -88,7 +88,7 @@ SocketCategories.getSelectCategories = async function (socket) {
 		categories.buildForSelect(socket.uid, 'find', ['disabled', 'link']),
 	]);
 	return categoriesData.filter(
-		(category) => category && (!category.disabled || isAdmin) && !category.link
+		category => category && (!category.disabled || isAdmin) && !category.link
 	);
 };
 
@@ -120,7 +120,7 @@ SocketCategories.ignore = async function (socket, data) {
 async function ignoreOrWatch(fn, socket, data) {
 	let targetUid = socket.uid;
 	const cids = Array.isArray(data.cid)
-		? data.cid.map((cid) => parseInt(cid, 10))
+		? data.cid.map(cid => parseInt(cid, 10))
 		: [parseInt(data.cid, 10)];
 	if (data.hasOwnProperty('uid')) {
 		targetUid = data.uid;
@@ -136,7 +136,7 @@ async function ignoreOrWatch(fn, socket, data) {
 	let cat;
 	do {
 		cat = categoryData.find(
-			(c) => !cids.includes(c.cid) && cids.includes(c.parentCid)
+			c => !cids.includes(c.cid) && cids.includes(c.parentCid)
 		);
 		if (cat) {
 			cids.push(cat.cid);

@@ -21,7 +21,7 @@ file.saveFileToLocal = async function (filename, folder, tempPath) {
 	 */
 	filename = filename
 		.split('.')
-		.map((name) => slugify(name))
+		.map(name => slugify(name))
 		.join('.');
 
 	const uploadPath = path.join(nconf.get('upload_path'), folder, filename);
@@ -73,7 +73,7 @@ file.allowedExtensions = function () {
 		return [];
 	}
 	allowedExtensions = allowedExtensions.split(',');
-	allowedExtensions = allowedExtensions.filter(Boolean).map((extension) => {
+	allowedExtensions = allowedExtensions.filter(Boolean).map(extension => {
 		extension = extension.trim();
 		if (!extension.startsWith('.')) {
 			extension = `.${extension}`;
@@ -165,7 +165,7 @@ file.typeToExtension = function (type) {
 file.walk = async function (dir) {
 	const subdirs = await fs.promises.readdir(dir);
 	const files = await Promise.all(
-		subdirs.map(async (subdir) => {
+		subdirs.map(async subdir => {
 			const res = path.resolve(dir, subdir);
 			return (await fs.promises.stat(res)).isDirectory() ? file.walk(res) : res;
 		})

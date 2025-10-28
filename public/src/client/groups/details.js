@@ -231,12 +231,12 @@ define('forum/groups/details', [
 					const method = action === 'acceptAll' ? 'put' : 'del';
 					let uids = Array.prototype.map.call(
 						listEl.querySelectorAll('[data-uid]'),
-						(el) => parseInt(el.getAttribute('data-uid'), 10)
+						el => parseInt(el.getAttribute('data-uid'), 10)
 					);
 					uids = uids.filter((uid, idx) => uids.indexOf(uid) === idx);
 
 					Promise.all(
-						uids.map(async (uid) =>
+						uids.map(async uid =>
 							api[method](`/groups/${ajaxify.data.group.slug}/pending/${uid}`)
 						)
 					)
@@ -301,7 +301,7 @@ define('forum/groups/details', [
 				onSelect: function (selectedCategory) {
 					let cids = ($('#memberPostCids').val() || '')
 						.split(',')
-						.map((cid) => parseInt(cid, 10));
+						.map(cid => parseInt(cid, 10));
 					cids.push(selectedCategory.cid);
 					cids = cids.filter(
 						(cid, index, array) => array.indexOf(cid) === index
@@ -427,9 +427,9 @@ define('forum/groups/details', [
 				}
 
 				// Filter out bad usernames
-				usernames = usernames.split(',').map((username) => slugify(username));
+				usernames = usernames.split(',').map(username => slugify(username));
 				usernames = await Promise.all(
-					usernames.map((slug) =>
+					usernames.map(slug =>
 						api
 							.head(`/users/bySlug/${slug}`)
 							.then(() => slug)
@@ -439,13 +439,13 @@ define('forum/groups/details', [
 				usernames = usernames.filter(Boolean);
 
 				const uids = await Promise.all(
-					usernames.map((slug) =>
+					usernames.map(slug =>
 						api.get(`/users/bySlug/${slug}`).then(({ uid }) => uid)
 					)
 				);
 
 				await Promise.all(
-					uids.map(async (uid) =>
+					uids.map(async uid =>
 						api.post(`/groups/${ajaxify.data.group.slug}/invites/${uid}`)
 					)
 				)

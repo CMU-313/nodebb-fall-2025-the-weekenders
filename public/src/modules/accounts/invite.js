@@ -17,7 +17,7 @@ define('accounts/invite', ['api', 'benchpress', 'bootbox', 'alerts'], function (
 			e.preventDefault();
 			api
 				.get(`/api/v3/users/${app.user.uid}/invites/groups`, {})
-				.then((groups) => {
+				.then(groups => {
 					Benchpress.parse(
 						'modals/invite',
 						{ groups: groups },
@@ -53,7 +53,7 @@ define('accounts/invite', ['api', 'benchpress', 'bootbox', 'alerts'], function (
 			emails: $emails
 				.val()
 				.split(',')
-				.map((m) => m.trim())
+				.map(m => m.trim())
 				.filter(Boolean)
 				.filter((m, i, arr) => i === arr.indexOf(m))
 				.join(','),

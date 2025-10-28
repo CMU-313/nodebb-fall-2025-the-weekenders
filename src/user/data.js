@@ -114,7 +114,7 @@ module.exports = function (User) {
 			return [];
 		}
 
-		uids = uids.map((uid) => {
+		uids = uids.map(uid => {
 			if (utils.isNumber(uid)) {
 				return parseInt(uid, 10);
 			} else if (activitypub.helpers.isUri(uid)) {
@@ -128,8 +128,8 @@ module.exports = function (User) {
 		fields = fields.slice();
 		ensureRequiredFields(fields, fieldsToRemove);
 
-		const uniqueUids = _.uniq(uids).filter((uid) => isFinite(uid) && uid > 0);
-		const remoteIds = _.uniq(uids).filter((uid) => !isFinite(uid));
+		const uniqueUids = _.uniq(uids).filter(uid => isFinite(uid) && uid > 0);
+		const remoteIds = _.uniq(uids).filter(uid => !isFinite(uid));
 		if (!customFieldWhiteList) {
 			await User.reloadCustomFieldWhitelist();
 		}
@@ -141,13 +141,13 @@ module.exports = function (User) {
 		if (!fields.length) {
 			fields = results.whitelist;
 		} else {
-			fields = fields.filter((value) => value !== 'password');
+			fields = fields.filter(value => value !== 'password');
 		}
 
 		const users = await db.getObjectsFields(
 			uniqueUids
-				.map((uid) => `user:${uid}`)
-				.concat(remoteIds.map((id) => `userRemote:${id}`)),
+				.map(uid => `user:${uid}`)
+				.concat(remoteIds.map(id => `userRemote:${id}`)),
 			fields
 		);
 		const result = await plugins.hooks.fire('filter:user.getFields', {
@@ -195,7 +195,7 @@ module.exports = function (User) {
 
 	function uidsToUsers(uids, uniqueUids, usersData) {
 		const uidToUser = _.zipObject(uniqueUids, usersData);
-		const users = uids.map((uid) => {
+		const users = uids.map(uid => {
 			const user = uidToUser[uid] || { ...User.guestData };
 			if (!parseInt(user.uid, 10) && !activitypub.helpers.isUri(user.uid)) {
 				user.username =
@@ -240,7 +240,7 @@ module.exports = function (User) {
 		}
 
 		const [userSettings, isAdmin, isGlobalModerator] = await Promise.all([
-			User.getMultipleUserSettings(users.map((user) => user.uid)),
+			User.getMultipleUserSettings(users.map(user => user.uid)),
 			User.isAdministrator(callerUID),
 			User.isGlobalModerator(callerUID),
 		]);
@@ -274,11 +274,11 @@ module.exports = function (User) {
 	async function modifyUserData(users, requestedFields, fieldsToRemove) {
 		let uidToSettings = {};
 		if (meta.config.showFullnameAsDisplayName) {
-			const uids = users.map((user) => user.uid);
+			const uids = users.map(user => user.uid);
 			uidToSettings = _.zipObject(
 				uids,
 				await db.getObjectsFields(
-					uids.map((uid) => `user:${uid}:settings`),
+					uids.map(uid => `user:${uid}:settings`),
 					['showfullname']
 				)
 			);
@@ -288,7 +288,7 @@ module.exports = function (User) {
 		}
 
 		const unbanUids = [];
-		users.forEach((user) => {
+		users.forEach(user => {
 			if (!user) {
 				return;
 			}

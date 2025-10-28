@@ -21,20 +21,20 @@ Settings.get = async function (hash) {
 	]);
 	const values = data || {};
 	await Promise.all(
-		sortedLists.map(async (list) => {
+		sortedLists.map(async list => {
 			const members = await db.getSortedSetRange(
 				`settings:${hash}:sorted-list:${list}`,
 				0,
 				-1
 			);
 			const keys = members.map(
-				(order) => `settings:${hash}:sorted-list:${list}:${order}`
+				order => `settings:${hash}:sorted-list:${list}:${order}`
 			);
 
 			values[list] = [];
 
 			const objects = await db.getObjects(keys);
-			objects.forEach((obj) => {
+			objects.forEach(obj => {
 				values[list].push(obj);
 			});
 		})
@@ -79,12 +79,12 @@ Settings.set = async function (hash, values, quiet) {
 		// Remove provided (but empty) sorted lists from the hash set
 		await db.setRemove(
 			`settings:${hash}:sorted-lists`,
-			sortedLists.filter((list) => !sortedListData[list].length)
+			sortedLists.filter(list => !sortedListData[list].length)
 		);
 		await db.setAdd(`settings:${hash}:sorted-lists`, sortedLists);
 
 		await Promise.all(
-			sortedLists.map(async (list) => {
+			sortedLists.map(async list => {
 				const numItems = await db.sortedSetCard(
 					`settings:${hash}:sorted-list:${list}`
 				);
@@ -98,7 +98,7 @@ Settings.set = async function (hash, values, quiet) {
 
 		const sortedSetData = [];
 		const objectData = [];
-		sortedLists.forEach((list) => {
+		sortedLists.forEach(list => {
 			const arr = sortedListData[list];
 			arr.forEach((data, order) => {
 				sortedSetData.push([
@@ -147,7 +147,7 @@ Settings.setOnEmpty = async function (hash, values) {
 	const settings = (await Settings.get(hash)) || {};
 	const empty = {};
 
-	Object.keys(values).forEach((key) => {
+	Object.keys(values).forEach(key => {
 		if (!settings.hasOwnProperty(key)) {
 			empty[key] = values[key];
 		}

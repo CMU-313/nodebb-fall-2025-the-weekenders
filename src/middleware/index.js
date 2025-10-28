@@ -266,10 +266,10 @@ middleware.buildSkinAsset = helpers.try(async (req, res, next) => {
 		return next();
 	}
 
-	const skins = (await meta.css.getCustomSkins()).map((skin) => skin.value);
+	const skins = (await meta.css.getCustomSkins()).map(skin => skin.value);
 	const found = skins
 		.concat(meta.css.supportedSkins)
-		.find((skin) => `client-${skin}` === targetSkin);
+		.find(skin => `client-${skin}` === targetSkin);
 	if (!found) {
 		return next();
 	}
@@ -309,9 +309,7 @@ middleware.validateAuth = helpers.try(async (req, res, next) => {
 		});
 		next();
 	} catch (err) {
-		const regenerateSession = util.promisify((cb) =>
-			req.session.regenerate(cb)
-		);
+		const regenerateSession = util.promisify(cb => req.session.regenerate(cb));
 		await regenerateSession();
 		req.uid = 0;
 		req.loggedIn = false;
@@ -322,7 +320,7 @@ middleware.validateAuth = helpers.try(async (req, res, next) => {
 middleware.checkRequired = function (fields, req, res, next) {
 	// Used in API calls to ensure that necessary parameters/data values are present
 	const missing = fields.filter(
-		(field) =>
+		field =>
 			req.body &&
 			!req.body.hasOwnProperty(field) &&
 			!req.query.hasOwnProperty(field)

@@ -63,7 +63,7 @@ usersController.getOnlineUsers = async function (req, res) {
 
 	let hiddenCount = 0;
 	if (!userData.isAdminOrGlobalMod) {
-		userData.users = userData.users.filter((user) => {
+		userData.users = userData.users.filter(user => {
 			const showUser =
 				user && (user.uid === req.uid || user.userStatus !== 'offline');
 			if (!showUser) {
@@ -209,11 +209,11 @@ usersController.getUsersAndCount = async function (set, uid, start, stop) {
 				'+inf',
 				Date.now() - 86400000
 			);
-			const uids = data.map((d) => d.value);
-			const scores = data.map((d) => d.score);
+			const uids = data.map(d => d.value);
+			const scores = data.map(d => d.score);
 			const [userStatus, userData] = await Promise.all([
 				db.getObjectsFields(
-					uids.map((uid) => `user:${uid}`),
+					uids.map(uid => `user:${uid}`),
 					['status']
 				),
 				user.getUsers(uids, uid),

@@ -25,7 +25,7 @@ admin.getAreas = async function () {
 
 	areas.push({ name: 'Draft Zone', template: 'global', location: 'drafts' });
 	const areaData = await Promise.all(
-		areas.map((area) => index.getArea(area.template, area.location))
+		areas.map(area => index.getArea(area.template, area.location))
 	);
 	areas.forEach((area, i) => {
 		area.data = areaData[i];
@@ -38,7 +38,7 @@ async function getAvailableWidgets() {
 		plugins.hooks.fire('filter:widgets.getWidgets', []),
 		renderAdminTemplate(),
 	]);
-	availableWidgets.forEach((w) => {
+	availableWidgets.forEach(w => {
 		w.content += adminTemplate;
 	});
 	return availableWidgets;
@@ -61,7 +61,7 @@ function buildTemplatesFromAreas(areas) {
 	const list = {};
 	let index = 0;
 
-	areas.forEach((area) => {
+	areas.forEach(area => {
 		if (typeof list[area.template] === 'undefined') {
 			list[area.template] = index;
 			templates.push({

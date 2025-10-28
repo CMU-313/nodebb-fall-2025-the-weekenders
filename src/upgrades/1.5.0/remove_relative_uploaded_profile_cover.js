@@ -11,9 +11,9 @@ module.exports = {
 
 		await batch.processSortedSet(
 			'users:joindate',
-			async (ids) => {
+			async ids => {
 				await Promise.all(
-					ids.map(async (uid) => {
+					ids.map(async uid => {
 						const url = await db.getObjectField(`user:${uid}`, 'cover:url');
 						progress.incr();
 

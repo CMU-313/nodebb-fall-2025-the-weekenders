@@ -12,7 +12,7 @@ module.exports = {
 		const { progress } = this;
 
 		let flags = await db.getSortedSetRange('flags:datetime', 0, -1);
-		flags = flags.map((flagId) => `flag:${flagId}`);
+		flags = flags.map(flagId => `flag:${flagId}`);
 		flags = await db.getObjectsFields(flags, [
 			'flagId',
 			'type',
@@ -25,11 +25,11 @@ module.exports = {
 
 		await batch.processArray(
 			flags,
-			async (subset) => {
+			async subset => {
 				progress.incr(subset.length);
 
 				await Promise.all(
-					subset.map(async (flagObj) => {
+					subset.map(async flagObj => {
 						const methods = [];
 						switch (flagObj.type) {
 							case 'post':
@@ -70,7 +70,7 @@ module.exports = {
 							)
 						);
 
-						await Promise.all(methods.map(async (method) => method()));
+						await Promise.all(methods.map(async method => method()));
 					})
 				);
 			},

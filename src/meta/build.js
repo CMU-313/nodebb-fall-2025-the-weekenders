@@ -49,7 +49,7 @@ const targetHandlers = {
 
 const aliasMap = Object.keys(aliases).reduce((prev, key) => {
 	const arr = aliases[key];
-	arr.forEach((alias) => {
+	arr.forEach(alias => {
 		prev[alias] = key;
 	});
 	prev[key] = key;
@@ -73,20 +73,20 @@ async function beforeBuild(targets) {
 }
 
 const allTargets = Object.keys(targetHandlers).filter(
-	(name) => typeof targetHandlers[name] === 'function'
+	name => typeof targetHandlers[name] === 'function'
 );
 
 async function buildTargets(targets, parallel, options) {
-	const length = Math.max(...targets.map((name) => name.length));
-	const jsTargets = targets.filter((target) =>
+	const length = Math.max(...targets.map(name => name.length));
+	const jsTargets = targets.filter(target =>
 		targetHandlers.javascript.includes(target)
 	);
 	const otherTargets = targets.filter(
-		(target) => !targetHandlers.javascript.includes(target)
+		target => !targetHandlers.javascript.includes(target)
 	);
 	async function buildJSTargets() {
 		await Promise.all(
-			jsTargets.map((target) =>
+			jsTargets.map(target =>
 				step(target, parallel, `${_.padStart(target, length)} `)
 			)
 		);
@@ -98,7 +98,7 @@ async function buildTargets(targets, parallel, options) {
 	if (parallel) {
 		await Promise.all([
 			buildJSTargets(),
-			...otherTargets.map((target) =>
+			...otherTargets.map(target =>
 				step(target, parallel, `${_.padStart(target, length)} `)
 			),
 		]);
@@ -151,7 +151,7 @@ exports.build = async function (targets, options) {
 
 	targets = targets
 		// get full target name
-		.map((target) => {
+		.map(target => {
 			target = target.toLowerCase().replace(/-/g, '');
 			if (!aliasMap[target]) {
 				winston.warn(`[build] Unknown target: ${target}`);
@@ -172,7 +172,7 @@ exports.build = async function (targets, options) {
 
 	// map multitargets to their sets
 	targets = _.uniq(
-		_.flatMap(targets, (target) =>
+		_.flatMap(targets, target =>
 			Array.isArray(targetHandlers[target]) ? targetHandlers[target] : target
 		)
 	);
@@ -230,7 +230,7 @@ exports.webpack = async function (options) {
 	const util = require('util');
 	const plugins = require('../plugins/data');
 
-	const activePlugins = (await plugins.getActive()).map((p) => p.id);
+	const activePlugins = (await plugins.getActive()).map(p => p.id);
 	if (!activePlugins.includes('nodebb-plugin-composer-default')) {
 		activePlugins.push('nodebb-plugin-composer-default');
 	}
@@ -247,7 +247,7 @@ exports.webpack = async function (options) {
 		let stats;
 		if (options.watch) {
 			stats = await webpackWatch(webpackCfg.watchOptions);
-			compiler.hooks.assetEmitted.tap('nbbWatchPlugin', (file) => {
+			compiler.hooks.assetEmitted.tap('nbbWatchPlugin', file => {
 				console.log(
 					`webpack:assetEmitted > ${webpackCfg.output.publicPath}${file}`
 				);

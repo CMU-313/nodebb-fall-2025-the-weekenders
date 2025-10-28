@@ -209,7 +209,7 @@ postsAPI.edit = async function (caller, data) {
 	]);
 
 	const uids = _.uniq(_.flatten(memberData).concat(String(caller.uid)));
-	uids.forEach((uid) =>
+	uids.forEach(uid =>
 		websockets.in(`uid_${uid}`).emit('event:post_edited', editResult)
 	);
 
@@ -547,7 +547,7 @@ async function getTooltipData(uids) {
 	const users = await user.getUsersFields(uids, ['username']);
 	return {
 		otherCount,
-		usernames: users.map((user) => user.displayname),
+		usernames: users.map(user => user.displayname),
 		cutoff,
 	};
 }
@@ -572,7 +572,7 @@ postsAPI.getAnnouncers = async (caller, data) => {
 	}
 	const notes = require('../activitypub/notes');
 	const announcers = await notes.announce.list({ pid });
-	const uids = announcers.map((ann) => ann.actor);
+	const uids = announcers.map(ann => ann.actor);
 	if (data.tooltip) {
 		return await getTooltipData(uids);
 	}
@@ -651,12 +651,10 @@ postsAPI.getDiffs = async (caller, data) => {
 		posts.diffs.get(data.pid),
 	]);
 
-	const uids = diffs.map((diff) => diff.uid || null);
+	const uids = diffs.map(diff => diff.uid || null);
 	uids.push(post.uid);
 	let usernames = await user.getUsersFields(uids, ['username']);
-	usernames = usernames.map((userObj) =>
-		userObj.uid ? userObj.username : null
-	);
+	usernames = usernames.map(userObj => (userObj.uid ? userObj.username : null));
 
 	const cid = await posts.getCidByPid(data.pid);
 	const [isAdmin, isModerator] = await Promise.all([

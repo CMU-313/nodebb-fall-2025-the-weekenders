@@ -20,10 +20,10 @@ module.exports = {
 
 		await batch.processSortedSet(
 			'topics:tid',
-			async (tids) => {
-				const keys = tids.map((tid) => `topic:${tid}`);
+			async tids => {
+				const keys = tids.map(tid => `topic:${tid}`);
 				const topicThumbs = (await db.getObjectsFields(keys, ['thumb'])).map(
-					(obj) =>
+					obj =>
 						obj.thumb ? obj.thumb.replace(nconf.get('upload_url'), '') : null
 				);
 

@@ -50,7 +50,7 @@ module.exports = function (User) {
 			),
 		]);
 
-		const keys = flags.map((flagObj) => `flag:${flagObj.value}`);
+		const keys = flags.map(flagObj => `flag:${flagObj.value}`);
 		const payload = await db.getObjectsFields(keys, [
 			'flagId',
 			'type',
@@ -73,7 +73,7 @@ module.exports = function (User) {
 
 	User.getHistory = async function (set) {
 		const data = await db.getSortedSetRevRangeWithScores(set, 0, -1);
-		data.forEach((set) => {
+		data.forEach(set => {
 			set.timestamp = set.score;
 			set.timestampISO = utils.toISOString(set.score);
 			const parts = set.value.split(':');
@@ -82,7 +82,7 @@ module.exports = function (User) {
 			delete set.score;
 		});
 
-		const uids = _.uniq(data.map((d) => d && d.byUid).filter(Boolean));
+		const uids = _.uniq(data.map(d => d && d.byUid).filter(Boolean));
 		const usersData = await User.getUsersFields(uids, [
 			'uid',
 			'username',
@@ -90,7 +90,7 @@ module.exports = function (User) {
 			'picture',
 		]);
 		const uidToUser = _.zipObject(uids, usersData);
-		data.forEach((d) => {
+		data.forEach(d => {
 			if (d.byUid) {
 				d.byUser = uidToUser[d.byUid];
 			}
@@ -99,9 +99,9 @@ module.exports = function (User) {
 	};
 
 	async function getFlagMetadata(flags) {
-		const postFlags = flags.filter((flag) => flag && flag.type === 'post');
+		const postFlags = flags.filter(flag => flag && flag.type === 'post');
 		const reports = await Promise.all(
-			flags.map((flag) => Flags.getReports(flag.flagId))
+			flags.map(flag => Flags.getReports(flag.flagId))
 		);
 
 		flags.forEach((flag, idx) => {
@@ -112,9 +112,9 @@ module.exports = function (User) {
 			}
 		});
 
-		const pids = postFlags.map((flagObj) => parseInt(flagObj.targetId, 10));
+		const pids = postFlags.map(flagObj => parseInt(flagObj.targetId, 10));
 		const postData = await posts.getPostsFields(pids, ['tid']);
-		const tids = postData.map((post) => post.tid);
+		const tids = postData.map(post => post.tid);
 
 		const topicData = await topics.getTopicsFields(tids, ['title']);
 		postFlags.forEach((flagObj, idx) => {
@@ -129,7 +129,7 @@ module.exports = function (User) {
 
 	async function formatBanMuteData(keys, noReasonLangKey) {
 		const data = await db.getObjects(keys);
-		const uids = data.map((d) => d.fromUid);
+		const uids = data.map(d => d.fromUid);
 		const usersData = await User.getUsersFields(uids, [
 			'uid',
 			'username',
@@ -157,7 +157,7 @@ module.exports = function (User) {
 	};
 
 	User.getModerationNotesByIds = async (uid, noteIds) => {
-		const keys = noteIds.map((id) => `uid:${uid}:moderation:note:${id}`);
+		const keys = noteIds.map(id => `uid:${uid}:moderation:note:${id}`);
 		const notes = await db.getObjects(keys);
 		const uids = [];
 

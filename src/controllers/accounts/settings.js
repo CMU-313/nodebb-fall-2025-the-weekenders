@@ -80,12 +80,12 @@ settingsController.get = async function (req, res, next) {
 		},
 	];
 
-	userData.languages.forEach((language) => {
+	userData.languages.forEach(language => {
 		language.selected = language.code === userData.settings.userLang;
 	});
 
 	if (userData.isAdmin && userData.isSelf) {
-		userData.acpLanguages.forEach((language) => {
+		userData.acpLanguages.forEach(language => {
 			language.selected = language.code === userData.settings.acpLang;
 		});
 	}
@@ -99,7 +99,7 @@ settingsController.get = async function (req, res, next) {
 		'disabled',
 	];
 
-	userData.upvoteNotifFreq = notifFreqOptions.map((name) => ({
+	userData.upvoteNotifFreq = notifFreqOptions.map(name => ({
 		name: name,
 		selected: name === userData.settings.upvoteNotifFreq,
 	}));
@@ -137,7 +137,7 @@ const jwtVerifyAsync = util.promisify((token, callback) => {
 		callback(err, payload)
 	);
 });
-const doUnsubscribe = async (payload) => {
+const doUnsubscribe = async payload => {
 	if (payload.template === 'digest') {
 		await Promise.all([
 			user.setSetting(payload.uid, 'dailyDigestFreq', 'off'),
@@ -243,7 +243,7 @@ async function getNotificationSettings(userData) {
 
 	if (meta.config.disableChat) {
 		results.types = results.types.filter(
-			(type) => type !== 'notificationType_new-chat'
+			type => type !== 'notificationType_new-chat'
 		);
 	}
 
@@ -289,7 +289,7 @@ async function getSkinOptions(userData) {
 	];
 	const customSkins = await meta.settings.get('custom-skins');
 	if (customSkins && Array.isArray(customSkins['custom-skin-list'])) {
-		customSkins['custom-skin-list'].forEach((customSkin) => {
+		customSkins['custom-skin-list'].forEach(customSkin => {
 			bootswatchSkinOptions.push({
 				name: customSkin['custom-skin-name'],
 				value: slugify(customSkin['custom-skin-name']),
@@ -298,13 +298,13 @@ async function getSkinOptions(userData) {
 	}
 
 	bootswatchSkinOptions.push(
-		...meta.css.supportedSkins.map((skin) => ({
+		...meta.css.supportedSkins.map(skin => ({
 			name: _.capitalize(skin),
 			value: skin,
 		}))
 	);
 
-	bootswatchSkinOptions.forEach((skin) => {
+	bootswatchSkinOptions.forEach(skin => {
 		skin.selected = skin.value === userData.settings.bootswatchSkin;
 	});
 	return bootswatchSkinOptions;

@@ -382,7 +382,7 @@ module.exports = function (middleware) {
 					'groups',
 					'tags',
 					'settings',
-				].some((priv) => results.privileges[`admin:${priv}`]),
+				].some(priv => results.privileges[`admin:${priv}`]),
 			defaultLang: meta.config.defaultLang || 'en-GB',
 			acpLang: res.locals.config.acpLang,
 			languageDirection: results.languageDirection,
@@ -431,7 +431,7 @@ module.exports = function (middleware) {
 
 		const scripts = await plugins.hooks.fire('filter:scripts.get', []);
 
-		hookReturn.templateData.scripts = scripts.map((script) => ({
+		hookReturn.templateData.scripts = scripts.map(script => ({
 			src: script,
 		}));
 
@@ -512,7 +512,7 @@ module.exports = function (middleware) {
 	}
 
 	async function appendUnreadCounts({ uid, navigation, unreadData, query }) {
-		const originalRoutes = navigation.map((nav) => nav.originalRoute);
+		const originalRoutes = navigation.map(nav => nav.originalRoute);
 		const calls = {
 			unreadData: topics.getUnreadData({ uid: uid, query: query }),
 			unreadChatCount: messaging.getUnreadCount(uid),
@@ -551,14 +551,14 @@ module.exports = function (middleware) {
 			flags: results.unreadFlagCount || 0,
 		};
 
-		Object.keys(unreadCount).forEach((key) => {
+		Object.keys(unreadCount).forEach(key => {
 			if (unreadCount[key] > 99) {
 				unreadCount[key] = '99+';
 			}
 		});
 
 		const { tidsByFilter } = results.unreadData;
-		navigation = navigation.map((item) => {
+		navigation = navigation.map(item => {
 			function modifyNavItem(item, route, filter, content) {
 				if (item && item.originalRoute === route) {
 					unreadData[filter] = _.zipObject(
@@ -588,7 +588,7 @@ module.exports = function (middleware) {
 				unreadCount.unrepliedTopic
 			);
 
-			['flags'].forEach((prop) => {
+			['flags'].forEach(prop => {
 				if (
 					item &&
 					item.originalRoute === `/${prop}` &&
@@ -624,7 +624,7 @@ module.exports = function (middleware) {
 
 	async function getAdminScripts() {
 		const scripts = await plugins.hooks.fire('filter:admin.scripts.get', []);
-		return scripts.map((script) => ({ src: script }));
+		return scripts.map(script => ({ src: script }));
 	}
 
 	async function getLatestVersion() {

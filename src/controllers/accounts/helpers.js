@@ -117,14 +117,14 @@ helpers.getUserDataByUserSlug = async function (
 	userData.allowProfileImageUploads = meta.config.allowProfileImageUploads;
 	userData.allowedProfileImageExtensions = user
 		.getAllowedProfileImageExtensions()
-		.map((ext) => `.${ext}`)
+		.map(ext => `.${ext}`)
 		.join(', ');
 	userData.groups =
 		Array.isArray(results.groups) && results.groups.length
 			? results.groups[0]
 			: [];
 	userData.selectedGroup = userData.groups
-		.filter((group) => group && userData.groupTitleArray.includes(group.name))
+		.filter(group => group && userData.groupTitleArray.includes(group.name))
 		.sort(
 			(a, b) =>
 				userData.groupTitleArray.indexOf(a.name) -
@@ -212,7 +212,7 @@ helpers.getCustomUserFields = async function (callerUID, userData) {
 
 	const keys = await db.getSortedSetRange('user-custom-fields', 0, -1);
 	const allFields = (
-		await db.getObjects(keys.map((k) => `user-custom-field:${k}`))
+		await db.getObjects(keys.map(k => `user-custom-field:${k}`))
 	).filter(Boolean);
 
 	const isSelf = String(callerUID) === String(userData.uid);
@@ -221,7 +221,7 @@ helpers.getCustomUserFields = async function (callerUID, userData) {
 		user.isModeratorOfAnyCategory(callerUID),
 	]);
 
-	const fields = allFields.filter((field) => {
+	const fields = allFields.filter(field => {
 		const visibility = field.visibility || 'all';
 		const visibilityCheck =
 			isAdmin ||
@@ -237,7 +237,7 @@ helpers.getCustomUserFields = async function (callerUID, userData) {
 		return visibilityCheck && repCheck;
 	});
 
-	fields.forEach((f) => {
+	fields.forEach(f => {
 		let userValue = userData[f.key];
 		if (f.type === 'select-multi' && userValue) {
 			userValue = JSON.parse(userValue || '[]');
@@ -253,7 +253,7 @@ helpers.getCustomUserFields = async function (callerUID, userData) {
 		if (f.type === 'select') {
 			f['select-options'].unshift('');
 		}
-		f['select-options'] = f['select-options'].map((opt) => ({
+		f['select-options'] = f['select-options'].map(opt => ({
 			value: opt,
 			selected: Array.isArray(userValue)
 				? userValue.includes(opt)
@@ -323,8 +323,8 @@ async function getCounts(userData, callerUID) {
 		'topics:read'
 	);
 	const promises = {
-		posts: db.sortedSetsCardSum(cids.map((c) => `cid:${c}:uid:${uid}:pids`)),
-		topics: db.sortedSetsCardSum(cids.map((c) => `cid:${c}:uid:${uid}:tids`)),
+		posts: db.sortedSetsCardSum(cids.map(c => `cid:${c}:uid:${uid}:pids`)),
+		topics: db.sortedSetsCardSum(cids.map(c => `cid:${c}:uid:${uid}:tids`)),
 		shares: db.sortedSetCard(`uid:${uid}:shares`),
 	};
 	if (userData.isAdmin || userData.isSelf) {
@@ -399,7 +399,7 @@ async function getProfileMenu(uid, callerUID) {
 		links: links,
 	});
 	const userslug = await user.getUserField(uid, 'userslug');
-	data.links.forEach((link) => {
+	data.links.forEach(link => {
 		if (!link.hasOwnProperty('url')) {
 			link.url = `${relative_path}/user/${userslug}/${link.route}`;
 		}
@@ -441,7 +441,7 @@ function filterLinks(links, states) {
 		};
 
 		const permit = Object.keys(states).some(
-			(state) => states[state] && link.visibility[state]
+			state => states[state] && link.visibility[state]
 		);
 
 		links[index].public = permit;

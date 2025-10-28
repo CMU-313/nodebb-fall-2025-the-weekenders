@@ -8,7 +8,7 @@ module.exports = function (module) {
 			return;
 		}
 
-		await module.transaction(async (client) => {
+		await module.transaction(async client => {
 			await helpers.ensureLegacyObjectType(client, key, 'list');
 			value = Array.isArray(value) ? value : [value];
 			value.reverse();
@@ -28,7 +28,7 @@ DO UPDATE SET "array" = EXCLUDED.array || "legacy_list"."array"`,
 		if (!key) {
 			return;
 		}
-		await module.transaction(async (client) => {
+		await module.transaction(async client => {
 			value = Array.isArray(value) ? value : [value];
 
 			await helpers.ensureLegacyObjectType(client, key, 'list');

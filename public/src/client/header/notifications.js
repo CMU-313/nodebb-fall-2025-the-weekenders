@@ -8,7 +8,7 @@ define('forum/header/notifications', function () {
 			'[component="notifications"] [data-bs-toggle="dropdown"]'
 		);
 
-		notifTrigger.on('show.bs.dropdown', async (ev) => {
+		notifTrigger.on('show.bs.dropdown', async ev => {
 			const notifications = await app.require('notifications');
 			const triggerEl = $(ev.target);
 			notifications.loadNotifications(
@@ -21,7 +21,7 @@ define('forum/header/notifications', function () {
 			const triggerEl = $(el);
 			const dropdownEl = triggerEl.parent().find('.dropdown-menu');
 			if (dropdownEl.hasClass('show')) {
-				app.require('notifications').then((notifications) => {
+				app.require('notifications').then(notifications => {
 					notifications.loadNotifications(
 						triggerEl,
 						dropdownEl.find('[component="notifications/list"]')

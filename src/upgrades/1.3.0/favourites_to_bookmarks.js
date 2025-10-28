@@ -12,9 +12,9 @@ module.exports = {
 		async function upgradePosts() {
 			await batch.processSortedSet(
 				'posts:pid',
-				async (ids) => {
+				async ids => {
 					await Promise.all(
-						ids.map(async (id) => {
+						ids.map(async id => {
 							progress.incr();
 							await db.rename(
 								`pid:${id}:users_favourited`,
@@ -40,9 +40,9 @@ module.exports = {
 		async function upgradeUsers() {
 			await batch.processSortedSet(
 				'users:joindate',
-				async (ids) => {
+				async ids => {
 					await Promise.all(
-						ids.map(async (id) => {
+						ids.map(async id => {
 							await db.rename(`uid:${id}:favourites`, `uid:${id}:bookmarks`);
 						})
 					);

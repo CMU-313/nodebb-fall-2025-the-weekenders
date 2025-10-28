@@ -51,7 +51,7 @@
 	});
 	console.log('BEFORE modifyTopicsByPrivilege:');
 	console.log(
-		res.topics.map((t) => ({
+		res.topics.map(t => ({
 			tid: t.tid,
 			title: t.title,
 			uid: t.uid,
@@ -68,7 +68,7 @@
 
 	console.log('AFTER modifyTopicsByPrivilege:');
 	console.log(
-		res.topics.map((t) => ({
+		res.topics.map(t => ({
 			tid: t.tid,
 			title: t.title,
 			uid: t.uid,

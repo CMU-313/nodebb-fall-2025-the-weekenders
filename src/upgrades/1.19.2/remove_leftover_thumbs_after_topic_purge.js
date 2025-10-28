@@ -24,7 +24,7 @@ module.exports = {
 			.filter(Boolean);
 
 		const affectedTids = (
-			await db.exists(purgedTids.map((tid) => `topic:${tid}:thumbs`))
+			await db.exists(purgedTids.map(tid => `topic:${tid}:thumbs`))
 		)
 			.map((exists, idx) => (exists ? purgedTids[idx] : false))
 			.filter(Boolean);
@@ -33,18 +33,18 @@ module.exports = {
 
 		await batch.processArray(
 			affectedTids,
-			async (tids) => {
+			async tids => {
 				await Promise.all(
-					tids.map(async (tid) => {
+					tids.map(async tid => {
 						const relativePaths = await db.getSortedSetMembers(
 							`topic:${tid}:thumbs`
 						);
-						const absolutePaths = relativePaths.map((relativePath) =>
+						const absolutePaths = relativePaths.map(relativePath =>
 							path.join(nconf.get('upload_path'), relativePath)
 						);
 
 						await Promise.all(
-							absolutePaths.map(async (absolutePath) => {
+							absolutePaths.map(async absolutePath => {
 								const exists = await file.exists(absolutePath);
 								if (exists) {
 									await fs.unlink(absolutePath);

@@ -34,7 +34,7 @@ async function linkModules() {
 	]);
 
 	await Promise.all(
-		Object.keys(modules).map(async (relPath) => {
+		Object.keys(modules).map(async relPath => {
 			const srcPath = path.join(__dirname, '../../', modules[relPath]);
 			const destPath = path.join(
 				__dirname,
@@ -72,11 +72,11 @@ async function linkModules() {
 const moduleDirs = ['modules', 'admin', 'client'];
 
 async function clearModules() {
-	const builtPaths = moduleDirs.map((p) =>
+	const builtPaths = moduleDirs.map(p =>
 		path.join(__dirname, '../../build/public/src', p)
 	);
 	await Promise.all(
-		builtPaths.map((builtPath) =>
+		builtPaths.map(builtPath =>
 			fs.promises.rm(builtPath, { recursive: true, force: true })
 		)
 	);
@@ -110,7 +110,7 @@ JS.linkStatics = async function () {
 	);
 
 	await Promise.all(
-		Object.keys(plugins.staticDirs).map(async (mappedPath) => {
+		Object.keys(plugins.staticDirs).map(async mappedPath => {
 			const sourceDir = plugins.staticDirs[mappedPath];
 			const destDir = path.join(
 				__dirname,
@@ -130,7 +130,7 @@ async function getBundleScriptList(target) {
 	if (target === 'admin') {
 		target = 'acp';
 	}
-	let pluginScripts = plugins[`${target}Scripts`].filter((path) => {
+	let pluginScripts = plugins[`${target}Scripts`].filter(path => {
 		if (path.endsWith('.js')) {
 			return true;
 		}
@@ -140,13 +140,13 @@ async function getBundleScriptList(target) {
 	});
 
 	await Promise.all(
-		pluginDirectories.map(async (directory) => {
+		pluginDirectories.map(async directory => {
 			const scripts = await file.walk(directory);
 			pluginScripts = pluginScripts.concat(scripts);
 		})
 	);
 
-	pluginScripts = JS.scripts.base.concat(pluginScripts).map((script) => {
+	pluginScripts = JS.scripts.base.concat(pluginScripts).map(script => {
 		const srcPath = path.resolve(basePath, script).replace(/\\/g, '/');
 		return {
 			srcPath: srcPath,

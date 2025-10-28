@@ -858,13 +858,13 @@ const utils = {
 			arrays[key] = arrays[key] || [];
 			arrays[key].push(utils.toType(value));
 		});
-		Object.keys(arrays).forEach((key) => {
+		Object.keys(arrays).forEach(key => {
 			params.delete(`${key}[]`);
 		});
 
 		// Backwards compatibility with v1.x -- all values passed through utils.toType()
 		params = Object.fromEntries(params);
-		Object.keys(params).forEach((key) => {
+		Object.keys(params).forEach(key => {
 			params[key] = utils.toType(params[key]);
 		});
 

@@ -15,7 +15,7 @@ module.exports = function (SocketTopics) {
 		}
 
 		await Promise.all(
-			tids.map(async (tid) => api.topics.markRead(socket, { tid }))
+			tids.map(async tid => api.topics.markRead(socket, { tid }))
 		);
 	};
 
@@ -68,8 +68,6 @@ module.exports = function (SocketTopics) {
 			throw new Error('[[error:no-privileges]]');
 		}
 
-		await Promise.all(
-			tids.map(async (tid) => api.topics.bump(socket, { tid }))
-		);
+		await Promise.all(tids.map(async tid => api.topics.bump(socket, { tid })));
 	};
 };

@@ -69,7 +69,7 @@ define('forum/flags/detail', [
 						inputType: 'textarea',
 						rows: 3,
 						value,
-						callback: (result) => {
+						callback: result => {
 							if (!result) {
 								return;
 							}
@@ -79,7 +79,7 @@ define('forum/flags/detail', [
 									note: result,
 									datetime,
 								})
-								.then((payload) => {
+								.then(payload => {
 									alerts.success('[[flags:note-added]]');
 									Detail.reloadNotes(payload.notes);
 									Detail.reloadHistory(payload.history);
@@ -96,7 +96,7 @@ define('forum/flags/detail', [
 							note: noteEl.value,
 							datetime: parseInt(noteEl.getAttribute('data-datetime'), 10),
 						})
-						.then((payload) => {
+						.then(payload => {
 							alerts.success('[[flags:note-added]]');
 							Detail.reloadNotes(payload.notes);
 							Detail.reloadHistory(payload.history);
@@ -115,7 +115,7 @@ define('forum/flags/detail', [
 						if (ok) {
 							api
 								.del(`/flags/${ajaxify.data.flagId}/notes/${datetime}`, {})
-								.then((payload) => {
+								.then(payload => {
 									alerts.success('[[flags:note-deleted]]');
 									Detail.reloadNotes(payload.notes);
 									Detail.reloadHistory(payload.history);

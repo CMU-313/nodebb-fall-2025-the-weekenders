@@ -79,12 +79,12 @@ OFFSET $2::INTEGER`,
 		}
 
 		if (withScores) {
-			res.rows = res.rows.map((r) => ({
+			res.rows = res.rows.map(r => ({
 				value: r.value,
 				score: parseFloat(r.score),
 			}));
 		} else {
-			res.rows = res.rows.map((r) => r.value);
+			res.rows = res.rows.map(r => r.value);
 		}
 
 		return res.rows;
@@ -201,12 +201,12 @@ OFFSET $2::INTEGER`,
 		});
 
 		if (withScores) {
-			res.rows = res.rows.map((r) => ({
+			res.rows = res.rows.map(r => ({
 				value: r.value,
 				score: parseFloat(r.score),
 			}));
 		} else {
-			res.rows = res.rows.map((r) => r.value);
+			res.rows = res.rows.map(r => r.value);
 		}
 
 		return res.rows;
@@ -280,8 +280,8 @@ SELECT o."_key" k,
 			values: [keys],
 		});
 
-		return keys.map((k) =>
-			parseInt((res.rows.find((r) => r.k === k) || { c: 0 }).c, 10)
+		return keys.map(k =>
+			parseInt((res.rows.find(r => r.k === k) || { c: 0 }).c, 10)
 		);
 	};
 
@@ -316,8 +316,8 @@ SELECT o."_key" k,
 	GROUP BY o."_key"`,
 				values: [keys, min, max],
 			});
-			counts = keys.map((k) =>
-				parseInt((res.rows.find((r) => r.k === k) || { c: 0 }).c, 10)
+			counts = keys.map(k =>
+				parseInt((res.rows.find(r => r.k === k) || { c: 0 }).c, 10)
 			);
 		} else {
 			counts = await module.sortedSetsCard(keys);
@@ -356,7 +356,7 @@ SELECT (SELECT r
 			values: [keys, values],
 		});
 
-		return res.rows.map((r) => (r.r === null ? null : parseFloat(r.r)));
+		return res.rows.map(r => (r.r === null ? null : parseFloat(r.r)));
 	}
 
 	module.sortedSetsRanks = async function (keys, values) {
@@ -445,8 +445,8 @@ SELECT o."_key" k,
 			values: [keys, value],
 		});
 
-		return keys.map((k) => {
-			const s = res.rows.find((r) => r.k === k);
+		return keys.map(k => {
+			const s = res.rows.find(r => r.k === k);
 			return s ? parseFloat(s.s) : null;
 		});
 	};
@@ -474,8 +474,8 @@ SELECT z."value" v,
 			values: [key, values],
 		});
 
-		return values.map((v) => {
-			const s = res.rows.find((r) => r.v === v);
+		return values.map(v => {
+			const s = res.rows.find(r => r.v === v);
 			return s ? parseFloat(s.s) : null;
 		});
 	};
@@ -526,7 +526,7 @@ SELECT z."value" v
 			values: [key, values],
 		});
 
-		return values.map((v) => res.rows.some((r) => r.v === v));
+		return values.map(v => res.rows.some(r => r.v === v));
 	};
 
 	module.isMemberOfSortedSets = async function (keys, value) {
@@ -549,7 +549,7 @@ SELECT o."_key" k
 			values: [keys, value],
 		});
 
-		return keys.map((k) => res.rows.some((r) => r.k === k));
+		return keys.map(k => res.rows.some(r => r.k === k));
 	};
 
 	module.getSortedSetMembers = async function (key) {
@@ -576,7 +576,7 @@ SELECT "_key" k,
 			values: [keys],
 		});
 
-		return keys.map((k) => (res.rows.find((r) => r.k === k) || {}).m || []);
+		return keys.map(k => (res.rows.find(r => r.k === k) || {}).m || []);
 	};
 
 	module.getSortedSetsMembersWithScores = async function (keys) {
@@ -593,7 +593,7 @@ SELECT "_key" k,
 			values: [keys],
 		});
 
-		return keys.map((k) => (res.rows.find((r) => r.k === k) || {}).m || []);
+		return keys.map(k => (res.rows.find(r => r.k === k) || {}).m || []);
 	};
 
 	module.sortedSetIncrBy = async function (key, increment, value) {
@@ -604,7 +604,7 @@ SELECT "_key" k,
 		value = helpers.valueToString(value);
 		increment = parseFloat(increment);
 
-		return await module.transaction(async (client) => {
+		return await module.transaction(async client => {
 			await helpers.ensureLegacyObjectType(client, key, 'zset');
 			const res = await client.query({
 				name: 'sortedSetIncrBy',
@@ -625,10 +625,10 @@ RETURNING "score" s`,
 			return [];
 		}
 
-		return await module.transaction(async (client) => {
+		return await module.transaction(async client => {
 			await helpers.ensureLegacyObjectsType(
 				client,
-				data.map((item) => item[0]),
+				data.map(item => item[0]),
 				'zset'
 			);
 
@@ -657,7 +657,7 @@ RETURNING "value", "score"`;
 				text: query,
 				values,
 			});
-			return res.rows.map((row) => parseFloat(row.score));
+			return res.rows.map(row => parseFloat(row.score));
 		});
 	};
 
@@ -715,7 +715,7 @@ OFFSET $${q.values.length - 1}::INTEGER`,
 			values: q.values,
 		});
 
-		return res.rows.map((r) => r.v);
+		return res.rows.map(r => r.v);
 	}
 
 	module.sortedSetRemoveRangeByLex = async function (key, min, max) {
@@ -798,9 +798,9 @@ SELECT z."value",
 			values: [params.key, params.limit, match],
 		});
 		if (!params.withScores) {
-			return res.rows.map((r) => r.value);
+			return res.rows.map(r => r.value);
 		}
-		return res.rows.map((r) => ({
+		return res.rows.map(r => ({
 			value: r.value,
 			score: parseFloat(r.score),
 		}));
@@ -845,12 +845,12 @@ SELECT z."value", z."score"
 			}
 
 			if (options.withScores) {
-				rows = rows.map((r) => ({
+				rows = rows.map(r => ({
 					value: r.value,
 					score: parseFloat(r.score),
 				}));
 			} else {
-				rows = rows.map((r) => r.value);
+				rows = rows.map(r => r.value);
 			}
 			try {
 				if (iteration > 1 && options.interval) {

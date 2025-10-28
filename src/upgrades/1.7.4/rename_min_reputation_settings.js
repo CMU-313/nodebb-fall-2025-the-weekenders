@@ -21,7 +21,7 @@ module.exports = {
 							parseInt(config['privileges:downvote'], 10) || 0,
 						'min:rep:flag': parseInt(config['privileges:downvote'], 10) || 0,
 					},
-					(err) => {
+					err => {
 						if (err) {
 							return callback(err);
 						}

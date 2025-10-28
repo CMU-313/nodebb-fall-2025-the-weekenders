@@ -28,7 +28,7 @@ const _filenames = [
 ];
 const _recreateFiles = () => {
 	// Create stub files for testing
-	_filenames.forEach((filename) =>
+	_filenames.forEach(filename =>
 		fs.closeSync(
 			fs.openSync(path.join(nconf.get('upload_path'), 'files', filename), 'w')
 		)
@@ -75,8 +75,8 @@ describe('upload methods', () => {
 	});
 
 	describe('.sync()', () => {
-		it("should properly add new images to the post's zset", (done) => {
-			posts.uploads.sync(pid, (err) => {
+		it("should properly add new images to the post's zset", done => {
+			posts.uploads.sync(pid, err => {
 				assert.ifError(err);
 
 				db.sortedSetCard(`post:${pid}:uploads`, (err, length) => {
@@ -101,7 +101,7 @@ describe('upload methods', () => {
 	});
 
 	describe('.list()', () => {
-		it('should display the uploaded files for a specific post', (done) => {
+		it('should display the uploaded files for a specific post', done => {
 			posts.uploads.list(pid, (err, uploads) => {
 				assert.ifError(err);
 				assert.equal(true, Array.isArray(uploads));
@@ -113,7 +113,7 @@ describe('upload methods', () => {
 	});
 
 	describe('.isOrphan()', () => {
-		it('should return false if upload is not an orphan', (done) => {
+		it('should return false if upload is not an orphan', done => {
 			posts.uploads.isOrphan('/files/abracadabra.png', (err, isOrphan) => {
 				assert.ifError(err);
 				assert.strictEqual(isOrphan, false);
@@ -121,7 +121,7 @@ describe('upload methods', () => {
 			});
 		});
 
-		it('should return true if upload is an orphan', (done) => {
+		it('should return true if upload is an orphan', done => {
 			posts.uploads.isOrphan('/files/shazam.jpg', (err, isOrphan) => {
 				assert.ifError(err);
 				assert.strictEqual(isOrphan, true);
@@ -150,7 +150,7 @@ describe('upload methods', () => {
 		});
 
 		it('should save a reverse association of md5sum to pid', async () => {
-			const md5 = (filename) =>
+			const md5 = filename =>
 				crypto.createHash('md5').update(filename).digest('hex');
 			await posts.uploads.associate(pid, ['/files/test.bmp']);
 			const pids = await db.getSortedSetRange(
@@ -336,7 +336,7 @@ describe('upload methods', () => {
 			]);
 
 			const existsOnDisk = await Promise.all(
-				_filenames.map(async (filename) => {
+				_filenames.map(async filename => {
 					const fullPath = path.resolve(
 						nconf.get('upload_path'),
 						'files',
@@ -435,7 +435,7 @@ describe('post uploads management', () => {
 		reply = replyData;
 	});
 
-	it('should automatically sync uploads on topic create and reply', (done) => {
+	it('should automatically sync uploads on topic create and reply', done => {
 		db.sortedSetsCard(
 			[`post:${topic.topicData.mainPid}:uploads`, `post:${reply.pid}:uploads`],
 			(err, lengths) => {

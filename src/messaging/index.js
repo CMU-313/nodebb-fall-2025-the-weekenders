@@ -32,9 +32,9 @@ Messaging.notificationSettings.NONE = 1;
 Messaging.notificationSettings.ATMENTION = 2;
 Messaging.notificationSettings.ALLMESSAGES = 3;
 
-Messaging.messageExists = async (mid) => db.exists(`message:${mid}`);
+Messaging.messageExists = async mid => db.exists(`message:${mid}`);
 
-Messaging.getMessages = async (params) => {
+Messaging.getMessages = async params => {
 	const { callerUid, uid, roomId } = params;
 	const isNew = params.isNew || false;
 	const start = params.hasOwnProperty('start') ? params.start : 0;
@@ -59,7 +59,7 @@ Messaging.getMessages = async (params) => {
 	mids.reverse();
 
 	const messageData = await Messaging.getMessagesData(mids, uid, roomId, isNew);
-	messageData.forEach((msg) => {
+	messageData.forEach(msg => {
 		msg.index = indices[msg.messageId.toString()];
 	});
 
@@ -152,7 +152,7 @@ Messaging.getPublicRooms = async (callerUid, uid) => {
 	const isAdmin = await privileges.users.isAdministrator(callerUid);
 	const checks = await Promise.all(
 		allRoomData.map(
-			(room) =>
+			room =>
 				room &&
 				(!Array.isArray(room.groups) ||
 					!room.groups.length ||
@@ -162,7 +162,7 @@ Messaging.getPublicRooms = async (callerUid, uid) => {
 	);
 
 	const roomData = allRoomData.filter((room, idx) => room && checks[idx]);
-	const roomIds = roomData.map((r) => r.roomId);
+	const roomIds = roomData.map(r => r.roomId);
 	const userReadTimestamps = await db.getObjectFields(
 		`uid:${uid}:chat:rooms:read`,
 		roomIds
@@ -170,7 +170,7 @@ Messaging.getPublicRooms = async (callerUid, uid) => {
 
 	const maxUnread = 50;
 	const unreadCounts = await Promise.all(
-		roomIds.map(async (roomId) => {
+		roomIds.map(async roomId => {
 			const cutoff = userReadTimestamps[roomId] || '-inf';
 			const unreadMids = await db.getSortedSetRangeByScore(
 				`chat:room:${roomId}:mids`,
@@ -208,10 +208,10 @@ Messaging.getRecentChats = async (callerUid, uid, start, stop) => {
 
 	async function getUsers(roomIds) {
 		const arrayOfUids = await Promise.all(
-			roomIds.map((roomId) => Messaging.getUidsInRoom(roomId, 0, 9))
+			roomIds.map(roomId => Messaging.getUidsInRoom(roomId, 0, 9))
 		);
 		const uniqUids = _.uniq(_.flatten(arrayOfUids)).filter(
-			(_uid) => _uid && parseInt(_uid, 10) !== parseInt(uid, 10)
+			_uid => _uid && parseInt(_uid, 10) !== parseInt(uid, 10)
 		);
 		const uidToUser = _.zipObject(
 			uniqUids,
@@ -224,7 +224,7 @@ Messaging.getRecentChats = async (callerUid, uid, start, stop) => {
 				'lastonline',
 			])
 		);
-		return arrayOfUids.map((uids) => uids.map((uid) => uidToUser[uid]));
+		return arrayOfUids.map(uids => uids.map(uid => uidToUser[uid]));
 	}
 
 	const results = await utils.promiseParallel({
@@ -243,13 +243,13 @@ Messaging.getRecentChats = async (callerUid, uid, start, stop) => {
 				room.unread = results.unread[index];
 				room.teaser = results.teasers[index];
 
-				room.users.forEach((userData) => {
+				room.users.forEach(userData => {
 					if (userData && parseInt(userData.uid, 10)) {
 						userData.status = user.getStatus(userData);
 					}
 				});
 				room.users = room.users.filter(
-					(user) =>
+					user =>
 						user &&
 						(parseInt(user.uid, 10) || activitypub.helpers.isUri(user.uid))
 				);
@@ -275,10 +275,8 @@ Messaging.getRecentChats = async (callerUid, uid, start, stop) => {
 };
 
 Messaging.generateUsernames = function (room, excludeUid) {
-	const users = room.users.filter(
-		(u) => u && parseInt(u.uid, 10) !== excludeUid
-	);
-	const usernames = users.map((u) => u.displayname);
+	const users = room.users.filter(u => u && parseInt(u.uid, 10) !== excludeUid);
+	const usernames = users.map(u => u.displayname);
 	if (users.length > 3) {
 		return translator.compile(
 			'modules:chat.usernames-and-x-others',
@@ -290,10 +288,8 @@ Messaging.generateUsernames = function (room, excludeUid) {
 };
 
 Messaging.generateChatWithMessage = async function (room, callerUid, userLang) {
-	const users = room.users.filter(
-		(u) => u && parseInt(u.uid, 10) !== callerUid
-	);
-	const usernames = users.map((u) =>
+	const users = room.users.filter(u => u && parseInt(u.uid, 10) !== callerUid);
+	const usernames = users.map(u =>
 		utils.isNumber(u.uid)
 			? `<a href="${relative_path}/uid/${u.uid}">${u.displayname}</a>`
 			: `<a href="${relative_path}/user/${u.username}">${u.displayname}</a>`
@@ -326,7 +322,7 @@ Messaging.getTeaser = async (uid, roomId) => {
 
 Messaging.getTeasers = async (uid, roomIds) => {
 	const mids = await Promise.all(
-		roomIds.map((roomId) => Messaging.getLatestUndeletedMessage(uid, roomId))
+		roomIds.map(roomId => Messaging.getLatestUndeletedMessage(uid, roomId))
 	);
 	const [teasers, blockedUids] = await Promise.all([
 		Messaging.getMessagesFields(mids, ['fromuid', 'content', 'timestamp']),
@@ -334,8 +330,8 @@ Messaging.getTeasers = async (uid, roomIds) => {
 	]);
 	const uids = _.uniq(
 		teasers
-			.map((t) => t && t.fromuid)
-			.filter((uid) => uid && !blockedUids.includes(uid))
+			.map(t => t && t.fromuid)
+			.filter(uid => uid && !blockedUids.includes(uid))
 	);
 
 	const userMap = _.zipObject(
@@ -517,7 +513,7 @@ Messaging.hasPrivateChat = async (uid, withUid) => {
 		theirRooms: db.getSortedSetRevRange(`uid:${withUid}:chat:rooms`, 0, -1),
 	});
 	const roomIds = results.myRooms.filter(
-		(roomId) => roomId && results.theirRooms.includes(roomId)
+		roomId => roomId && results.theirRooms.includes(roomId)
 	);
 
 	if (!roomIds.length) {
@@ -557,7 +553,7 @@ Messaging.canViewMessage = async (mids, roomId, uid) => {
 	]);
 
 	const canView = midTimestamps.map(
-		(midTimestamp) =>
+		midTimestamp =>
 			!!(
 				midTimestamp &&
 				userTimestamp &&

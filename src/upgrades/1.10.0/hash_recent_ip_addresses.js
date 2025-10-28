@@ -36,7 +36,7 @@ module.exports = {
 								async.apply(db.sortedSetAdd, 'ip:recent', set.score, hash),
 								async.apply(db.sortedSetRemove, 'ip:recent', set.value),
 							],
-							(err) => {
+							err => {
 								progress.incr();
 								next(err);
 							}

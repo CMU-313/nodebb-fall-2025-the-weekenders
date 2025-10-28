@@ -21,7 +21,7 @@ settingsController.general = async (req, res) => {
 	const routes = await helpers.getHomePageRoutes(req.uid);
 	const postSharing = await social.getPostSharing();
 	const languageData = await languages.list();
-	languageData.forEach((language) => {
+	languageData.forEach(language => {
 		language.selected = language.code === meta.config.defaultLang;
 	});
 
@@ -42,7 +42,7 @@ settingsController.navigation = async function (req, res) {
 
 	allGroups.sort((a, b) => b.system - a.system);
 
-	admin.groups = allGroups.map((group) => ({
+	admin.groups = allGroups.map(group => ({
 		name: group.name,
 		displayName: group.displayName,
 	}));
@@ -54,13 +54,13 @@ settingsController.navigation = async function (req, res) {
 		enabled.dropdownContent = translator.escape(
 			validator.escape(String(enabled.dropdownContent || ''))
 		);
-		enabled.groups = admin.groups.map((group) => ({
+		enabled.groups = admin.groups.map(group => ({
 			displayName: group.displayName,
 			selected: enabled.groups.includes(group.name),
 		}));
 	});
 
-	admin.available.forEach((available) => {
+	admin.available.forEach(available => {
 		available.groups = admin.groups;
 	});
 
@@ -74,7 +74,7 @@ settingsController.user = async (req, res) => {
 		notifications.getAllNotificationTypes(),
 		groups.getNonPrivilegeGroups('groups:createtime', 0, -1),
 	]);
-	const notificationSettings = notificationTypes.map((type) => ({
+	const notificationSettings = notificationTypes.map(type => ({
 		name: type,
 		label: `[[notifications:${type.replace(/_/g, '-')}]]`,
 	}));
@@ -129,9 +129,9 @@ settingsController.email = async (req, res) => {
 		emails: emails,
 		sendable: emails
 			.filter(
-				(e) => !e.path.includes('_plaintext') && !e.path.includes('partials')
+				e => !e.path.includes('_plaintext') && !e.path.includes('partials')
 			)
-			.map((tpl) => tpl.path),
+			.map(tpl => tpl.path),
 		services: emailer.listServices(),
 	});
 };

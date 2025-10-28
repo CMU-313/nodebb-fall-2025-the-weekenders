@@ -62,7 +62,7 @@ Flags.init = async function () {
 			if (value.length === 1) {
 				sets.push(prefix + value[0]);
 			} else {
-				orSets.push(value.map((x) => prefix + x));
+				orSets.push(value.map(x => prefix + x));
 			}
 		}
 	}
@@ -188,7 +188,7 @@ Flags.getFlagIdsWithFilters = async function ({ filters, uid, query }) {
 	if (orSets.length) {
 		let _flagIds = await Promise.all(
 			orSets.map(
-				async (orSet) =>
+				async orSet =>
 					await db.getSortedSetRevUnion({
 						sets: orSet,
 						start: 0,
@@ -242,7 +242,7 @@ Flags.list = async function (data) {
 	);
 
 	const reportCounts = await db.sortedSetsCard(
-		flagIds.map((flagId) => `flag:${flagId}:reports`)
+		flagIds.map(flagId => `flag:${flagId}:reports`)
 	);
 
 	const flags = await Promise.all(
@@ -278,8 +278,8 @@ Flags.list = async function (data) {
 };
 
 Flags.sort = async function (flagIds, sort) {
-	const filterPosts = async (flagIds) => {
-		const keys = flagIds.map((id) => `flag:${id}`);
+	const filterPosts = async flagIds => {
+		const keys = flagIds.map(id => `flag:${id}`);
 		const types = await db.getObjectsFields(keys, ['type']);
 		return flagIds.filter((id, idx) => types[idx].type === 'post');
 	};
@@ -291,14 +291,14 @@ Flags.sort = async function (flagIds, sort) {
 			break;
 
 		case 'reports': {
-			const keys = flagIds.map((id) => `flag:${id}:reports`);
+			const keys = flagIds.map(id => `flag:${id}:reports`);
 			const heat = await db.sortedSetsCard(keys);
 			const mapped = heat.map((el, i) => ({
 				index: i,
 				heat: el,
 			}));
 			mapped.sort((a, b) => b.heat - a.heat);
-			flagIds = mapped.map((obj) => flagIds[obj.index]);
+			flagIds = mapped.map(obj => flagIds[obj.index]);
 			break;
 		}
 
@@ -306,12 +306,12 @@ Flags.sort = async function (flagIds, sort) {
 		case 'downvotes':
 		case 'replies': {
 			flagIds = await filterPosts(flagIds);
-			const keys = flagIds.map((id) => `flag:${id}`);
+			const keys = flagIds.map(id => `flag:${id}`);
 			const pids = (await db.getObjectsFields(keys, ['targetId'])).map(
-				(obj) => obj.targetId
+				obj => obj.targetId
 			);
 			const votes = (await posts.getPostsFields(pids, [sort])).map(
-				(obj) => parseInt(obj[sort], 10) || 0
+				obj => parseInt(obj[sort], 10) || 0
 			);
 			const sortRef = flagIds.reduce((memo, cur, idx) => {
 				memo[cur] = votes[idx];
@@ -432,7 +432,7 @@ Flags.getFlagIdByTarget = async function (type, id) {
 
 async function modifyNotes(notes) {
 	const uids = [];
-	notes = notes.map((note) => {
+	notes = notes.map(note => {
 		const noteObj = JSON.parse(note.value);
 		uids.push(noteObj[0]);
 		return {
@@ -601,25 +601,25 @@ Flags.create = async function (
 
 Flags.purge = async function (flagIds) {
 	const flagData = (
-		await db.getObjects(flagIds.map((flagId) => `flag:${flagId}`))
+		await db.getObjects(flagIds.map(flagId => `flag:${flagId}`))
 	).filter(Boolean);
-	const postFlags = flagData.filter((flagObj) => flagObj.type === 'post');
-	const userFlags = flagData.filter((flagObj) => flagObj.type === 'user');
-	const assignedFlags = flagData.filter((flagObj) => !!flagObj.assignee);
+	const postFlags = flagData.filter(flagObj => flagObj.type === 'post');
+	const userFlags = flagData.filter(flagObj => flagObj.type === 'user');
+	const assignedFlags = flagData.filter(flagObj => !!flagObj.assignee);
 
 	const [allReports, cids] = await Promise.all([
 		db.getSortedSetsMembers(
-			flagData.map((flagObj) => `flag:${flagObj.flagId}:reports`)
+			flagData.map(flagObj => `flag:${flagObj.flagId}:reports`)
 		),
 		categories.getAllCidsFromSet('categories:cid'),
 	]);
-	const allReporterUids = allReports.map((flagReports) =>
-		flagReports.map((report) => report && report.split(';')[0])
+	const allReporterUids = allReports.map(flagReports =>
+		flagReports.map(report => report && report.split(';')[0])
 	);
 	const removeReporters = [];
 	flagData.forEach((flagObj, i) => {
 		if (Array.isArray(allReporterUids[i])) {
-			allReporterUids[i].forEach((uid) => {
+			allReporterUids[i].forEach(uid => {
 				removeReporters.push([
 					`flags:hash`,
 					[flagObj.type, flagObj.targetId, uid].join(':'),
@@ -630,51 +630,51 @@ Flags.purge = async function (flagIds) {
 	});
 	await Promise.all([
 		db.sortedSetRemoveBulk([
-			...flagData.map((flagObj) => [
+			...flagData.map(flagObj => [
 				`flags:byType:${flagObj.type}`,
 				flagObj.flagId,
 			]),
-			...flagData.map((flagObj) => [
+			...flagData.map(flagObj => [
 				`flags:byState:${flagObj.state}`,
 				flagObj.flagId,
 			]),
 			...removeReporters,
-			...postFlags.map((flagObj) => [
+			...postFlags.map(flagObj => [
 				`flags:byPid:${flagObj.targetId}`,
 				flagObj.flagId,
 			]),
-			...assignedFlags.map((flagObj) => [
+			...assignedFlags.map(flagObj => [
 				`flags:byAssignee:${flagObj.assignee}`,
 				flagObj.flagId,
 			]),
-			...userFlags.map((flagObj) => [
+			...userFlags.map(flagObj => [
 				`flags:byTargetUid:${flagObj.targetUid}`,
 				flagObj.flagId,
 			]),
 		]),
 		db.deleteObjectFields(
-			postFlags.map((flagObj) => `post:${flagObj.targetId}`, ['flagId'])
+			postFlags.map(flagObj => `post:${flagObj.targetId}`, ['flagId'])
 		),
 		db.deleteObjectFields(
-			userFlags.map((flagObj) => `user:${flagObj.targetId}`, ['flagId'])
+			userFlags.map(flagObj => `user:${flagObj.targetId}`, ['flagId'])
 		),
 		db.deleteAll([
-			...flagIds.map((flagId) => `flag:${flagId}`),
-			...flagIds.map((flagId) => `flag:${flagId}:notes`),
-			...flagIds.map((flagId) => `flag:${flagId}:reports`),
-			...flagIds.map((flagId) => `flag:${flagId}:history`),
+			...flagIds.map(flagId => `flag:${flagId}`),
+			...flagIds.map(flagId => `flag:${flagId}:notes`),
+			...flagIds.map(flagId => `flag:${flagId}:reports`),
+			...flagIds.map(flagId => `flag:${flagId}:history`),
 		]),
 		db.sortedSetRemove(
-			cids.map((cid) => `flags:byCid:${cid}`),
+			cids.map(cid => `flags:byCid:${cid}`),
 			flagIds
 		),
 		db.sortedSetRemove('flags:datetime', flagIds),
 		db.sortedSetRemove(
 			'flags:byTarget',
-			flagData.map((flagObj) => [flagObj.type, flagObj.targetId].join(':'))
+			flagData.map(flagObj => [flagObj.type, flagObj.targetId].join(':'))
 		),
 		flagData.flatMap(async (flagObj, i) =>
-			allReporterUids[i].map(async (uid) => {
+			allReporterUids[i].map(async uid => {
 				if (await db.isSortedSetMember(`flag:${flagObj.flagId}:remote`, uid)) {
 					await activitypubApi.undo.flag({ uid }, flagObj);
 				}
@@ -765,7 +765,7 @@ Flags.rescindReport = async (type, id, uid) => {
 	);
 	const reports = await db.getSortedSetMembers(`flag:${flagId}:reports`);
 	let reason;
-	reports.forEach((payload) => {
+	reports.forEach(payload => {
 		if (!reason) {
 			const [payloadUid, payloadReason] = payload.split(';');
 			if (parseInt(payloadUid, 10) === parseInt(uid, 10)) {
@@ -848,8 +848,8 @@ Flags.canFlag = async function (type, id, uid, skipLimitCheck = false) {
 	]);
 	const allowedFlagsPerDay = meta.config[`flags:${type}FlagsPerDay`];
 	if (!isPrivileged && allowedFlagsPerDay > 0) {
-		const flagData = await db.getObjects(flagIds.map((id) => `flag:${id}`));
-		const flagsOfType = flagData.filter((f) => f && f.type === type);
+		const flagData = await db.getObjects(flagIds.map(id => `flag:${id}`));
+		const flagsOfType = flagData.filter(f => f && f.type === type);
 		if (allowedFlagsPerDay > 0 && flagsOfType.length > allowedFlagsPerDay) {
 			throw new Error(
 				`[[error:too-many-${type}-flags-per-day, ${allowedFlagsPerDay}]]`
@@ -1047,10 +1047,10 @@ Flags.resolveUserPostFlags = async function (uid, callerUid) {
 	if (meta.config['flags:autoResolveOnBan']) {
 		await batch.processSortedSet(
 			`uid:${uid}:posts`,
-			async (pids) => {
+			async pids => {
 				let postData = await posts.getPostsFields(pids, ['pid', 'flagId']);
 				postData = postData.filter(
-					(p) => p && p.flagId && parseInt(p.flagId, 10)
+					p => p && p.flagId && parseInt(p.flagId, 10)
 				);
 				for (const postObj of postData) {
 					// eslint-disable-next-line no-await-in-loop
@@ -1073,7 +1073,7 @@ Flags.getHistory = async function (flagId) {
 	);
 	const targetUid = await db.getObjectField(`flag:${flagId}`, 'targetUid');
 
-	history = history.map((entry) => {
+	history = history.map(entry => {
 		entry.value = JSON.parse(entry.value);
 
 		uids.push(entry.value[0]);
@@ -1100,7 +1100,7 @@ Flags.getHistory = async function (flagId) {
 
 	// turn assignee uids into usernames
 	await Promise.all(
-		history.map(async (entry) => {
+		history.map(async entry => {
 			if (entry.fields.hasOwnProperty('assignee')) {
 				entry.fields.assignee = await user.getUserField(
 					entry.fields.assignee,
@@ -1223,7 +1223,7 @@ Flags.notify = async function (flagObj, uid, notifySelf = false) {
 		to: uids,
 	});
 	if (!notifySelf) {
-		uids = uids.filter((_uid) => parseInt(_uid, 10) !== parseInt(uid, 10));
+		uids = uids.filter(_uid => parseInt(_uid, 10) !== parseInt(uid, 10));
 	}
 	await notifications.push(notifObj, uids);
 };

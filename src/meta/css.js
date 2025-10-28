@@ -161,7 +161,7 @@ function boostrapImport(themeData) {
 function getFontawesomeStyle() {
 	const styles = utils.getFontawesomeStyles();
 	return styles
-		.map((style) => `@import "fontawesome/style-${style}";`)
+		.map(style => `@import "fontawesome/style-${style}";`)
 		.join('\n');
 }
 
@@ -191,7 +191,7 @@ async function copyFontAwesomeFiles() {
 
 async function filterMissingFiles(filepaths) {
 	const exists = await Promise.all(
-		filepaths.map(async (filepath) => {
+		filepaths.map(async filepath => {
 			const exists = await file.exists(
 				path.join(__dirname, '../../node_modules', filepath)
 			);
@@ -218,7 +218,7 @@ async function getImports(files, extension) {
 		return `\n@import "${newFile.replace(/\\/g, '/')}";`;
 	}
 
-	files.forEach((styleFile) => {
+	files.forEach(styleFile => {
 		if (styleFile.endsWith(extension)) {
 			source += pathToImport(styleFile);
 		} else {
@@ -226,9 +226,9 @@ async function getImports(files, extension) {
 		}
 	});
 	await Promise.all(
-		pluginDirectories.map(async (directory) => {
+		pluginDirectories.map(async directory => {
 			const styleFiles = await file.walk(directory);
-			styleFiles.forEach((styleFile) => {
+			styleFiles.forEach(styleFile => {
 				source += pathToImport(styleFile);
 			});
 		})
@@ -310,7 +310,7 @@ CSS.getSkinSwitcherOptions = async function (uid) {
 	]);
 
 	const foundCustom = customSkins.find(
-		(skin) => skin.value === meta.config.bootswatchSkin
+		skin => skin.value === meta.config.bootswatchSkin
 	);
 	const defaultSkin = foundCustom
 		? foundCustom.name
@@ -359,18 +359,18 @@ CSS.getSkinSwitcherOptions = async function (uid) {
 		'vapor',
 	];
 	function parseSkins(skins) {
-		skins = skins.map((skin) => ({
+		skins = skins.map(skin => ({
 			name: _.capitalize(skin),
 			value: skin,
 		}));
-		skins.forEach((skin) => {
+		skins.forEach(skin => {
 			skin.selected = skin.value === userSettings.bootswatchSkin;
 		});
 		return skins;
 	}
 	return await plugins.hooks.fire('filter:meta.css.getSkinSwitcherOptions', {
 		default: defaultSkins,
-		custom: customSkins.map((s) => ({
+		custom: customSkins.map(s => ({
 			...s,
 			selected: s.value === userSettings.bootswatchSkin,
 		})),
@@ -386,7 +386,7 @@ CSS.getCustomSkins = async function (opts = {}) {
 	const customSkins = await meta.settings.get('custom-skins');
 	const returnSkins = [];
 	if (customSkins && Array.isArray(customSkins['custom-skin-list'])) {
-		customSkins['custom-skin-list'].forEach((customSkin) => {
+		customSkins['custom-skin-list'].forEach(customSkin => {
 			if (customSkin) {
 				returnSkins.push({
 					name: customSkin['custom-skin-name'],
@@ -405,12 +405,12 @@ CSS.isSkinValid = async function (skin) {
 
 CSS.isCustomSkin = async function (skin) {
 	const skins = await CSS.getCustomSkins();
-	return !!skins.find((s) => s.value === skin);
+	return !!skins.find(s => s.value === skin);
 };
 
 CSS.getCustomSkin = async function (skin) {
 	const skins = await CSS.getCustomSkins({ loadVariables: true });
-	return skins.find((s) => s.value === skin);
+	return skins.find(s => s.value === skin);
 };
 
 CSS.buildBundle = async function (target, fork) {
@@ -418,9 +418,9 @@ CSS.buildBundle = async function (target, fork) {
 		let files = await fs.promises.readdir(
 			path.join(__dirname, '../../build/public')
 		);
-		files = files.filter((f) => f.match(/^client.*\.css$/));
+		files = files.filter(f => f.match(/^client.*\.css$/));
 		await Promise.all(
-			files.map((f) =>
+			files.map(f =>
 				fs.promises.unlink(path.join(__dirname, '../../build/public', f))
 			)
 		);

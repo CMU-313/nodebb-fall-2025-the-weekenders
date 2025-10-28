@@ -8,7 +8,7 @@ module.exports = function (Topics) {
 		options = options || {};
 
 		const topicsData = await Topics.getTopicsFields(tids, ['scheduled']);
-		if (topicsData.some((t) => t.scheduled)) {
+		if (topicsData.some(t => t.scheduled)) {
 			throw new Error('[[error:cant-merge-scheduled]]');
 		}
 
@@ -22,7 +22,7 @@ module.exports = function (Topics) {
 
 		const otherTids = tids
 			.sort((a, b) => a - b)
-			.filter((tid) => tid && String(tid) !== String(mergeIntoTid));
+			.filter(tid => tid && String(tid) !== String(mergeIntoTid));
 
 		for (const tid of otherTids) {
 			/* eslint-disable no-await-in-loop */

@@ -7,13 +7,13 @@ const db = require('./mocks/databasemock');
 const helpers = require('../src/helpers');
 
 describe('helpers', () => {
-	it("should return false if item doesn't exist", (done) => {
+	it("should return false if item doesn't exist", done => {
 		const flag = helpers.displayMenuItem({ navigation: [] }, 0);
 		assert(!flag);
 		done();
 	});
 
-	it('should return false if route is /users and user does not have view:users privilege', (done) => {
+	it('should return false if route is /users and user does not have view:users privilege', done => {
 		const flag = helpers.displayMenuItem(
 			{
 				navigation: [{ route: '/users' }],
@@ -29,7 +29,7 @@ describe('helpers', () => {
 		done();
 	});
 
-	it('should return false if route is /tags and user does not have view:tags privilege', (done) => {
+	it('should return false if route is /tags and user does not have view:tags privilege', done => {
 		const flag = helpers.displayMenuItem(
 			{
 				navigation: [{ route: '/tags' }],
@@ -45,7 +45,7 @@ describe('helpers', () => {
 		done();
 	});
 
-	it('should return false if route is /groups and user does not have view:groups privilege', (done) => {
+	it('should return false if route is /groups and user does not have view:groups privilege', done => {
 		const flag = helpers.displayMenuItem(
 			{
 				navigation: [{ route: '/groups' }],
@@ -61,7 +61,7 @@ describe('helpers', () => {
 		done();
 	});
 
-	it('should return true if route is visible', (done) => {
+	it('should return true if route is visible', done => {
 		const flag = helpers.displayMenuItem(
 			{
 				navigation: [{ route: '/recent' }],
@@ -75,7 +75,7 @@ describe('helpers', () => {
 		done();
 	});
 
-	it('should stringify object', (done) => {
+	it('should stringify object', done => {
 		const str = helpers.stringify({ a: 'herp < derp > and & quote "' });
 		assert.equal(
 			str,
@@ -84,13 +84,13 @@ describe('helpers', () => {
 		done();
 	});
 
-	it('should escape html', (done) => {
+	it('should escape html', done => {
 		const str = helpers.escape('gdkfhgk < some > and &');
 		assert.equal(str, 'gdkfhgk &lt; some &gt; and &amp;');
 		done();
 	});
 
-	it('should build category icon', (done) => {
+	it('should build category icon', done => {
 		assert.strictEqual(
 			helpers.buildCategoryIcon(
 				{
@@ -121,7 +121,7 @@ describe('helpers', () => {
 		done();
 	});
 
-	it('should build category label', (done) => {
+	it('should build category label', done => {
 		assert.strictEqual(
 			helpers.buildCategoryLabel(
 				{
@@ -154,14 +154,14 @@ describe('helpers', () => {
 		done();
 	});
 
-	it('should return empty string if category is falsy', (done) => {
+	it('should return empty string if category is falsy', done => {
 		assert.equal(helpers.buildCategoryIcon(null), '');
 		assert.equal(helpers.buildCategoryLabel(null), '');
 		assert.equal(helpers.generateCategoryBackground(null), '');
 		done();
 	});
 
-	it('should generate category background', (done) => {
+	it('should generate category background', done => {
 		const category = {
 			bgColor: '#ff0000',
 			color: '#00ff00',
@@ -176,7 +176,7 @@ describe('helpers', () => {
 		done();
 	});
 
-	it('should return empty string if category has no children', (done) => {
+	it('should return empty string if category has no children', done => {
 		const category = {
 			children: [],
 		};
@@ -185,7 +185,7 @@ describe('helpers', () => {
 		done();
 	});
 
-	it('should generate html for children', (done) => {
+	it('should generate html for children', done => {
 		const category = {
 			children: [
 				{
@@ -204,7 +204,7 @@ describe('helpers', () => {
 		done();
 	});
 
-	it('should generate topic class', (done) => {
+	it('should generate topic class', done => {
 		const className = helpers.generateTopicClass({
 			locked: true,
 			pinned: true,
@@ -215,7 +215,7 @@ describe('helpers', () => {
 		done();
 	});
 
-	it('should show leave button if isMember and group is not administrators', (done) => {
+	it('should show leave button if isMember and group is not administrators', done => {
 		const btn = helpers.membershipBtn({
 			displayName: 'some group',
 			name: 'some group',
@@ -228,7 +228,7 @@ describe('helpers', () => {
 		done();
 	});
 
-	it('should show pending button if isPending and group is not administrators', (done) => {
+	it('should show pending button if isPending and group is not administrators', done => {
 		const btn = helpers.membershipBtn({
 			displayName: 'some group',
 			name: 'some group',
@@ -241,7 +241,7 @@ describe('helpers', () => {
 		done();
 	});
 
-	it('should show reject invite button if isInvited', (done) => {
+	it('should show reject invite button if isInvited', done => {
 		const btn = helpers.membershipBtn({
 			displayName: 'some group',
 			name: 'some group',
@@ -254,7 +254,7 @@ describe('helpers', () => {
 		done();
 	});
 
-	it('should show join button if join requests are not disabled and group is not administrators', (done) => {
+	it('should show join button if join requests are not disabled and group is not administrators', done => {
 		const btn = helpers.membershipBtn({
 			displayName: 'some group',
 			name: 'some group',
@@ -267,7 +267,7 @@ describe('helpers', () => {
 		done();
 	});
 
-	it('should show nothing if group is administrators ', (done) => {
+	it('should show nothing if group is administrators ', done => {
 		const btn = helpers.membershipBtn({
 			displayName: 'administrators',
 			name: 'administrators',
@@ -276,7 +276,7 @@ describe('helpers', () => {
 		done();
 	});
 
-	it('should spawn privilege states', (done) => {
+	it('should spawn privilege states', done => {
 		const privs = {
 			find: true,
 			read: true,
@@ -305,7 +305,7 @@ describe('helpers', () => {
 		done();
 	});
 
-	it('should render thumb as topic image', (done) => {
+	it('should render thumb as topic image', done => {
 		const topicObj = {
 			thumb: '/uploads/1.png',
 			user: { username: 'baris', displayname: 'Baris Soner Usakli' },
@@ -318,7 +318,7 @@ describe('helpers', () => {
 		done();
 	});
 
-	it('should render user picture as topic image', (done) => {
+	it('should render user picture as topic image', done => {
 		const topicObj = {
 			thumb: '',
 			user: {
@@ -336,7 +336,7 @@ describe('helpers', () => {
 		done();
 	});
 
-	it('should render digest avatar', (done) => {
+	it('should render digest avatar', done => {
 		const block = {
 			teaser: { user: { username: 'baris', picture: '/uploads/1.png' } },
 		};
@@ -348,7 +348,7 @@ describe('helpers', () => {
 		done();
 	});
 
-	it('should render digest avatar', (done) => {
+	it('should render digest avatar', done => {
 		const block = {
 			teaser: {
 				user: { username: 'baris', 'icon:text': 'B', 'icon:bgColor': '#ff000' },
@@ -362,7 +362,7 @@ describe('helpers', () => {
 		done();
 	});
 
-	it('should render digest avatar', (done) => {
+	it('should render digest avatar', done => {
 		const block = { user: { username: 'baris', picture: '/uploads/1.png' } };
 		const html = helpers.renderDigestAvatar(block);
 		assert.equal(
@@ -372,7 +372,7 @@ describe('helpers', () => {
 		done();
 	});
 
-	it('should render digest avatar', (done) => {
+	it('should render digest avatar', done => {
 		const block = {
 			user: { username: 'baris', 'icon:text': 'B', 'icon:bgColor': '#ff000' },
 		};
@@ -384,7 +384,7 @@ describe('helpers', () => {
 		done();
 	});
 
-	it('shoud render user agent/browser icons', (done) => {
+	it('shoud render user agent/browser icons', done => {
 		const html = helpers.userAgentIcons({
 			platform: 'Linux',
 			browser: 'Chrome',
@@ -396,7 +396,7 @@ describe('helpers', () => {
 		done();
 	});
 
-	it('shoud render user agent/browser icons', (done) => {
+	it('shoud render user agent/browser icons', done => {
 		const html = helpers.userAgentIcons({
 			platform: 'Microsoft Windows',
 			browser: 'Firefox',
@@ -408,7 +408,7 @@ describe('helpers', () => {
 		done();
 	});
 
-	it('shoud render user agent/browser icons', (done) => {
+	it('shoud render user agent/browser icons', done => {
 		const html = helpers.userAgentIcons({
 			platform: 'Apple Mac',
 			browser: 'Safari',
@@ -420,7 +420,7 @@ describe('helpers', () => {
 		done();
 	});
 
-	it('shoud render user agent/browser icons', (done) => {
+	it('shoud render user agent/browser icons', done => {
 		const html = helpers.userAgentIcons({ platform: 'Android', browser: 'IE' });
 		assert.equal(
 			html,
@@ -429,7 +429,7 @@ describe('helpers', () => {
 		done();
 	});
 
-	it('shoud render user agent/browser icons', (done) => {
+	it('shoud render user agent/browser icons', done => {
 		const html = helpers.userAgentIcons({ platform: 'iPad', browser: 'Edge' });
 		assert.equal(
 			html,
@@ -438,7 +438,7 @@ describe('helpers', () => {
 		done();
 	});
 
-	it('shoud render user agent/browser icons', (done) => {
+	it('shoud render user agent/browser icons', done => {
 		const html = helpers.userAgentIcons({
 			platform: 'iPhone',
 			browser: 'unknow',
@@ -450,7 +450,7 @@ describe('helpers', () => {
 		done();
 	});
 
-	it('shoud render user agent/browser icons', (done) => {
+	it('shoud render user agent/browser icons', done => {
 		const html = helpers.userAgentIcons({
 			platform: 'unknow',
 			browser: 'unknown',
@@ -462,7 +462,7 @@ describe('helpers', () => {
 		done();
 	});
 
-	it('should generate replied to or wrote based on toPid', (done) => {
+	it('should generate replied to or wrote based on toPid', done => {
 		const now = Date.now();
 		const iso = new Date().toISOString();
 		let post = {
@@ -512,7 +512,7 @@ describe('helpers', () => {
 		done();
 	});
 
-	it('should generate placeholder wave', (done) => {
+	it('should generate placeholder wave', done => {
 		const items = [2, 'divider', 3];
 		const str = helpers.generatePlaceholderWave(items);
 		assert(str.includes('dropdown-divider'));

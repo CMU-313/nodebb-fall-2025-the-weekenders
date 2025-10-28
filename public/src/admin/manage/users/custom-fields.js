@@ -97,7 +97,7 @@ define('admin/manage/user/custom-fields', [
 							{
 								fields: [formData],
 							},
-							(html) => {
+							html => {
 								if (field) {
 									const oldKey = field.key;
 									$(`tbody [data-key="${oldKey}"]`).replaceWith(html);

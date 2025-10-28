@@ -14,7 +14,7 @@ module.exports = function (module) {
 		if (!Object.keys(data).length) {
 			return;
 		}
-		await module.transaction(async (client) => {
+		await module.transaction(async client => {
 			const dataString = JSON.stringify(data);
 
 			if (Array.isArray(key)) {
@@ -56,20 +56,20 @@ module.exports = function (module) {
 			// conver old format to new format for backwards compatibility
 			data = args[0].map((key, i) => [key, args[1][i]]);
 		}
-		await module.transaction(async (client) => {
-			data = data.filter((item) => {
+		await module.transaction(async client => {
+			data = data.filter(item => {
 				if (item[1].hasOwnProperty('')) {
 					delete item[1][''];
 				}
 				return !!Object.keys(item[1]).length;
 			});
-			const keys = data.map((item) => item[0]);
+			const keys = data.map(item => item[0]);
 			if (!keys.length) {
 				return;
 			}
 
 			await helpers.ensureLegacyObjectsType(client, keys, 'hash');
-			const dataStrings = data.map((item) => JSON.stringify(item[1]));
+			const dataStrings = data.map(item => JSON.stringify(item[1]));
 			await client.query({
 				name: 'setObjectBulk',
 				text: `
@@ -88,7 +88,7 @@ module.exports = function (module) {
 			return;
 		}
 
-		await module.transaction(async (client) => {
+		await module.transaction(async client => {
 			const valueString = JSON.stringify(value);
 			if (Array.isArray(key)) {
 				await module.setObject(key, { [field]: value });
@@ -151,7 +151,7 @@ SELECT h."data"
 			values: [keys],
 		});
 
-		return res.rows.map((row) => row.data);
+		return res.rows.map(row => row.data);
 	};
 
 	module.getObjectField = async function (key, field) {
@@ -202,7 +202,7 @@ SELECT (SELECT jsonb_object_agg(f, d."value")
 		}
 
 		const obj = {};
-		fields.forEach((f) => {
+		fields.forEach(f => {
 			obj[f] = null;
 		});
 
@@ -234,7 +234,7 @@ SELECT (SELECT jsonb_object_agg(f, d."value")
 			values: [keys, fields],
 		});
 
-		return res.rows.map((row) => row.d);
+		return res.rows.map(row => row.d);
 	};
 
 	module.getObjectKeys = async function (key) {
@@ -294,7 +294,7 @@ SELECT (h."data" ? $2::TEXT AND h."data"->>$2::TEXT IS NOT NULL) b
 			return fields.map(() => false);
 		}
 		return fields.map(
-			(field) => data.hasOwnProperty(field) && data[field] !== null
+			field => data.hasOwnProperty(field) && data[field] !== null
 		);
 	};
 
@@ -355,7 +355,7 @@ SELECT (h."data" ? $2::TEXT AND h."data"->>$2::TEXT IS NOT NULL) b
 			return null;
 		}
 
-		return await module.transaction(async (client) => {
+		return await module.transaction(async client => {
 			if (Array.isArray(key)) {
 				await helpers.ensureLegacyObjectsType(client, key, 'hash');
 			} else {
@@ -386,7 +386,7 @@ RETURNING ("data"->>$2::TEXT)::NUMERIC v`,
 						}
 			);
 			return Array.isArray(key)
-				? res.rows.map((r) => parseFloat(r.v))
+				? res.rows.map(r => parseFloat(r.v))
 				: parseFloat(res.rows[0].v);
 		});
 	};
@@ -396,15 +396,15 @@ RETURNING ("data"->>$2::TEXT)::NUMERIC v`,
 			return;
 		}
 
-		await module.transaction(async (client) => {
+		await module.transaction(async client => {
 			await helpers.ensureLegacyObjectsType(
 				client,
-				data.map((item) => item[0]),
+				data.map(item => item[0]),
 				'hash'
 			);
 
-			const keys = data.map((item) => item[0]);
-			const dataStrings = data.map((item) => JSON.stringify(item[1]));
+			const keys = data.map(item => item[0]);
+			const dataStrings = data.map(item => JSON.stringify(item[1]));
 
 			await client.query({
 				name: 'incrObjectFieldByBulk',

@@ -83,7 +83,7 @@ module.exports = function (Categories) {
 		} else {
 			normalTids = await db.getSortedSetRevRange(set, start, stop);
 		}
-		normalTids = normalTids.filter((tid) => !pinnedTids.includes(tid));
+		normalTids = normalTids.filter(tid => !pinnedTids.includes(tid));
 		return pinnedTidsOnPage.concat(normalTids);
 	};
 
@@ -129,7 +129,7 @@ module.exports = function (Categories) {
 
 		if (data.tag) {
 			if (Array.isArray(data.tag)) {
-				data.tag.forEach((tag) => {
+				data.tag.forEach(tag => {
 					set.add(`tag:${tag}:topics`);
 				});
 			} else {
@@ -217,7 +217,7 @@ module.exports = function (Categories) {
 			return;
 		}
 
-		topics.forEach((topic) => {
+		topics.forEach(topic => {
 			// ...existing code...
 			// Coerce isOwner to boolean to avoid edge cases where it's a string/number
 			const isOwner = !!topic.isOwner;
@@ -255,9 +255,9 @@ module.exports = function (Categories) {
 		await Categories.updateRecentTidForCid(cid);
 	};
 
-	Categories.onTopicsMoved = async (cids) => {
+	Categories.onTopicsMoved = async cids => {
 		await Promise.all(
-			cids.map(async (cid) => {
+			cids.map(async cid => {
 				await Promise.all([
 					Categories.setCategoryField(
 						cid,
@@ -288,7 +288,7 @@ module.exports = function (Categories) {
 		const followers = [];
 		await batch.processSortedSet(
 			`cid:${cid}:uid:watch:state`,
-			async (uids) => {
+			async uids => {
 				followers.push(
 					...(await privileges.categories.filterUids('topics:read', cid, uids))
 				);

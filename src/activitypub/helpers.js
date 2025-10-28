@@ -24,7 +24,7 @@ const webfingerCache = ttl({
 	max: 5000,
 	ttl: 1000 * 60 * 60 * 24, // 24 hours
 });
-const sha256 = (payload) =>
+const sha256 = payload =>
 	crypto.createHash('sha256').update(payload).digest('hex');
 
 const Helpers = module.exports;
@@ -41,7 +41,7 @@ Helpers._test = (method, args) => {
 // Helpers._test(activitypub.notes.assert, [1, `https://`]);
 // });
 let _lastLog;
-Helpers.log = (message) => {
+Helpers.log = message => {
 	if (!message) {
 		return _lastLog;
 	}
@@ -52,7 +52,7 @@ Helpers.log = (message) => {
 	}
 };
 
-Helpers.isUri = (value) => {
+Helpers.isUri = value => {
 	if (typeof value !== 'string') {
 		value = String(value);
 	}
@@ -66,14 +66,14 @@ Helpers.isUri = (value) => {
 	});
 };
 
-Helpers.assertAccept = (accept) =>
+Helpers.assertAccept = accept =>
 	accept &&
-	accept.split(',').some((value) => {
-		const parts = value.split(';').map((v) => v.trim());
+	accept.split(',').some(value => {
+		const parts = value.split(';').map(v => v.trim());
 		return activitypub._constants.acceptableTypes.includes(value || parts[0]);
 	});
 
-Helpers.isWebfinger = (value) => {
+Helpers.isWebfinger = value => {
 	// N.B. returns normalized handle, so truthy check!
 	if (webfingerRegex.test(value) && !Helpers.isUri(value)) {
 		if (value.startsWith('@')) {
@@ -88,7 +88,7 @@ Helpers.isWebfinger = (value) => {
 	return false;
 };
 
-Helpers.query = async (id) => {
+Helpers.query = async id => {
 	const isUri = Helpers.isUri(id);
 	// username@host ids use acct: URI schema
 	const uri = isUri ? new URL(id) : new URL(`acct:${id}`);
@@ -131,7 +131,7 @@ Helpers.query = async (id) => {
 
 	// Parse links to find actor endpoint
 	let actorUri = body.links.filter(
-		(link) =>
+		link =>
 			activitypub._constants.acceptableTypes.includes(link.type) &&
 			link.rel === 'self'
 	);
@@ -172,7 +172,7 @@ Helpers.generateKeys = async (type, id) => {
 	return { publicKey, privateKey };
 };
 
-Helpers.resolveLocalId = async (input) => {
+Helpers.resolveLocalId = async input => {
 	if (Helpers.isUri(input)) {
 		const { host, pathname, hash } = new URL(input);
 
@@ -272,7 +272,7 @@ Helpers.resolveActivity = async (activity, data, id, resolved) => {
 	}
 };
 
-Helpers.mapToLocalType = (type) => {
+Helpers.mapToLocalType = type => {
 	if (type === 'Person') {
 		return 'user';
 	}
@@ -287,12 +287,12 @@ Helpers.mapToLocalType = (type) => {
 	}
 };
 
-Helpers.resolveObjects = async (ids) => {
+Helpers.resolveObjects = async ids => {
 	if (!Array.isArray(ids)) {
 		ids = [ids];
 	}
 	const objects = await Promise.all(
-		ids.map(async (id) => {
+		ids.map(async id => {
 			// try to get a local ID first
 			const {
 				type,
@@ -366,7 +366,7 @@ Helpers.resolveObjects = async (ids) => {
 
 const titleishTags = ['h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'title', 'p', 'span'];
 const titleRegex = new RegExp(`<(${titleishTags.join('|')})>(.+?)</\\1>`, 'm');
-Helpers.generateTitle = (html) => {
+Helpers.generateTitle = html => {
 	// Given an html string, generates a more appropriate title if possible
 	let title;
 
@@ -441,9 +441,9 @@ Helpers.remoteAnchorToLocalProfile = async (content, isMarkdown = false) => {
 	const urlsArray = Array.from(urls);
 
 	// Local references
-	const localUrls = urlsArray.filter((url) => url.startsWith(nconf.get('url')));
+	const localUrls = urlsArray.filter(url => url.startsWith(nconf.get('url')));
 	await Promise.all(
-		localUrls.map(async (url) => {
+		localUrls.map(async url => {
 			const { type, id } = await Helpers.resolveLocalId(url);
 			if (type === 'user') {
 				urlMap.set(url, id);
@@ -555,13 +555,13 @@ Helpers.generateCollection = async ({
 	return object;
 };
 
-Helpers.generateDigest = (set) => {
+Helpers.generateDigest = set => {
 	if (!(set instanceof Set)) {
 		throw new Error('[[error:invalid-data]]');
 	}
 
 	return Array.from(set)
-		.map((item) => sha256(item))
+		.map(item => sha256(item))
 		.reduce((memo, cur) => {
 			const a = Buffer.from(memo, 'hex');
 			const b = Buffer.from(cur, 'hex');

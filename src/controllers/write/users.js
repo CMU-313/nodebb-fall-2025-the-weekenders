@@ -270,7 +270,7 @@ Users.getExportByType = async (req, res, next) => {
 				'Content-Disposition': `attachment; filename=${data.filename}`,
 			},
 		},
-		(err) => {
+		err => {
 			if (err) {
 				throw err;
 			}

@@ -13,10 +13,10 @@ module.exports = {
 			}
 			let currentChatRoomId = 1;
 			async.whilst(
-				(next) => {
+				next => {
 					next(null, currentChatRoomId <= nextChatRoomId);
 				},
-				(next) => {
+				next => {
 					db.getSortedSetRange(
 						`chat:room:${currentChatRoomId}:uids`,
 						0,
@@ -33,7 +33,7 @@ module.exports = {
 							db.setObject(
 								`chat:room:${currentChatRoomId}`,
 								{ owner: uids[0], roomId: currentChatRoomId },
-								(err) => {
+								err => {
 									if (err) {
 										return next(err);
 									}

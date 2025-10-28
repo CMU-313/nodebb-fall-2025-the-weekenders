@@ -12,9 +12,9 @@ module.exports = {
 
 		await batch.processSortedSet(
 			'flags:datetime',
-			async (flagIds) => {
+			async flagIds => {
 				progress.incr(flagIds.length);
-				const flagData = await db.getObjects(flagIds.map((id) => `flag:${id}`));
+				const flagData = await db.getObjects(flagIds.map(id => `flag:${id}`));
 				for (const flagObj of flagData) {
 					/* eslint-disable no-await-in-loop */
 					if (flagObj) {

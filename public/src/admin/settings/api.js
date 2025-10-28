@@ -33,7 +33,7 @@ define('admin/settings/api', [
 			return;
 		}
 
-		formEl.addEventListener('click', (e) => {
+		formEl.addEventListener('click', e => {
 			const subselector = e.target.closest('[data-action]');
 			if (subselector) {
 				const action = subselector.getAttribute('data-action');
@@ -166,7 +166,7 @@ define('admin/settings/api', [
 		const rowEl = el.closest('[data-token]');
 		const token = rowEl.getAttribute('data-token');
 
-		bootbox.confirm('[[admin/settings/api:delete-confirm]]', async (ok) => {
+		bootbox.confirm('[[admin/settings/api:delete-confirm]]', async ok => {
 			if (ok) {
 				try {
 					await api.del(`/admin/tokens/${token}`);
@@ -183,7 +183,7 @@ define('admin/settings/api', [
 		const rowEl = el.closest('[data-token]');
 		const token = rowEl.getAttribute('data-token');
 
-		bootbox.confirm('[[admin/settings/api:roll-confirm]]', async (ok) => {
+		bootbox.confirm('[[admin/settings/api:roll-confirm]]', async ok => {
 			if (ok) {
 				try {
 					const tokenObj = await api.post(`/admin/tokens/${token}/roll`);

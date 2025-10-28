@@ -494,7 +494,7 @@ define('forum/topic/postTools', [
 	}
 
 	function getUserSlug(button) {
-		return new Promise((resolve) => {
+		return new Promise(resolve => {
 			let slug = '';
 			if (button.attr('component') === 'topic/reply') {
 				resolve(slug);

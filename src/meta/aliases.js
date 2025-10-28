@@ -35,7 +35,7 @@ exports.aliases = aliases;
 function buildTargets() {
 	let length = 0;
 	const output = Object.keys(aliases)
-		.map((name) => {
+		.map(name => {
 			const arr = aliases[name];
 			if (name.length > length) {
 				length = name.length;
@@ -44,7 +44,7 @@ function buildTargets() {
 			return [name, arr.join(', ')];
 		})
 		.map(
-			(tuple) =>
+			tuple =>
 				`     ${chalk.magenta(_.padEnd(`"${tuple[0]}"`, length + 2))}  |  ${tuple[1]}`
 		)
 		.join('\n');

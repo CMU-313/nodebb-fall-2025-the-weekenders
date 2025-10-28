@@ -17,7 +17,7 @@ module.exports = function (Groups) {
 			groupNames = Groups.ephemeralGroups.concat(groupNames);
 		}
 		groupNames = groupNames.filter(
-			(name) =>
+			name =>
 				name.toLowerCase().includes(query) &&
 				name !== Groups.BANNED_USERS && // hide banned-users in searches
 				!excludeGroups.includes(name)
@@ -32,7 +32,7 @@ module.exports = function (Groups) {
 		}
 		groupsData = groupsData.filter(Boolean);
 		if (options.filterHidden) {
-			groupsData = groupsData.filter((group) => !group.hidden);
+			groupsData = groupsData.filter(group => !group.hidden);
 		}
 		return Groups.sort(options.sort, groupsData);
 	};
@@ -76,7 +76,7 @@ module.exports = function (Groups) {
 			hardCap: -1,
 		});
 
-		const uids = results.users.map((user) => user && user.uid);
+		const uids = results.users.map(user => user && user.uid);
 		const isOwners = await Groups.ownership.isOwners(uids, data.groupName);
 
 		results.users.forEach((user, index) => {

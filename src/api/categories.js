@@ -20,7 +20,7 @@ const hasAdminPrivilege = async (uid, privilege = 'categories') => {
 	}
 };
 
-categoriesAPI.list = async (caller) => {
+categoriesAPI.list = async caller => {
 	async function getCategories() {
 		const cids = await categories.getCidsByPrivilege(
 			'categories:cid',
@@ -37,7 +37,7 @@ categoriesAPI.list = async (caller) => {
 
 	return {
 		categories: categoriesData.filter(
-			(category) => category && (!category.disabled || isAdmin)
+			category => category && (!category.disabled || isAdmin)
 		),
 	};
 };
@@ -173,7 +173,7 @@ categoriesAPI.getTopics = async (caller, data) => {
 categoriesAPI.setWatchState = async (caller, { cid, state, uid }) => {
 	let targetUid = caller.uid;
 	let cids = Array.isArray(cid) ? cid : [cid];
-	cids = cids.map((cid) => (utils.isNumber(cid) ? parseInt(cid, 10) : cid));
+	cids = cids.map(cid => (utils.isNumber(cid) ? parseInt(cid, 10) : cid));
 
 	if (uid) {
 		targetUid = uid;
@@ -189,7 +189,7 @@ categoriesAPI.setWatchState = async (caller, { cid, state, uid }) => {
 	let cat;
 	do {
 		cat = categoryData.find(
-			(c) => !cids.includes(c.cid) && cids.includes(c.parentCid)
+			c => !cids.includes(c.cid) && cids.includes(c.parentCid)
 		);
 		if (cat) {
 			cids.push(cat.cid);
@@ -238,20 +238,18 @@ categoriesAPI.setPrivilege = async (caller, data) => {
 	}
 	if (parseInt(data.cid, 10) === 0) {
 		const adminPrivList = await privileges.admin.getPrivilegeList();
-		const adminPrivs = privs.filter((priv) => adminPrivList.includes(priv));
+		const adminPrivs = privs.filter(priv => adminPrivList.includes(priv));
 		if (adminPrivs.length) {
 			await privileges.admin[type](adminPrivs, data.member);
 		}
 		const globalPrivList = await privileges.global.getPrivilegeList();
-		const globalPrivs = privs.filter((priv) => globalPrivList.includes(priv));
+		const globalPrivs = privs.filter(priv => globalPrivList.includes(priv));
 		if (globalPrivs.length) {
 			await privileges.global[type](globalPrivs, data.member);
 		}
 	} else {
 		const categoryPrivList = await privileges.categories.getPrivilegeList();
-		const categoryPrivs = privs.filter((priv) =>
-			categoryPrivList.includes(priv)
-		);
+		const categoryPrivs = privs.filter(priv => categoryPrivList.includes(priv));
 		await privileges.categories[type](categoryPrivs, data.cid, data.member);
 	}
 

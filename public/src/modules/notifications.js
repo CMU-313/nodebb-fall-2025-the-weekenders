@@ -13,7 +13,7 @@ define('notifications', [
 	let unreadNotifs = {};
 
 	const _addTimeagoString = ({ notifications: notifs }) =>
-		new Promise((resolve) => {
+		new Promise(resolve => {
 			for (let i = 0; i < notifs.length; i += 1) {
 				notifs[i].timeagoLong = $.timeago(
 					new Date(parseInt(notifs[i].datetime, 10))

@@ -237,7 +237,7 @@ define('admin/manage/categories', [
 	Categories.toggle = function (cids, disabled) {
 		const listEl = document.querySelector('.categories [data-cid="0"]');
 		Promise.all(
-			cids.map((cid) =>
+			cids.map(cid =>
 				api
 					.put('/categories/' + cid, {
 						disabled: disabled ? 1 : 0,

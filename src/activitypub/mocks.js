@@ -44,7 +44,7 @@ const sanitizeConfig = {
 	},
 };
 
-Mocks._normalize = async (object) => {
+Mocks._normalize = async object => {
 	// Normalized incoming AP objects into expected types for easier mocking
 	let {
 		type,
@@ -195,10 +195,10 @@ Mocks._normalize = async (object) => {
 	};
 };
 
-Mocks.profile = async (actors) => {
+Mocks.profile = async actors => {
 	// Should only ever be called by activitypub.actors.assert
 	const profiles = await Promise.all(
-		actors.map(async (actor) => {
+		actors.map(async actor => {
 			if (!actor) {
 				return null;
 			}
@@ -244,14 +244,14 @@ Mocks.profile = async (actors) => {
 			if (tag && Array.isArray(tag)) {
 				tag
 					.filter(
-						(tag) =>
+						tag =>
 							tag.type === 'Emoji' &&
 							isEmojiShortcode.test(tag.name) &&
 							tag.icon &&
 							tag.icon.mediaType &&
 							tag.icon.mediaType.startsWith('image/')
 					)
-					.forEach((tag) => {
+					.forEach(tag => {
 						summary = summary.replace(
 							new RegExp(tag.name, 'g'),
 							`<img class="not-responsive emoji" src="${tag.icon.url}" title="${tag.name}" />`
@@ -265,7 +265,7 @@ Mocks.profile = async (actors) => {
 				Array.isArray(actor.attachment) &&
 				actor.attachment.length
 					? actor.attachment
-							.filter((attachment) =>
+							.filter(attachment =>
 								activitypub._constants.acceptable.customFields.has(
 									attachment.type
 								)
@@ -331,9 +331,9 @@ Mocks.profile = async (actors) => {
 	return profiles;
 };
 
-Mocks.category = async (actors) => {
+Mocks.category = async actors => {
 	const categories = await Promise.all(
-		actors.map(async (actor) => {
+		actors.map(async actor => {
 			if (!actor) {
 				return null;
 			}
@@ -385,14 +385,14 @@ Mocks.category = async (actors) => {
 			if (tag && Array.isArray(tag)) {
 				tag
 					.filter(
-						(tag) =>
+						tag =>
 							tag.type === 'Emoji' &&
 							isEmojiShortcode.test(tag.name) &&
 							tag.icon &&
 							tag.icon.mediaType &&
 							tag.icon.mediaType.startsWith('image/')
 					)
-					.forEach((tag) => {
+					.forEach(tag => {
 						summary = summary.replace(
 							new RegExp(tag.name, 'g'),
 							`<img class="not-responsive emoji" src="${tag.icon.url}" title="${tag.name}" />`
@@ -429,7 +429,7 @@ Mocks.category = async (actors) => {
 	return categories;
 };
 
-Mocks.post = async (objects) => {
+Mocks.post = async objects => {
 	let single = false;
 	if (!Array.isArray(objects)) {
 		single = true;
@@ -437,7 +437,7 @@ Mocks.post = async (objects) => {
 	}
 
 	const posts = await Promise.all(
-		objects.map(async (object) => {
+		objects.map(async object => {
 			object = await Mocks._normalize(object);
 
 			if (
@@ -499,7 +499,7 @@ Mocks.post = async (objects) => {
 	return single ? posts.pop() : posts;
 };
 
-Mocks.message = async (object) => {
+Mocks.message = async object => {
 	object = await Mocks._normalize(object);
 
 	const message = {
@@ -514,7 +514,7 @@ Mocks.message = async (object) => {
 
 Mocks.actors = {};
 
-Mocks.actors.user = async (uid) => {
+Mocks.actors.user = async uid => {
 	const userData = await user.getUserData(uid);
 	let {
 		username,
@@ -557,7 +557,7 @@ Mocks.actors.user = async (uid) => {
 	const attachment = [];
 	// Translate field names and values
 	fields = await Promise.all(
-		fields.map(async (field) => {
+		fields.map(async field => {
 			const [name, value] = await Promise.all([
 				translator.translate(field.name),
 				translator.translate(field.value),
@@ -624,7 +624,7 @@ Mocks.actors.user = async (uid) => {
 	};
 };
 
-Mocks.actors.category = async (cid) => {
+Mocks.actors.category = async cid => {
 	let {
 		name,
 		handle: preferredUsername,
@@ -700,7 +700,7 @@ Mocks.actors.category = async (cid) => {
 
 Mocks.notes = {};
 
-Mocks.notes.public = async (post) => {
+Mocks.notes.public = async post => {
 	const id = `${nconf.get('url')}/post/${post.pid}`;
 
 	// Return a tombstone for a deleted post
@@ -757,7 +757,7 @@ Mocks.notes.public = async (post) => {
 		followersUrl = await user.getUserField(post.topic.uid, 'followersUrl');
 	} else {
 		// new topic
-		tag = post.topic.tags.map((tag) => ({
+		tag = post.topic.tags.map(tag => ({
 			type: 'Hashtag',
 			href: `${nconf.get('url')}/tags/${tag.valueEncoded}`,
 			name: `#${tag.value}`,
@@ -823,12 +823,12 @@ Mocks.notes.public = async (post) => {
 
 					return ids;
 				}, [])
-				.forEach((id) => cc.add(id));
+				.forEach(id => cc.add(id));
 		}
 	}
 
 	let attachment = (await posts.attachments.get(post.pid)) || [];
-	const normalizeAttachment = (attachment) =>
+	const normalizeAttachment = attachment =>
 		attachment.map(({ mediaType, url, width, height }) => {
 			let type;
 
@@ -859,7 +859,7 @@ Mocks.notes.public = async (post) => {
 	const uploads = await posts.uploads.listWithSizes(post.pid);
 	const isThumb = await db.isSortedSetMembers(
 		`topic:${post.tid}:thumbs`,
-		uploads.map((u) => u.name)
+		uploads.map(u => u.name)
 	);
 	uploads.forEach(({ name, width, height }, idx) => {
 		const mediaType = mime.getType(name);
@@ -910,7 +910,7 @@ Mocks.notes.public = async (post) => {
 		: post.category.cid;
 	if (inReplyTo) {
 		const chain = await activitypub.notes.getParentChain(post.uid, inReplyTo);
-		chain.forEach((post) => {
+		chain.forEach(post => {
 			audience = post.audience || audience;
 		});
 	}
@@ -961,9 +961,9 @@ Mocks.notes.private = async ({ messageObj }) => {
 	}
 
 	let uids = await messaging.getUidsInRoom(messageObj.roomId, 0, -1);
-	uids = uids.filter((uid) => String(uid) !== String(messageObj.fromuid)); // no author
+	uids = uids.filter(uid => String(uid) !== String(messageObj.fromuid)); // no author
 	const to = new Set(
-		uids.map((uid) =>
+		uids.map(uid =>
 			utils.isNumber(uid) ? `${nconf.get('url')}/uid/${uid}` : uid
 		)
 	);
@@ -1013,7 +1013,7 @@ Mocks.notes.private = async ({ messageObj }) => {
 				-1
 			);
 			let isSystem = await messaging.getMessagesFields(mids, ['system']);
-			isSystem = isSystem.map((o) => o.system);
+			isSystem = isSystem.map(o => o.system);
 			inReplyTo = mids.reduce(
 				(memo, mid, idx) => memo || (!isSystem[idx] ? mid : undefined),
 				undefined
@@ -1091,7 +1091,7 @@ Mocks.activities.create = async (pid, uid, post) => {
 	return { activity, targets };
 };
 
-Mocks.tombstone = async (properties) => ({
+Mocks.tombstone = async properties => ({
 	'@context': 'https://www.w3.org/ns/activitystreams',
 	type: 'Tombstone',
 	...properties,

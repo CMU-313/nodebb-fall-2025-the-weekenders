@@ -26,7 +26,7 @@ module.exports = function (Topics) {
 		const teaserPids = [];
 		const tidToPost = {};
 
-		topics.forEach((topic) => {
+		topics.forEach(topic => {
 			counts.push(topic && topic.postcount);
 			if (topic) {
 				if (topic.teaserPid === 'null') {
@@ -56,10 +56,10 @@ module.exports = function (Topics) {
 			user.getSettings(uid),
 			uid ? user.isPrivileged(uid) : false,
 		]);
-		let postData = allPostData.filter((post) => post && post.pid);
+		let postData = allPostData.filter(post => post && post.pid);
 		postData = await handleBlocks(uid, postData);
 		postData = postData.filter(Boolean);
-		const uids = _.uniq(postData.map((post) => post.uid));
+		const uids = _.uniq(postData.map(post => post.uid));
 		const sortNewToOld = callerSettings.topicPostSort === 'newest_to_oldest';
 		const usersData = await user.getUsersFields(uids, [
 			'uid',
@@ -71,10 +71,10 @@ module.exports = function (Topics) {
 		]);
 
 		const users = {};
-		usersData.forEach((user) => {
+		usersData.forEach(user => {
 			users[user.uid] = user;
 		});
-		postData.forEach((post) => {
+		postData.forEach(post => {
 			// If the post author isn't represented in the retrieved users' data,
 			// then it means they were deleted, assume guest.
 			if (!users.hasOwnProperty(post.uid)) {
@@ -89,7 +89,7 @@ module.exports = function (Topics) {
 			post.timestampISO = utils.toISOString(post.timestamp);
 			tidToPost[post.tid] = post;
 		});
-		await Promise.all(postData.map((p) => posts.parsePost(p, 'plaintext')));
+		await Promise.all(postData.map(p => posts.parsePost(p, 'plaintext')));
 
 		const teasers = topics.map((topic, index) => {
 			if (!topic) {
@@ -130,7 +130,7 @@ module.exports = function (Topics) {
 		}
 
 		return await Promise.all(
-			teasers.map(async (postData) => {
+			teasers.map(async postData => {
 				if (blockedUids.includes(parseInt(postData.uid, 10))) {
 					return await getPreviousNonBlockedPost(postData, blockedUids);
 				}

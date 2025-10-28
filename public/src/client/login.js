@@ -109,7 +109,7 @@ define('forum/login', ['hooks', 'translator', 'jquery-form'], function (
 	};
 
 	Login.capsLockCheck = (inputEl, warningEl) => {
-		const toggle = (state) => {
+		const toggle = state => {
 			warningEl.classList[state ? 'remove' : 'add']('hidden');
 			warningEl.parentNode.classList[state ? 'add' : 'remove']('has-warning');
 		};

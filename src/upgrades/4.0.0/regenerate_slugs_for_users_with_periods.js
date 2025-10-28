@@ -13,7 +13,7 @@ module.exports = {
 
 		await batch.processSortedSet(
 			'users:joindate',
-			async (uids) => {
+			async uids => {
 				const data = await user.getUsersFields(uids, ['username', 'userslug']);
 				await Promise.all(
 					data.map(async ({ uid, username, userslug }) => {

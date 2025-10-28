@@ -22,7 +22,7 @@ searchApi.categories = async (caller, data) => {
 	const privilege = data.privilege || 'topics:read';
 	data.states = (
 		data.states || ['watching', 'tracking', 'notwatching', 'ignoring']
-	).map((state) => categories.watchStates[state]);
+	).map(state => categories.watchStates[state]);
 	data.parentCid = parseInt(data.parentCid || 0, 10);
 
 	if (data.search) {
@@ -44,7 +44,7 @@ searchApi.categories = async (caller, data) => {
 	});
 
 	if (Array.isArray(data.selectedCids)) {
-		data.selectedCids = data.selectedCids.map((cid) => parseInt(cid, 10));
+		data.selectedCids = data.selectedCids.map(cid => parseInt(cid, 10));
 	}
 
 	let categoriesData = categories.buildForSelectCategories(
@@ -54,7 +54,7 @@ searchApi.categories = async (caller, data) => {
 	);
 	categoriesData = categoriesData.slice(0, 200);
 
-	categoriesData.forEach((category) => {
+	categoriesData.forEach(category => {
 		category.selected = data.selectedCids
 			? data.selectedCids.includes(category.cid)
 			: false;
@@ -79,10 +79,10 @@ async function findMatchedCids(uid, data) {
 		paginate: false,
 	});
 
-	let matchedCids = result.categories.map((c) => c.cid);
+	let matchedCids = result.categories.map(c => c.cid);
 	// no need to filter if all 3 states are used
 	const filterByWatchState = !Object.values(categories.watchStates).every(
-		(state) => data.states.includes(state)
+		state => data.states.includes(state)
 	);
 
 	if (filterByWatchState) {
@@ -113,7 +113,7 @@ async function loadCids(uid, parentCid) {
 		]);
 		const cidToData = _.zipObject(cids, categoryData);
 		await Promise.all(
-			cids.map(async (cid) => {
+			cids.map(async cid => {
 				const allChildCids = await categories.getAllCidsFromSet(
 					`cid:${cid}:children`
 				);
@@ -165,15 +165,15 @@ searchApi.roomUsers = async (caller, { query, roomId }) => {
 	});
 
 	const { users } = results;
-	const foundUids = users.map((user) => user && user.uid);
+	const foundUids = users.map(user => user && user.uid);
 	const isUidInRoom = _.zipObject(
 		foundUids,
 		await messaging.isUsersInRoom(foundUids, roomId)
 	);
 
-	const roomUsers = users.filter((user) => isUidInRoom[user.uid]);
+	const roomUsers = users.filter(user => isUidInRoom[user.uid]);
 	const isOwners = await messaging.isRoomOwner(
-		roomUsers.map((u) => u.uid),
+		roomUsers.map(u => u.uid),
 		roomId
 	);
 
@@ -231,13 +231,13 @@ searchApi.roomMessages = async (caller, { query, roomId, uid }) => {
 		false
 	);
 	messageData = messageData
-		.map((msg) => {
+		.map(msg => {
 			if (msg) {
 				msg.newSet = true;
 			}
 			return msg;
 		})
-		.filter((msg) => msg && !msg.deleted && msg.timestamp > userjoinTimestamp);
+		.filter(msg => msg && !msg.deleted && msg.timestamp > userjoinTimestamp);
 
 	return { messages: messageData };
 };

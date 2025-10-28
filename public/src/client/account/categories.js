@@ -18,7 +18,7 @@ define('forum/account/categories', [
 			.find(
 				'[component="category/watching"], [component="category/tracking"], [component="category/ignoring"], [component="category/notwatching"]'
 			)
-			.on('click', async (e) => {
+			.on('click', async e => {
 				const cids = [];
 				const state = e.currentTarget.getAttribute('data-state');
 				const { uid } = ajaxify.data;
@@ -27,7 +27,7 @@ define('forum/account/categories', [
 				});
 
 				let modified_cids = await Promise.all(
-					cids.map(async (cid) =>
+					cids.map(async cid =>
 						api.put(`/categories/${cid}/watch`, { state, uid })
 					)
 				);
@@ -45,7 +45,7 @@ define('forum/account/categories', [
 			.find(
 				'[component="category/watching"], [component="category/tracking"], [component="category/ignoring"], [component="category/notwatching"]'
 			)
-			.on('click', async (e) => {
+			.on('click', async e => {
 				const state = e.currentTarget.getAttribute('data-state');
 				const { uid } = ajaxify.data;
 

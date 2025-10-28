@@ -170,7 +170,7 @@ define('search', [
 					app.parseAndTranslate(
 						'partials/quick-category-search-results',
 						data,
-						(html) => {
+						html => {
 							if (html.length) {
 								html.find('.timeago').timeago();
 							}
@@ -395,7 +395,7 @@ define('search', [
 		);
 		const regexStr = searchQuery
 			.split(' ')
-			.filter((word) => word.length > 1)
+			.filter(word => word.length > 1)
 			.map(function (word) {
 				return utils.escapeRegexChars(word);
 			})

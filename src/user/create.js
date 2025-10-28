@@ -50,7 +50,7 @@ module.exports = function (User) {
 			lastonline: timestamp,
 			status: 'online',
 		};
-		['picture', 'fullname', 'birthday'].forEach((field) => {
+		['picture', 'fullname', 'birthday'].forEach(field => {
 			if (data[field]) {
 				userData[field] = data[field];
 			}
@@ -130,7 +130,7 @@ module.exports = function (User) {
 					template: 'welcome',
 					subject: `[[email:welcome-to, ${meta.config.title || meta.config.browserTitle || 'NodeBB'}]]`,
 				})
-				.catch((err) =>
+				.catch(err =>
 					winston.error(
 						`[user.create] Validation email failed to send\n[emailer.send] ${err.stack}`
 					)

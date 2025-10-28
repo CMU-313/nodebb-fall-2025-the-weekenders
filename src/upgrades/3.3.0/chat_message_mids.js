@@ -18,9 +18,9 @@ module.exports = {
 		for (const roomId of allRoomIds) {
 			await batch.processSortedSet(
 				`chat:room:${roomId}:mids`,
-				async (mids) => {
+				async mids => {
 					let messageData = await db.getObjects(
-						mids.map((mid) => `message:${mid}`)
+						mids.map(mid => `message:${mid}`)
 					);
 					messageData.forEach((m, idx) => {
 						if (m) {
@@ -29,7 +29,7 @@ module.exports = {
 					});
 					messageData = messageData.filter(Boolean);
 
-					const bulkSet = messageData.map((msg) => [
+					const bulkSet = messageData.map(msg => [
 						`message:${msg.mid}`,
 						{ mid: msg.mid },
 					]);
@@ -37,8 +37,8 @@ module.exports = {
 					await db.setObjectBulk(bulkSet);
 					await db.sortedSetAdd(
 						'messages:mid',
-						messageData.map((msg) => msg.timestamp),
-						messageData.map((msg) => msg.mid)
+						messageData.map(msg => msg.timestamp),
+						messageData.map(msg => msg.mid)
 					);
 				},
 				{

@@ -20,7 +20,7 @@ module.exports.render = function (template) {
 			return;
 		}
 
-		const html = widgetsAtLocation.map((widget) => widget.html).join('');
+		const html = widgetsAtLocation.map(widget => widget.html).join('');
 		if (!html) {
 			return;
 		}

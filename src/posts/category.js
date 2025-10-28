@@ -18,13 +18,11 @@ module.exports = function (Posts) {
 
 	Posts.getCidsByPids = async function (pids) {
 		const postData = await Posts.getPostsFields(pids, ['tid']);
-		const tids = _.uniq(
-			postData.map((post) => post && post.tid).filter(Boolean)
-		);
+		const tids = _.uniq(postData.map(post => post && post.tid).filter(Boolean));
 		const topicData = await topics.getTopicsFields(tids, ['cid']);
 		const tidToTopic = _.zipObject(tids, topicData);
 		const cids = postData.map(
-			(post) => tidToTopic[post.tid] && tidToTopic[post.tid].cid
+			post => tidToTopic[post.tid] && tidToTopic[post.tid].cid
 		);
 		return cids;
 	};
@@ -38,7 +36,7 @@ module.exports = function (Posts) {
 			return await filterPidsBySingleCid(pids, cid);
 		}
 		const pidsArr = await Promise.all(
-			cid.map((c) => Posts.filterPidsByCid(pids, c))
+			cid.map(c => Posts.filterPidsByCid(pids, c))
 		);
 		return _.union(...pidsArr);
 	};

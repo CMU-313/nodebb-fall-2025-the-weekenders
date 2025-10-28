@@ -55,7 +55,7 @@ module.exports = function (Topics) {
 		];
 		const countedSortedSetKeys = [
 			...['views', 'posts', 'votes'].map(
-				(prop) => `${utils.isNumber(tid) ? 'topics' : 'topicsRemote'}:${prop}`
+				prop => `${utils.isNumber(tid) ? 'topics' : 'topicsRemote'}:${prop}`
 			),
 			`cid:${topicData.cid}:tids:votes`,
 			`cid:${topicData.cid}:tids:posts`,

@@ -405,7 +405,7 @@ define('forum/topic/posts', [
 		}
 
 		const translated = await Promise.all(
-			events.map((event) =>
+			events.map(event =>
 				app.parseAndTranslate('partials/topic/event', {
 					...event,
 					privileges: ajaxify.data.privileges,
@@ -464,7 +464,7 @@ define('forum/topic/posts', [
 						'prefixFromNow',
 					];
 					const savedProps = {};
-					props.forEach((prop) => {
+					props.forEach(prop => {
 						savedProps[prop] = $.timeago.settings.strings[prop];
 						$.timeago.settings.strings[prop] = '';
 					});
@@ -474,7 +474,7 @@ define('forum/topic/posts', [
 						$.timeago.inWords(diff) +
 						']]';
 
-					props.forEach((prop) => {
+					props.forEach(prop => {
 						$.timeago.settings.strings[prop] = savedProps[prop];
 					});
 					const html = await app.parseAndTranslate(

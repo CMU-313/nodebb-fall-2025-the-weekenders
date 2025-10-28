@@ -99,7 +99,7 @@ privsCategories.getType = function (privilege) {
 
 privsCategories.getUserPrivilegeList = () => Array.from(_privilegeMap.keys());
 privsCategories.getGroupPrivilegeList = () =>
-	Array.from(_privilegeMap.keys()).map((privilege) => `groups:${privilege}`);
+	Array.from(_privilegeMap.keys()).map(privilege => `groups:${privilege}`);
 
 privsCategories.getPrivilegeList = async () => {
 	const [user, group] = await Promise.all([
@@ -111,8 +111,8 @@ privsCategories.getPrivilegeList = async () => {
 
 privsCategories.getPrivilegesByFilter = function (filter) {
 	return Array.from(_privilegeMap.entries())
-		.filter((priv) => priv[1] && (!filter || priv[1].type === filter))
-		.map((priv) => priv[0]);
+		.filter(priv => priv[1] && (!filter || priv[1].type === filter))
+		.map(priv => priv[0]);
 };
 
 // Method used in admin/category controller to show all users/groups with privs in that given cid
@@ -153,7 +153,7 @@ privsCategories.get = async function (cid, uid) {
 		user.isModerator(uid, cid),
 	]);
 
-	const combined = userPrivileges.map((allowed) => allowed || isAdministrator);
+	const combined = userPrivileges.map(allowed => allowed || isAdministrator);
 	const privData = _.zipObject(privs, combined);
 	const isAdminOrMod = isAdministrator || isModerator;
 

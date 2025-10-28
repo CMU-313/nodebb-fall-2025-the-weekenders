@@ -101,7 +101,7 @@ async function activate(plugin) {
 async function listPlugins() {
 	await db.init();
 	const installed = await plugins.showInstalled();
-	const installedList = installed.map((plugin) => plugin.name);
+	const installedList = installed.map(plugin => plugin.name);
 	const active = await plugins.getActive();
 	// Merge the two sets, defer to plugins in  `installed` if already present
 	const combined = installed.concat(
@@ -123,7 +123,7 @@ async function listPlugins() {
 
 	// Pretty output
 	process.stdout.write('Active plugins:\n');
-	combined.forEach((plugin) => {
+	combined.forEach(plugin => {
 		process.stdout.write(
 			`\t* ${plugin.id}${plugin.version ? `@${plugin.version}` : ''} (`
 		);
@@ -150,7 +150,7 @@ async function listEvents(count = 10) {
 	console.log(
 		chalk.bold(`\nDisplaying last ${count} administrative events...`)
 	);
-	eventData.forEach((event) => {
+	eventData.forEach(event => {
 		console.log(
 			`  * ${chalk.green(String(event.timestampISO))} ${chalk.yellow(String(event.type))}${event.text ? ` ${event.text}` : ''} (uid: ${event.uid ? event.uid : 0})`
 		);

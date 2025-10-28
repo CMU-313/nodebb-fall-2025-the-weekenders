@@ -91,7 +91,7 @@ describe('Groups', () => {
 	});
 
 	describe('.list()', () => {
-		it('should list the groups present', (done) => {
+		it('should list the groups present', done => {
 			Groups.getGroupsFromSet(
 				'groups:visible:createtime',
 				0,
@@ -106,11 +106,11 @@ describe('Groups', () => {
 	});
 
 	describe('.get()', () => {
-		before((done) => {
+		before(done => {
 			Groups.join('Test', testUid, done);
 		});
 
-		it('with no options, should show group information', (done) => {
+		it('with no options, should show group information', done => {
 			Groups.get('Test', {}, (err, groupObj) => {
 				assert.ifError(err);
 				assert.equal(typeof groupObj, 'object');
@@ -124,7 +124,7 @@ describe('Groups', () => {
 			});
 		});
 
-		it('should return null if group does not exist', (done) => {
+		it('should return null if group does not exist', done => {
 			Groups.get('doesnotexist', {}, (err, groupObj) => {
 				assert.ifError(err);
 				assert.strictEqual(groupObj, null);
@@ -136,7 +136,7 @@ describe('Groups', () => {
 	describe('.search()', () => {
 		const socketGroups = require('../src/socket.io/groups');
 
-		it('should return empty array if query is falsy', (done) => {
+		it('should return empty array if query is falsy', done => {
 			Groups.search(null, {}, (err, groups) => {
 				assert.ifError(err);
 				assert.equal(0, groups.length);
@@ -144,7 +144,7 @@ describe('Groups', () => {
 			});
 		});
 
-		it('should return the groups when search query is empty', (done) => {
+		it('should return the groups when search query is empty', done => {
 			socketGroups.search({ uid: adminUid }, { query: '' }, (err, groups) => {
 				assert.ifError(err);
 				assert.equal(5, groups.length);
@@ -152,7 +152,7 @@ describe('Groups', () => {
 			});
 		});
 
-		it('should return the "Test" group when searched for', (done) => {
+		it('should return the "Test" group when searched for', done => {
 			socketGroups.search(
 				{ uid: adminUid },
 				{ query: 'test' },
@@ -165,7 +165,7 @@ describe('Groups', () => {
 			);
 		});
 
-		it('should return the "Test" group when searched for and sort by member count', (done) => {
+		it('should return the "Test" group when searched for and sort by member count', done => {
 			Groups.search(
 				'test',
 				{ filterHidden: true, sort: 'count' },
@@ -178,7 +178,7 @@ describe('Groups', () => {
 			);
 		});
 
-		it('should return the "Test" group when searched for and sort by creation time', (done) => {
+		it('should return the "Test" group when searched for and sort by creation time', done => {
 			Groups.search(
 				'test',
 				{ filterHidden: true, sort: 'date' },
@@ -287,7 +287,7 @@ describe('Groups', () => {
 	});
 
 	describe('.isMemberOfGroupList', () => {
-		it('should report that a user is part of a groupList, if they are', (done) => {
+		it('should report that a user is part of a groupList, if they are', done => {
 			Groups.isMemberOfGroupList(1, 'Hidden', (err, isMember) => {
 				assert.ifError(err);
 				assert.strictEqual(isMember, true);
@@ -295,7 +295,7 @@ describe('Groups', () => {
 			});
 		});
 
-		it('should report that a user is not part of a groupList, if they are not', (done) => {
+		it('should report that a user is not part of a groupList, if they are not', done => {
 			Groups.isMemberOfGroupList(2, 'Hidden', (err, isMember) => {
 				assert.ifError(err);
 				assert.strictEqual(isMember, false);
@@ -305,7 +305,7 @@ describe('Groups', () => {
 	});
 
 	describe('.exists()', () => {
-		it('should verify that the test group exists', (done) => {
+		it('should verify that the test group exists', done => {
 			Groups.exists('Test', (err, exists) => {
 				assert.ifError(err);
 				assert.strictEqual(exists, true);
@@ -313,7 +313,7 @@ describe('Groups', () => {
 			});
 		});
 
-		it('should verify that a fake group does not exist', (done) => {
+		it('should verify that a fake group does not exist', done => {
 			Groups.exists('Derp', (err, exists) => {
 				assert.ifError(err);
 				assert.strictEqual(exists, false);
@@ -321,7 +321,7 @@ describe('Groups', () => {
 			});
 		});
 
-		it('should check if group exists using an array', (done) => {
+		it('should check if group exists using an array', done => {
 			Groups.exists(['Test', 'Derp'], (err, groupsExists) => {
 				assert.ifError(err);
 				assert.strictEqual(groupsExists[0], true);
@@ -332,26 +332,26 @@ describe('Groups', () => {
 	});
 
 	describe('.create()', () => {
-		it('should create another group', (done) => {
+		it('should create another group', done => {
 			Groups.create(
 				{
 					name: 'foo',
 					description: 'bar',
 				},
-				(err) => {
+				err => {
 					assert.ifError(err);
 					Groups.get('foo', {}, done);
 				}
 			);
 		});
 
-		it('should create a hidden group if hidden is 1', (done) => {
+		it('should create a hidden group if hidden is 1', done => {
 			Groups.create(
 				{
 					name: 'hidden group',
 					hidden: '1',
 				},
-				(err) => {
+				err => {
 					assert.ifError(err);
 					db.isSortedSetMember(
 						'groups:visible:memberCount',
@@ -366,13 +366,13 @@ describe('Groups', () => {
 			);
 		});
 
-		it('should create a visible group if hidden is 0', (done) => {
+		it('should create a visible group if hidden is 0', done => {
 			Groups.create(
 				{
 					name: 'visible group',
 					hidden: '0',
 				},
-				(err) => {
+				err => {
 					assert.ifError(err);
 					db.isSortedSetMember(
 						'groups:visible:memberCount',
@@ -387,12 +387,12 @@ describe('Groups', () => {
 			);
 		});
 
-		it('should create a visible group if hidden is not passed in', (done) => {
+		it('should create a visible group if hidden is not passed in', done => {
 			Groups.create(
 				{
 					name: 'visible group 2',
 				},
-				(err) => {
+				err => {
 					assert.ifError(err);
 					db.isSortedSetMember(
 						'groups:visible:memberCount',
@@ -407,30 +407,30 @@ describe('Groups', () => {
 			);
 		});
 
-		it('should fail to create group with duplicate group name', (done) => {
-			Groups.create({ name: 'foo' }, (err) => {
+		it('should fail to create group with duplicate group name', done => {
+			Groups.create({ name: 'foo' }, err => {
 				assert(err);
 				assert.equal(err.message, '[[error:group-already-exists]]');
 				done();
 			});
 		});
 
-		it('should fail to create group if slug is empty', (done) => {
-			Groups.create({ name: '>>>>' }, (err) => {
+		it('should fail to create group if slug is empty', done => {
+			Groups.create({ name: '>>>>' }, err => {
 				assert.equal(err.message, '[[error:invalid-group-name]]');
 				done();
 			});
 		});
 
-		it('should fail if group name is invalid', (done) => {
-			Groups.create({ name: 'not/valid' }, (err) => {
+		it('should fail if group name is invalid', done => {
+			Groups.create({ name: 'not/valid' }, err => {
 				assert.equal(err.message, '[[error:invalid-group-name]]');
 				done();
 			});
 		});
 
-		it('should fail if group name is invalid', (done) => {
-			Groups.create({ name: ['array/'] }, (err) => {
+		it('should fail if group name is invalid', done => {
+			Groups.create({ name: ['array/'] }, err => {
 				assert.equal(err.message, '[[error:invalid-group-name]]');
 				done();
 			});
@@ -457,21 +457,21 @@ describe('Groups', () => {
 			assert.strictEqual(data.system, 0);
 		});
 
-		it('should fail if group name is invalid', (done) => {
-			Groups.create({ name: 'not:valid' }, (err) => {
+		it('should fail if group name is invalid', done => {
+			Groups.create({ name: 'not:valid' }, err => {
 				assert.equal(err.message, '[[error:invalid-group-name]]');
 				done();
 			});
 		});
 
-		it('should return falsy for userTitleEnabled', (done) => {
-			Groups.create({ name: 'userTitleEnabledGroup' }, (err) => {
+		it('should return falsy for userTitleEnabled', done => {
+			Groups.create({ name: 'userTitleEnabledGroup' }, err => {
 				assert.ifError(err);
 				Groups.setGroupField(
 					'userTitleEnabledGroup',
 					'userTitleEnabled',
 					0,
-					(err) => {
+					err => {
 						assert.ifError(err);
 						Groups.getGroupData('userTitleEnabledGroup', (err, data) => {
 							assert.ifError(err);
@@ -498,7 +498,7 @@ describe('Groups', () => {
 	});
 
 	describe('.update()', () => {
-		before((done) => {
+		before(done => {
 			Groups.create(
 				{
 					name: 'updateTestGroup',
@@ -510,13 +510,13 @@ describe('Groups', () => {
 			);
 		});
 
-		it('should change an aspect of a group', (done) => {
+		it('should change an aspect of a group', done => {
 			Groups.update(
 				'updateTestGroup',
 				{
 					description: 'baz',
 				},
-				(err) => {
+				err => {
 					assert.ifError(err);
 
 					Groups.get('updateTestGroup', {}, (err, groupObj) => {
@@ -541,13 +541,13 @@ describe('Groups', () => {
 			assert.strictEqual(navItems[0].route, '&#x2F;categories');
 		});
 
-		it('should fail if system groups is being renamed', (done) => {
+		it('should fail if system groups is being renamed', done => {
 			Groups.update(
 				'administrators',
 				{
 					name: 'administrators_fail',
 				},
-				(err) => {
+				err => {
 					assert.equal(
 						err.message,
 						'[[error:not-allowed-to-rename-system-group]]'
@@ -638,21 +638,21 @@ describe('Groups', () => {
 			}
 		});
 
-		it('should fail to rename group to an existing group', (done) => {
+		it('should fail to rename group to an existing group', done => {
 			Groups.create(
 				{
 					name: 'group2',
 					system: 0,
 					hidden: 0,
 				},
-				(err) => {
+				err => {
 					assert.ifError(err);
 					Groups.update(
 						'group2',
 						{
 							name: 'updateTestGroup?',
 						},
-						(err) => {
+						err => {
 							assert.equal(err.message, '[[error:group-already-exists]]');
 							done();
 						}
@@ -663,12 +663,12 @@ describe('Groups', () => {
 	});
 
 	describe('.destroy()', () => {
-		before((done) => {
+		before(done => {
 			Groups.join('foobar?', 1, done);
 		});
 
-		it('should destroy a group', (done) => {
-			Groups.destroy('foobar?', (err) => {
+		it('should destroy a group', done => {
+			Groups.destroy('foobar?', err => {
 				assert.ifError(err);
 
 				Groups.get('foobar?', {}, (err, groupObj) => {
@@ -679,7 +679,7 @@ describe('Groups', () => {
 			});
 		});
 
-		it('should also remove the members set', (done) => {
+		it('should also remove the members set', done => {
 			db.exists('group:foo:members', (err, exists) => {
 				assert.ifError(err);
 				assert.strictEqual(false, exists);
@@ -715,12 +715,12 @@ describe('Groups', () => {
 	});
 
 	describe('.join()', () => {
-		before((done) => {
+		before(done => {
 			Groups.leave('Test', testUid, done);
 		});
 
-		it('should add a user to a group', (done) => {
-			Groups.join('Test', testUid, (err) => {
+		it('should add a user to a group', done => {
+			Groups.join('Test', testUid, err => {
 				assert.ifError(err);
 
 				Groups.isMember(testUid, 'Test', (err, isMember) => {
@@ -750,12 +750,12 @@ describe('Groups', () => {
 			meta.config.allowPrivateGroups = oldValue;
 		});
 
-		it('should fail to add user to group if group name is invalid', (done) => {
-			Groups.join(0, 1, (err) => {
+		it('should fail to add user to group if group name is invalid', done => {
+			Groups.join(0, 1, err => {
 				assert.equal(err.message, '[[error:invalid-data]]');
-				Groups.join(null, 1, (err) => {
+				Groups.join(null, 1, err => {
 					assert.equal(err.message, '[[error:invalid-data]]');
-					Groups.join(undefined, 1, (err) => {
+					Groups.join(undefined, 1, err => {
 						assert.equal(err.message, '[[error:invalid-data]]');
 						done();
 					});
@@ -763,12 +763,12 @@ describe('Groups', () => {
 			});
 		});
 
-		it('should fail to add user to group if uid is invalid', (done) => {
-			Groups.join('Test', 0, (err) => {
+		it('should fail to add user to group if uid is invalid', done => {
+			Groups.join('Test', 0, err => {
 				assert.equal(err.message, '[[error:invalid-uid]]');
-				Groups.join('Test', null, (err) => {
+				Groups.join('Test', null, err => {
 					assert.equal(err.message, '[[error:invalid-uid]]');
-					Groups.join('Test', undefined, (err) => {
+					Groups.join('Test', undefined, err => {
 						assert.equal(err.message, '[[error:invalid-uid]]');
 						done();
 					});
@@ -784,16 +784,16 @@ describe('Groups', () => {
 			assert.strictEqual(isGlobalMod, true);
 		});
 
-		it('should add user to multiple groups', (done) => {
+		it('should add user to multiple groups', done => {
 			const groupNames = [
 				'test-hidden1',
 				'Test',
 				'test-hidden2',
 				'empty group',
 			];
-			Groups.create({ name: 'empty group' }, (err) => {
+			Groups.create({ name: 'empty group' }, err => {
 				assert.ifError(err);
-				Groups.join(groupNames, testUid, (err) => {
+				Groups.join(groupNames, testUid, err => {
 					assert.ifError(err);
 					Groups.isMemberOfGroups(testUid, groupNames, (err, isMembers) => {
 						assert.ifError(err);
@@ -813,13 +813,13 @@ describe('Groups', () => {
 			});
 		});
 
-		it('should set group title when user joins the group', (done) => {
+		it('should set group title when user joins the group', done => {
 			const groupName = 'this will be title';
 			User.create({ username: 'needstitle' }, (err, uid) => {
 				assert.ifError(err);
-				Groups.create({ name: groupName }, (err) => {
+				Groups.create({ name: groupName }, err => {
 					assert.ifError(err);
-					Groups.join([groupName], uid, (err) => {
+					Groups.join([groupName], uid, err => {
 						assert.ifError(err);
 						User.getUserData(uid, (err, data) => {
 							assert.ifError(err);
@@ -884,8 +884,8 @@ describe('Groups', () => {
 	});
 
 	describe('.leave()', () => {
-		it('should remove a user from a group', (done) => {
-			Groups.leave('Test', testUid, (err) => {
+		it('should remove a user from a group', done => {
+			Groups.leave('Test', testUid, err => {
 				assert.ifError(err);
 
 				Groups.isMember(testUid, 'Test', (err, isMember) => {
@@ -919,15 +919,15 @@ describe('Groups', () => {
 	});
 
 	describe('socket/api methods', () => {
-		it('should error if data is null', (done) => {
-			socketGroups.before({ uid: 0 }, 'groups.join', null, (err) => {
+		it('should error if data is null', done => {
+			socketGroups.before({ uid: 0 }, 'groups.join', null, err => {
 				assert.equal(err.message, '[[error:invalid-data]]');
 				done();
 			});
 		});
 
-		it('should not error if data is valid', (done) => {
-			socketGroups.before({ uid: 0 }, 'groups.join', {}, (err) => {
+		it('should not error if data is valid', done => {
+			socketGroups.before({ uid: 0 }, 'groups.join', {}, err => {
 				assert.ifError(err);
 				done();
 			});
@@ -1489,13 +1489,13 @@ describe('Groups', () => {
 			await helpers.copyFile(logoPath, imagePath);
 		});
 
-		it('should fail if user is not logged in or not owner', (done) => {
-			socketGroups.cover.update({ uid: 0 }, { imageData: 'asd' }, (err) => {
+		it('should fail if user is not logged in or not owner', done => {
+			socketGroups.cover.update({ uid: 0 }, { imageData: 'asd' }, err => {
 				assert.equal(err.message, '[[error:no-privileges]]');
 				socketGroups.cover.update(
 					{ uid: regularUid },
 					{ groupName: 'Test', imageData: 'asd' },
-					(err) => {
+					err => {
 						assert.equal(err.message, '[[error:no-privileges]]');
 						done();
 					}
@@ -1503,7 +1503,7 @@ describe('Groups', () => {
 			});
 		});
 
-		it('should upload group cover image from file', (done) => {
+		it('should upload group cover image from file', done => {
 			const data = {
 				groupName: 'Test',
 				file: {
@@ -1531,7 +1531,7 @@ describe('Groups', () => {
 			});
 		});
 
-		it('should upload group cover image from data', (done) => {
+		it('should upload group cover image from data', done => {
 			const data = {
 				groupName: 'Test',
 				imageData:
@@ -1550,7 +1550,7 @@ describe('Groups', () => {
 			});
 		});
 
-		it('should fail to upload group cover with invalid image', (done) => {
+		it('should fail to upload group cover with invalid image', done => {
 			const data = {
 				groupName: 'Test',
 				file: {
@@ -1558,13 +1558,13 @@ describe('Groups', () => {
 					type: 'image/png',
 				},
 			};
-			socketGroups.cover.update({ uid: adminUid }, data, (err) => {
+			socketGroups.cover.update({ uid: adminUid }, data, err => {
 				assert.equal(err.message, '[[error:invalid-data]]');
 				done();
 			});
 		});
 
-		it('should fail to upload group cover with invalid image', (done) => {
+		it('should fail to upload group cover with invalid image', done => {
 			const data = {
 				groupName: 'Test',
 				imageData: 'data:image/svg;base64,iVBORw0KGgoAAAANSUhEUgAAABwA',
@@ -1575,12 +1575,12 @@ describe('Groups', () => {
 			});
 		});
 
-		it('should update group cover position', (done) => {
+		it('should update group cover position', done => {
 			const data = {
 				groupName: 'Test',
 				position: '50% 50%',
 			};
-			socketGroups.cover.update({ uid: adminUid }, data, (err) => {
+			socketGroups.cover.update({ uid: adminUid }, data, err => {
 				assert.ifError(err);
 				Groups.getGroupFields('Test', ['cover:position'], (err, groupData) => {
 					assert.ifError(err);
@@ -1590,25 +1590,25 @@ describe('Groups', () => {
 			});
 		});
 
-		it('should fail to update cover position if group name is missing', (done) => {
-			Groups.updateCoverPosition('', '50% 50%', (err) => {
+		it('should fail to update cover position if group name is missing', done => {
+			Groups.updateCoverPosition('', '50% 50%', err => {
 				assert.equal(err.message, '[[error:invalid-data]]');
 				done();
 			});
 		});
 
-		it('should fail to remove cover if not logged in', (done) => {
-			socketGroups.cover.remove({ uid: 0 }, { groupName: 'Test' }, (err) => {
+		it('should fail to remove cover if not logged in', done => {
+			socketGroups.cover.remove({ uid: 0 }, { groupName: 'Test' }, err => {
 				assert.equal(err.message, '[[error:no-privileges]]');
 				done();
 			});
 		});
 
-		it('should fail to remove cover if not owner', (done) => {
+		it('should fail to remove cover if not owner', done => {
 			socketGroups.cover.remove(
 				{ uid: regularUid },
 				{ groupName: 'Test' },
-				(err) => {
+				err => {
 					assert.equal(err.message, '[[error:no-privileges]]');
 					done();
 				}
@@ -1620,7 +1620,7 @@ describe('Groups', () => {
 			const values = await Groups.getGroupFields('Test', fields);
 			await socketGroups.cover.remove({ uid: adminUid }, { groupName: 'Test' });
 
-			fields.forEach((field) => {
+			fields.forEach(field => {
 				const filename = values[field].split('/').pop();
 				const filePath = path.join(nconf.get('upload_path'), 'files', filename);
 				assert.strictEqual(fs.existsSync(filePath), false);

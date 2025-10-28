@@ -62,11 +62,11 @@ Hooks.register = function (id, data) {
 	if (
 		Array.isArray(data.method) &&
 		data.method.every(
-			(method) => typeof method === 'function' || typeof method === 'string'
+			method => typeof method === 'function' || typeof method === 'string'
 		)
 	) {
 		// Go go gadget recursion!
-		data.method.forEach((method) => {
+		data.method.forEach(method => {
 			const singularData = { ...data, method: method };
 			Hooks.register(id, singularData);
 		});
@@ -95,7 +95,7 @@ Hooks.register = function (id, data) {
 Hooks.unregister = function (id, hook, method) {
 	const hooks = plugins.loadedHooks[hook] || [];
 	plugins.loadedHooks[hook] = hooks.filter(
-		(hookData) => hookData && hookData.id !== id && hookData.method !== method
+		hookData => hookData && hookData.id !== id && hookData.method !== method
 	);
 };
 
@@ -168,8 +168,8 @@ function hookHandlerPromise(hook, hookObj, params) {
 
 		if (utils.isPromise(returned)) {
 			returned.then(
-				(payload) => _resolve(payload),
-				(err) => reject(err)
+				payload => _resolve(payload),
+				err => reject(err)
 			);
 			return;
 		}

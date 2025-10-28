@@ -168,9 +168,9 @@ module.exports = function (Topics) {
 		});
 	};
 
-	topicTools.checkPinExpiry = async (tids) => {
+	topicTools.checkPinExpiry = async tids => {
 		const expiry = (await topics.getTopicsFields(tids, ['pinExpiry'])).map(
-			(obj) => obj.pinExpiry
+			obj => obj.pinExpiry
 		);
 		const now = Date.now();
 
@@ -315,7 +315,7 @@ module.exports = function (Topics) {
 				`cid:${topicData.cid}:tids:lastposttime`,
 				`cid:${topicData.cid}:recent_tids`,
 				`cid:${topicData.cid}:uid:${topicData.uid}:tids`,
-				...tags.map((tag) => `cid:${topicData.cid}:tag:${tag}:topics`),
+				...tags.map(tag => `cid:${topicData.cid}:tag:${tag}:topics`),
 			],
 			tid
 		);
@@ -326,7 +326,7 @@ module.exports = function (Topics) {
 		const bulk = [
 			[`cid:${cid}:tids:lastposttime`, topicData.lastposttime, tid],
 			[`cid:${cid}:uid:${topicData.uid}:tids`, topicData.timestamp, tid],
-			...tags.map((tag) => [
+			...tags.map(tag => [
 				`cid:${cid}:tag:${tag}:topics`,
 				topicData.timestamp,
 				tid,

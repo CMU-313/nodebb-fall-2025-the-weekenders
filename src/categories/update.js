@@ -11,7 +11,7 @@ const cache = require('../cache');
 module.exports = function (Categories) {
 	Categories.update = async function (modified) {
 		const cids = Object.keys(modified);
-		await Promise.all(cids.map((cid) => updateCategory(cid, modified[cid])));
+		await Promise.all(cids.map(cid => updateCategory(cid, modified[cid])));
 		return cids;
 	};
 
@@ -44,7 +44,7 @@ module.exports = function (Categories) {
 		}
 
 		if (
-			['icon', 'color', 'bgColor'].some((prop) =>
+			['icon', 'color', 'bgColor'].some(prop =>
 				Object.keys(modifiedFields).includes(prop)
 			)
 		) {
@@ -110,7 +110,7 @@ module.exports = function (Categories) {
 	async function updateTagWhitelist(cid, tags) {
 		tags = tags
 			.split(',')
-			.map((tag) => utils.cleanUpTag(tag, meta.config.maximumTagLength))
+			.map(tag => utils.cleanUpTag(tag, meta.config.maximumTagLength))
 			.filter(Boolean);
 		await db.delete(`cid:${cid}:tag:whitelist`);
 		const scores = tags.map((tag, index) => index);

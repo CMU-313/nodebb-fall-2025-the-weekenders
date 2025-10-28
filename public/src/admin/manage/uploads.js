@@ -43,7 +43,7 @@ define('admin/manage/uploads', [
 		$('#new-folder').on('click', async function () {
 			bootbox.prompt(
 				'[[admin/manage/uploads:name-new-folder]]',
-				(newFolderName) => {
+				newFolderName => {
 					if (!newFolderName || !newFolderName.trim()) {
 						return;
 					}

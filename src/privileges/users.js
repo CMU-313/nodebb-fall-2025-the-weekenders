@@ -55,7 +55,7 @@ async function isModeratorOfCategories(cids, uid) {
 	const isAllowed = await helpers.isAllowedTo('moderate', uid, uniqueCids);
 
 	const cidToIsAllowed = _.zipObject(uniqueCids, isAllowed);
-	const isModerator = cids.map((cid) => cidToIsAllowed[cid]);
+	const isModerator = cids.map(cid => cidToIsAllowed[cid]);
 	return await filterIsModerator(cids, uid, isModerator);
 }
 
@@ -164,18 +164,17 @@ privsUsers.canFlag = async function (callerUid, uid) {
 	return { flag: canFlag };
 };
 
-privsUsers.hasBanPrivilege = async (uid) =>
-	await hasGlobalPrivilege('ban', uid);
-privsUsers.hasMutePrivilege = async (uid) =>
+privsUsers.hasBanPrivilege = async uid => await hasGlobalPrivilege('ban', uid);
+privsUsers.hasMutePrivilege = async uid =>
 	await hasGlobalPrivilege('mute', uid);
-privsUsers.hasInvitePrivilege = async (uid) =>
+privsUsers.hasInvitePrivilege = async uid =>
 	await hasGlobalPrivilege('invite', uid);
 
 async function hasGlobalPrivilege(privilege, uid) {
 	const privsGlobal = require('./global');
 	const privilegeName = privilege
 		.split('-')
-		.map((word) => word.slice(0, 1).toUpperCase() + word.slice(1))
+		.map(word => word.slice(0, 1).toUpperCase() + word.slice(1))
 		.join('');
 	let payload = { uid };
 	payload[`can${privilegeName}`] = await privsGlobal.can(privilege, uid);

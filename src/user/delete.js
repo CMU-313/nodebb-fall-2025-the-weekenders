@@ -43,7 +43,7 @@ module.exports = function (User) {
 	async function deletePosts(callerUid, uid) {
 		await batch.processSortedSet(
 			`uid:${uid}:posts`,
-			async (pids) => {
+			async pids => {
 				await posts.purge(pids, callerUid);
 			},
 			{ alwaysStartAt: 0, batch: 500 }
@@ -53,8 +53,8 @@ module.exports = function (User) {
 	async function deleteTopics(callerUid, uid) {
 		await batch.processSortedSet(
 			`uid:${uid}:topics`,
-			async (ids) => {
-				await async.eachSeries(ids, async (tid) => {
+			async ids => {
+				await async.eachSeries(ids, async tid => {
 					await topics.purge(tid, callerUid);
 				});
 			},
@@ -71,11 +71,11 @@ module.exports = function (User) {
 		let deleteIds = [];
 		await batch.processSortedSet(
 			'post:queue',
-			async (ids) => {
-				const data = await db.getObjects(ids.map((id) => `post:queue:${id}`));
+			async ids => {
+				const data = await db.getObjects(ids.map(id => `post:queue:${id}`));
 				const userQueuedIds = data
-					.filter((d) => String(d.uid) === String(uid))
-					.map((d) => d.id);
+					.filter(d => String(d.uid) === String(uid))
+					.map(d => d.id);
 				deleteIds = deleteIds.concat(userQueuedIds);
 			},
 			{ batch: 500 }
@@ -204,7 +204,7 @@ module.exports = function (User) {
 	async function deleteUserFromFollowedTopics(uid) {
 		const tids = await db.getSortedSetRange(`uid:${uid}:followed_tids`, 0, -1);
 		await db.setsRemove(
-			tids.map((tid) => `tid:${tid}:followers`),
+			tids.map(tid => `tid:${tid}:followers`),
 			uid
 		);
 	}
@@ -212,7 +212,7 @@ module.exports = function (User) {
 	async function deleteUserFromIgnoredTopics(uid) {
 		const tids = await db.getSortedSetRange(`uid:${uid}:ignored_tids`, 0, -1);
 		await db.setsRemove(
-			tids.map((tid) => `tid:${tid}:ignorers`),
+			tids.map(tid => `tid:${tid}:ignorers`),
 			uid
 		);
 	}
@@ -220,7 +220,7 @@ module.exports = function (User) {
 	async function deleteUserFromFollowedTags(uid) {
 		const tags = await db.getSortedSetRange(`uid:${uid}:followed_tags`, 0, -1);
 		await db.sortedSetsRemove(
-			tags.map((tag) => `tag:${tag}:followers`),
+			tags.map(tag => `tag:${tag}:followers`),
 			uid
 		);
 	}
@@ -231,7 +231,7 @@ module.exports = function (User) {
 			db.getSortedSetRange(`uid:${uid}:downvote`, 0, -1),
 		]);
 		const pids = _.uniq(upvotedPids.concat(downvotedPids).filter(Boolean));
-		await async.eachSeries(pids, async (pid) => {
+		await async.eachSeries(pids, async pid => {
 			await posts.unvote(pid, uid);
 		});
 	}
@@ -248,7 +248,7 @@ module.exports = function (User) {
 	async function deleteUserIps(uid) {
 		const ips = await db.getSortedSetRange(`uid:${uid}:ip`, 0, -1);
 		await db.sortedSetsRemove(
-			ips.map((ip) => `ip:${ip}:uid`),
+			ips.map(ip => `ip:${ip}:uid`),
 			uid
 		);
 		await db.delete(`uid:${uid}:ip`);
@@ -263,8 +263,8 @@ module.exports = function (User) {
 		async function updateCount(uids, name, fieldName) {
 			await batch.processArray(
 				uids,
-				async (uids) => {
-					const counts = await db.sortedSetsCard(uids.map((uid) => name + uid));
+				async uids => {
+					const counts = await db.sortedSetsCard(uids.map(uid => name + uid));
 					const bulkSet = counts.map((count, index) => [
 						`user:${uids[index]}`,
 						{ [fieldName]: count || 0 },
@@ -277,8 +277,8 @@ module.exports = function (User) {
 			);
 		}
 
-		const followingSets = followers.map((uid) => `following:${uid}`);
-		const followerSets = following.map((uid) => `followers:${uid}`);
+		const followingSets = followers.map(uid => `following:${uid}`);
+		const followerSets = following.map(uid => `followers:${uid}`);
 
 		await db.sortedSetsRemove(followerSets.concat(followingSets), uid);
 		await Promise.all([

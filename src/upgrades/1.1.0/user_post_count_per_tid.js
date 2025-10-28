@@ -19,7 +19,7 @@ module.exports = {
 				async.each(
 					tids,
 					(tid, next) => {
-						db.delete(`tid:${tid}:posters`, (err) => {
+						db.delete(`tid:${tid}:posters`, err => {
 							if (err) {
 								return next(err);
 							}

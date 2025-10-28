@@ -80,7 +80,7 @@ Blacklist.test = async function (clientIp) {
 			winston.error(`[meta/blacklist] Error parsing client IP : ${clientIp}`);
 			throw err;
 		}
-		return rules.cidr.some((subnet) => {
+		return rules.cidr.some(subnet => {
 			const cidr = ipaddr.parseCIDR(subnet);
 			if (addr.kind() !== cidr[0].kind()) {
 				return false;
@@ -124,7 +124,7 @@ Blacklist.validate = function (rules) {
 	// Filter out blank lines and lines starting with the hash character (comments)
 	// Also trim inputs and remove inline comments
 	rules = rules
-		.map((rule) => {
+		.map(rule => {
 			rule = rule.replace(inlineCommentMatch, '').trim();
 			return rule.length && !rule.startsWith('#') ? rule : null;
 		})
@@ -136,7 +136,7 @@ Blacklist.validate = function (rules) {
 	rules = uniqRules;
 
 	// Filter out invalid rules
-	rules = rules.filter((rule) => {
+	rules = rules.filter(rule => {
 		let addr;
 		let isRange = false;
 		try {

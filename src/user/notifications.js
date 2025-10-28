@@ -47,11 +47,11 @@ async function filterNotifications(nids, filter) {
 	if (!filter) {
 		return nids;
 	}
-	const keys = nids.map((nid) => `notifications:${nid}`);
+	const keys = nids.map(nid => `notifications:${nid}`);
 	const notifications = await db.getObjectsFields(keys, ['nid', 'type']);
 	return notifications
-		.filter((n) => n && n.nid && n.type === filter)
-		.map((n) => n.nid);
+		.filter(n => n && n.nid && n.type === filter)
+		.map(n => n.nid);
 }
 
 UserNotifications.getAll = async function (uid, filter) {
@@ -61,21 +61,19 @@ UserNotifications.getAll = async function (uid, filter) {
 
 UserNotifications.getAllWithCounts = async function (uid, filter) {
 	const nids = await getAllNids(uid);
-	const keys = nids.map((nid) => `notifications:${nid}`);
+	const keys = nids.map(nid => `notifications:${nid}`);
 	let notifications = await db.getObjectsFields(keys, ['nid', 'type']);
 	const counts = {};
-	notifications.forEach((n) => {
+	notifications.forEach(n => {
 		if (n && n.type) {
 			counts[n.type] = counts[n.type] || 0;
 			counts[n.type] += 1;
 		}
 	});
 	if (filter) {
-		notifications = notifications.filter(
-			(n) => n && n.nid && n.type === filter
-		);
+		notifications = notifications.filter(n => n && n.nid && n.type === filter);
 	}
-	return { counts, nids: notifications.map((n) => n.nid) };
+	return { counts, nids: notifications.map(n => n.nid) };
 };
 
 async function getAllNids(uid) {
@@ -137,7 +135,7 @@ UserNotifications.getNotifications = async function (nids, uid) {
 	await deleteUserNids(deletedNids, uid);
 	notificationData = await notifications.merge(notificationData);
 	await Promise.all(
-		notificationData.map(async (n) => {
+		notificationData.map(async n => {
 			if (n && n.bodyShort) {
 				n.bodyShort = await translator.translate(
 					n.bodyShort,
@@ -192,9 +190,9 @@ UserNotifications.getUnreadCount = async function (uid) {
 		99
 	);
 	nids = await notifications.filterExists(nids);
-	const keys = nids.map((nid) => `notifications:${nid}`);
+	const keys = nids.map(nid => `notifications:${nid}`);
 	const notifData = await db.getObjectsFields(keys, ['mergeId']);
-	const mergeIds = notifData.map((n) => n.mergeId);
+	const mergeIds = notifData.map(n => n.mergeId);
 
 	// Collapse any notifications with identical mergeIds
 	let count = mergeIds.reduce((count, mergeId, idx, arr) => {
@@ -222,12 +220,12 @@ UserNotifications.getUnreadByField = async function (uid, field, values) {
 	if (!nids.length) {
 		return [];
 	}
-	const keys = nids.map((nid) => `notifications:${nid}`);
+	const keys = nids.map(nid => `notifications:${nid}`);
 	const notifData = await db.getObjectsFields(keys, ['nid', field]);
-	const valuesSet = new Set(values.map((value) => String(value)));
+	const valuesSet = new Set(values.map(value => String(value)));
 	return notifData
-		.filter((n) => n && n[field] && valuesSet.has(String(n[field])))
-		.map((n) => n.nid);
+		.filter(n => n && n[field] && valuesSet.has(String(n[field])))
+		.map(n => n.nid);
 };
 
 UserNotifications.deleteAll = async function (uid) {

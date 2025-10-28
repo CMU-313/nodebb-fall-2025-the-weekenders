@@ -38,7 +38,7 @@ define('forum/topic/manage-editors', ['autocomplete', 'alerts'], function (
 					{ filters: ['notbanned'] },
 					function (ev, ui) {
 						const isInEditors = editors.find(
-							(e) => String(e.uid) === String(ui.item.user.uid)
+							e => String(e.uid) === String(ui.item.user.uid)
 						);
 						if (!isInEditors) {
 							editors.push(ui.item.user);
@@ -60,7 +60,7 @@ define('forum/topic/manage-editors', ['autocomplete', 'alerts'], function (
 				modal.on('click', 'button.remove-user-icon', function () {
 					const el = $(this).parents('[data-uid]');
 					const uid = el.attr('data-uid');
-					editors = editors.filter((e) => String(e.uid) !== String(uid));
+					editors = editors.filter(e => String(e.uid) !== String(uid));
 					el.remove();
 				});
 			}

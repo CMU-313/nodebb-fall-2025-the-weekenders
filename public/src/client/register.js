@@ -149,8 +149,8 @@ define('forum/register', [
 			Promise.allSettled([
 				api.head(`/users/bySlug/${userslug}`, {}),
 				api.head(`/groups/${username}`, {}),
-			]).then((results) => {
-				if (results.every((obj) => obj.status === 'rejected')) {
+			]).then(results => {
+				if (results.every(obj => obj.status === 'rejected')) {
 					showSuccess(usernameInput, username_notify, successIcon);
 				} else {
 					showError(usernameInput, username_notify, '[[error:username-taken]]');

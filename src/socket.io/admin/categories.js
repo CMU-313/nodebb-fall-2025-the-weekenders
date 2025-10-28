@@ -54,7 +54,7 @@ Categories.copyPrivilegesFrom = async function (socket, data) {
 
 Categories.copyPrivilegesToAllCategories = async function (socket, data) {
 	let cids = await categories.getAllCidsFromSet('categories:cid');
-	cids = cids.filter((cid) => parseInt(cid, 10) !== parseInt(data.cid, 10));
+	cids = cids.filter(cid => parseInt(cid, 10) !== parseInt(data.cid, 10));
 	for (const toCid of cids) {
 		// eslint-disable-next-line no-await-in-loop
 		await categories.copyPrivilegesFrom(

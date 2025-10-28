@@ -44,7 +44,7 @@ app.onDomReady();
 	}
 
 	require(['hooks', 'admin/settings'], (hooks, Settings) => {
-		hooks.on('action:ajaxify.end', (data) => {
+		hooks.on('action:ajaxify.end', data => {
 			updatePageTitle(data.url);
 			setupRestartLinks();
 			showCorrectNavTab();

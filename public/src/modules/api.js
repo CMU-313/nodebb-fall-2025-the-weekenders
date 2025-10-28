@@ -12,8 +12,8 @@ async function call(options, callback) {
 
 	if (typeof callback === 'function') {
 		xhr(options).then(
-			(result) => callback(null, result),
-			(err) => callback(err)
+			result => callback(null, result),
+			err => callback(err)
 		);
 		return;
 	}
@@ -27,7 +27,7 @@ async function call(options, callback) {
 			'A valid login session was not found. Please log in and try again.'
 		) {
 			const { url } = await fireHook('filter:admin.reauth', { url: 'login' });
-			return confirm('[[error:api.reauth-required]]', (ok) => {
+			return confirm('[[error:api.reauth-required]]', ok => {
 				if (ok) {
 					ajaxify.go(url);
 				}

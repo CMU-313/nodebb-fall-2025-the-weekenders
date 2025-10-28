@@ -32,15 +32,15 @@ module.exports = function (Groups) {
 			return memo;
 		}, []);
 
-		const keys = groupNames.map((groupName) => `group:${groupName}`);
+		const keys = groupNames.map(groupName => `group:${groupName}`);
 		const groupData = await db.getObjects(keys, fields);
 		if (ephemeralIdx.length) {
-			ephemeralIdx.forEach((idx) => {
+			ephemeralIdx.forEach(idx => {
 				groupData[idx] = Groups.getEphemeralGroup(groupNames[idx]);
 			});
 		}
 
-		groupData.forEach((group) => modifyGroup(group, fields));
+		groupData.forEach(group => modifyGroup(group, fields));
 
 		const results = await plugins.hooks.fire('filter:groups.get', {
 			groups: groupData,
@@ -97,7 +97,7 @@ function modifyGroup(group, fields) {
 		group.memberPostCids = group.memberPostCids || '';
 		group.memberPostCidsArray = group.memberPostCids
 			.split(',')
-			.map((cid) => parseInt(cid, 10))
+			.map(cid => parseInt(cid, 10))
 			.filter(Boolean);
 
 		group['cover:thumb:url'] = group['cover:thumb:url'] || group['cover:url'];

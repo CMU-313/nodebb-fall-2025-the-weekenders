@@ -66,7 +66,7 @@ uploadsController.get = async function (req, res, next) {
 		if (['files', '/files', '/files/'].includes(req.query.dir)) {
 			const usage = await posts.uploads.getUsage(files);
 			files.forEach((file, idx) => {
-				file.inPids = usage[idx].map((pid) => parseInt(pid, 10));
+				file.inPids = usage[idx].map(pid => parseInt(pid, 10));
 			});
 		}
 		res.render('admin/manage/uploads', {
@@ -137,7 +137,7 @@ function buildBreadcrumbs(currentFolder) {
 }
 
 async function filesToData(currentDir, files) {
-	return await Promise.all(files.map((file) => getFileData(currentDir, file)));
+	return await Promise.all(files.map(file => getFileData(currentDir, file)));
 }
 
 async function getFileData(currentDir, file) {

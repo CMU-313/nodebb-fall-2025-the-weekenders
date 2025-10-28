@@ -99,7 +99,7 @@ define('forum/account/settings', [
 	function saveSettings(settings) {
 		api
 			.put(`/users/${ajaxify.data.uid}/settings`, { settings })
-			.then((newSettings) => {
+			.then(newSettings => {
 				alerts.success('[[success:settings-saved]]');
 				let languageChanged = false;
 				for (const [key, value] of Object.entries(newSettings)) {

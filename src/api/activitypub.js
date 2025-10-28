@@ -202,7 +202,7 @@ activitypubApi.create.privateNote = enabledCheck(
 	async (caller, { messageObj }) => {
 		const { roomId } = messageObj;
 		let targets = await messaging.getUidsInRoom(roomId, 0, -1);
-		targets = targets.filter((uid) => !utils.isNumber(uid)); // remote uids only
+		targets = targets.filter(uid => !utils.isNumber(uid)); // remote uids only
 
 		const object = await activitypub.mocks.notes.private({ messageObj });
 
@@ -301,11 +301,11 @@ activitypubApi.update.privateNote = enabledCheck(
 
 		const { roomId } = messageObj;
 		let uids = await messaging.getUidsInRoom(roomId, 0, -1);
-		uids = uids.filter((uid) => String(uid) !== String(messageObj.fromuid)); // no author
-		const to = uids.map((uid) =>
+		uids = uids.filter(uid => String(uid) !== String(messageObj.fromuid)); // no author
+		const to = uids.map(uid =>
 			utils.isNumber(uid) ? `${nconf.get('url')}/uid/${uid}` : uid
 		);
-		const targets = uids.filter((uid) => !utils.isNumber(uid)); // remote uids only
+		const targets = uids.filter(uid => !utils.isNumber(uid)); // remote uids only
 
 		const object = await activitypub.mocks.notes.private({ messageObj });
 
@@ -483,7 +483,7 @@ activitypubApi.flag = enabledCheck(async (caller, flag) => {
 	const reason =
 		flag.reason ||
 		(flag.reports &&
-			flag.reports.filter((report) => report.reporter.uid === caller.uid).at(-1)
+			flag.reports.filter(report => report.reporter.uid === caller.uid).at(-1)
 				.value);
 	await activitypub.send('uid', caller.uid, reportedIds, {
 		id: `${nconf.get('url')}/${flag.type}/${encodeURIComponent(flag.targetId)}#activity/flag/${caller.uid}`,
@@ -534,7 +534,7 @@ activitypubApi.undo.flag = enabledCheck(async (caller, flag) => {
 	const reason =
 		flag.reason ||
 		(flag.reports &&
-			flag.reports.filter((report) => report.reporter.uid === caller.uid).at(-1)
+			flag.reports.filter(report => report.reporter.uid === caller.uid).at(-1)
 				.value);
 	await activitypub.send('uid', caller.uid, reportedIds, {
 		id: `${nconf.get('url')}/${flag.type}/${encodeURIComponent(flag.targetId)}#activity/undo:flag/${caller.uid}/${Date.now()}`,

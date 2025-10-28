@@ -91,7 +91,7 @@ async function getPosts(callerUid, userData, setSuffix) {
 		callerUid,
 		'topics:read'
 	);
-	const keys = cids.map((c) => `cid:${c}:uid:${userData.uid}:${setSuffix}`);
+	const keys = cids.map(c => `cid:${c}:uid:${userData.uid}:${setSuffix}`);
 	let hasMorePosts = true;
 	let start = 0;
 	const count = 10;
@@ -123,7 +123,7 @@ async function getPosts(callerUid, userData, setSuffix) {
 			});
 			postData.push(
 				...p.filter(
-					(p) =>
+					p =>
 						p &&
 						p.topic &&
 						(isAdmin ||

@@ -137,11 +137,11 @@ ActivityPub.resolveId = async (uid, id) => {
 	}
 };
 
-ActivityPub.resolveInboxes = async (ids) => {
+ActivityPub.resolveInboxes = async ids => {
 	const inboxes = new Set();
 
 	if (!meta.config.activitypubAllowLoopback) {
-		ids = ids.filter((id) => {
+		ids = ids.filter(id => {
 			const { hostname } = new URL(id);
 			return hostname !== nconf.get('url_parsed').hostname;
 		});
@@ -155,9 +155,9 @@ ActivityPub.resolveInboxes = async (ids) => {
 
 	await batch.processArray(
 		ids,
-		async (currentIds) => {
+		async currentIds => {
 			const isCategory = await db.exists(
-				currentIds.map((id) => `categoryRemote:${id}`)
+				currentIds.map(id => `categoryRemote:${id}`)
 			);
 			const [cids, uids] = currentIds.reduce(
 				([cids, uids], id, idx) => {
@@ -176,7 +176,7 @@ ActivityPub.resolveInboxes = async (ids) => {
 				'sharedInbox',
 			]);
 
-			currentIds.forEach((id) => {
+			currentIds.forEach(id => {
 				if (cids.includes(id)) {
 					const data = categoryData[cids.indexOf(id)];
 					inboxes.add(data.sharedInbox || data.inbox);
@@ -234,7 +234,7 @@ ActivityPub.getPrivateKey = async (type, id) => {
 	return { key: privateKey, keyId };
 };
 
-ActivityPub.fetchPublicKey = async (uri) => {
+ActivityPub.fetchPublicKey = async uri => {
 	// Used for retrieving the public key from the passed-in keyId uri
 	const body = await ActivityPub.get('uid', 0, uri);
 
@@ -277,7 +277,7 @@ ActivityPub.sign = async ({ key, keyId }, url, payload) => {
 	};
 };
 
-ActivityPub.verify = async (req) => {
+ActivityPub.verify = async req => {
 	ActivityPub.helpers.log(
 		'[activitypub/verify] Starting signature verification...'
 	);
@@ -418,7 +418,7 @@ ActivityPub.retryQueue = lru({
 	name: 'activitypub-retry-queue',
 	max: 4000,
 	ttl: 1000 * 60 * 60 * 24 * 60,
-	dispose: (value) => {
+	dispose: value => {
 		if (value) {
 			clearTimeout(value);
 		}
@@ -426,9 +426,9 @@ ActivityPub.retryQueue = lru({
 });
 
 // handle clearing retry queue from another member of the cluster
-pubsub.on(`activitypub-retry-queue:lruCache:del`, (keys) => {
+pubsub.on(`activitypub-retry-queue:lruCache:del`, keys => {
 	if (Array.isArray(keys)) {
-		keys.forEach((key) => clearTimeout(ActivityPub.retryQueue.get(key)));
+		keys.forEach(key => clearTimeout(ActivityPub.retryQueue.get(key)));
 	}
 });
 
@@ -513,9 +513,9 @@ ActivityPub.send = async (type, id, targets, payload) => {
 	// Runs in background... potentially a better queue is required... later.
 	batch.processArray(
 		inboxes,
-		async (inboxBatch) =>
+		async inboxBatch =>
 			Promise.all(
-				inboxBatch.map(async (uri) => sendMessage(uri, id, type, payload))
+				inboxBatch.map(async uri => sendMessage(uri, id, type, payload))
 			),
 		{
 			batch: 50,
@@ -587,7 +587,7 @@ ActivityPub.buildRecipients = async function (object, { pid, uid, cid }) {
 		const tid = await posts.getPostField(pid, 'tid');
 		const participants = (
 			await db.getSortedSetMembers(`tid:${tid}:posters`)
-		).filter((uid) => !utils.isNumber(uid)); // remote users only
+		).filter(uid => !utils.isNumber(uid)); // remote users only
 		const announcers = (await ActivityPub.notes.announce.list({ pid })).map(
 			({ actor }) => actor
 		);
@@ -595,12 +595,10 @@ ActivityPub.buildRecipients = async function (object, { pid, uid, cid }) {
 		const auxiliaryFollowers = (
 			await user.getUsersFields(auxiliaries, ['followersUrl'])
 		)
-			.filter((o) => o.hasOwnProperty('followersUrl'))
+			.filter(o => o.hasOwnProperty('followersUrl'))
 			.map(({ followersUrl }) => followersUrl);
-		[...auxiliaries].forEach((uri) => uri && targets.add(uri));
-		[...auxiliaries, ...auxiliaryFollowers].forEach(
-			(uri) => uri && cc.add(uri)
-		);
+		[...auxiliaries].forEach(uri => uri && targets.add(uri));
+		[...auxiliaries, ...auxiliaryFollowers].forEach(uri => uri && cc.add(uri));
 	}
 
 	return {
@@ -685,7 +683,7 @@ ActivityPub.probe = async ({ uid, url }) => {
 			let parts = headers.link.split(';');
 			parts.shift();
 			parts = parts
-				.map((p) => p.trim())
+				.map(p => p.trim())
 				.reduce((memo, cur) => {
 					cur = cur.split('=');
 					memo[cur[0]] = cur[1].slice(1, -1);
@@ -710,10 +708,10 @@ ActivityPub.probe = async ({ uid, url }) => {
 		if (e.name === 'TimeoutError') {
 			// Return early but retry for caching purposes
 			checkHeader(1000 * 60)
-				.then((result) => {
+				.then(result => {
 					probeCache.set(url, result);
 				})
-				.catch((err) => ActivityPub.helpers.log(err.stack));
+				.catch(err => ActivityPub.helpers.log(err.stack));
 			return false;
 		}
 	}

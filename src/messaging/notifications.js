@@ -33,7 +33,7 @@ module.exports = function (Messaging) {
 			db.getObjectFields(`chat:room:${roomId}:notification:settings`, uids),
 			Messaging.getRoomData(roomId, ['notificationSetting']),
 		]);
-		return uids.map((uid) =>
+		return uids.map(uid =>
 			parseInt(settings[uid] || roomData.notificationSetting, 10)
 		);
 	};
@@ -122,9 +122,9 @@ module.exports = function (Messaging) {
 		const { ALLMESSAGES } = Messaging.notificationSettings;
 		await batch.processSortedSet(
 			`chat:room:${roomId}:uids:online`,
-			async (uids) => {
+			async uids => {
 				uids = uids.filter(
-					(uid) =>
+					uid =>
 						utils.isNumber(uid) &&
 						parseInt((settings && settings[uid]) || roomDefault, 10) ===
 							ALLMESSAGES &&

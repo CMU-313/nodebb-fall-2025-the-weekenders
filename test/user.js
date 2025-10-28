@@ -34,7 +34,7 @@ describe('User', () => {
 	async function dummyEmailerHook(data) {
 		// pretend to handle sending emails
 	}
-	before((done) => {
+	before(done => {
 		// Attach an emailer hook so related requests do not error
 		plugins.hooks.register('emailer-test', {
 			hook: 'static:email.send',
@@ -106,14 +106,14 @@ describe('User', () => {
 			assert.strictEqual(data.banned, false);
 		});
 
-		it('should have a valid email, if using an email', (done) => {
+		it('should have a valid email, if using an email', done => {
 			User.create(
 				{
 					username: userData.username,
 					password: userData.password,
 					email: 'fakeMail',
 				},
-				(err) => {
+				err => {
 					assert(err);
 					assert.equal(err.message, '[[error:invalid-email]]');
 					done();
@@ -121,26 +121,26 @@ describe('User', () => {
 			);
 		});
 
-		it('should error with invalid password', (done) => {
-			User.create({ username: 'test', password: '1' }, (err) => {
+		it('should error with invalid password', done => {
+			User.create({ username: 'test', password: '1' }, err => {
 				assert.equal(err.message, '[[reset_password:password-too-short]]');
 				done();
 			});
 		});
 
-		it('should error with invalid password', (done) => {
-			User.create({ username: 'test', password: {} }, (err) => {
+		it('should error with invalid password', done => {
+			User.create({ username: 'test', password: {} }, err => {
 				assert.equal(err.message, '[[error:invalid-password]]');
 				done();
 			});
 		});
 
-		it('should error with a too long password', (done) => {
+		it('should error with a too long password', done => {
 			let toolong = '';
 			for (let i = 0; i < 5000; i++) {
 				toolong += 'a';
 			}
-			User.create({ username: 'test', password: toolong }, (err) => {
+			User.create({ username: 'test', password: toolong }, err => {
 				assert.equal(err.message, '[[error:password-too-long]]');
 				done();
 			});
@@ -164,14 +164,14 @@ describe('User', () => {
 				assert.strictEqual(err.message, '[[error:username-taken]]');
 			} else {
 				const userData = await User.getUsersFields([uid1, uid2], ['username']);
-				const userNames = userData.map((u) => u.username);
+				const userNames = userData.map(u => u.username);
 				// make sure only 1 dupe1 is created
 				assert.equal(
-					userNames.filter((username) => username === 'dupe1').length,
+					userNames.filter(username => username === 'dupe1').length,
 					1
 				);
 				assert.equal(
-					userNames.filter((username) => username === 'dupe1 0').length,
+					userNames.filter(username => username === 'dupe1 0').length,
 					1
 				);
 			}
@@ -218,7 +218,7 @@ describe('User', () => {
 	});
 
 	describe('.isModerator()', () => {
-		it('should return false', (done) => {
+		it('should return false', done => {
 			User.isModerator(testUid, testCid, (err, isModerator) => {
 				assert.equal(err, null);
 				assert.equal(isModerator, false);
@@ -226,7 +226,7 @@ describe('User', () => {
 			});
 		});
 
-		it('should return two false results', (done) => {
+		it('should return two false results', done => {
 			User.isModerator([testUid, testUid], testCid, (err, isModerator) => {
 				assert.equal(err, null);
 				assert.equal(isModerator[0], false);
@@ -235,7 +235,7 @@ describe('User', () => {
 			});
 		});
 
-		it('should return two false results', (done) => {
+		it('should return two false results', done => {
 			User.isModerator(testUid, [testCid, testCid], (err, isModerator) => {
 				assert.equal(err, null);
 				assert.equal(isModerator[0], false);
@@ -246,11 +246,11 @@ describe('User', () => {
 	});
 
 	describe('.getModeratorUids()', () => {
-		before((done) => {
+		before(done => {
 			groups.join('cid:1:privileges:moderate', 1, done);
 		});
 
-		it('should retrieve all users with moderator bit in category privilege', (done) => {
+		it('should retrieve all users with moderator bit in category privilege', done => {
 			User.getModeratorUids((err, uids) => {
 				assert.ifError(err);
 				assert.strictEqual(1, uids.length);
@@ -259,7 +259,7 @@ describe('User', () => {
 			});
 		});
 
-		after((done) => {
+		after(done => {
 			groups.leave('cid:1:privileges:moderate', 1, done);
 		});
 	});
@@ -271,7 +271,7 @@ describe('User', () => {
 			await groups.join('testGroup', 1);
 		});
 
-		it('should retrieve all users with moderator bit in category privilege', (done) => {
+		it('should retrieve all users with moderator bit in category privilege', done => {
 			User.getModeratorUids((err, uids) => {
 				assert.ifError(err);
 				assert.strictEqual(1, uids.length);
@@ -287,7 +287,7 @@ describe('User', () => {
 	});
 
 	describe('.isReadyToPost()', () => {
-		it('should allow a post if the last post time is > 10 seconds', (done) => {
+		it('should allow a post if the last post time is > 10 seconds', done => {
 			User.setUserField(
 				testUid,
 				'lastposttime',
@@ -300,7 +300,7 @@ describe('User', () => {
 							content: 'lorem ipsum',
 							cid: testCid,
 						},
-						(err) => {
+						err => {
 							assert.ifError(err);
 							done();
 						}
@@ -309,7 +309,7 @@ describe('User', () => {
 			);
 		});
 
-		it('should error when a new user posts if the last post time is 10 < 30 seconds', (done) => {
+		it('should error when a new user posts if the last post time is 10 < 30 seconds', done => {
 			meta.config.newbiePostDelay = 30;
 			meta.config.newbieReputationThreshold = 3;
 
@@ -325,7 +325,7 @@ describe('User', () => {
 							content: 'lorem ipsum',
 							cid: testCid,
 						},
-						(err) => {
+						err => {
 							assert(err);
 							done();
 						}
@@ -334,7 +334,7 @@ describe('User', () => {
 			);
 		});
 
-		it('should not error if a non-newbie user posts if the last post time is 10 < 30 seconds', (done) => {
+		it('should not error if a non-newbie user posts if the last post time is 10 < 30 seconds', done => {
 			User.setUserFields(
 				testUid,
 				{
@@ -349,7 +349,7 @@ describe('User', () => {
 							content: 'lorem ipsum',
 							cid: testCid,
 						},
-						(err) => {
+						err => {
 							assert.ifError(err);
 							done();
 						}
@@ -363,7 +363,7 @@ describe('User', () => {
 			const { jar } = await helpers.loginUser('flooder', '123456');
 			const titles = new Array(10).fill('topic title');
 			const res = await Promise.allSettled(
-				titles.map(async (title) => {
+				titles.map(async title => {
 					const { body } = await helpers.request('post', '/api/v3/topics', {
 						body: {
 							cid: testCid,
@@ -375,8 +375,8 @@ describe('User', () => {
 					return body.status;
 				})
 			);
-			const failed = res.filter((res) => res.value.code === 'bad-request');
-			const success = res.filter((res) => res.value.code === 'ok');
+			const failed = res.filter(res => res.value.code === 'bad-request');
+			const success = res.filter(res => res.value.code === 'ok');
 			assert.strictEqual(failed.length, 9);
 			assert.strictEqual(success.length, 1);
 		});
@@ -390,7 +390,7 @@ describe('User', () => {
 			await groups.join('administrators', adminUid);
 		});
 
-		it('should return an object containing an array of matching users', (done) => {
+		it('should return an object containing an array of matching users', done => {
 			User.search({ query: 'john' }, (err, searchData) => {
 				assert.ifError(err);
 				uid = searchData.users[0].uid;
@@ -550,7 +550,7 @@ describe('User', () => {
 
 	describe('.delete()', () => {
 		let uid;
-		before((done) => {
+		before(done => {
 			User.create(
 				{
 					username: 'usertodelete',
@@ -565,8 +565,8 @@ describe('User', () => {
 			);
 		});
 
-		it('should delete a user account', (done) => {
-			User.delete(1, uid, (err) => {
+		it('should delete a user account', done => {
+			User.delete(1, uid, err => {
 				assert.ifError(err);
 				User.existsBySlug('usertodelete', (err, exists) => {
 					assert.ifError(err);
@@ -627,7 +627,7 @@ describe('User', () => {
 	});
 
 	describe('hash methods', () => {
-		it('should return uid from email', (done) => {
+		it('should return uid from email', done => {
 			User.getUidByEmail('john@example.com', (err, uid) => {
 				assert.ifError(err);
 				assert.equal(parseInt(uid, 10), parseInt(testUid, 10));
@@ -635,7 +635,7 @@ describe('User', () => {
 			});
 		});
 
-		it('should return uid from username', (done) => {
+		it('should return uid from username', done => {
 			User.getUidByUsername('John Smith', (err, uid) => {
 				assert.ifError(err);
 				assert.equal(parseInt(uid, 10), parseInt(testUid, 10));
@@ -643,7 +643,7 @@ describe('User', () => {
 			});
 		});
 
-		it('should return uid from userslug', (done) => {
+		it('should return uid from userslug', done => {
 			User.getUidByUserslug('john-smith', (err, uid) => {
 				assert.ifError(err);
 				assert.equal(parseInt(uid, 10), parseInt(testUid, 10));
@@ -651,7 +651,7 @@ describe('User', () => {
 			});
 		});
 
-		it('should get user data even if one uid is NaN', (done) => {
+		it('should get user data even if one uid is NaN', done => {
 			User.getUsersData([NaN, testUid], (err, data) => {
 				assert.ifError(err);
 				assert(data[0]);
@@ -662,7 +662,7 @@ describe('User', () => {
 			});
 		});
 
-		it('should not return private user data', (done) => {
+		it('should not return private user data', done => {
 			User.setUserFields(
 				testUid,
 				{
@@ -670,7 +670,7 @@ describe('User', () => {
 					another_secret: 'abcde',
 					postcount: '123',
 				},
-				(err) => {
+				err => {
 					assert.ifError(err);
 					User.getUserData(testUid, (err, userData) => {
 						assert.ifError(err);
@@ -686,7 +686,7 @@ describe('User', () => {
 			);
 		});
 
-		it('should not return password even if explicitly requested', (done) => {
+		it('should not return password even if explicitly requested', done => {
 			User.getUserFields(testUid, ['password'], (err, payload) => {
 				assert.ifError(err);
 				assert(!payload.hasOwnProperty('password'));
@@ -726,7 +726,7 @@ describe('User', () => {
 			assert(validBackgrounds.includes(payload['icon:bgColor']));
 		});
 
-		it('should return private data if field is whitelisted', (done) => {
+		it('should return private data if field is whitelisted', done => {
 			function filterMethod(data, callback) {
 				data.whitelist.push('another_secret');
 				callback(null, data);
@@ -749,7 +749,7 @@ describe('User', () => {
 			});
 		});
 
-		it('should return 0 as uid if username is falsy', (done) => {
+		it('should return 0 as uid if username is falsy', done => {
 			User.getUidByUsername('', (err, uid) => {
 				assert.ifError(err);
 				assert.strictEqual(uid, 0);
@@ -757,7 +757,7 @@ describe('User', () => {
 			});
 		});
 
-		it('should get username by userslug', (done) => {
+		it('should get username by userslug', done => {
 			User.getUsernameByUserslug('john-smith', (err, username) => {
 				assert.ifError(err);
 				assert.strictEqual('John Smith', username);
@@ -765,7 +765,7 @@ describe('User', () => {
 			});
 		});
 
-		it('should get uids by emails', (done) => {
+		it('should get uids by emails', done => {
 			User.getUidsByEmails(['john@example.com'], (err, uids) => {
 				assert.ifError(err);
 				assert.equal(uids[0], testUid);
@@ -773,7 +773,7 @@ describe('User', () => {
 			});
 		});
 
-		it('should not get groupTitle for guests', (done) => {
+		it('should not get groupTitle for guests', done => {
 			User.getUserData(0, (err, userData) => {
 				assert.ifError(err);
 				assert.strictEqual(userData.groupTitle, '');
@@ -782,7 +782,7 @@ describe('User', () => {
 			});
 		});
 
-		it('should load guest data', (done) => {
+		it('should load guest data', done => {
 			User.getUsersData([1, 0], (err, data) => {
 				assert.ifError(err);
 				assert.strictEqual(data[1].username, '[[global:guest]]');
@@ -886,7 +886,7 @@ describe('User', () => {
 				assert.equal(result.fullname, 'updatedFullname');
 
 				const userData = await db.getObject(`user:${uid}`);
-				Object.keys(data).forEach((key) => {
+				Object.keys(data).forEach(key => {
 					if (key === 'email') {
 						assert.strictEqual(userData.email, 'just@for.updated'); // email remains the same until confirmed
 					} else if (key !== 'password') {
@@ -1124,7 +1124,7 @@ describe('User', () => {
 				0,
 				-1
 			);
-			usernames = usernames.filter((d) => d.score === uid);
+			usernames = usernames.filter(d => d.score === uid);
 			assert.deepStrictEqual(usernames, [{ value: 'DennyO', score: uid }]);
 
 			await apiUser.update(
@@ -1136,7 +1136,7 @@ describe('User', () => {
 				0,
 				-1
 			);
-			usernames = usernames.filter((d) => d.score === uid);
+			usernames = usernames.filter(d => d.score === uid);
 			assert.deepStrictEqual(usernames, [{ value: "DennyO's", score: uid }]);
 
 			await apiUser.update(
@@ -1148,7 +1148,7 @@ describe('User', () => {
 				0,
 				-1
 			);
-			usernames = usernames.filter((d) => d.score === uid);
+			usernames = usernames.filter(d => d.score === uid);
 			assert.deepStrictEqual(usernames, [{ value: 'Denny O', score: uid }]);
 		});
 
@@ -1173,7 +1173,7 @@ describe('User', () => {
 			);
 		});
 
-		it('should update cover image', (done) => {
+		it('should update cover image', done => {
 			const position = '50.0301% 19.2464%';
 			socketUser.updateCover(
 				{ uid: uid },
@@ -1203,7 +1203,7 @@ describe('User', () => {
 			assert.strictEqual(fs.existsSync(coverPath), false);
 		});
 
-		it('should set user status', (done) => {
+		it('should set user status', done => {
 			socketUser.setStatus({ uid: uid }, 'away', (err, data) => {
 				assert.ifError(err);
 				assert.equal(data.uid, uid);
@@ -1212,14 +1212,14 @@ describe('User', () => {
 			});
 		});
 
-		it('should fail for invalid status', (done) => {
-			socketUser.setStatus({ uid: uid }, '12345', (err) => {
+		it('should fail for invalid status', done => {
+			socketUser.setStatus({ uid: uid }, '12345', err => {
 				assert.equal(err.message, '[[error:invalid-user-status]]');
 				done();
 			});
 		});
 
-		it('should get user status', (done) => {
+		it('should get user status', done => {
 			socketUser.checkStatus({ uid: uid }, uid, (err, status) => {
 				assert.ifError(err);
 				assert.equal(status, 'away');
@@ -1284,7 +1284,7 @@ describe('User', () => {
 			assert.equal(picture, `${nconf.get('relative_path')}/test`);
 		});
 
-		it('should return error if profile image uploads disabled', (done) => {
+		it('should return error if profile image uploads disabled', done => {
 			meta.config.allowProfileImageUploads = 0;
 			const picture = {
 				path: path.join(nconf.get('base_dir'), 'test/files/test_copy.png'),
@@ -1298,7 +1298,7 @@ describe('User', () => {
 					uid: uid,
 					file: picture,
 				},
-				(err) => {
+				err => {
 					assert.equal(err.message, '[[error:profile-image-uploads-disabled]]');
 					meta.config.allowProfileImageUploads = 1;
 					done();
@@ -1306,14 +1306,14 @@ describe('User', () => {
 			);
 		});
 
-		it('should return error if profile image has no mime type', (done) => {
+		it('should return error if profile image has no mime type', done => {
 			User.uploadCroppedPicture(
 				{
 					callerUid: uid,
 					uid: uid,
 					imageData: 'data:image/invalid;base64,R0lGODlhPQBEAPeoAJosM/',
 				},
-				(err) => {
+				err => {
 					assert.equal(err.message, '[[error:invalid-image]]');
 					done();
 				}
@@ -1373,14 +1373,14 @@ describe('User', () => {
 				assert.strictEqual(result.url, data.picture);
 			});
 
-			it('should error if both file and imageData are missing', (done) => {
-				User.uploadCroppedPicture({}, (err) => {
+			it('should error if both file and imageData are missing', done => {
+				User.uploadCroppedPicture({}, err => {
 					assert.equal('[[error:invalid-data]]', err.message);
 					done();
 				});
 			});
 
-			it('should error if file size is too big', (done) => {
+			it('should error if file size is too big', done => {
 				const temp = meta.config.maximumProfileImageSize;
 				meta.config.maximumProfileImageSize = 1;
 				User.uploadCroppedPicture(
@@ -1389,7 +1389,7 @@ describe('User', () => {
 						uid: 1,
 						imageData: goodImage,
 					},
-					(err) => {
+					err => {
 						assert.equal('[[error:file-too-big, 1]]', err.message);
 
 						// Restore old value
@@ -1399,21 +1399,21 @@ describe('User', () => {
 				);
 			});
 
-			it('should not allow image data with bad MIME type to be passed in', (done) => {
+			it('should not allow image data with bad MIME type to be passed in', done => {
 				User.uploadCroppedPicture(
 					{
 						callerUid: uid,
 						uid: 1,
 						imageData: badImage,
 					},
-					(err) => {
+					err => {
 						assert.equal('[[error:invalid-image]]', err.message);
 						done();
 					}
 				);
 			});
 
-			it('should get profile pictures', (done) => {
+			it('should get profile pictures', done => {
 				socketUser.getProfilePictures(
 					{ uid: uid },
 					{ uid: uid },
@@ -1430,7 +1430,7 @@ describe('User', () => {
 				);
 			});
 
-			it('should get default profile avatar', (done) => {
+			it('should get default profile avatar', done => {
 				assert.strictEqual(User.getDefaultAvatar(), '');
 				meta.config.defaultAvatar = 'https://path/to/default/avatar';
 				assert.strictEqual(User.getDefaultAvatar(), meta.config.defaultAvatar);
@@ -1443,10 +1443,10 @@ describe('User', () => {
 				done();
 			});
 
-			it('should fail to get profile pictures with invalid data', (done) => {
-				socketUser.getProfilePictures({ uid: uid }, null, (err) => {
+			it('should fail to get profile pictures with invalid data', done => {
+				socketUser.getProfilePictures({ uid: uid }, null, err => {
 					assert.equal(err.message, '[[error:invalid-data]]');
-					socketUser.getProfilePictures({ uid: uid }, { uid: null }, (err) => {
+					socketUser.getProfilePictures({ uid: uid }, { uid: null }, err => {
 						assert.equal(err.message, '[[error:invalid-data]]');
 						done();
 					});
@@ -1462,12 +1462,12 @@ describe('User', () => {
 				assert.strictEqual(fs.existsSync(avatarPath), false);
 			});
 
-			it('should fail to remove uploaded picture with invalid-data', (done) => {
-				socketUser.removeUploadedPicture({ uid: uid }, null, (err) => {
+			it('should fail to remove uploaded picture with invalid-data', done => {
+				socketUser.removeUploadedPicture({ uid: uid }, null, err => {
 					assert.equal(err.message, '[[error:invalid-data]]');
-					socketUser.removeUploadedPicture({ uid: uid }, {}, (err) => {
+					socketUser.removeUploadedPicture({ uid: uid }, {}, err => {
 						assert.equal(err.message, '[[error:invalid-data]]');
-						socketUser.removeUploadedPicture({ uid: null }, {}, (err) => {
+						socketUser.removeUploadedPicture({ uid: null }, {}, err => {
 							assert.equal(err.message, '[[error:invalid-data]]');
 							done();
 						});
@@ -1558,8 +1558,8 @@ describe('User', () => {
 			});
 		});
 
-		it('should return error if there is no ban reason', (done) => {
-			User.getLatestBanInfo(123, (err) => {
+		it('should return error if there is no ban reason', done => {
+			User.getLatestBanInfo(123, err => {
 				assert.equal(err.message, 'no-ban-info');
 				done();
 			});
@@ -1589,8 +1589,8 @@ describe('User', () => {
 			await User.bans.unban(testUserUid);
 		});
 
-		it('should ban user permanently', (done) => {
-			User.bans.ban(testUserUid, (err) => {
+		it('should ban user permanently', done => {
+			User.bans.ban(testUserUid, err => {
 				assert.ifError(err);
 				User.bans.isBanned(testUserUid, (err, isBanned) => {
 					assert.ifError(err);
@@ -1610,8 +1610,8 @@ describe('User', () => {
 			await User.bans.unban(testUserUid);
 		});
 
-		it('should error if until is NaN', (done) => {
-			User.bans.ban(testUserUid, 'asd', (err) => {
+		it('should error if until is NaN', done => {
+			User.bans.ban(testUserUid, 'asd', err => {
 				assert.equal(err.message, '[[error:ban-expiry-missing]]');
 				done();
 			});
@@ -1621,7 +1621,7 @@ describe('User', () => {
 			await User.bans.ban(testUserUid);
 
 			const systemGroups = groups.systemGroups.filter(
-				(group) => group !== groups.BANNED_USERS
+				group => group !== groups.BANNED_USERS
 			);
 			const isMember = await groups.isMember(testUserUid, groups.BANNED_USERS);
 			const isMemberOfAny = await groups.isMemberOfAny(
@@ -1727,7 +1727,7 @@ describe('User', () => {
 		before(async () => {
 			const testUsers = ['daysub', 'offsub', 'nullsub', 'weeksub'];
 			await Promise.all(
-				testUsers.map(async (username) => {
+				testUsers.map(async username => {
 					const uid = await User.create({
 						username,
 						email: `${username}@example.com`,
@@ -1744,7 +1744,7 @@ describe('User', () => {
 			);
 		});
 
-		it('should accurately build digest list given ACP default "null" (not set)', (done) => {
+		it('should accurately build digest list given ACP default "null" (not set)', done => {
 			User.digest.getSubscribers('day', (err, subs) => {
 				assert.ifError(err);
 				assert.strictEqual(subs.length, 1);
@@ -1827,7 +1827,7 @@ describe('User', () => {
 
 		it('should get delivery times', async () => {
 			const data = await User.digest.getDeliveryTimes(0, -1);
-			const users = data.users.filter((u) => u.username === 'digestuser');
+			const users = data.users.filter(u => u.username === 'digestuser');
 			assert.strictEqual(users[0].setting, 'day');
 		});
 
@@ -1932,8 +1932,8 @@ describe('User', () => {
 		const socketUser = require('../src/socket.io/user');
 		let delUid;
 
-		it('should fail with invalid data', (done) => {
-			meta.userOrGroupExists(null, (err) => {
+		it('should fail with invalid data', done => {
+			meta.userOrGroupExists(null, err => {
 				assert.equal(err.message, '[[error:invalid-data]]');
 				done();
 			});
@@ -2003,7 +2003,7 @@ describe('User', () => {
 				path.join(nconf.get('upload_path'), 'profile')
 			);
 			const deletedUserImages = allProfileFiles.filter(
-				(f) =>
+				f =>
 					f.startsWith(`${delUid}-profilecover`) ||
 					f.startsWith(`${delUid}-profileavatar`)
 			);
@@ -2052,37 +2052,37 @@ describe('User', () => {
 			meta.config.allowAccountDelete = oldValue;
 		});
 
-		it('should send reset email', (done) => {
-			socketUser.reset.send({ uid: 0 }, 'john@example.com', (err) => {
+		it('should send reset email', done => {
+			socketUser.reset.send({ uid: 0 }, 'john@example.com', err => {
 				assert.ifError(err);
 				done();
 			});
 		});
 
-		it('should return invalid-data error', (done) => {
-			socketUser.reset.send({ uid: 0 }, null, (err) => {
+		it('should return invalid-data error', done => {
+			socketUser.reset.send({ uid: 0 }, null, err => {
 				assert.equal(err.message, '[[error:invalid-data]]');
 				done();
 			});
 		});
 
-		it('should not error', (done) => {
-			socketUser.reset.send({ uid: 0 }, 'doestnot@exist.com', (err) => {
+		it('should not error', done => {
+			socketUser.reset.send({ uid: 0 }, 'doestnot@exist.com', err => {
 				assert.ifError(err);
 				done();
 			});
 		});
 
-		it('should commit reset', (done) => {
+		it('should commit reset', done => {
 			db.getObject('reset:uid', (err, data) => {
 				assert.ifError(err);
 				const code = Object.keys(data).find(
-					(code) => parseInt(data[code], 10) === parseInt(testUid, 10)
+					code => parseInt(data[code], 10) === parseInt(testUid, 10)
 				);
 				socketUser.reset.commit(
 					{ uid: 0 },
 					{ code: code, password: 'pwdchange' },
-					(err) => {
+					err => {
 						assert.ifError(err);
 						done();
 					}
@@ -2261,7 +2261,7 @@ describe('User', () => {
 	describe('approval queue', () => {
 		let oldRegistrationApprovalType;
 		let adminUid;
-		before((done) => {
+		before(done => {
 			oldRegistrationApprovalType = meta.config.registrationApprovalType;
 			meta.config.registrationApprovalType = 'admin-approval';
 			User.create({ username: 'admin', password: '123456' }, (err, uid) => {
@@ -2271,7 +2271,7 @@ describe('User', () => {
 			});
 		});
 
-		after((done) => {
+		after(done => {
 			meta.config.registrationApprovalType = oldRegistrationApprovalType;
 			done();
 		});
@@ -2659,7 +2659,7 @@ describe('User', () => {
 		});
 
 		describe('after invites checks', () => {
-			it("should get user's invites", (done) => {
+			it("should get user's invites", done => {
 				User.getInvites(inviterUid, (err, data) => {
 					assert.ifError(err);
 					Array.from(Array(6)).forEach((_, i) => {
@@ -2669,12 +2669,12 @@ describe('User', () => {
 				});
 			});
 
-			it('should get all invites', (done) => {
+			it('should get all invites', done => {
 				User.getAllInvites((err, data) => {
 					assert.ifError(err);
 
 					const adminData = data.filter(
-						(d) => parseInt(d.uid, 10) === adminUid
+						d => parseInt(d.uid, 10) === adminUid
 					)[0];
 					assert.notEqual(
 						adminData.invitations.indexOf('invite99@test.com'),
@@ -2682,7 +2682,7 @@ describe('User', () => {
 					);
 
 					const inviterData = data.filter(
-						(d) => parseInt(d.uid, 10) === inviterUid
+						d => parseInt(d.uid, 10) === inviterUid
 					)[0];
 					Array.from(Array(6)).forEach((_, i) => {
 						assert.notEqual(
@@ -2695,8 +2695,8 @@ describe('User', () => {
 				});
 			});
 
-			it('should fail to verify invitation with invalid data', (done) => {
-				User.verifyInvitation({ token: '', email: '' }, (err) => {
+			it('should fail to verify invitation with invalid data', done => {
+				User.verifyInvitation({ token: '', email: '' }, err => {
 					assert.strictEqual(
 						err.message,
 						'[[register:invite.error-invite-only]]'
@@ -2705,10 +2705,10 @@ describe('User', () => {
 				});
 			});
 
-			it('should fail to verify invitation with invalid email', (done) => {
+			it('should fail to verify invitation with invalid email', done => {
 				User.verifyInvitation(
 					{ token: 'test', email: 'doesnotexist@test.com' },
-					(err) => {
+					err => {
 						assert.strictEqual(
 							err.message,
 							'[[register:invite.error-invalid-data]]'
@@ -2718,7 +2718,7 @@ describe('User', () => {
 				);
 			});
 
-			it('should verify installation with no errors', (done) => {
+			it('should verify installation with no errors', done => {
 				const email = 'invite1@test.com';
 				db.get(
 					`invitation:uid:${inviterUid}:invited:${email}`,
@@ -2727,7 +2727,7 @@ describe('User', () => {
 						assert.ifError(err);
 						User.verifyInvitation(
 							{ token: token, email: 'invite1@test.com' },
-							(err) => {
+							err => {
 								assert.ifError(err);
 								done();
 							}
@@ -2736,19 +2736,19 @@ describe('User', () => {
 				);
 			});
 
-			it('should error with invalid username', (done) => {
-				User.deleteInvitation('doesnotexist', 'test@test.com', (err) => {
+			it('should error with invalid username', done => {
+				User.deleteInvitation('doesnotexist', 'test@test.com', err => {
 					assert.equal(err.message, '[[error:invalid-username]]');
 					done();
 				});
 			});
 
-			it('should delete invitation', (done) => {
+			it('should delete invitation', done => {
 				const socketUser = require('../src/socket.io/user');
 				socketUser.deleteInvitation(
 					{ uid: adminUid },
 					{ invitedBy: 'inviter', email: 'invite1@test.com' },
-					(err) => {
+					err => {
 						assert.ifError(err);
 						db.isSetMember(
 							`invitation:uid:${inviterUid}`,
@@ -2763,8 +2763,8 @@ describe('User', () => {
 				);
 			});
 
-			it('should delete invitation key', (done) => {
-				User.deleteInvitationKey('invite99@test.com', (err) => {
+			it('should delete invitation key', done => {
+				User.deleteInvitationKey('invite99@test.com', err => {
 					assert.ifError(err);
 					db.isSetMember(
 						`invitation:uid:${adminUid}`,
@@ -2851,8 +2851,8 @@ describe('User', () => {
 	});
 
 	describe('email confirm', () => {
-		it('should error with invalid code', (done) => {
-			User.email.confirmByCode('asdasda', (err) => {
+		it('should error with invalid code', done => {
+			User.email.confirmByCode('asdasda', err => {
 				assert.equal(err.message, '[[error:invalid-data]]');
 				done();
 			});
@@ -2917,24 +2917,24 @@ describe('User', () => {
 	});
 
 	describe('user jobs', () => {
-		it('should start user jobs', (done) => {
+		it('should start user jobs', done => {
 			User.startJobs();
 			done();
 		});
 
-		it('should stop user jobs', (done) => {
+		it('should stop user jobs', done => {
 			User.stopJobs();
 			done();
 		});
 
-		it('should send digest', (done) => {
+		it('should send digest', done => {
 			db.sortedSetAdd(
 				'digest:day:uids',
 				[Date.now(), Date.now()],
 				[1, 2],
-				(err) => {
+				err => {
 					assert.ifError(err);
-					User.digest.execute({ interval: 'day' }, (err) => {
+					User.digest.execute({ interval: 'day' }, err => {
 						assert.ifError(err);
 						done();
 					});
@@ -2998,7 +2998,7 @@ describe('User', () => {
 			));
 		});
 
-		after((done) => {
+		after(done => {
 			meta.config.hideEmail = 0;
 			meta.config.hideFullname = 0;
 			done();
@@ -3264,9 +3264,9 @@ describe('User', () => {
 		});
 	});
 
-	describe('user blocking methods', (done) => {
+	describe('user blocking methods', done => {
 		let blockeeUid;
-		before((done) => {
+		before(done => {
 			User.create(
 				{
 					username: 'blockee',
@@ -3281,11 +3281,11 @@ describe('User', () => {
 		});
 
 		describe('.toggle()', () => {
-			it('should toggle block', (done) => {
+			it('should toggle block', done => {
 				socketUser.toggleBlock(
 					{ uid: 1 },
 					{ blockerUid: 1, blockeeUid: blockeeUid, action: 'block' },
-					(err) => {
+					err => {
 						assert.ifError(err);
 						User.blocks.is(blockeeUid, 1, (err, blocked) => {
 							assert.ifError(err);
@@ -3296,11 +3296,11 @@ describe('User', () => {
 				);
 			});
 
-			it('should toggle block', (done) => {
+			it('should toggle block', done => {
 				socketUser.toggleBlock(
 					{ uid: 1 },
 					{ blockerUid: 1, blockeeUid: blockeeUid, action: 'unblock' },
-					(err) => {
+					err => {
 						assert.ifError(err);
 						User.blocks.is(blockeeUid, 1, (err, blocked) => {
 							assert.ifError(err);
@@ -3313,8 +3313,8 @@ describe('User', () => {
 		});
 
 		describe('.add()', () => {
-			it('should block a uid', (done) => {
-				User.blocks.add(blockeeUid, 1, (err) => {
+			it('should block a uid', done => {
+				User.blocks.add(blockeeUid, 1, err => {
 					assert.ifError(err);
 					User.blocks.list(1, (err, blocked_uids) => {
 						assert.ifError(err);
@@ -3326,7 +3326,7 @@ describe('User', () => {
 				});
 			});
 
-			it('should automatically increment corresponding user field', (done) => {
+			it('should automatically increment corresponding user field', done => {
 				db.getObjectField('user:1', 'blocksCount', (err, count) => {
 					assert.ifError(err);
 					assert.strictEqual(parseInt(count, 10), 1);
@@ -3334,8 +3334,8 @@ describe('User', () => {
 				});
 			});
 
-			it('should error if you try to block the same uid again', (done) => {
-				User.blocks.add(blockeeUid, 1, (err) => {
+			it('should error if you try to block the same uid again', done => {
+				User.blocks.add(blockeeUid, 1, err => {
 					assert.equal(err.message, '[[error:already-blocked]]');
 					done();
 				});
@@ -3343,8 +3343,8 @@ describe('User', () => {
 		});
 
 		describe('.remove()', () => {
-			it('should unblock a uid', (done) => {
-				User.blocks.remove(blockeeUid, 1, (err) => {
+			it('should unblock a uid', done => {
+				User.blocks.remove(blockeeUid, 1, err => {
 					assert.ifError(err);
 					User.blocks.list(1, (err, blocked_uids) => {
 						assert.ifError(err);
@@ -3355,7 +3355,7 @@ describe('User', () => {
 				});
 			});
 
-			it('should automatically decrement corresponding user field', (done) => {
+			it('should automatically decrement corresponding user field', done => {
 				db.getObjectField('user:1', 'blocksCount', (err, count) => {
 					assert.ifError(err);
 					assert.strictEqual(parseInt(count, 10), 0);
@@ -3363,8 +3363,8 @@ describe('User', () => {
 				});
 			});
 
-			it('should error if you try to unblock the same uid again', (done) => {
-				User.blocks.remove(blockeeUid, 1, (err) => {
+			it('should error if you try to unblock the same uid again', done => {
+				User.blocks.remove(blockeeUid, 1, err => {
 					assert.equal(err.message, '[[error:already-unblocked]]');
 					done();
 				});
@@ -3372,11 +3372,11 @@ describe('User', () => {
 		});
 
 		describe('.is()', () => {
-			before((done) => {
+			before(done => {
 				User.blocks.add(blockeeUid, 1, done);
 			});
 
-			it('should return a Boolean with blocked status for the queried uid', (done) => {
+			it('should return a Boolean with blocked status for the queried uid', done => {
 				User.blocks.is(blockeeUid, 1, (err, blocked) => {
 					assert.ifError(err);
 					assert.strictEqual(blocked, true);
@@ -3386,7 +3386,7 @@ describe('User', () => {
 		});
 
 		describe('.list()', () => {
-			it('should return a list of blocked uids', (done) => {
+			it('should return a list of blocked uids', done => {
 				User.blocks.list(1, (err, blocked_uids) => {
 					assert.ifError(err);
 					assert.strictEqual(Array.isArray(blocked_uids), true);
@@ -3398,7 +3398,7 @@ describe('User', () => {
 		});
 
 		describe('.filter()', () => {
-			it('should remove entries by blocked uids and return filtered set', (done) => {
+			it('should remove entries by blocked uids and return filtered set', done => {
 				User.blocks.filter(
 					1,
 					[
@@ -3425,7 +3425,7 @@ describe('User', () => {
 				);
 			});
 
-			it('should allow property argument to be passed in to customise checked property', (done) => {
+			it('should allow property argument to be passed in to customise checked property', done => {
 				User.blocks.filter(
 					1,
 					'fromuid',
@@ -3453,7 +3453,7 @@ describe('User', () => {
 				);
 			});
 
-			it('should not process invalid sets', (done) => {
+			it('should not process invalid sets', done => {
 				User.blocks.filter(
 					1,
 					[{ foo: 'foo' }, { foo: 'bar' }, { foo: 'baz' }],
@@ -3461,7 +3461,7 @@ describe('User', () => {
 						assert.ifError(err);
 						assert.strictEqual(Array.isArray(filtered), true);
 						assert.strictEqual(filtered.length, 3);
-						filtered.forEach((obj) => {
+						filtered.forEach(obj => {
 							assert.strictEqual(obj.hasOwnProperty('foo'), true);
 						});
 						done();
@@ -3469,7 +3469,7 @@ describe('User', () => {
 				);
 			});
 
-			it('should process plain sets that just contain uids', (done) => {
+			it('should process plain sets that just contain uids', done => {
 				User.blocks.filter(1, [1, blockeeUid], (err, filtered) => {
 					assert.ifError(err);
 					assert.strictEqual(filtered.length, 1);
@@ -3478,7 +3478,7 @@ describe('User', () => {
 				});
 			});
 
-			it('should filter uids that are blocking targetUid', (done) => {
+			it('should filter uids that are blocking targetUid', done => {
 				User.blocks.filterUids(blockeeUid, [1, 2], (err, filtered) => {
 					assert.ifError(err);
 					assert.deepEqual(filtered, [2]);
@@ -3489,7 +3489,7 @@ describe('User', () => {
 	});
 
 	describe('status/online', () => {
-		it('should return offline if user is guest', (done) => {
+		it('should return offline if user is guest', done => {
 			const status = User.getStatus({ uid: 0 });
 			assert.strictEqual(status, 'offline');
 			done();
@@ -3505,19 +3505,19 @@ describe('User', () => {
 	});
 
 	describe('isPrivilegedOrSelf', () => {
-		it('should return not error if self', (done) => {
-			User.isPrivilegedOrSelf(1, 1, (err) => {
+		it('should return not error if self', done => {
+			User.isPrivilegedOrSelf(1, 1, err => {
 				assert.ifError(err);
 				done();
 			});
 		});
 
-		it('should not error if privileged', (done) => {
+		it('should not error if privileged', done => {
 			User.create({ username: 'theadmin' }, (err, uid) => {
 				assert.ifError(err);
-				groups.join('administrators', uid, (err) => {
+				groups.join('administrators', uid, err => {
 					assert.ifError(err);
-					User.isPrivilegedOrSelf(uid, 2, (err) => {
+					User.isPrivilegedOrSelf(uid, 2, err => {
 						assert.ifError(err);
 						done();
 					});
@@ -3525,15 +3525,15 @@ describe('User', () => {
 			});
 		});
 
-		it('should error if not privileged', (done) => {
-			User.isPrivilegedOrSelf(0, 1, (err) => {
+		it('should error if not privileged', done => {
+			User.isPrivilegedOrSelf(0, 1, err => {
 				assert.equal(err.message, '[[error:no-privileges]]');
 				done();
 			});
 		});
 	});
 
-	it('should get admins and mods', (done) => {
+	it('should get admins and mods', done => {
 		User.getAdminsandGlobalMods((err, data) => {
 			assert.ifError(err);
 			assert(Array.isArray(data));
@@ -3557,7 +3557,7 @@ describe('User', () => {
 		});
 
 		it('subfolder tests', () => {
-			files.forEach((filePath) => {
+			files.forEach(filePath => {
 				require(filePath);
 			});
 		});

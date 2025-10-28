@@ -23,7 +23,7 @@ define('categorySearch', ['alerts', 'bootstrap', 'api'], function (
 
 		let localCategories = [];
 		if (Array.isArray(options.localCategories)) {
-			localCategories = options.localCategories.map((c) => ({ ...c }));
+			localCategories = options.localCategories.map(c => ({ ...c }));
 			if (categoriesList) {
 				categoriesList = [...localCategories, ...categoriesList];
 			}

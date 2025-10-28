@@ -44,7 +44,7 @@ SocketAdmin.before = async function (socket, method) {
 		: [];
 	const hasPrivilege = (
 		await Promise.all(
-			privilegeSet.map(async (privilege) =>
+			privilegeSet.map(async privilege =>
 				privileges.admin.can(privilege, socket.uid)
 			)
 		)

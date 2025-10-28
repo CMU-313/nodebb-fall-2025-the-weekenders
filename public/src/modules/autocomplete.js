@@ -19,7 +19,7 @@ define('autocomplete', [
 		appendTo: null,
 	};
 
-	autocomplete.init = (params) => {
+	autocomplete.init = params => {
 		const acParams = { ..._default, ...params };
 		const { input, onSelect } = acParams;
 		app.loadJQueryUI(function () {

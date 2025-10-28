@@ -102,7 +102,7 @@ module.exports = function (User) {
 
 		// Filter out remote categories
 		const isCategory = await db.exists(
-			uids.map((uid) => `categoryRemote:${uid}`)
+			uids.map(uid => `categoryRemote:${uid}`)
 		);
 		uids = uids.filter((uid, idx) => !isCategory[idx]);
 

@@ -492,7 +492,7 @@ define('iconSelect', ['benchpress', 'bootbox'], function (Benchpress, bootbox) {
 							iconData = initialIcons;
 						}
 						icons.remove();
-						iconData.forEach((iconData) => {
+						iconData.forEach(iconData => {
 							iconContainer.append(
 								$(
 									`<i class="fa fa-xl fa-${iconData.style}${iconData.family !== 'classic' ? ` fa-${iconData.family}` : ''} fa-${iconData.id} rounded-1" data-label="${iconData.label}"></i>`
@@ -590,10 +590,10 @@ define('iconSelect', ['benchpress', 'bootbox'], function (Benchpress, bootbox) {
 		});
 		const response = await request.json();
 		const icons = response.data.search
-			.filter((icon) => icon.familyStylesByLicense.free.length > 0)
-			.flatMap((icon) => {
+			.filter(icon => icon.familyStylesByLicense.free.length > 0)
+			.flatMap(icon => {
 				const result = [];
-				icon.familyStylesByLicense[fontawesome_license].forEach((style) => {
+				icon.familyStylesByLicense[fontawesome_license].forEach(style => {
 					let familyStyle = style.style;
 					if (style.family !== 'classic') {
 						familyStyle = `${style.family}-${familyStyle}`;

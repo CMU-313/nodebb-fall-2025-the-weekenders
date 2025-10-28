@@ -84,11 +84,11 @@ describe('Messaging Library', () => {
 	});
 
 	describe('.canMessageUser()', () => {
-		it('should allow messages to be sent to an unrestricted user', (done) => {
+		it('should allow messages to be sent to an unrestricted user', done => {
 			Messaging.canMessageUser(
 				mocks.users.baz.uid,
 				mocks.users.herp.uid,
-				(err) => {
+				err => {
 					assert.ifError(err);
 					done();
 				}
@@ -111,11 +111,11 @@ describe('Messaging Library', () => {
 			}
 		});
 
-		it('should always allow admins through', (done) => {
+		it('should always allow admins through', done => {
 			Messaging.canMessageUser(
 				mocks.users.foo.uid,
 				mocks.users.baz.uid,
-				(err) => {
+				err => {
 					assert.ifError(err);
 					done();
 				}
@@ -162,7 +162,7 @@ describe('Messaging Library', () => {
 			);
 			await assert.rejects(
 				Messaging.canMessageRoom(mocks.users.herp.uid, roomId),
-				(err) => {
+				err => {
 					assert(err.message.startsWith('[[error:user-muted-for-minutes,'));
 					return true;
 				}
@@ -175,7 +175,7 @@ describe('Messaging Library', () => {
 			);
 			await assert.rejects(
 				Messaging.canMessageRoom(mocks.users.herp.uid, roomId),
-				(err) => {
+				err => {
 					assert(err.message.startsWith('[[error:user-muted-for-hours,'));
 					return true;
 				}
@@ -766,7 +766,7 @@ describe('Messaging Library', () => {
 			assert(Array.isArray(messages));
 
 			// Filter out system messages
-			const normalMessages = messages.filter((message) => !message.system);
+			const normalMessages = messages.filter(message => !message.system);
 			assert.equal(normalMessages[0].roomId, roomId);
 			assert.equal(normalMessages[0].fromuid, mocks.users.foo.uid);
 		});
@@ -1169,7 +1169,7 @@ describe('Messaging Library', () => {
 		it('should not show deleted message to other users', async () => {
 			const { body } = await callv3API('get', `/chats/${roomId}`, {}, 'herp');
 			const { messages } = body.response;
-			messages.forEach((msg) => {
+			messages.forEach(msg => {
 				assert(
 					!msg.deleted ||
 						msg.content === '<p>[[modules:chat.message-deleted]]</p>',

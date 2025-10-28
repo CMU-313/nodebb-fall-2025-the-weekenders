@@ -44,7 +44,7 @@ module.exports = {
 function getGroupPrivileges(cid, callback) {
 	const tasks = {};
 
-	['groups:find', 'groups:read', 'groups:topics:read'].forEach((privilege) => {
+	['groups:find', 'groups:read', 'groups:topics:read'].forEach(privilege => {
 		tasks[privilege] = async.apply(
 			groups.isMember,
 			'guests',

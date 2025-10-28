@@ -127,10 +127,10 @@ define('forum/topic', [
 		renderEndorsedBadgesFromData();
 
 		// live updates from backend socket events
-		socket.on('event:post_endorsed', (payload) =>
+		socket.on('event:post_endorsed', payload =>
 			updateEndorsedBadge(payload.pid, true)
 		);
-		socket.on('event:post_unendorsed', (payload) =>
+		socket.on('event:post_unendorsed', payload =>
 			updateEndorsedBadge(payload.pid, false)
 		);
 
@@ -169,7 +169,7 @@ define('forum/topic', [
 
 		function renderEndorsedBadgesFromData() {
 			if (!ajaxify?.data?.posts) return;
-			ajaxify.data.posts.forEach((p) => {
+			ajaxify.data.posts.forEach(p => {
 				const $post = $(`[component="post"][data-pid="${p.pid}"]`);
 				updateEndorsedBadgeByEl($post, !!p.endorsed);
 			});
@@ -188,7 +188,7 @@ define('forum/topic', [
 	};
 
 	function handleTopicSearch() {
-		require(['mousetrap'], (mousetrap) => {
+		require(['mousetrap'], mousetrap => {
 			if (config.topicSearchEnabled) {
 				require(['search'], function (search) {
 					mousetrap.bind(['command+f', 'ctrl+f'], function (e) {
@@ -210,7 +210,7 @@ define('forum/topic', [
 				});
 			}
 
-			mousetrap.bind('j', (e) => {
+			mousetrap.bind('j', e => {
 				if (e.target.classList.contains('mousetrap')) {
 					return;
 				}
@@ -224,7 +224,7 @@ define('forum/topic', [
 				navigator.scrollToIndex(index, true, 0);
 			});
 
-			mousetrap.bind('k', (e) => {
+			mousetrap.bind('k', e => {
 				if (e.target.classList.contains('mousetrap')) {
 					return;
 				}
@@ -300,7 +300,7 @@ define('forum/topic', [
 			return;
 		}
 
-		listEl.addEventListener('click', async (e) => {
+		listEl.addEventListener('click', async e => {
 			const clickedThumb = e.target.closest('a');
 			if (clickedThumb) {
 				const clickedThumbIndex = Array.from(
@@ -308,7 +308,7 @@ define('forum/topic', [
 				).indexOf(clickedThumb);
 				e.stopPropagation();
 				e.preventDefault();
-				const thumbs = ajaxify.data.thumbs.map((t) => ({ ...t }));
+				const thumbs = ajaxify.data.thumbs.map(t => ({ ...t }));
 				thumbs.forEach((t, i) => {
 					t.selected = i === clickedThumbIndex;
 				});
@@ -737,7 +737,7 @@ define('forum/topic', [
 
 		// Sort endorsed posts by rank asc, then endorsed_at desc
 		const endorsed = postList
-			.filter((p) => p.endorsed)
+			.filter(p => p.endorsed)
 			.sort((a, b) => {
 				const ra = Number(a.endorsed_rank || 0);
 				const rb = Number(b.endorsed_rank || 0);
@@ -778,7 +778,7 @@ define('forum/topic', [
 		}
 
 		// Move each endorsed post into the block (this reorders in the DOM)
-		endorsed.forEach((p) => {
+		endorsed.forEach(p => {
 			const postEl = topicEl.find(
 				'[component="post"][data-pid="' + p.pid + '"]'
 			);

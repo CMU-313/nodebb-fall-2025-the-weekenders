@@ -16,7 +16,7 @@ describe('minifier', () => {
 
 	after(async () => {
 		const files = await file.walk(testPath);
-		await Promise.all(files.map(async (path) => fs.promises.rm(path)));
+		await Promise.all(files.map(async path => fs.promises.rm(path)));
 		await fs.promises.rmdir(testPath);
 	});
 
@@ -24,13 +24,13 @@ describe('minifier', () => {
 	const scripts = [
 		path.resolve(__dirname, './files/1.js'),
 		path.resolve(__dirname, './files/2.js'),
-	].map((script) => ({
+	].map(script => ({
 		srcPath: script,
 		destPath: path.resolve(__dirname, '../test/build', path.basename(script)),
 		filename: path.basename(script),
 	}));
 
-	it('.js.bundle() should concat scripts', (done) => {
+	it('.js.bundle() should concat scripts', done => {
 		const destPath = path.resolve(__dirname, '../test/build/concatenated.js');
 
 		minifier.js.bundle(
@@ -40,7 +40,7 @@ describe('minifier', () => {
 				filename: 'concatenated.js',
 			},
 			false,
-			(err) => {
+			err => {
 				assert.ifError(err);
 
 				assert(file.existsSync(destPath));
@@ -65,7 +65,7 @@ describe('minifier', () => {
 
 	const styles = ['@import "./1";', '@import "./2.scss";'].join('\n');
 	const paths = [path.resolve(__dirname, './files')];
-	it('.css.bundle() should concat styles', (done) => {
+	it('.css.bundle() should concat styles', done => {
 		minifier.css.bundle(styles, paths, false, false, 'ltr', (err, bundle) => {
 			assert.ifError(err);
 			assert.strictEqual(
@@ -76,7 +76,7 @@ describe('minifier', () => {
 		});
 	});
 
-	it('.css.bundle() should minify styles', (done) => {
+	it('.css.bundle() should minify styles', done => {
 		minifier.css.bundle(styles, paths, true, false, 'ltr', (err, bundle) => {
 			assert.ifError(err);
 			assert.strictEqual(
@@ -103,15 +103,15 @@ describe('Build', () => {
 		);
 	});
 
-	it('should build plugin static dirs', (done) => {
-		build.build(['plugin static dirs'], (err) => {
+	it('should build plugin static dirs', done => {
+		build.build(['plugin static dirs'], err => {
 			assert.ifError(err);
 			done();
 		});
 	});
 
-	it('should build requirejs modules', (done) => {
-		build.build(['requirejs modules'], (err) => {
+	it('should build requirejs modules', done => {
+		build.build(['requirejs modules'], err => {
 			assert.ifError(err);
 			const filename = path.join(
 				__dirname,
@@ -122,8 +122,8 @@ describe('Build', () => {
 		});
 	});
 
-	it('should build client js bundle', (done) => {
-		build.build(['client js bundle'], (err) => {
+	it('should build client js bundle', done => {
+		build.build(['client js bundle'], err => {
 			assert.ifError(err);
 			const filename = path.join(
 				__dirname,
@@ -135,8 +135,8 @@ describe('Build', () => {
 		});
 	});
 
-	it('should build admin js bundle', (done) => {
-		build.build(['admin js bundle'], (err) => {
+	it('should build admin js bundle', done => {
+		build.build(['admin js bundle'], err => {
 			assert.ifError(err);
 			const filename = path.join(__dirname, '../build/public/scripts-admin.js');
 			assert(file.existsSync(filename));
@@ -145,8 +145,8 @@ describe('Build', () => {
 		});
 	});
 
-	it('should build client side styles', (done) => {
-		build.build(['client side styles'], (err) => {
+	it('should build client side styles', done => {
+		build.build(['client side styles'], err => {
 			assert.ifError(err);
 			const filename = path.join(__dirname, '../build/public/client.css');
 			assert(file.existsSync(filename));
@@ -154,8 +154,8 @@ describe('Build', () => {
 		});
 	});
 
-	it('should build admin control panel styles', (done) => {
-		build.build(['admin control panel styles'], (err) => {
+	it('should build admin control panel styles', done => {
+		build.build(['admin control panel styles'], err => {
 			assert.ifError(err);
 			const filename = path.join(__dirname, '../build/public/admin.css');
 			assert(file.existsSync(filename));
@@ -183,7 +183,7 @@ describe('Build', () => {
 
 	it('should build templates', function (done) {
 		this.timeout(0);
-		build.build(['templates'], (err) => {
+		build.build(['templates'], err => {
 			assert.ifError(err);
 			const filename = path.join(
 				__dirname,
@@ -197,8 +197,8 @@ describe('Build', () => {
 		});
 	});
 
-	it('should build languages', (done) => {
-		build.build(['languages'], (err) => {
+	it('should build languages', done => {
+		build.build(['languages'], err => {
 			assert.ifError(err);
 
 			const globalFile = path.join(

@@ -107,7 +107,7 @@ describe('Analytics', () => {
 				},
 			},
 			{
-				sendStatus: (statusCode) => {
+				sendStatus: statusCode => {
 					assert.strictEqual(statusCode, 200);
 				},
 			}
@@ -167,7 +167,7 @@ describe('Analytics', () => {
 			'activities:byType:Like',
 			'activities:byHost:example.org',
 		];
-		metrics.forEach((metric) => {
+		metrics.forEach(metric => {
 			before[metric] = before[metric] || 0;
 			assert(
 				before.hasOwnProperty(metric) && after.hasOwnProperty(metric),

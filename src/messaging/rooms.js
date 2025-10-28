@@ -34,7 +34,7 @@ module.exports = function (Messaging) {
 			fields.push('public');
 		}
 		const roomData = await db.getObjects(
-			roomIds.map((roomId) => `chat:room:${roomId}`),
+			roomIds.map(roomId => `chat:room:${roomId}`),
 			fields
 		);
 		modifyRoomData(roomData, fields);
@@ -42,7 +42,7 @@ module.exports = function (Messaging) {
 	};
 
 	function modifyRoomData(rooms, fields) {
-		rooms.forEach((data) => {
+		rooms.forEach(data => {
 			if (data) {
 				db.parseIntFields(data, intFields, fields);
 				data.roomName = validator.escape(String(data.roomName || ''));
@@ -134,7 +134,7 @@ module.exports = function (Messaging) {
 		return roomId;
 	};
 
-	Messaging.deleteRooms = async (roomIds) => {
+	Messaging.deleteRooms = async roomIds => {
 		if (!roomIds) {
 			throw new Error('[[error:invalid-data]]');
 		}
@@ -144,22 +144,22 @@ module.exports = function (Messaging) {
 		}
 
 		await Promise.all(
-			roomIds.map(async (roomId) => {
+			roomIds.map(async roomId => {
 				const uids = await db.getSortedSetMembers(`chat:room:${roomId}:uids`);
 				const keys = uids
-					.map((uid) => `uid:${uid}:chat:rooms`)
-					.concat(uids.map((uid) => `uid:${uid}:chat:rooms:unread`));
+					.map(uid => `uid:${uid}:chat:rooms`)
+					.concat(uids.map(uid => `uid:${uid}:chat:rooms:unread`));
 
 				await db.sortedSetsRemove(keys, roomId);
 			})
 		);
 		await Promise.all([
 			db.deleteAll([
-				...roomIds.map((id) => `chat:room:${id}`),
-				...roomIds.map((id) => `chat:room:${id}:uids`),
-				...roomIds.map((id) => `chat:room:${id}:owners`),
-				...roomIds.map((id) => `chat:room:${id}:uids:online`),
-				...roomIds.map((id) => `chat:room:${id}:notification:settings`),
+				...roomIds.map(id => `chat:room:${id}`),
+				...roomIds.map(id => `chat:room:${id}:uids`),
+				...roomIds.map(id => `chat:room:${id}:owners`),
+				...roomIds.map(id => `chat:room:${id}:uids:online`),
+				...roomIds.map(id => `chat:room:${id}:notification:settings`),
 			]),
 			db.sortedSetRemove(
 				[
@@ -181,7 +181,7 @@ module.exports = function (Messaging) {
 			single = true;
 		}
 		const inRooms = await db.isMemberOfSortedSets(
-			roomIds.map((id) => `chat:room:${id}:uids`),
+			roomIds.map(id => `chat:room:${id}:uids`),
 			uid
 		);
 
@@ -219,9 +219,9 @@ module.exports = function (Messaging) {
 		return single ? data.inRooms.pop() : data.inRooms;
 	};
 
-	Messaging.roomExists = async (roomId) => db.exists(`chat:room:${roomId}`);
+	Messaging.roomExists = async roomId => db.exists(`chat:room:${roomId}`);
 
-	Messaging.getUserCountInRoom = async (roomId) =>
+	Messaging.getUserCountInRoom = async roomId =>
 		db.sortedSetCard(`chat:room:${roomId}:uids`);
 
 	Messaging.isRoomOwner = async (uids, roomId) => {
@@ -281,7 +281,7 @@ module.exports = function (Messaging) {
 		const isPublic = await db.getObjectField(`chat:room:${roomId}`, 'public');
 		if (
 			parseInt(isPublic, 10) === 1 &&
-			uids.some((uid) => !utils.isNumber(uid))
+			uids.some(uid => !utils.isNumber(uid))
 		) {
 			throw new Error('[[error:invalid-uid]]');
 		}
@@ -308,7 +308,7 @@ module.exports = function (Messaging) {
 		]);
 		await updateUserCount([roomId]);
 		await Promise.all(
-			uids.map((uid) => Messaging.addSystemMessage('user-join', uid, roomId))
+			uids.map(uid => Messaging.addSystemMessage('user-join', uid, roomId))
 		);
 	}
 
@@ -335,7 +335,7 @@ module.exports = function (Messaging) {
 
 	async function updateUserCount(roomIds) {
 		const userCounts = await db.sortedSetsCard(
-			roomIds.map((roomId) => `chat:room:${roomId}:uids`)
+			roomIds.map(roomId => `chat:room:${roomId}:uids`)
 		);
 		const countMap = _.zipObject(roomIds, userCounts);
 		const groupChats = roomIds.filter((roomId, index) => userCounts[index] > 2);
@@ -343,27 +343,27 @@ module.exports = function (Messaging) {
 			(roomId, index) => userCounts[index] <= 2
 		);
 		await db.setObjectBulk([
-			...groupChats.map((id) => [
+			...groupChats.map(id => [
 				`chat:room:${id}`,
 				{ groupChat: 1, userCount: countMap[id] },
 			]),
-			...privateChats.map((id) => [
+			...privateChats.map(id => [
 				`chat:room:${id}`,
 				{ groupChat: 0, userCount: countMap[id] },
 			]),
 		]);
-		roomUidCache.del(roomIds.map((id) => `chat:room:${id}:users`));
+		roomUidCache.del(roomIds.map(id => `chat:room:${id}:users`));
 	}
 
 	Messaging.leaveRoom = async (uids, roomId) => {
 		const isInRoom = await Promise.all(
-			uids.map((uid) => Messaging.isUserInRoom(uid, roomId))
+			uids.map(uid => Messaging.isUserInRoom(uid, roomId))
 		);
 		uids = uids.filter((uid, index) => isInRoom[index]);
 
 		const keys = uids
-			.map((uid) => `uid:${uid}:chat:rooms`)
-			.concat(uids.map((uid) => `uid:${uid}:chat:rooms:unread`));
+			.map(uid => `uid:${uid}:chat:rooms`)
+			.concat(uids.map(uid => `uid:${uid}:chat:rooms:unread`));
 
 		await Promise.all([
 			db.sortedSetRemove(
@@ -378,7 +378,7 @@ module.exports = function (Messaging) {
 		]);
 
 		await Promise.all(
-			uids.map((uid) => Messaging.addSystemMessage('user-leave', uid, roomId))
+			uids.map(uid => Messaging.addSystemMessage('user-leave', uid, roomId))
 		);
 		await updateOwner(roomId);
 		await updateUserCount([roomId]);
@@ -386,14 +386,14 @@ module.exports = function (Messaging) {
 
 	Messaging.leaveRooms = async (uid, roomIds) => {
 		const isInRoom = await Promise.all(
-			roomIds.map((roomId) => Messaging.isUserInRoom(uid, roomId))
+			roomIds.map(roomId => Messaging.isUserInRoom(uid, roomId))
 		);
 		roomIds = roomIds.filter((roomId, index) => isInRoom[index]);
 
 		const roomKeys = [
-			...roomIds.map((roomId) => `chat:room:${roomId}:uids`),
-			...roomIds.map((roomId) => `chat:room:${roomId}:owners`),
-			...roomIds.map((roomId) => `chat:room:${roomId}:uids:online`),
+			...roomIds.map(roomId => `chat:room:${roomId}:uids`),
+			...roomIds.map(roomId => `chat:room:${roomId}:owners`),
+			...roomIds.map(roomId => `chat:room:${roomId}:uids:online`),
 		];
 		await Promise.all([
 			db.sortedSetsRemove(roomKeys, uid),
@@ -405,9 +405,9 @@ module.exports = function (Messaging) {
 
 		await Promise.all(
 			roomIds
-				.map((roomId) => updateOwner(roomId))
+				.map(roomId => updateOwner(roomId))
 				.concat(
-					roomIds.map((roomId) =>
+					roomIds.map(roomId =>
 						Messaging.addSystemMessage('user-leave', uid, roomId)
 					)
 				)
@@ -612,7 +612,7 @@ module.exports = function (Messaging) {
 					selected: userSetting === null,
 				},
 			];
-			Object.keys(labels).forEach((key) => {
+			Object.keys(labels).forEach(key => {
 				options.push({
 					label: labels[key].label,
 					icon: labels[key].icon,
@@ -654,7 +654,7 @@ module.exports = function (Messaging) {
 			Messaging.markRoomNotificationsRead(uid, roomId),
 		]);
 
-		users.forEach((user) => {
+		users.forEach(user => {
 			if (user) {
 				user.online =
 					parseInt(user.uid, 10) === parseInt(uid, 10) ||
@@ -702,7 +702,7 @@ module.exports = function (Messaging) {
 	Messaging.getRoomIcon = function (roomData) {
 		const hasGroups = Array.isArray(roomData.groups) && roomData.groups.length;
 		return !hasGroups ||
-			roomData.groups.some((group) => globalUserGroups.includes(group))
+			roomData.groups.some(group => globalUserGroups.includes(group))
 			? 'fa-hashtag'
 			: 'fa-lock';
 	};

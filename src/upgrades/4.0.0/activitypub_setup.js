@@ -19,7 +19,7 @@ module.exports = {
 		// Run through all categories and ensure their slugs are unique (incl. users/groups too)
 		const cids = await db.getSortedSetMembers('categories:cid');
 		const names = await db.getObjectsFields(
-			cids.map((cid) => `category:${cid}`),
+			cids.map(cid => `category:${cid}`),
 			cids.map(() => 'name')
 		);
 

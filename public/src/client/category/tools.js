@@ -123,7 +123,7 @@ define('forum/category/tools', [
 				return alerts.error('[[error:no-topics-selected]]');
 			}
 			const topics = await Promise.all(
-				tids.map((tid) => api.get(`/topics/${tid}`))
+				tids.map(tid => api.get(`/topics/${tid}`))
 			);
 			require(['forum/topic/tag'], function (tag) {
 				tag.init(topics, ajaxify.data.tagWhitelist, onCommandComplete);
@@ -149,9 +149,7 @@ define('forum/category/tools', [
 		const body = {};
 		const execute = function (ok) {
 			if (ok) {
-				Promise.all(
-					tids.map((tid) => api[method](`/topics/${tid}${path}`, body))
-				)
+				Promise.all(tids.map(tid => api[method](`/topics/${tid}${path}`, body)))
 					.then(onComplete)
 					.catch(alerts.error);
 			}
@@ -314,9 +312,7 @@ define('forum/category/tools', [
 		if (!ajaxify.data.topics || !ajaxify.data.template.category) {
 			return;
 		}
-		const numPinned = ajaxify.data.topics.filter(
-			(topic) => topic.pinned
-		).length;
+		const numPinned = ajaxify.data.topics.filter(topic => topic.pinned).length;
 		if ((!app.user.isAdmin && !app.user.isMod) || numPinned < 2) {
 			return;
 		}

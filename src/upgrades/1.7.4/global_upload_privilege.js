@@ -40,15 +40,13 @@ module.exports = {
 function getGroupPrivileges(cid, callback) {
 	const tasks = {};
 
-	['groups:upload:post:image', 'groups:upload:post:file'].forEach(
-		(privilege) => {
-			tasks[privilege] = async.apply(
-				groups.isMember,
-				'registered-users',
-				`cid:${cid}:privileges:${privilege}`
-			);
-		}
-	);
+	['groups:upload:post:image', 'groups:upload:post:file'].forEach(privilege => {
+		tasks[privilege] = async.apply(
+			groups.isMember,
+			'registered-users',
+			`cid:${cid}:privileges:${privilege}`
+		);
+	});
 
 	async.parallel(tasks, callback);
 }

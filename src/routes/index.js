@@ -205,14 +205,14 @@ module.exports = async function (app, middleware) {
 		}, {}),
 	});
 	// Guard against plugins sending back missing/extra mounts
-	Object.keys(mounts).forEach((mount) => {
+	Object.keys(mounts).forEach(mount => {
 		if (!remountable.includes(mount)) {
 			delete mounts[mount];
 		} else if (typeof mount !== 'string') {
 			mounts[mount] = mount;
 		}
 	});
-	remountable.forEach((mount) => {
+	remountable.forEach(mount => {
 		if (!mounts.hasOwnProperty(mount)) {
 			mounts[mount] = mount;
 		}
@@ -287,7 +287,7 @@ function addCoreRoutes(app, router, middleware, mounts) {
 		});
 	}
 
-	statics.forEach((obj) => {
+	statics.forEach(obj => {
 		app.use(
 			relativePath + obj.route,
 			middleware.addUploadHeaders,
@@ -314,7 +314,7 @@ function addCoreRoutes(app, router, middleware, mounts) {
 }
 
 function addRemountableRoutes(app, router, middleware, mounts) {
-	Object.keys(mounts).map(async (mount) => {
+	Object.keys(mounts).map(async mount => {
 		const original = mount;
 		mount = mounts[original];
 

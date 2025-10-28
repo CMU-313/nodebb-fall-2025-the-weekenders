@@ -26,7 +26,7 @@ function setupWinston() {
 		formats.push(winston.format.timestamp());
 		formats.push(winston.format.json());
 	} else {
-		const timestampFormat = winston.format((info) => {
+		const timestampFormat = winston.format(info => {
 			const dateString = `${new Date().toISOString()} [${nconf.get('port')}/${global.process.pid}]`;
 			info.level = `${dateString} - ${info.level}`;
 			return info;
@@ -78,7 +78,7 @@ function loadConfig(configFile) {
 		'acpPluginInstallDisabled',
 	];
 	nconf.stores.env.readOnly = false;
-	castAsBool.forEach((prop) => {
+	castAsBool.forEach(prop => {
 		const value = nconf.get(prop);
 		if (value !== undefined) {
 			nconf.set(prop, ['1', 1, 'true', true].includes(value));

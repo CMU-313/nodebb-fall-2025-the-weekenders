@@ -62,7 +62,7 @@ define('settings/sorted-list', [
 
 			if (Array.isArray(list) && typeof list[0] !== 'string') {
 				const items = await Promise.all(
-					list.map(async (item) => {
+					list.map(async item => {
 						({ item } = await hooks.fire(
 							'filter:settings.sorted-list.loadItem',
 							{ item }
@@ -149,7 +149,7 @@ define('settings/sorted-list', [
 				el.value = form.find(`select#${el.id}`).val();
 			});
 
-			const modal = bootbox.confirm(clone, async (save) => {
+			const modal = bootbox.confirm(clone, async save => {
 				if (save) {
 					const form = $(
 						'<form class="" data-sorted-list-uuid="' +
@@ -195,7 +195,7 @@ define('settings/sorted-list', [
 
 		stripTags(data);
 
-		return new Promise((resolve) => {
+		return new Promise(resolve => {
 			app.parseAndTranslate(itemTpl, data, function (itemHtml) {
 				itemHtml = $(itemHtml);
 				if (replaceEl) {

@@ -46,11 +46,11 @@ define('forum/topic/delete-posts', ['postSelect', 'alerts', 'api'], function (
 			deleteBtn.on('click', function () {
 				deletePosts(
 					deleteBtn,
-					(pid) => `/posts/${encodeURIComponent(pid)}/state`
+					pid => `/posts/${encodeURIComponent(pid)}/state`
 				);
 			});
 			purgeBtn.on('click', function () {
-				deletePosts(purgeBtn, (pid) => `/posts/${encodeURIComponent(pid)}`);
+				deletePosts(purgeBtn, pid => `/posts/${encodeURIComponent(pid)}`);
 			});
 		});
 	};
@@ -64,7 +64,7 @@ define('forum/topic/delete-posts', ['postSelect', 'alerts', 'api'], function (
 
 	function deletePosts(btn, route) {
 		btn.attr('disabled', true);
-		Promise.all(postSelect.pids.map((pid) => api.del(route(pid), {})))
+		Promise.all(postSelect.pids.map(pid => api.del(route(pid), {})))
 			.then(closeModal)
 			.catch(alerts.error)
 			.finally(() => {

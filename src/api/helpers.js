@@ -65,7 +65,7 @@ exports.doTopicAction = async function (action, event, caller, { tids }) {
 	const uids = await user.getUidsFromSet('users:online', 0, -1);
 
 	await Promise.all(
-		tids.map(async (tid) => {
+		tids.map(async tid => {
 			const title = await topics.getTopicField(tid, 'title');
 			const data = await topics.tools[action](tid, caller.uid);
 			const notifyUids = await privileges.categories.filterUids(

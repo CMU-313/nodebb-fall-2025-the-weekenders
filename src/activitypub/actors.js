@@ -38,16 +38,16 @@ Actors.qualify = async (ids, options = {}) => {
 		return false;
 	}
 	// Existance in failure cache is automatic assertion failure
-	if (ids.some((id) => failedWebfingerCache.has(id))) {
+	if (ids.some(id => failedWebfingerCache.has(id))) {
 		return false;
 	}
 
 	// Filter out uids if passed in
-	ids = ids.filter((id) => !utils.isNumber(id));
+	ids = ids.filter(id => !utils.isNumber(id));
 
 	// Translate webfinger handles to uris
 	ids = await Promise.all(
-		ids.map(async (id) => {
+		ids.map(async id => {
 			const originalId = id;
 			if (activitypub.helpers.isWebfinger(id)) {
 				const host = id.replace(/^(acct:|@)/, '').split('@')[1];
@@ -75,7 +75,7 @@ Actors.qualify = async (ids, options = {}) => {
 	// Filter out loopback uris
 	if (!meta.config.activitypubAllowLoopback) {
 		ids = ids.filter(
-			(uri) =>
+			uri =>
 				uri !== 'loopback' && new URL(uri).host !== nconf.get('url_parsed').host
 		);
 	}
@@ -83,7 +83,7 @@ Actors.qualify = async (ids, options = {}) => {
 	// Separate those who need migration from user to category
 	const migrate = new Set();
 	if (options.qualifyGroup) {
-		const exists = await db.exists(ids.map((id) => `userRemote:${id}`));
+		const exists = await db.exists(ids.map(id => `userRemote:${id}`));
 		ids.forEach((id, idx) => {
 			if (exists[idx]) {
 				migrate.add(id);
@@ -97,7 +97,7 @@ Actors.qualify = async (ids, options = {}) => {
 			Date.now() - 1000 * 60 * 60 * 24 * meta.config.activitypubUserPruneDays;
 		const lastCrawled = await db.sortedSetScores(
 			'usersRemote:lastCrawled',
-			ids.map((id) =>
+			ids.map(id =>
 				typeof id === 'object' && id.hasOwnProperty('id') ? id.id : id
 			)
 		);
@@ -137,7 +137,7 @@ Actors.assert = async (ids, options = {}) => {
 	const pubKeysMap = new Map();
 	const categories = new Set();
 	let actors = await Promise.all(
-		ids.map(async (id) => {
+		ids.map(async id => {
 			try {
 				activitypub.helpers.log(`[activitypub/actors] Processing ${id}`);
 				const actor =
@@ -158,12 +158,12 @@ Actors.assert = async (ids, options = {}) => {
 
 				let typeOk = false;
 				if (Array.isArray(actor.type)) {
-					typeOk = actor.type.some((type) =>
+					typeOk = actor.type.some(type =>
 						activitypub._constants.acceptableActorTypes.has(type)
 					);
 					if (
 						!typeOk &&
-						actor.type.some((type) =>
+						actor.type.some(type =>
 							activitypub._constants.acceptableGroupTypes.has(type)
 						)
 					) {
@@ -181,7 +181,7 @@ Actors.assert = async (ids, options = {}) => {
 
 				if (
 					!typeOk ||
-					!activitypub._constants.requiredActorProps.every((prop) =>
+					!activitypub._constants.requiredActorProps.every(prop =>
 						actor.hasOwnProperty(prop)
 					)
 				) {
@@ -264,7 +264,7 @@ Actors.assert = async (ids, options = {}) => {
 
 	const exists = await db.isSortedSetMembers(
 		'usersRemote:lastCrawled',
-		profiles.map((p) => p.uid)
+		profiles.map(p => p.uid)
 	);
 	const uidsForCurrent = profiles.map((p, idx) => (exists[idx] ? p.uid : 0));
 	const current = await user.getUsersFields(uidsForCurrent, [
@@ -327,7 +327,7 @@ Actors.assert = async (ids, options = {}) => {
 		db.sortedSetAdd(
 			'usersRemote:lastCrawled',
 			profiles.map(() => now),
-			profiles.map((p) => p.uid)
+			profiles.map(p => p.uid)
 		),
 		db.sortedSetAddBulk(queries.searchAdd),
 		db.setObject('handle:uid', queries.handleAdd),
@@ -377,7 +377,7 @@ Actors.assertGroup = async (ids, options = {}) => {
 	const followersUrlMap = new Map();
 	const pubKeysMap = new Map();
 	let groups = await Promise.all(
-		ids.map(async (id) => {
+		ids.map(async id => {
 			try {
 				activitypub.helpers.log(`[activitypub/actors] Processing group ${id}`);
 				const actor =
@@ -397,14 +397,14 @@ Actors.assertGroup = async (ids, options = {}) => {
 				}
 
 				const typeOk = Array.isArray(actor.type)
-					? actor.type.some((type) =>
+					? actor.type.some(type =>
 							activitypub._constants.acceptableGroupTypes.has(type)
 						)
 					: activitypub._constants.acceptableGroupTypes.has(actor.type);
 
 				if (
 					!typeOk ||
-					!activitypub._constants.requiredActorProps.every((prop) =>
+					!activitypub._constants.requiredActorProps.every(prop =>
 						actor.hasOwnProperty(prop)
 					)
 				) {
@@ -463,7 +463,7 @@ Actors.assertGroup = async (ids, options = {}) => {
 
 	const exists = await db.isSortedSetMembers(
 		'usersRemote:lastCrawled',
-		categoryObjs.map((p) => p.cid)
+		categoryObjs.map(p => p.cid)
 	);
 	const cidsForCurrent = categoryObjs.map((p, idx) =>
 		exists[idx] ? p.cid : 0
@@ -520,7 +520,7 @@ Actors.assertGroup = async (ids, options = {}) => {
 		db.sortedSetAdd(
 			'usersRemote:lastCrawled',
 			groups.map(() => now),
-			groups.map((p) => p.id)
+			groups.map(p => p.id)
 		),
 		db.sortedSetAddBulk(queries.searchAdd),
 		db.setObject('handle:cid', queries.handleAdd),
@@ -532,8 +532,8 @@ Actors.assertGroup = async (ids, options = {}) => {
 
 async function _migratePersonToGroup(categoryObjs) {
 	// 4.0.0-4.1.x asserted as:Group as users. This moves relevant stuff over and deletes the now-duplicate user.
-	let ids = categoryObjs.map((category) => category.cid);
-	const slugs = categoryObjs.map((category) => category.slug);
+	let ids = categoryObjs.map(category => category.cid);
+	const slugs = categoryObjs.map(category => category.slug);
 	const isUser = await db.isObjectFields('handle:uid', slugs);
 	ids = ids.filter((id, idx) => isUser[idx]);
 	if (!ids.length) {
@@ -541,10 +541,10 @@ async function _migratePersonToGroup(categoryObjs) {
 	}
 
 	await Promise.all(
-		ids.map(async (id) => {
+		ids.map(async id => {
 			const shares = await db.getSortedSetMembers(`uid:${id}:shares`);
 			let cids = await topics.getTopicsFields(shares, ['cid']);
-			cids = cids.map((o) => o.cid);
+			cids = cids.map(o => o.cid);
 			await Promise.all(
 				shares.map(async (share, idx) => {
 					const cid = cids[idx];
@@ -571,7 +571,7 @@ async function _migratePersonToGroup(categoryObjs) {
 	await categories.onTopicsMoved(ids);
 }
 
-Actors.getLocalFollowers = async (id) => {
+Actors.getLocalFollowers = async id => {
 	// Returns local uids and cids that follow a remote actor (by id)
 	const response = {
 		uids: new Set(),
@@ -590,7 +590,7 @@ Actors.getLocalFollowers = async (id) => {
 	if (isUser) {
 		const members = await db.getSortedSetMembers(`followersRemote:${id}`);
 
-		members.forEach((id) => {
+		members.forEach(id => {
 			if (utils.isNumber(id)) {
 				response.uids.add(parseInt(id, 10));
 			} else if (id.startsWith('cid|') && utils.isNumber(id.slice(4))) {
@@ -605,7 +605,7 @@ Actors.getLocalFollowers = async (id) => {
 			categories.watchStates.tracking,
 			categories.watchStates.watching
 		);
-		members.forEach((uid) => {
+		members.forEach(uid => {
 			response.uids.add(uid);
 		});
 	}
@@ -613,17 +613,15 @@ Actors.getLocalFollowers = async (id) => {
 	return response;
 };
 
-Actors.getLocalFollowCounts = async (actors) => {
+Actors.getLocalFollowCounts = async actors => {
 	const isArray = Array.isArray(actors);
 	if (!isArray) {
 		actors = [actors];
 	}
 
-	const validActors = actors.filter((actor) =>
-		activitypub.helpers.isUri(actor)
-	);
-	const followerKeys = validActors.map((actor) => `followersRemote:${actor}`);
-	const followingKeys = validActors.map((actor) => `followingRemote:${actor}`);
+	const validActors = actors.filter(actor => activitypub.helpers.isUri(actor));
+	const followerKeys = validActors.map(actor => `followersRemote:${actor}`);
+	const followingKeys = validActors.map(actor => `followingRemote:${actor}`);
 
 	const [followersCounts, followingCounts] = await Promise.all([
 		db.sortedSetsCard(followerKeys),
@@ -636,7 +634,7 @@ Actors.getLocalFollowCounts = async (actors) => {
 			following: followingCounts[idx],
 		}))
 	);
-	const results = actors.map((actor) => {
+	const results = actors.map(actor => {
 		if (!actorToCounts.hasOwnProperty(actor)) {
 			return { followers: 0, following: 0 };
 		}
@@ -649,7 +647,7 @@ Actors.getLocalFollowCounts = async (actors) => {
 	return isArray ? results : results[0];
 };
 
-Actors.remove = async (id) => {
+Actors.remove = async id => {
 	/**
 	 * Remove ActivityPub related metadata pertaining to a remote id
 	 *
@@ -687,7 +685,7 @@ Actors.remove = async (id) => {
 	]);
 };
 
-Actors.removeGroup = async (id) => {
+Actors.removeGroup = async id => {
 	/**
 	 * Remove ActivityPub related metadata pertaining to a remote id
 	 *
@@ -763,10 +761,10 @@ Actors.prune = async () => {
 	const preservedIds = [];
 	await batch.processArray(
 		ids,
-		async (ids) => {
+		async ids => {
 			const exists = await Promise.all([
-				db.exists(ids.map((id) => `userRemote:${id}`)),
-				db.exists(ids.map((id) => `categoryRemote:${id}`)),
+				db.exists(ids.map(id => `userRemote:${id}`)),
+				db.exists(ids.map(id => `categoryRemote:${id}`)),
 			]);
 
 			let uids = new Set();
@@ -795,8 +793,8 @@ Actors.prune = async () => {
 
 			// Remote users
 			const [postCounts, roomCounts, followCounts] = await Promise.all([
-				db.sortedSetsCard(uids.map((uid) => `uid:${uid}:posts`)),
-				db.sortedSetsCard(uids.map((uid) => `uid:${uid}:chat:rooms`)),
+				db.sortedSetsCard(uids.map(uid => `uid:${uid}:posts`)),
+				db.sortedSetsCard(uids.map(uid => `uid:${uid}:chat:rooms`)),
 				Actors.getLocalFollowCounts(uids),
 			]);
 
@@ -807,7 +805,7 @@ Actors.prune = async () => {
 					const roomCount = roomCounts[idx];
 					if (
 						[postCount, roomCount, followers, following].every(
-							(metric) => metric < 1
+							metric => metric < 1
 						)
 					) {
 						try {
@@ -825,7 +823,7 @@ Actors.prune = async () => {
 
 			// Remote categories
 			let counts = await categories.getCategoriesFields(cids, ['topic_count']);
-			counts = counts.map((count) => count.topic_count);
+			counts = counts.map(count => count.topic_count);
 			await Promise.all(
 				cids.map(async (cid, idx) => {
 					const topicCount = counts[idx];

@@ -95,7 +95,7 @@ Auth.reloadRoutes = async function (params) {
 		winston.error(`[authentication] ${err.stack}`);
 	}
 	loginStrategies = loginStrategies || [];
-	loginStrategies.forEach((strategy) => {
+	loginStrategies.forEach(strategy => {
 		if (strategy.url) {
 			router[strategy.urlMethod || 'get'](
 				strategy.url,
@@ -183,7 +183,7 @@ Auth.reloadRoutes = async function (params) {
 							res.locals.user.uid
 						),
 					],
-					(err) => {
+					err => {
 						if (err) {
 							return next(err);
 						}

@@ -13,9 +13,9 @@ module.exports = {
 
 		await batch.processSortedSet(
 			'users:joindate',
-			async (uids) => {
+			async uids => {
 				await Promise.all(
-					uids.map(async (uid) => {
+					uids.map(async uid => {
 						progress.incr();
 
 						const notes = await db.getSortedSetRevRange(

@@ -226,7 +226,7 @@ define('navigator', [
 		const el = thumb.find('.thumb-timestamp');
 		if (el.length) {
 			const postAtIndex = ajaxify.data.posts.find(
-				(p) => parseInt(p.index, 10) === Math.max(0, parseInt(index, 10) - 1)
+				p => parseInt(p.index, 10) === Math.max(0, parseInt(index, 10) - 1)
 			);
 			const timestamp = postAtIndex
 				? postAtIndex.timestamp
@@ -638,7 +638,7 @@ define('navigator', [
 
 	navigator.getIndex = () => index;
 
-	navigator.setIndex = (newIndex) => {
+	navigator.setIndex = newIndex => {
 		index = newIndex + 1;
 		if (typeof navigator.callback === 'function') {
 			navigator.callback(index, count);

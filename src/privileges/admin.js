@@ -64,7 +64,7 @@ privsAdmin.init = async () => {
 
 privsAdmin.getUserPrivilegeList = () => Array.from(_privilegeMap.keys());
 privsAdmin.getGroupPrivilegeList = () =>
-	Array.from(_privilegeMap.keys()).map((privilege) => `groups:${privilege}`);
+	Array.from(_privilegeMap.keys()).map(privilege => `groups:${privilege}`);
 privsAdmin.getPrivilegeList = async () => {
 	const [user, group] = await Promise.all([
 		privsAdmin.getUserPrivilegeList(),
@@ -146,13 +146,13 @@ privsAdmin.socketMap = {
 	'admin.settings.set': 'admin:settings',
 };
 
-privsAdmin.resolve = (path) => {
+privsAdmin.resolve = path => {
 	if (privsAdmin.routeMap.hasOwnProperty(path)) {
 		return privsAdmin.routeMap[path];
 	}
 
 	const found = Object.entries(privsAdmin.routePrefixMap)
-		.filter((entry) => path.startsWith(entry[0]))
+		.filter(entry => path.startsWith(entry[0]))
 		.sort((entry1, entry2) => entry2[0].length - entry1[0].length);
 	if (!found.length) {
 		return undefined;
@@ -162,7 +162,7 @@ privsAdmin.resolve = (path) => {
 
 privsAdmin.list = async function (uid) {
 	const privilegeLabels = Array.from(_privilegeMap.values()).map(
-		(data) => data.label
+		data => data.label
 	);
 	const userPrivilegeList = await privsAdmin.getUserPrivilegeList();
 	const groupPrivilegeList = await privsAdmin.getGroupPrivilegeList();
@@ -197,7 +197,7 @@ privsAdmin.get = async function (uid) {
 		user.isAdministrator(uid),
 	]);
 
-	const combined = userPrivileges.map((allowed) => allowed || isAdministrator);
+	const combined = userPrivileges.map(allowed => allowed || isAdministrator);
 	const privData = _.zipObject(userPrivilegeList, combined);
 
 	privData.superadmin = isAdministrator;

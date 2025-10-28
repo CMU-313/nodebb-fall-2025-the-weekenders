@@ -95,7 +95,7 @@ module.exports = function (Categories) {
 			return;
 		}
 		const categoriesToLoad = categoryData.filter(
-			(c) => c && c.numRecentReplies && parseInt(c.numRecentReplies, 10) > 0
+			c => c && c.numRecentReplies && parseInt(c.numRecentReplies, 10) > 0
 		);
 		let keys = [];
 		if (plugins.hooks.hasListeners('filter:categories.getRecentTopicReplies')) {
@@ -110,7 +110,7 @@ module.exports = function (Categories) {
 			);
 			keys = result.keys;
 		} else {
-			keys = categoriesToLoad.map((c) => `cid:${c.cid}:recent_tids`);
+			keys = categoriesToLoad.map(c => `cid:${c.cid}:recent_tids`);
 		}
 
 		const results = await db.getSortedSetsMembers(keys);
@@ -133,13 +133,13 @@ module.exports = function (Categories) {
 			'cid',
 			'postcount',
 		]);
-		topicData.forEach((topic) => {
+		topicData.forEach(topic => {
 			if (topic) {
 				topic.teaserPid = topic.teaserPid || topic.mainPid;
 			}
 		});
 		const cids = _.uniq(
-			topicData.map((t) => t && t.cid).filter((cid) => parseInt(cid, 10))
+			topicData.map(t => t && t.cid).filter(cid => parseInt(cid, 10))
 		);
 		const getToRoot = async () =>
 			await Promise.all(cids.map(Categories.getParentCids));
@@ -166,11 +166,11 @@ module.exports = function (Categories) {
 	}
 
 	function assignTopicsToCategories(categories, topics) {
-		categories.forEach((category) => {
+		categories.forEach(category => {
 			if (category) {
 				category.posts = topics
 					.filter(
-						(t) =>
+						t =>
 							t.cid &&
 							(t.cid === category.cid ||
 								(t.parentCids && t.parentCids.includes(category.cid)))
@@ -179,13 +179,13 @@ module.exports = function (Categories) {
 					.slice(0, parseInt(category.numRecentReplies, 10));
 			}
 		});
-		topics.forEach((t) => {
+		topics.forEach(t => {
 			t.parentCids = undefined;
 		});
 	}
 
 	function bubbleUpChildrenPosts(categoryData) {
-		categoryData.forEach((category) => {
+		categoryData.forEach(category => {
 			if (category) {
 				if (category.posts.length) {
 					return;
@@ -203,10 +203,10 @@ module.exports = function (Categories) {
 
 	function getPostsRecursive(category, posts) {
 		if (Array.isArray(category.posts)) {
-			category.posts.forEach((p) => posts.push(p));
+			category.posts.forEach(p => posts.push(p));
 		}
 
-		category.children.forEach((child) => getPostsRecursive(child, posts));
+		category.children.forEach(child => getPostsRecursive(child, posts));
 	}
 
 	// terrible name, should be topics.moveTopicPosts
@@ -218,7 +218,7 @@ module.exports = function (Categories) {
 
 		await batch.processArray(
 			pids,
-			async (pids) => {
+			async pids => {
 				const postData = await posts.getPostsFields(pids, [
 					'pid',
 					'deleted',
@@ -230,7 +230,7 @@ module.exports = function (Categories) {
 
 				const bulkRemove = [];
 				const bulkAdd = [];
-				postData.forEach((post) => {
+				postData.forEach(post => {
 					bulkRemove.push([`cid:${oldCid}:uid:${post.uid}:pids`, post.pid]);
 					bulkRemove.push([
 						`cid:${oldCid}:uid:${post.uid}:pids:votes`,
@@ -250,16 +250,14 @@ module.exports = function (Categories) {
 					}
 				});
 
-				const postsToReAdd = postData.filter(
-					(p) => !p.deleted && !topicDeleted
-				);
-				const timestamps = postsToReAdd.map((p) => p && p.timestamp);
+				const postsToReAdd = postData.filter(p => !p.deleted && !topicDeleted);
+				const timestamps = postsToReAdd.map(p => p && p.timestamp);
 				await Promise.all([
 					db.sortedSetRemove(`cid:${oldCid}:pids`, pids),
 					db.sortedSetAdd(
 						`cid:${cid}:pids`,
 						timestamps,
-						postsToReAdd.map((p) => p.pid)
+						postsToReAdd.map(p => p.pid)
 					),
 					db.sortedSetRemoveBulk(bulkRemove),
 					db.sortedSetAddBulk(bulkAdd),

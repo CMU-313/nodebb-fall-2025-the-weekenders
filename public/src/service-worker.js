@@ -5,7 +5,7 @@ self.addEventListener('install', () => {
 	self.skipWaiting();
 });
 
-self.addEventListener('activate', (event) => {
+self.addEventListener('activate', event => {
 	// Take responsibility over existing clients from old service worker
 	event.waitUntil(self.clients.claim());
 });

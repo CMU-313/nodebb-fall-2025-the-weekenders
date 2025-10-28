@@ -180,9 +180,7 @@ topicsAPI.pin = async function (caller, { tids, expiry }) {
 
 	if (expiry) {
 		await Promise.all(
-			tids.map(async (tid) =>
-				topics.tools.setPinExpiry(tid, expiry, caller.uid)
-			)
+			tids.map(async tid => topics.tools.setPinExpiry(tid, expiry, caller.uid))
 		);
 	}
 };
@@ -356,9 +354,9 @@ topicsAPI.move = async (caller, { tid, cid }) => {
 
 	await batch.processArray(
 		tids,
-		async (tids) => {
+		async tids => {
 			await Promise.all(
-				tids.map(async (tid) => {
+				tids.map(async tid => {
 					const canMove = await privileges.topics.isAdminOrMod(tid, caller.uid);
 					if (!canMove) {
 						throw new Error('[[error:no-privileges]]');

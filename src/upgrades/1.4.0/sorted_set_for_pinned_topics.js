@@ -22,7 +22,7 @@ module.exports = {
 						}
 
 						data = data.filter(
-							(topicData) => parseInt(topicData.pinned, 10) === 1
+							topicData => parseInt(topicData.pinned, 10) === 1
 						);
 
 						async.eachSeries(

@@ -63,7 +63,7 @@ module.exports = function (Posts) {
 		}
 
 		if (Array.isArray(pid)) {
-			const sets = pid.map((pid) => `pid:${pid}:users_bookmarked`);
+			const sets = pid.map(pid => `pid:${pid}:users_bookmarked`);
 			return await db.isMemberOfSets(sets, uid);
 		}
 		return await db.isSetMember(`pid:${pid}:users_bookmarked`, uid);

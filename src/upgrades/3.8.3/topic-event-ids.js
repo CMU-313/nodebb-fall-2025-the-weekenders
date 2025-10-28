@@ -17,9 +17,9 @@ module.exports = {
 		}
 		await batch.processArray(
 			ids,
-			async (eids) => {
+			async eids => {
 				const eventData = await db.getObjects(
-					eids.map((eid) => `topicEvent:${eid}`)
+					eids.map(eid => `topicEvent:${eid}`)
 				);
 				const bulkSet = [];
 				eventData.forEach((event, idx) => {

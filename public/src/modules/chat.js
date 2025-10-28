@@ -37,7 +37,7 @@ define('chat', [
 				roomId: roomId,
 				uid: uid,
 			})
-			.then((hookData) => {
+			.then(hookData => {
 				if (!hookData.modal) {
 					return ajaxify.go(`/chats/${roomId}`);
 				}
@@ -48,7 +48,7 @@ define('chat', [
 						.get(`/chats/${roomId}`, {
 							uid: uid || app.user.uid,
 						})
-						.then((roomData) => {
+						.then(roomData => {
 							roomData.users = roomData.users.filter(function (user) {
 								return (
 									user && parseInt(user.uid, 10) !== parseInt(app.user.uid, 10)
@@ -120,8 +120,8 @@ define('chat', [
 				uid: app.user.uid,
 				after: 0,
 			})
-			.then((data) => {
-				const rooms = data.rooms.map((room) => {
+			.then(data => {
+				const rooms = data.rooms.map(room => {
 					if (room && room.teaser) {
 						room.teaser.timeagoLong = $.timeago(
 							new Date(parseInt(room.teaser.timestamp, 10))
@@ -131,7 +131,7 @@ define('chat', [
 				});
 
 				translator.toggleTimeagoShorthand(async function () {
-					rooms.forEach((room) => {
+					rooms.forEach(room => {
 						if (room && room.teaser) {
 							room.teaser.timeago = $.timeago(
 								new Date(parseInt(room.teaser.timestamp, 10))
@@ -150,7 +150,7 @@ define('chat', [
 					chatsListEl.prepend(html);
 					chatsListEl.off('click').on('click', '[data-roomid]', function (ev) {
 						if (
-							['.user-link', '.mark-read'].some((className) =>
+							['.user-link', '.mark-read'].some(className =>
 								ev.target.closest(className)
 							)
 						) {
@@ -174,7 +174,7 @@ define('chat', [
 								'[component="chat/list"] [data-roomid]'
 							);
 							await Promise.all(
-								Array.prototype.map.call(chatEls, async (el) => {
+								Array.prototype.map.call(chatEls, async el => {
 									const roomId = el.getAttribute('data-roomid');
 									await api.del(`/chats/${roomId}/state`);
 									if (ajaxify.data.template.chats) {
@@ -202,7 +202,7 @@ define('chat', [
 	module.toggleReadState = function (chatEl) {
 		const state = !chatEl.classList.contains('unread'); // this is the new state
 		const roomId = chatEl.getAttribute('data-roomid');
-		api[state ? 'put' : 'del'](`/chats/${roomId}/state`, {}).catch((err) => {
+		api[state ? 'put' : 'del'](`/chats/${roomId}/state`, {}).catch(err => {
 			alerts.error(err);
 
 			// Revert on failure

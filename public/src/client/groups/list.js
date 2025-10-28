@@ -16,7 +16,7 @@ define('forum/groups/list', ['api', 'bootbox', 'alerts'], function (
 						.post('/groups', {
 							name: name,
 						})
-						.then((res) => {
+						.then(res => {
 							ajaxify.go('groups/' + res.slug);
 						})
 						.catch(alerts.error);

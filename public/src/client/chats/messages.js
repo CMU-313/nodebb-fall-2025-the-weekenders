@@ -48,7 +48,7 @@ define('forum/chats/messages', [
 				replyToEl.addClass('hidden');
 				replyToEl.attr('data-tomid', '');
 			})
-			.catch((err) => {
+			.catch(err => {
 				inputEl.val(message).trigger('input');
 				messages.updateRemainingLength(chatComposer);
 				messages.updateTextAreaHeight(chatContent);
@@ -287,7 +287,7 @@ define('forum/chats/messages', [
 				autoCompleteEl.destroy();
 			}
 		}
-		textarea.on('keyup', (e) => {
+		textarea.on('keyup', e => {
 			if (e.key === 'Escape') {
 				finishEdit();
 			}
@@ -305,7 +305,7 @@ define('forum/chats/messages', [
 					finishEdit();
 					hooks.fire('action:chat.edited', { roomId, message, mid });
 				})
-				.catch((err) => {
+				.catch(err => {
 					textarea.val(message).trigger('input');
 					alerts.error(err);
 				});
@@ -342,7 +342,7 @@ define('forum/chats/messages', [
 						'[component="chat/message/body"]',
 						'[component="chat/message/edited"]',
 					];
-					componentsToReplace.forEach((cmp) => {
+					componentsToReplace.forEach(cmp => {
 						msgEl.find(cmp).replaceWith(html.find(cmp));
 					});
 					messages.onMessagesAddedToDom(

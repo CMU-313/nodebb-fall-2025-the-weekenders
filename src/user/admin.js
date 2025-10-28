@@ -26,7 +26,7 @@ module.exports = function (User) {
 
 	User.getIPs = async function (uid, stop) {
 		const ips = await db.getSortedSetRevRange(`uid:${uid}:ip`, 0, stop);
-		return ips.map((ip) => validator.escape(String(ip)));
+		return ips.map(ip => validator.escape(String(ip)));
 	};
 
 	User.getUsersCSV = async function () {
@@ -38,10 +38,10 @@ module.exports = function (User) {
 		let csvContent = `${data.fields.join(',')}\n`;
 		await batch.processSortedSet(
 			'users:joindate',
-			async (uids) => {
+			async uids => {
 				const usersData = await User.getUsersFields(uids, data.fields);
 				csvContent += usersData.reduce((memo, user) => {
-					memo += `${data.fields.map((field) => user[field]).join(',')}\n`;
+					memo += `${data.fields.map(field => user[field]).join(',')}\n`;
 					return memo;
 				}, '');
 			},
@@ -71,18 +71,18 @@ module.exports = function (User) {
 			path.join(baseDir, 'build/export', 'users.csv'),
 			'w'
 		);
-		fs.promises.appendFile(fd, `${fields.map((f) => `"${f}"`).join(',')}\n`);
+		fs.promises.appendFile(fd, `${fields.map(f => `"${f}"`).join(',')}\n`);
 		await batch.processSortedSet(
 			'users:joindate',
-			async (uids) => {
+			async uids => {
 				const userFieldsToLoad = fields.filter(
-					(field) => field !== 'ip' && field !== 'password'
+					field => field !== 'ip' && field !== 'password'
 				);
 				const usersData = await User.getUsersFields(uids, userFieldsToLoad);
 				let userIps = [];
 				if (showIps) {
 					userIps = await db.getSortedSetsMembers(
-						uids.map((uid) => `uid:${uid}:ip`)
+						uids.map(uid => `uid:${uid}:ip`)
 					);
 				}
 

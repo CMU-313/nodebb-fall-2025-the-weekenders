@@ -119,7 +119,7 @@ async function getUsers(req, res) {
 	]);
 
 	await render(req, res, {
-		users: users.filter((user) => user && parseInt(user.uid, 10)),
+		users: users.filter(user => user && parseInt(user.uid, 10)),
 		page: page,
 		pageCount: Math.max(1, Math.ceil(count / resultsPerPage)),
 		resultsPerPage: resultsPerPage,
@@ -131,9 +131,9 @@ async function getUsers(req, res) {
 
 async function getCustomUserFields() {
 	const keys = await db.getSortedSetRange('user-custom-fields', 0, -1);
-	return (
-		await db.getObjects(keys.map((k) => `user-custom-field:${k}`))
-	).filter(Boolean);
+	return (await db.getObjects(keys.map(k => `user-custom-field:${k}`))).filter(
+		Boolean
+	);
 }
 
 usersController.search = async function (req, res) {
@@ -168,15 +168,15 @@ usersController.search = async function (req, res) {
 				match: query,
 				limit: hardCap || resultsPerPage * 10,
 			});
-			return data.map((data) => data.split(':').pop());
+			return data.map(data => data.split(':').pop());
 		},
 	});
 
-	const uids = searchData.users.map((user) => user && user.uid);
+	const uids = searchData.users.map(user => user && user.uid);
 	searchData.users = await loadUserInfo(req.uid, uids);
 	if (req.query.searchBy === 'ip') {
-		searchData.users.forEach((user) => {
-			user.ip = user.ips.find((ip) => ip.includes(String(req.query.query)));
+		searchData.users.forEach(user => {
+			user.ip = user.ips.find(ip => ip.includes(String(req.query.query)));
 		});
 	}
 	searchData.query = validator.escape(String(req.query.query || ''));
@@ -190,14 +190,14 @@ usersController.search = async function (req, res) {
 async function loadUserInfo(callerUid, uids) {
 	async function getIPs() {
 		return await Promise.all(
-			uids.map((uid) => db.getSortedSetRevRange(`uid:${uid}:ip`, 0, 4))
+			uids.map(uid => db.getSortedSetRevRange(`uid:${uid}:ip`, 0, 4))
 		);
 	}
 	async function getConfirmObjs() {
-		const keys = uids.map((uid) => `confirm:byUid:${uid}`);
+		const keys = uids.map(uid => `confirm:byUid:${uid}`);
 		const codes = await db.mget(keys);
 		const confirmObjs = await db.getObjects(
-			codes.map((code) => `confirm:${code}`)
+			codes.map(code => `confirm:${code}`)
 		);
 		return uids.map((uid, index) => confirmObjs[index]);
 	}
@@ -259,9 +259,9 @@ usersController.registrationQueue = async function (req, res) {
 
 async function getInvites() {
 	const invitations = await user.getAllInvites();
-	const uids = invitations.map((invite) => invite.uid);
+	const uids = invitations.map(invite => invite.uid);
 	let usernames = await user.getUsersFields(uids, ['username']);
-	usernames = usernames.map((user) => user.username);
+	usernames = usernames.map(user => user.username);
 
 	invitations.forEach((invites, index) => {
 		invites.username = usernames[index];
@@ -270,14 +270,14 @@ async function getInvites() {
 	async function getUsernamesByEmails(emails) {
 		const uids = await db.sortedSetScores(
 			'email:uid',
-			emails.map((email) => String(email).toLowerCase())
+			emails.map(email => String(email).toLowerCase())
 		);
 		const usernames = await user.getUsersFields(uids, ['username']);
-		return usernames.map((user) => user.username);
+		return usernames.map(user => user.username);
 	}
 
 	usernames = await Promise.all(
-		invitations.map((invites) => getUsernamesByEmails(invites.invitations))
+		invitations.map(invites => getUsernamesByEmails(invites.invitations))
 	);
 
 	invitations.forEach((invites, index) => {
@@ -306,7 +306,7 @@ async function render(req, res, data) {
 	const filterBy = Array.isArray(req.query.filters || [])
 		? req.query.filters || []
 		: [req.query.filters];
-	filterBy.forEach((filter) => {
+	filterBy.forEach(filter => {
 		data[`filterBy_${validator.escape(String(filter))}`] = true;
 	});
 	data.userCount = parseInt(await db.getObjectField('global', 'userCount'), 10);
@@ -336,7 +336,7 @@ usersController.getCSV = async function (req, res, next) {
 				'Content-Disposition': 'attachment; filename=users.csv',
 			},
 		},
-		(err) => {
+		err => {
 			if (err) {
 				if (err.code === 'ENOENT') {
 					res.locals.isAPI = false;
@@ -351,9 +351,9 @@ usersController.getCSV = async function (req, res, next) {
 usersController.customFields = async function (req, res) {
 	const keys = await db.getSortedSetRange('user-custom-fields', 0, -1);
 	const fields = (
-		await db.getObjects(keys.map((k) => `user-custom-field:${k}`))
+		await db.getObjects(keys.map(k => `user-custom-field:${k}`))
 	).filter(Boolean);
-	fields.forEach((field) => {
+	fields.forEach(field => {
 		if (field['select-options']) {
 			field.selectOptionsFormatted = field['select-options']
 				.trim()

@@ -33,7 +33,7 @@ widgets.render = async function (uid, options) {
 	}
 
 	const widgetData = await Promise.all(
-		locations.map((location) =>
+		locations.map(location =>
 			renderLocation(location, data, uid, options, config)
 		)
 	);
@@ -42,7 +42,7 @@ widgets.render = async function (uid, options) {
 	locations.forEach((location, i) => {
 		if (Array.isArray(widgetData[i]) && widgetData[i].length) {
 			returnData[location] = widgetData[i].filter(
-				(widget) => widget && widget.html
+				widget => widget && widget.html
 			);
 		}
 	});
@@ -60,7 +60,7 @@ async function renderLocation(location, data, uid, options, config) {
 	}
 
 	const renderedWidgets = await Promise.all(
-		widgetsAtLocation.map((widget) =>
+		widgetsAtLocation.map(widget =>
 			renderWidget(widget, uid, options, config, location)
 		)
 	);
@@ -142,7 +142,7 @@ widgets.checkVisibility = async function (data, uid) {
 };
 
 widgets.getWidgetDataForTemplates = async function (templates) {
-	const keys = templates.map((tpl) => `widgets:${tpl}`);
+	const keys = templates.map(tpl => `widgets:${tpl}`);
 	const data = await db.getObjects(keys);
 
 	const returnData = {};
@@ -153,7 +153,7 @@ widgets.getWidgetDataForTemplates = async function (templates) {
 		const templateWidgetData = data[index] || {};
 		const locations = Object.keys(templateWidgetData);
 
-		locations.forEach((location) => {
+		locations.forEach(location => {
 			if (templateWidgetData && templateWidgetData[location]) {
 				try {
 					returnData[template][location] = parseWidgetData(
@@ -184,7 +184,7 @@ widgets.getArea = async function (template, location) {
 
 function parseWidgetData(data) {
 	const widgets = JSON.parse(data);
-	widgets.forEach((widget) => {
+	widgets.forEach(widget => {
 		if (widget) {
 			widget.data.groups = widget.data.groups || [];
 			if (widget.data.groups && !Array.isArray(widget.data.groups)) {
@@ -217,7 +217,7 @@ widgets.setArea = async function (area) {
 
 widgets.setAreas = async function (areas) {
 	const templates = {};
-	areas.forEach((area) => {
+	areas.forEach(area => {
 		if (!area.location || !area.template) {
 			throw new Error('Missing location and template data');
 		}
@@ -226,7 +226,7 @@ widgets.setAreas = async function (areas) {
 	});
 
 	await db.setObjectBulk(
-		Object.keys(templates).map((tpl) => [`widgets:${tpl}`, templates[tpl]])
+		Object.keys(templates).map(tpl => [`widgets:${tpl}`, templates[tpl]])
 	);
 };
 
@@ -291,7 +291,7 @@ widgets.moveMissingAreasToDrafts = async function () {
 		for (const [template, tplLocations] of Object.entries(locations)) {
 			for (const location of tplLocations) {
 				const locationExists = available.find(
-					(area) => area.template === template && area.location === location
+					area => area.template === template && area.location === location
 				);
 				if (!locationExists) {
 					const widgetsAtLocation = await widgets.getArea(template, location);
@@ -341,7 +341,7 @@ widgets.reset = async function () {
 widgets.resetTemplate = async function (template) {
 	const area = await db.getObject(`widgets:${template}.tpl`);
 	if (area) {
-		const toBeDrafted = _.flatMap(Object.values(area), (value) =>
+		const toBeDrafted = _.flatMap(Object.values(area), value =>
 			JSON.parse(value)
 		);
 		await db.delete(`widgets:${template}.tpl`);

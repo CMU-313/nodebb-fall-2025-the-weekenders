@@ -45,8 +45,8 @@ module.exports = function (Categories) {
 			return [];
 		}
 
-		cids = cids.map((cid) => (utils.isNumber(cid) ? parseInt(cid, 10) : cid));
-		const keys = cids.map((cid) =>
+		cids = cids.map(cid => (utils.isNumber(cid) ? parseInt(cid, 10) : cid));
+		const keys = cids.map(cid =>
 			utils.isNumber(cid) ? `category:${cid}` : `categoryRemote:${cid}`
 		);
 		const categories = await db.getObjects(keys, fields);
@@ -69,7 +69,7 @@ module.exports = function (Categories) {
 			fields: fields,
 			keys: keys,
 		});
-		result.categories.forEach((category) => modifyCategory(category, fields));
+		result.categories.forEach(category => modifyCategory(category, fields));
 		return result.categories;
 	};
 
@@ -150,7 +150,7 @@ function modifyCategory(category, fields) {
 		'class',
 		'link',
 	];
-	escapeFields.forEach((field) => {
+	escapeFields.forEach(field => {
 		if (category.hasOwnProperty(field)) {
 			category[field] = validator.escape(String(category[field] || ''));
 		}

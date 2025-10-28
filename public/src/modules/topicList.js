@@ -130,7 +130,7 @@ define('topicList', [
 		);
 		hooks
 			.fire('filter:topicList.onNewTopic', { topic: data, preventAlert })
-			.then((result) => {
+			.then(result => {
 				if (result.preventAlert) {
 					return;
 				}
@@ -174,7 +174,7 @@ define('topicList', [
 		);
 		hooks
 			.fire('filter:topicList.onNewPost', { post, preventAlert })
-			.then((result) => {
+			.then(result => {
 				if (result.preventAlert) {
 					return;
 				}

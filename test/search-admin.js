@@ -5,14 +5,14 @@ const search = require('../src/admin/search');
 
 describe('admin search', () => {
 	describe('filterDirectories', () => {
-		it('should resolve all paths to relative paths', (done) => {
+		it('should resolve all paths to relative paths', done => {
 			assert.deepEqual(
 				search.filterDirectories(['hfjksfd/fdsgagag/admin/gdhgfsdg/sggag.tpl']),
 				['admin/gdhgfsdg/sggag']
 			);
 			done();
 		});
-		it('should exclude .js files', (done) => {
+		it('should exclude .js files', done => {
 			assert.deepEqual(
 				search.filterDirectories([
 					'hfjksfd/fdsgagag/admin/gdhgfsdg/sggag.tpl',
@@ -22,7 +22,7 @@ describe('admin search', () => {
 			);
 			done();
 		});
-		it('should exclude partials', (done) => {
+		it('should exclude partials', done => {
 			assert.deepEqual(
 				search.filterDirectories([
 					'hfjksfd/fdsgagag/admin/gdhgfsdg/sggag.tpl',
@@ -32,7 +32,7 @@ describe('admin search', () => {
 			);
 			done();
 		});
-		it('should exclude files in the admin directory', (done) => {
+		it('should exclude files in the admin directory', done => {
 			assert.deepEqual(
 				search.filterDirectories([
 					'hfjksfd/fdsgagag/admin/gdhgfsdg/sggag.tpl',
@@ -45,7 +45,7 @@ describe('admin search', () => {
 	});
 
 	describe('sanitize', () => {
-		it('should strip out scripts', (done) => {
+		it('should strip out scripts', done => {
 			assert.equal(
 				search.sanitize(
 					'Pellentesque tristique senectus' +
@@ -55,7 +55,7 @@ describe('admin search', () => {
 			);
 			done();
 		});
-		it('should remove all tags', (done) => {
+		it('should remove all tags', done => {
 			assert.equal(
 				search.sanitize(
 					'<p>Pellentesque <b>habitant morbi</b> tristique senectus' +
@@ -69,7 +69,7 @@ describe('admin search', () => {
 	});
 
 	describe('simplify', () => {
-		it('should remove all mustaches', (done) => {
+		it('should remove all mustaches', done => {
 			assert.equal(
 				search.simplify(
 					'Pellentesque tristique {{senectus}}habitant morbi' +
@@ -79,7 +79,7 @@ describe('admin search', () => {
 			);
 			done();
 		});
-		it('should collapse all whitespace', (done) => {
+		it('should collapse all whitespace', done => {
 			assert.equal(
 				search.simplify(
 					'Pellentesque tristique   habitant morbi' +

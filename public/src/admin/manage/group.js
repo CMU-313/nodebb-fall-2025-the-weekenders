@@ -89,7 +89,7 @@ define('admin/manage/group', [
 				onSelect: function (selectedCategory) {
 					let cids = ($('#memberPostCids').val() || '')
 						.split(',')
-						.map((cid) => parseInt(cid, 10));
+						.map(cid => parseInt(cid, 10));
 					cids.push(selectedCategory.cid);
 					cids = cids.filter(
 						(cid, index, array) => array.indexOf(cid) === index

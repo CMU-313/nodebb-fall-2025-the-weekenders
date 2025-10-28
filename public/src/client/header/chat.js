@@ -9,7 +9,7 @@ define('forum/header/chat', ['components', 'hooks', 'api'], function (
 
 	chat.prepareDOM = function () {
 		const chatsToggleEl = $('[component="chat/dropdown"]');
-		chatsToggleEl.on('show.bs.dropdown', (ev) => {
+		chatsToggleEl.on('show.bs.dropdown', ev => {
 			requireAndCall(
 				'loadChatsDropdown',
 				$(ev.target).parent().find('[component="chat/list"]')

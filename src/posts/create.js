@@ -60,9 +60,9 @@ module.exports = function (Posts) {
 		if (_activitypub && _activitypub.tag && Array.isArray(_activitypub.tag)) {
 			_activitypub.tag
 				.filter(
-					(tag) => tag.type === 'Emoji' && tag.icon && tag.icon.type === 'Image'
+					tag => tag.type === 'Emoji' && tag.icon && tag.icon.type === 'Image'
 				)
-				.forEach((tag) => {
+				.forEach(tag => {
 					if (!tag.name.startsWith(':')) {
 						tag.name = `:${tag.name}`;
 					}

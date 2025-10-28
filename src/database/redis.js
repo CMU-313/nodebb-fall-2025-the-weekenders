@@ -87,7 +87,7 @@ redisModule.info = async function (cxn) {
 	const data = await cxn.info();
 	const lines = data.toString().split('\r\n').sort();
 	const redisData = {};
-	lines.forEach((line) => {
+	lines.forEach(line => {
 		const parts = line.split(':');
 		if (parts[1]) {
 			redisData[parts[0]] = parts[1];

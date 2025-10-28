@@ -60,9 +60,7 @@ module.exports = function (User) {
 	User.auth.getSessions = async function (uid, curSessionId) {
 		await cleanExpiredSessions(uid);
 		const sids = await db.getSortedSetRevRange(`uid:${uid}:sessions`, 0, 19);
-		let sessions = await Promise.all(
-			sids.map((sid) => db.sessionStoreGet(sid))
-		);
+		let sessions = await Promise.all(sids.map(sid => db.sessionStoreGet(sid)));
 		sessions = sessions
 			.map((sessObj, idx) => {
 				if (sessObj && sessObj.meta) {
@@ -87,7 +85,7 @@ module.exports = function (User) {
 		const expiredSids = [];
 		const activeSids = [];
 		await Promise.all(
-			sids.map(async (sid) => {
+			sids.map(async sid => {
 				const sessionObj = await db.sessionStoreGet(sid);
 				const expired =
 					!sessionObj ||
@@ -131,7 +129,7 @@ module.exports = function (User) {
 
 	User.auth.revokeSession = async function (sessionIds, uid) {
 		sessionIds = Array.isArray(sessionIds) ? sessionIds : [sessionIds];
-		const destroySids = (sids) => Promise.all(sids.map(db.sessionStoreDestroy));
+		const destroySids = sids => Promise.all(sids.map(db.sessionStoreDestroy));
 
 		await Promise.all([
 			db.sortedSetRemove(`uid:${uid}:sessions`, sessionIds),
@@ -142,11 +140,11 @@ module.exports = function (User) {
 	User.auth.revokeAllSessions = async function (uids, except) {
 		uids = Array.isArray(uids) ? uids : [uids];
 		const sids = await db.getSortedSetsMembers(
-			uids.map((uid) => `uid:${uid}:sessions`)
+			uids.map(uid => `uid:${uid}:sessions`)
 		);
 		const promises = [];
 		uids.forEach((uid, index) => {
-			const ids = sids[index].filter((id) => id !== except);
+			const ids = sids[index].filter(id => id !== except);
 			if (ids.length) {
 				promises.push(User.auth.revokeSession(ids, uid));
 			}
@@ -157,13 +155,13 @@ module.exports = function (User) {
 	User.auth.deleteAllSessions = async function () {
 		await batch.processSortedSet(
 			'users:joindate',
-			async (uids) => {
-				const sessionKeys = uids.map((uid) => `uid:${uid}:sessions`);
+			async uids => {
+				const sessionKeys = uids.map(uid => `uid:${uid}:sessions`);
 				const sids = _.flatten(await db.getSortedSetRange(sessionKeys, 0, -1));
 
 				await Promise.all([
 					db.deleteAll(sessionKeys),
-					...sids.map((sid) => db.sessionStoreDestroy(sid)),
+					...sids.map(sid => db.sessionStoreDestroy(sid)),
 				]);
 			},
 			{ batch: 1000 }

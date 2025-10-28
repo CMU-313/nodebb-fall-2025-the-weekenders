@@ -54,7 +54,7 @@ if (nconf.get('ssl')) {
 module.exports.server = server;
 module.exports.app = app;
 
-server.on('error', (err) => {
+server.on('error', err => {
 	if (err.code === 'EADDRINUSE') {
 		winston.error(`NodeBB address in use, exiting...\n${err.stack}`);
 	} else {
@@ -66,7 +66,7 @@ server.on('error', (err) => {
 
 // see https://github.com/isaacs/server-destroy/blob/master/index.js
 const connections = {};
-server.on('connection', (conn) => {
+server.on('connection', conn => {
 	const key = `${conn.remoteAddress}:${conn.remotePort}`;
 	connections[key] = conn;
 	conn.on('close', () => {
@@ -76,7 +76,7 @@ server.on('connection', (conn) => {
 
 exports.destroy = function () {
 	return new Promise((resolve, reject) => {
-		server.close((err) => {
+		server.close(err => {
 			if (err) reject(err);
 			else resolve();
 		});
@@ -363,12 +363,12 @@ exports.testSocket = async function (socketPath) {
 	}
 	return new Promise((resolve, reject) => {
 		const testSocket = new net.Socket();
-		testSocket.on('error', (err) => {
+		testSocket.on('error', err => {
 			if (err.code !== 'ECONNREFUSED') {
 				return reject(err);
 			}
 			// The socket was stale, kick it out of the way
-			fs.unlink(socketPath, (err) => {
+			fs.unlink(socketPath, err => {
 				if (err) reject(err);
 				else resolve();
 			});

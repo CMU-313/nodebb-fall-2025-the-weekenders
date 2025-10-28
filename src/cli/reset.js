@@ -55,8 +55,8 @@ exports.reset = async function (options) {
 	};
 
 	const tasks = Object.keys(map)
-		.filter((x) => options[x])
-		.map((x) => map[x]);
+		.filter(x => options[x])
+		.map(x => map[x]);
 
 	if (!tasks.length) {
 		console.log(

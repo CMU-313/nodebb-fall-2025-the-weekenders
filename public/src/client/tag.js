@@ -48,7 +48,7 @@ define('forum/tag', [
 						type: type,
 					});
 				})
-				.catch((err) => alerts.error(err));
+				.catch(err => alerts.error(err));
 		}
 
 		function setFollowState(state) {

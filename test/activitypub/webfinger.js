@@ -56,7 +56,7 @@ describe('WebFinger endpoint', () => {
 		assert(response);
 		assert.strictEqual(response.statusCode, 200);
 
-		['subject', 'aliases', 'links'].forEach((prop) => {
+		['subject', 'aliases', 'links'].forEach(prop => {
 			assert(body.hasOwnProperty(prop));
 			assert(body[prop]);
 		});
@@ -68,7 +68,7 @@ describe('WebFinger endpoint', () => {
 			[
 				`${nconf.get('url')}/uid/${uid}`,
 				`${nconf.get('url')}/user/${slug}`,
-			].every((url) => body.aliases.includes(url))
+			].every(url => body.aliases.includes(url))
 		);
 
 		assert(Array.isArray(body.links));

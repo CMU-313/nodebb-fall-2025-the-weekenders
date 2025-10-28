@@ -12,11 +12,11 @@ module.exports = {
 
 		await batch.processSortedSet(
 			'topics:tid',
-			async (tids) => {
+			async tids => {
 				let topicData = await topics.getTopicsData(tids);
-				topicData = topicData.filter((t) => t && t.cid);
+				topicData = topicData.filter(t => t && t.cid);
 				await db.sortedSetAddBulk(
-					topicData.map((t) => [
+					topicData.map(t => [
 						`cid:${t.cid}:tids:views`,
 						t.viewcount || 0,
 						t.tid,

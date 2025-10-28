@@ -14,7 +14,7 @@ module.exports = {
 		const { tokens = [] } = await meta.settings.get('core.api');
 
 		await Promise.all(
-			tokens.map(async (tokenObj) => {
+			tokens.map(async tokenObj => {
 				const { token, uid, description } = tokenObj;
 				await api.utils.tokens.add({ token, uid, description });
 			})

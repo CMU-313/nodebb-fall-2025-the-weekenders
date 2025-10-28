@@ -112,7 +112,7 @@ define('forum/topic/votes', [
 			}).show();
 		}
 		let usernames = data.usernames.filter(
-			(name) => name !== '[[global:former-user]]'
+			name => name !== '[[global:former-user]]'
 		);
 		if (!usernames.length) {
 			return;
@@ -199,7 +199,7 @@ define('forum/topic/votes', [
 	Votes.showAnnouncers = async function (pid) {
 		const data = await api
 			.get(`/posts/${encodeURIComponent(pid)}/announcers`, {})
-			.catch((err) => alerts.error(err));
+			.catch(err => alerts.error(err));
 
 		const html = await app.parseAndTranslate('modals/announcers', data);
 		const dialog = bootbox.dialog({

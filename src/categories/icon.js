@@ -16,9 +16,9 @@ Icons._constants = Object.freeze({
 	extensions: ['svg', 'png'],
 });
 
-Icons.get = async (cid) => {
+Icons.get = async cid => {
 	try {
-		const paths = Icons._constants.extensions.map((extension) =>
+		const paths = Icons._constants.extensions.map(extension =>
 			path.resolve(
 				nconf.get('upload_path'),
 				'category',
@@ -26,7 +26,7 @@ Icons.get = async (cid) => {
 			)
 		);
 		await Promise.all(
-			paths.map(async (path) => {
+			paths.map(async path => {
 				await fs.access(path);
 			})
 		);
@@ -42,9 +42,9 @@ Icons.get = async (cid) => {
 	}
 };
 
-Icons.flush = async (cid) => {
+Icons.flush = async cid => {
 	winston.verbose(`[categories/icons] Flushing ${cid}.`);
-	const paths = Icons._constants.extensions.map((extension) =>
+	const paths = Icons._constants.extensions.map(extension =>
 		path.resolve(
 			nconf.get('upload_path'),
 			'category',
@@ -53,11 +53,11 @@ Icons.flush = async (cid) => {
 	);
 
 	await Promise.all(
-		paths.map(async (path) => await fs.rm(path, { force: true }))
+		paths.map(async path => await fs.rm(path, { force: true }))
 	);
 };
 
-Icons.regenerate = async (cid) => {
+Icons.regenerate = async cid => {
 	winston.verbose(`[categories/icons] Regenerating ${cid}.`);
 	const { icon, color, bgColor } = await categories.getCategoryData(cid);
 

@@ -14,7 +14,7 @@ module.exports = {
 
 		await batch.processSortedSet(
 			'events:time',
-			async (eids) => {
+			async eids => {
 				for (const eid of eids) {
 					progress.incr();
 

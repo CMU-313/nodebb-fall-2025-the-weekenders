@@ -16,8 +16,8 @@ function toEndorsedOrder(posts) {
 	const main = posts[0];
 	const rest = posts.slice(1);
 
-	const endorsed = rest.filter((p) => !!p.endorsed);
-	const normal = rest.filter((p) => !p.endorsed);
+	const endorsed = rest.filter(p => !!p.endorsed);
+	const normal = rest.filter(p => !p.endorsed);
 
 	endorsed.sort((a, b) => {
 		const ar = Number.isFinite(a.endorsed_rank) ? a.endorsed_rank : Infinity;
@@ -37,7 +37,7 @@ describe('frontend endorse ordering (unit)', function () {
 		const posts = [{ pid: 1 }, { pid: 2 }, { pid: 3 }];
 		const ordered = toEndorsedOrder(posts);
 		assert.deepStrictEqual(
-			ordered.map((p) => p.pid),
+			ordered.map(p => p.pid),
 			[1, 2, 3]
 		);
 	});
@@ -52,7 +52,7 @@ describe('frontend endorse ordering (unit)', function () {
 		];
 		const ordered = toEndorsedOrder(posts);
 		assert.deepStrictEqual(
-			ordered.map((p) => p.pid),
+			ordered.map(p => p.pid),
 			[1, 4, 2, 3]
 		);
 	});
@@ -68,7 +68,7 @@ describe('frontend endorse ordering (unit)', function () {
 		];
 		const ordered = toEndorsedOrder(posts);
 		assert.deepStrictEqual(
-			ordered.map((p) => p.pid),
+			ordered.map(p => p.pid),
 			[1, 3, 2, 4, 5]
 		);
 	});

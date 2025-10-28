@@ -62,7 +62,7 @@ module.exports = function (Topics) {
 			} else {
 				const cids = await getCids(params.cids, params.uid);
 				tids = await Topics.getLatestTidsFromSet(
-					cids.map((cid) => `cid:${cid}:tids:create`),
+					cids.map(cid => `cid:${cid}:tids:create`),
 					0,
 					-1,
 					params.term
@@ -115,7 +115,7 @@ module.exports = function (Topics) {
 				uid,
 				'topics:read'
 			);
-			cids = cids.filter((cid) => cid !== -1);
+			cids = cids.filter(cid => cid !== -1);
 		}
 		return cids;
 	}
@@ -123,23 +123,23 @@ module.exports = function (Topics) {
 	async function getTidsWithMostPostsInTerm(cids, uid, term) {
 		cids = await getCids(cids, uid);
 		const pids = await db.getSortedSetRevRangeByScore(
-			cids.map((cid) => `cid:${cid}:pids`),
+			cids.map(cid => `cid:${cid}:pids`),
 			0,
 			1000,
 			'+inf',
 			Date.now() - Topics.getSinceFromTerm(term)
 		);
 		const postObjs = await db.getObjectsFields(
-			pids.map((pid) => `post:${pid}`),
+			pids.map(pid => `post:${pid}`),
 			['tid']
 		);
 		const tidToCount = {};
-		postObjs.forEach((post) => {
+		postObjs.forEach(post => {
 			tidToCount[post.tid] = tidToCount[post.tid] || 0;
 			tidToCount[post.tid] += 1;
 		});
 
-		return _.uniq(postObjs.map((post) => String(post.tid))).sort(
+		return _.uniq(postObjs.map(post => String(post.tid))).sort(
 			(t1, t2) => tidToCount[t2] - tidToCount[t1]
 		);
 	}
@@ -163,7 +163,7 @@ module.exports = function (Topics) {
 	async function getTagTids(params) {
 		const sets = [
 			sortToSet(params.sort),
-			...params.tags.map((tag) => `tag:${tag}:topics`),
+			...params.tags.map(tag => `tag:${tag}:topics`),
 		];
 		const method =
 			params.sort === 'old'
@@ -181,10 +181,8 @@ module.exports = function (Topics) {
 		if (params.tags.length) {
 			return _.intersection(
 				...(await Promise.all(
-					params.tags.map(async (tag) => {
-						const sets = params.cids.map(
-							(cid) => `cid:${cid}:tag:${tag}:topics`
-						);
+					params.tags.map(async tag => {
+						const sets = params.cids.map(cid => `cid:${cid}:tag:${tag}:topics`);
 						return await db.getSortedSetRevRange(sets, 0, -1);
 					})
 				))
@@ -193,7 +191,7 @@ module.exports = function (Topics) {
 
 		const sets = [];
 		const pinnedSets = [];
-		params.cids.forEach((cid) => {
+		params.cids.forEach(cid => {
 			if (params.sort === 'recent' || params.sort === 'old') {
 				sets.push(`cid:${cid}:tids`);
 			} else {
@@ -260,7 +258,7 @@ module.exports = function (Topics) {
 			topicData.sort(sortFn);
 		}
 
-		return topicData.map((topic) => topic && topic.tid);
+		return topicData.map(topic => topic && topic.tid);
 	}
 
 	function floatPinned(topicData, sortFn) {
@@ -317,9 +315,7 @@ module.exports = function (Topics) {
 			'cid',
 			'tags',
 		]);
-		const topicCids = _.uniq(topicData.map((topic) => topic.cid)).filter(
-			Boolean
-		);
+		const topicCids = _.uniq(topicData.map(topic => topic.cid)).filter(Boolean);
 
 		async function getIgnoredCids() {
 			if (
@@ -343,18 +339,16 @@ module.exports = function (Topics) {
 		const { tags } = params;
 		tids = topicData
 			.filter(
-				(t) =>
+				t =>
 					t &&
 					t.cid &&
 					!isCidIgnored[t.cid] &&
 					(cids || parseInt(t.cid, 10) !== -1) &&
 					(!cids || cids.includes(String(t.cid))) &&
 					(!tags.length ||
-						tags.every((tag) =>
-							t.tags.find((topicTag) => topicTag.value === tag)
-						))
+						tags.every(tag => t.tags.find(topicTag => topicTag.value === tag)))
 			)
-			.map((t) => t.tid);
+			.map(t => t.tid);
 
 		const result = await plugins.hooks.fire('filter:topics.filterSortedTids', {
 			tids: tids,

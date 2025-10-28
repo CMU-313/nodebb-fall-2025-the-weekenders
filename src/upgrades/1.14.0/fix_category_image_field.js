@@ -9,16 +9,14 @@ module.exports = {
 		const batch = require('../../batch');
 		await batch.processSortedSet(
 			'categories:cid',
-			async (cids) => {
-				let categoryData = await db.getObjects(
-					cids.map((c) => `category:${c}`)
-				);
+			async cids => {
+				let categoryData = await db.getObjects(cids.map(c => `category:${c}`));
 				categoryData = categoryData.filter(
-					(c) => c && (c.image || c.backgroundImage)
+					c => c && (c.image || c.backgroundImage)
 				);
 				if (categoryData.length) {
 					await Promise.all(
-						categoryData.map(async (data) => {
+						categoryData.map(async data => {
 							if (data.image && !data.backgroundImage) {
 								await db.setObjectField(
 									`category:${data.cid}`,

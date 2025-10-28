@@ -34,7 +34,7 @@ module.exports = function (Posts) {
 		const pids = await db.getSortedSetRevRange('posts:pid', start, stop);
 		const postData = await Posts.getPostsFields(pids, ['uid']);
 		return _.uniq(
-			postData.map((p) => p && p.uid).filter((uid) => parseInt(uid, 10))
+			postData.map(p => p && p.uid).filter(uid => parseInt(uid, 10))
 		);
 	};
 };

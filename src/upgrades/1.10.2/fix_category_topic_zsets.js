@@ -15,7 +15,7 @@ module.exports = {
 		const topics = require('../../topics');
 		await batch.processSortedSet(
 			'topics:tid',
-			async (tids) => {
+			async tids => {
 				for (const tid of tids) {
 					progress.incr();
 					const topicData = await db.getObjectFields(`topic:${tid}`, [

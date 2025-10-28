@@ -146,7 +146,7 @@ define('admin/extend/widgets', [
 				area.find('.widget-panel[data-widget]').each(function () {
 					const widgetData = {};
 					const data = $(this).find('form').serializeArray();
-					data.forEach((widgetField) => {
+					data.forEach(widgetField => {
 						const { name, value } = widgetField;
 						if (name) {
 							if (widgetData[name]) {

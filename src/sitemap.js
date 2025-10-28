@@ -106,7 +106,7 @@ sitemap.getCategories = async function () {
 
 	const categoryUrls = [];
 	const categoriesData = await getSitemapCategories();
-	categoriesData.forEach((category) => {
+	categoriesData.forEach(category => {
 		if (category) {
 			categoryUrls.push({
 				url: `${nconf.get('relative_path')}/category/${category.slug}`,
@@ -168,7 +168,7 @@ sitemap.getTopicPage = async function (page) {
 		return sitemap.maps.topics[page - 1].sm;
 	}
 
-	data.topics.forEach((topic) => {
+	data.topics.forEach(topic => {
 		if (topic) {
 			topicUrls.push({
 				url: `${nconf.get('relative_path')}/topic/${topic.slug}`,
@@ -192,7 +192,7 @@ async function urlsToSitemap(urls) {
 		return '';
 	}
 	const smStream = new SitemapStream({ hostname: nconf.get('url') });
-	urls.forEach((url) => smStream.write(url));
+	urls.forEach(url => smStream.write(url));
 	smStream.end();
 	return (await streamToPromise(smStream)).toString();
 }
@@ -204,7 +204,7 @@ sitemap.clearCache = function () {
 	if (sitemap.maps.categories) {
 		sitemap.maps.categoriesCacheExpireTimestamp = 0;
 	}
-	sitemap.maps.topics.forEach((topicMap) => {
+	sitemap.maps.topics.forEach(topicMap => {
 		topicMap.cacheExpireTimestamp = 0;
 	});
 };

@@ -61,7 +61,7 @@ Analytics.init = async function () {
 	}
 
 	if (runJobs) {
-		pubsub.on('analytics:publish', (data) => {
+		pubsub.on('analytics:publish', data => {
 			incrementProperties(total, data.local);
 		});
 	}
@@ -90,7 +90,7 @@ Analytics.increment = function (keys, callback) {
 
 	plugins.hooks.fire('action:analytics.increment', { keys: keys });
 
-	keys.forEach((key) => {
+	keys.forEach(key => {
 		local.counters[key] = local.counters[key] || 0;
 		local.counters[key] += 1;
 	});
@@ -139,9 +139,9 @@ Analytics.writeData = async function () {
 
 	// Build list of metrics that were updated
 	let metrics = ['pageviews', 'pageviews:month'];
-	metrics.forEach((metric) => {
+	metrics.forEach(metric => {
 		const toAdd = ['registered', 'guest', 'bot'].map(
-			(type) => `${metric}:${type}`
+			type => `${metric}:${type}`
 		);
 		metrics = [...metrics, ...toAdd];
 	});
@@ -265,7 +265,7 @@ Analytics.getHourlyStatsForSet = async function (set, hour, numHours) {
 	const termsArr = [];
 
 	hoursArr.reverse();
-	hoursArr.forEach((hour) => {
+	hoursArr.forEach(hour => {
 		termsArr.push(terms[hour]);
 	});
 

@@ -179,7 +179,7 @@ describe("Post's", () => {
 		}
 	});
 
-	it('should return falsy if post does not exist', (done) => {
+	it('should return falsy if post does not exist', done => {
 		posts.getPostData(9999, (err, postData) => {
 			assert.ifError(err);
 			assert.equal(postData, null);
@@ -245,7 +245,7 @@ describe("Post's", () => {
 			assert.strictEqual(score, 1);
 		});
 
-		it('should get voters', (done) => {
+		it('should get voters', done => {
 			socketPosts.getVoters(
 				{ uid: globalModUid },
 				{ pid: postData.pid, cid: cid },
@@ -260,7 +260,7 @@ describe("Post's", () => {
 			);
 		});
 
-		it('should get upvoters', (done) => {
+		it('should get upvoters', done => {
 			socketPosts.getUpvoters(
 				{ uid: globalModUid },
 				[postData.pid],
@@ -393,14 +393,14 @@ describe("Post's", () => {
 	});
 
 	describe('post tools', () => {
-		it('should error if data is invalid', (done) => {
-			socketPosts.loadPostTools({ uid: globalModUid }, null, (err) => {
+		it('should error if data is invalid', done => {
+			socketPosts.loadPostTools({ uid: globalModUid }, null, err => {
 				assert.equal(err.message, '[[error:invalid-data]]');
 				done();
 			});
 		});
 
-		it('should load post tools', (done) => {
+		it('should load post tools', done => {
 			socketPosts.loadPostTools(
 				{ uid: globalModUid },
 				{ pid: postData.pid, cid: cid },
@@ -525,7 +525,7 @@ describe("Post's", () => {
 		let pid;
 		let replyPid;
 		let tid;
-		before((done) => {
+		before(done => {
 			topics.post(
 				{
 					uid: voterUid,
@@ -745,7 +745,7 @@ describe("Post's", () => {
 			assert.equal(data.topic.renamed, false);
 		});
 
-		it('should return diffs', (done) => {
+		it('should return diffs', done => {
 			posts.diffs.get(replyPid, 0, (err, data) => {
 				assert.ifError(err);
 				assert(Array.isArray(data));
@@ -755,7 +755,7 @@ describe("Post's", () => {
 			});
 		});
 
-		it('should load diffs and reconstruct post', (done) => {
+		it('should load diffs and reconstruct post', done => {
 			posts.diffs.load(replyPid, 0, voterUid, (err, data) => {
 				assert.ifError(err);
 				assert.equal(data.content, 'A reply to edit');
@@ -784,7 +784,7 @@ describe("Post's", () => {
 
 			assert.equal(true, Array.isArray(data.revisions));
 			assert.strictEqual(data.timestamps.length, data.revisions.length);
-			['timestamp', 'username'].every((prop) =>
+			['timestamp', 'username'].every(prop =>
 				Object.keys(data.revisions[0]).includes(prop)
 			);
 		});
@@ -915,7 +915,7 @@ describe("Post's", () => {
 	});
 
 	describe('getPostSummaryByPids', () => {
-		it('should return empty array for empty pids', (done) => {
+		it('should return empty array for empty pids', done => {
 			posts.getPostSummaryByPids([], 0, {}, (err, data) => {
 				assert.ifError(err);
 				assert.equal(data.length, 0);
@@ -923,7 +923,7 @@ describe("Post's", () => {
 			});
 		});
 
-		it('should get post summaries', (done) => {
+		it('should get post summaries', done => {
 			posts.getPostSummaryByPids([postData.pid], 0, {}, (err, data) => {
 				assert.ifError(err);
 				assert(data[0].user);
@@ -934,7 +934,7 @@ describe("Post's", () => {
 		});
 	});
 
-	it('should get recent poster uids', (done) => {
+	it('should get recent poster uids', done => {
 		topics.reply(
 			{
 				uid: voterUid,
@@ -942,7 +942,7 @@ describe("Post's", () => {
 				timestamp: Date.now(),
 				content: 'some content',
 			},
-			(err) => {
+			err => {
 				assert.ifError(err);
 				posts.getRecentPosterUids(0, 1, (err, uids) => {
 					assert.ifError(err);
@@ -956,7 +956,7 @@ describe("Post's", () => {
 	});
 
 	describe('parse', () => {
-		it('should not crash and return falsy if post data is falsy', (done) => {
+		it('should not crash and return falsy if post data is falsy', done => {
 			posts.parsePost(null, (err, postData) => {
 				assert.ifError(err);
 				assert.strictEqual(postData, null);
@@ -964,16 +964,16 @@ describe("Post's", () => {
 			});
 		});
 
-		it('should store post content in cache', (done) => {
+		it('should store post content in cache', done => {
 			const oldValue = global.env;
 			global.env = 'production';
 			const postData = {
 				pid: 9999,
 				content: 'some post content',
 			};
-			posts.parsePost(postData, (err) => {
+			posts.parsePost(postData, err => {
 				assert.ifError(err);
-				posts.parsePost(postData, (err) => {
+				posts.parsePost(postData, err => {
 					assert.ifError(err);
 					global.env = oldValue;
 					done();
@@ -981,7 +981,7 @@ describe("Post's", () => {
 			});
 		});
 
-		it('should parse signature and remove links and images', (done) => {
+		it('should parse signature and remove links and images', done => {
 			meta.config['signatures:disableLinks'] = 1;
 			meta.config['signatures:disableImages'] = 1;
 			const userData = {
@@ -997,7 +997,7 @@ describe("Post's", () => {
 			});
 		});
 
-		it('should turn relative links in post body to absolute urls', (done) => {
+		it('should turn relative links in post body to absolute urls', done => {
 			const nconf = require('nconf');
 			const content =
 				'<a href="/users">test</a> <a href="youtube.com">youtube</a>';
@@ -1009,7 +1009,7 @@ describe("Post's", () => {
 			done();
 		});
 
-		it('should turn relative links in post body to absolute urls', (done) => {
+		it('should turn relative links in post body to absolute urls', done => {
 			const nconf = require('nconf');
 			const content =
 				'<a href="/users">test</a> <a href="youtube.com">youtube</a> some test <img src="/path/to/img"/>';
@@ -1025,7 +1025,7 @@ describe("Post's", () => {
 
 	describe('socket methods', () => {
 		let pid;
-		before((done) => {
+		before(done => {
 			topics.reply(
 				{
 					uid: voterUid,
@@ -1171,7 +1171,7 @@ describe("Post's", () => {
 	});
 
 	describe('filterPidsByCid', () => {
-		it('should return pids as is if cid is falsy', (done) => {
+		it('should return pids as is if cid is falsy', done => {
 			posts.filterPidsByCid([1, 2, 3], null, (err, pids) => {
 				assert.ifError(err);
 				assert.deepEqual([1, 2, 3], pids);
@@ -1179,7 +1179,7 @@ describe("Post's", () => {
 			});
 		});
 
-		it('should filter pids by single cid', (done) => {
+		it('should filter pids by single cid', done => {
 			posts.filterPidsByCid([postData.pid, 100, 101], cid, (err, pids) => {
 				assert.ifError(err);
 				assert.deepEqual([postData.pid], pids);
@@ -1187,7 +1187,7 @@ describe("Post's", () => {
 			});
 		});
 
-		it('should filter pids by multiple cids', (done) => {
+		it('should filter pids by multiple cids', done => {
 			posts.filterPidsByCid(
 				[postData.pid, 100, 101],
 				[cid, 2, 3],
@@ -1199,7 +1199,7 @@ describe("Post's", () => {
 			);
 		});
 
-		it('should filter pids by multiple cids', (done) => {
+		it('should filter pids by multiple cids', done => {
 			posts.filterPidsByCid([postData.pid, 100, 101], [cid], (err, pids) => {
 				assert.ifError(err);
 				assert.deepEqual([postData.pid], pids);
@@ -1208,8 +1208,8 @@ describe("Post's", () => {
 		});
 	});
 
-	it('should error if user does not exist', (done) => {
-		user.isReadyToPost(21123123, 1, (err) => {
+	it('should error if user does not exist', done => {
+		user.isReadyToPost(21123123, 1, err => {
 			assert.equal(err.message, '[[error:no-user]]');
 			done();
 		});
@@ -1220,7 +1220,7 @@ describe("Post's", () => {
 		let queueId;
 		let topicQueueId;
 		let jar;
-		before((done) => {
+		before(done => {
 			meta.config.postQueue = 1;
 			user.create({ username: 'newuser' }, (err, _uid) => {
 				assert.ifError(err);
@@ -1229,7 +1229,7 @@ describe("Post's", () => {
 			});
 		});
 
-		after((done) => {
+		after(done => {
 			meta.config.postQueue = 0;
 			meta.config.groupsExemptFromPostQueue = [];
 			done();
@@ -1382,7 +1382,7 @@ describe("Post's", () => {
 
 			let postData = await posts.getQueuedPosts();
 			postData = postData.filter(
-				(p) => parseInt(p.data.tid, 10) === parseInt(result2.tid, 10)
+				p => parseInt(p.data.tid, 10) === parseInt(result2.tid, 10)
 			);
 			assert.strictEqual(postData.length, 1);
 			assert.strictEqual(postData[0].data.content, 'the moved queued post');
@@ -1599,7 +1599,7 @@ describe("Posts'", async () => {
 	});
 
 	it('subfolder tests', () => {
-		files.forEach((filePath) => {
+		files.forEach(filePath => {
 			require(filePath);
 		});
 	});

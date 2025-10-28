@@ -113,11 +113,11 @@ module.exports = function (module) {
 			const batchSize = Math.ceil(key.length / Math.ceil(key.length / 100));
 			await batch.processArray(
 				key,
-				async (currentBatch) => batches.push(currentBatch),
+				async currentBatch => batches.push(currentBatch),
 				{ batch: batchSize }
 			);
 			const batchData = await Promise.all(
-				batches.map((batch) =>
+				batches.map(batch =>
 					doQuery({ $in: batch }, { _id: 0, _key: 0 }, 0, stop + 1)
 				)
 			);
@@ -133,7 +133,7 @@ module.exports = function (module) {
 			result.reverse();
 		}
 		if (!withScores) {
-			result = result.map((item) => item.value);
+			result = result.map(item => item.value);
 		}
 
 		return result;
@@ -327,7 +327,7 @@ module.exports = function (module) {
 		for (let i = 0; i < values.length; i += 1) {
 			data[i] = { key: keys[i], value: values[i] };
 		}
-		const promises = data.map((item) => method(item.key, item.value));
+		const promises = data.map(item => method(item.key, item.value));
 		return await Promise.all(promises);
 	}
 
@@ -346,7 +346,7 @@ module.exports = function (module) {
 		const sortedSet = await module[
 			reverse ? 'getSortedSetRevRange' : 'getSortedSetRange'
 		](key, 0, -1);
-		return values.map((value) => {
+		return values.map(value => {
 			if (!value) {
 				return null;
 			}
@@ -382,13 +382,13 @@ module.exports = function (module) {
 			)
 			.toArray();
 		const map = {};
-		result.forEach((item) => {
+		result.forEach(item => {
 			if (item) {
 				map[item._key] = item;
 			}
 		});
 
-		return keys.map((key) => (map[key] ? map[key].score : null));
+		return keys.map(key => (map[key] ? map[key].score : null));
 	};
 
 	module.sortedSetScores = async function (key, values) {
@@ -408,13 +408,13 @@ module.exports = function (module) {
 			.toArray();
 
 		const valueToScore = {};
-		result.forEach((item) => {
+		result.forEach(item => {
 			if (item) {
 				valueToScore[item.value] = item.score;
 			}
 		});
 
-		return values.map((v) =>
+		return values.map(v =>
 			utils.isNumber(valueToScore[v]) ? valueToScore[v] : null
 		);
 	};
@@ -458,13 +458,13 @@ module.exports = function (module) {
 			.toArray();
 
 		const isMember = {};
-		results.forEach((item) => {
+		results.forEach(item => {
 			if (item) {
 				isMember[item.value] = true;
 			}
 		});
 
-		return values.map((value) => !!isMember[value]);
+		return values.map(value => !!isMember[value]);
 	};
 
 	module.isMemberOfSortedSets = async function (keys, value) {
@@ -486,13 +486,13 @@ module.exports = function (module) {
 			.toArray();
 
 		const isMember = {};
-		results.forEach((item) => {
+		results.forEach(item => {
 			if (item) {
 				isMember[item._key] = true;
 			}
 		});
 
-		return keys.map((key) => !!isMember[key]);
+		return keys.map(key => !!isMember[key]);
 	};
 
 	module.getSortedSetMembers = async function (key) {
@@ -539,12 +539,12 @@ module.exports = function (module) {
 		if (!arrayOfKeys) {
 			return [
 				withScores
-					? data.map((i) => ({ value: i.value, score: i.score }))
-					: data.map((item) => item.value),
+					? data.map(i => ({ value: i.value, score: i.score }))
+					: data.map(item => item.value),
 			];
 		}
 		const sets = {};
-		data.forEach((item) => {
+		data.forEach(item => {
 			sets[item._key] = sets[item._key] || [];
 			if (withScores) {
 				sets[item._key].push({ value: item.value, score: item.score });
@@ -553,7 +553,7 @@ module.exports = function (module) {
 			}
 		});
 
-		return keys.map((k) => sets[k] || []);
+		return keys.map(k => sets[k] || []);
 	}
 
 	module.sortedSetIncrBy = async function (key, increment, value) {
@@ -597,7 +597,7 @@ module.exports = function (module) {
 		const bulk = module.client
 			.collection('objects')
 			.initializeUnorderedBulkOp();
-		data.forEach((item) => {
+		data.forEach(item => {
 			bulk
 				.find({ _key: item[0], value: helpers.valueToString(item[2]) })
 				.upsert()
@@ -608,8 +608,8 @@ module.exports = function (module) {
 			.collection('objects')
 			.find(
 				{
-					_key: { $in: _.uniq(data.map((i) => i[0])) },
-					value: { $in: _.uniq(data.map((i) => i[2])) },
+					_key: { $in: _.uniq(data.map(i => i[0])) },
+					value: { $in: _.uniq(data.map(i => i[2])) },
 				},
 				{
 					projection: { _id: 0, _key: 1, value: 1, score: 1 },
@@ -618,10 +618,10 @@ module.exports = function (module) {
 			.toArray();
 
 		const map = {};
-		result.forEach((item) => {
+		result.forEach(item => {
 			map[`${item._key}:${item.value}`] = item.score;
 		});
-		return data.map((item) => map[`${item[0]}:${item[2]}`]);
+		return data.map(item => map[`${item[0]}:${item[2]}`]);
 	};
 
 	module.getSortedSetRangeByLex = async function (key, min, max, start, count) {
@@ -657,7 +657,7 @@ module.exports = function (module) {
 			.limit(count === -1 ? 0 : count)
 			.toArray();
 
-		return data.map((item) => item && item.value);
+		return data.map(item => item && item.value);
 	}
 
 	module.sortedSetRemoveRangeByLex = async function (key, min, max) {
@@ -717,7 +717,7 @@ module.exports = function (module) {
 
 		const data = await cursor.toArray();
 		if (!params.withScores) {
-			return data.map((d) => d.value);
+			return data.map(d => d.value);
 		}
 		return data;
 	};

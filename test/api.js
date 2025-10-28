@@ -254,7 +254,7 @@ describe('API', async () => {
 		mocks.delete['/groups/{slug}/pending/{uid}'][1].example = pending2;
 		mocks.delete['/groups/{slug}/invites/{uid}'][1].example = inviteUid;
 		await Promise.all(
-			['private-group', 'invitations-only'].map(async (name) => {
+			['private-group', 'invitations-only'].map(async name => {
 				await groups.create({ name, private: true });
 			})
 		);
@@ -347,7 +347,7 @@ describe('API', async () => {
 
 		const socketAdmin = require('../src/socket.io/admin');
 		await Promise.all(
-			['profile', 'posts', 'uploads'].map(async (type) =>
+			['profile', 'posts', 'uploads'].map(async type =>
 				api.users.generateExport({ uid: adminUid }, { uid: adminUid, type })
 			)
 		);
@@ -401,7 +401,7 @@ describe('API', async () => {
 	it('should grab all mounted routes and ensure a schema exists', async () => {
 		const webserver = require('../src/webserver');
 		const buildPaths = function (stack, prefix) {
-			const paths = stack.map((dispatch) => {
+			const paths = stack.map(dispatch => {
 				if (
 					dispatch.route &&
 					dispatch.route.path &&
@@ -437,7 +437,7 @@ describe('API', async () => {
 
 		let paths = buildPaths(webserver.app._router.stack)
 			.filter(Boolean)
-			.map((pathObj) => {
+			.map(pathObj => {
 				pathObj.path = pathObj.path.replace(/\/:([^\\/]+)/g, '/{$1}');
 				return pathObj;
 			});
@@ -448,13 +448,13 @@ describe('API', async () => {
 			'/api/user/{userslug}/theme', // from persona
 		];
 		paths = paths.filter(
-			(path) =>
+			path =>
 				path.method !== '_all' &&
-				!exclusionPrefixes.some((prefix) => path.path.startsWith(prefix))
+				!exclusionPrefixes.some(prefix => path.path.startsWith(prefix))
 		);
 
 		// For each express path, query for existence in read and write api schemas
-		paths.forEach((pathObj) => {
+		paths.forEach(pathObj => {
 			describe(`${pathObj.method.toUpperCase()} ${pathObj.path}`, () => {
 				it('should be defined in schema docs', () => {
 					let schema = readApi;
@@ -491,7 +491,7 @@ describe('API', async () => {
 		// Iterate through all documented paths, make a call to it,
 		// and compare the result body with what is defined in the spec
 		const pathLib = path; // for calling path module from inside this forEach
-		paths.forEach((path) => {
+		paths.forEach(path => {
 			const context = api.paths[path];
 			let schema;
 			let result;
@@ -500,7 +500,7 @@ describe('API', async () => {
 			const headers = {};
 			const qs = {};
 
-			Object.keys(context).forEach((_method) => {
+			Object.keys(context).forEach(_method => {
 				// Only test GET routes in the Read API
 				if (api.info.title === 'NodeBB Read API' && _method !== 'get') {
 					return;
@@ -512,14 +512,14 @@ describe('API', async () => {
 						return;
 					}
 
-					const pathParams = (path.match(/{[\w\-_*]+}?/g) || []).map((match) =>
+					const pathParams = (path.match(/{[\w\-_*]+}?/g) || []).map(match =>
 						match.slice(1, -1)
 					);
 					const schemaParams = context[method].parameters
-						.map((param) => (param.in === 'path' ? param.name : null))
+						.map(param => (param.in === 'path' ? param.name : null))
 						.filter(Boolean);
 					assert(
-						pathParams.every((param) => schemaParams.includes(param)),
+						pathParams.every(param => schemaParams.includes(param)),
 						`${method.toUpperCase()} ${path} has path parameters specified but not defined`
 					);
 				});
@@ -532,7 +532,7 @@ describe('API', async () => {
 						// Use mock data if provided
 						parameters = mocks[method][path] || parameters;
 
-						parameters.forEach((param) => {
+						parameters.forEach(param => {
 							assert(
 								param.example !== null && param.example !== undefined,
 								`${method.toUpperCase()} ${path} has parameters without examples`
@@ -801,7 +801,7 @@ describe('API', async () => {
 		}
 
 		// Compare the schema to the response
-		required.forEach((prop) => {
+		required.forEach(prop => {
 			if (schema.hasOwnProperty(prop)) {
 				assert(
 					response.hasOwnProperty(prop),
@@ -874,7 +874,7 @@ describe('API', async () => {
 										schema[prop].items.oneOf
 								)
 							) {
-								response[prop].forEach((res) => {
+								response[prop].forEach(res => {
 									compare(
 										schema[prop].items,
 										res,
@@ -885,7 +885,7 @@ describe('API', async () => {
 								});
 							} else if (response[prop].length) {
 								// for now
-								response[prop].forEach((item) => {
+								response[prop].forEach(item => {
 									assert.strictEqual(
 										typeof item,
 										schema[prop].items.type,
@@ -900,7 +900,7 @@ describe('API', async () => {
 		});
 
 		// Compare the response to the schema
-		Object.keys(response).forEach((prop) => {
+		Object.keys(response).forEach(prop => {
 			if (additionalProperties) {
 				// All bets are off
 				return;

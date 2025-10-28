@@ -102,7 +102,7 @@ searchController.search = async function (req, res, next) {
 	searchData.showAsTopics = req.query.showAs === 'topics';
 	searchData.title = '[[global:header.search]]';
 	if (Array.isArray(data.categories)) {
-		searchData.selectedCids = data.categories.map((cid) =>
+		searchData.selectedCids = data.categories.map(cid =>
 			validator.escape(String(cid))
 		);
 		if (
@@ -131,7 +131,7 @@ searchController.search = async function (req, res, next) {
 			label: translator.compile(
 				'search:posted-by-usernames',
 				(Array.isArray(data.postedBy) ? data.postedBy : [])
-					.map((u) => validator.escape(String(u)))
+					.map(u => validator.escape(String(u)))
 					.join(', ')
 			),
 		},
@@ -140,7 +140,7 @@ searchController.search = async function (req, res, next) {
 			label: translator.compile(
 				'search:tags-x',
 				(Array.isArray(data.hasTags) ? data.hasTags : [])
-					.map((u) => validator.escape(String(u)))
+					.map(u => validator.escape(String(u)))
 					.join(', ')
 			),
 		},
@@ -184,16 +184,14 @@ async function recordSearch(data) {
 			if (searches[data.uid] && searches[data.uid].queries) {
 				const copy = searches[data.uid].queries.slice();
 				const filtered = searches[data.uid].queries.filter(
-					(q) =>
-						!copy.find(
-							(query) => query.startsWith(q) && query.length > q.length
-						)
+					q =>
+						!copy.find(query => query.startsWith(q) && query.length > q.length)
 				);
 				delete searches[data.uid];
 				const dayTimestamp = new Date();
 				dayTimestamp.setHours(0, 0, 0, 0);
 				await Promise.all(
-					_.uniq(filtered).map(async (query) => {
+					_.uniq(filtered).map(async query => {
 						await db.sortedSetIncrBy('searches:all', 1, query);
 						await db.sortedSetIncrBy(
 							`searches:${dayTimestamp.getTime()}`,
@@ -219,7 +217,7 @@ function getSelectedTags(hasTags) {
 	if (!Array.isArray(hasTags) || !hasTags.length) {
 		return [];
 	}
-	const tags = hasTags.map((tag) => ({ value: tag }));
+	const tags = hasTags.map(tag => ({ value: tag }));
 	return topics.getTagData(tags);
 }
 

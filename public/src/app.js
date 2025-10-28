@@ -290,7 +290,7 @@ if (document.readyState === 'loading') {
 	};
 
 	app.toggleNavbar = function (state) {
-		require(['components'], (components) => {
+		require(['components'], components => {
 			const navbarEl = components.get('navbar');
 			navbarEl[state ? 'show' : 'hide']();
 		});
@@ -372,11 +372,11 @@ if (document.readyState === 'loading') {
 		return new Promise((resolve, reject) => {
 			require(['translator', 'benchpress'], function (translator, Benchpress) {
 				Benchpress.render(template, data, blockName)
-					.then((rendered) => translator.translate(rendered))
-					.then((translated) => translator.unescape(translated))
+					.then(rendered => translator.translate(rendered))
+					.then(translated => translator.unescape(translated))
 					.then(resolve, reject);
 			});
-		}).then((html) => {
+		}).then(html => {
 			html = $(html);
 			if (callback && typeof callback === 'function') {
 				setTimeout(callback, 0, html);
@@ -394,7 +394,7 @@ if (document.readyState === 'loading') {
 					scope: config.relative_path + '/',
 				})
 				.then(function () {
-					navigator.serviceWorker.addEventListener('message', (event) => {
+					navigator.serviceWorker.addEventListener('message', event => {
 						const { action, url } = event.data;
 						switch (action) {
 							case 'ajaxify': {

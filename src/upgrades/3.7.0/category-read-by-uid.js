@@ -15,8 +15,8 @@ module.exports = {
 		}
 		await batch.processArray(
 			allCids,
-			async (cids) => {
-				await db.deleteAll(cids.map((cid) => `cid:${cid}:read_by_uid`));
+			async cids => {
+				await db.deleteAll(cids.map(cid => `cid:${cid}:read_by_uid`));
 				progress.incr(cids.length);
 			},
 			{

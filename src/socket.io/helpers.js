@@ -22,10 +22,10 @@ SocketHelpers.notifyNew = async function (uid, type, result) {
 		return;
 	}
 	let uids = await user.getUidsFromSet('users:online', 0, -1);
-	uids = uids.filter((toUid) => parseInt(toUid, 10) !== uid);
+	uids = uids.filter(toUid => parseInt(toUid, 10) !== uid);
 	await batch.processArray(
 		uids,
-		async (uids) => {
+		async uids => {
 			await notifyUids(uid, uids, type, result);
 		},
 		{
@@ -63,7 +63,7 @@ async function notifyUids(uid, uids, type, result) {
 	post.ip = undefined;
 
 	await Promise.all(
-		data.uidsTo.map(async (toUid) => {
+		data.uidsTo.map(async toUid => {
 			const copyResult = _.cloneDeep(result);
 			const postToUid = copyResult.posts[0];
 			postToUid.categoryWatchState = categoryWatchStates[toUid];
@@ -250,13 +250,13 @@ SocketHelpers.rescindUpvoteNotification = async function (pid, fromuid) {
 };
 
 SocketHelpers.emitToUids = async function (event, data, uids) {
-	uids.forEach((toUid) => websockets.in(`uid_${toUid}`).emit(event, data));
+	uids.forEach(toUid => websockets.in(`uid_${toUid}`).emit(event, data));
 };
 
 SocketHelpers.removeSocketsFromRoomByUids = async function (uids, roomId) {
 	const sockets = _.flatten(
 		await Promise.all(
-			uids.map((uid) => websockets.in(`uid_${uid}`).fetchSockets())
+			uids.map(uid => websockets.in(`uid_${uid}`).fetchSockets())
 		)
 	);
 

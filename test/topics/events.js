@@ -65,7 +65,7 @@ describe('Topic Events', () => {
 
 			assert(events);
 			assert(Array.isArray(events));
-			events.forEach((event) => {
+			events.forEach(event => {
 				assert(
 					[
 						'id',
@@ -75,7 +75,7 @@ describe('Topic Events', () => {
 						'timestampISO',
 						'type',
 						'quux',
-					].every((key) => event.hasOwnProperty(key))
+					].every(key => event.hasOwnProperty(key))
 				);
 			});
 		});
@@ -88,7 +88,7 @@ describe('Topic Events', () => {
 			assert(events);
 			assert(Array.isArray(events));
 			assert.strictEqual(events.length, 1);
-			events.forEach((event) => {
+			events.forEach(event => {
 				assert(
 					[
 						'id',
@@ -98,7 +98,7 @@ describe('Topic Events', () => {
 						'timestampISO',
 						'type',
 						'quux',
-					].every((key) => event.hasOwnProperty(key))
+					].every(key => event.hasOwnProperty(key))
 				);
 			});
 		});
@@ -109,17 +109,17 @@ describe('Topic Events', () => {
 
 		before(async () => {
 			const events = await topics.events.get(topic.topicData.tid);
-			eventIds = events.map((event) => event.id);
+			eventIds = events.map(event => event.id);
 		});
 
 		it("should purge topic's events from the database", async () => {
 			await topics.events.purge(topic.topicData.tid);
 
 			const keys = [`topic:${topic.topicData.tid}:events`];
-			keys.push(...eventIds.map((id) => `topicEvent:${id}`));
+			keys.push(...eventIds.map(id => `topicEvent:${id}`));
 
-			const exists = await Promise.all(keys.map((key) => db.exists(key)));
-			assert(exists.every((exists) => !exists));
+			const exists = await Promise.all(keys.map(key => db.exists(key)));
+			assert(exists.every(exists => !exists));
 		});
 	});
 });

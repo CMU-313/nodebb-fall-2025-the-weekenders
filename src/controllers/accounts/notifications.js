@@ -50,10 +50,10 @@ notificationsController.get = async function (req, res, next) {
 			.concat(filters.moderatorFilters);
 	}
 
-	allFilters.forEach((filterData) => {
+	allFilters.forEach(filterData => {
 		filterData.selected = filterData.filter === filter;
 	});
-	const selectedFilter = allFilters.find((filterData) => filterData.selected);
+	const selectedFilter = allFilters.find(filterData => filterData.selected);
 	if (!selectedFilter) {
 		return next();
 	}
@@ -67,7 +67,7 @@ notificationsController.get = async function (req, res, next) {
 		req.uid
 	);
 
-	allFilters.forEach((filterData) => {
+	allFilters.forEach(filterData => {
 		if (filterData && filterData.filter) {
 			filterData.count = data.counts[filterData.filter] || 0;
 		}

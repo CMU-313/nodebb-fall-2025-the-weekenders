@@ -98,21 +98,21 @@ chatsAPI.create = async function (caller, data) {
 		: messaging.notificationSettings.ALLMESSAGES;
 
 	await Promise.all(
-		data.uids.map((uid) => messaging.canMessageUser(caller.uid, uid))
+		data.uids.map(uid => messaging.canMessageUser(caller.uid, uid))
 	);
 	const roomId = await messaging.newRoom(caller.uid, data);
 
 	return await messaging.getRoomData(roomId);
 };
 
-chatsAPI.getUnread = async (caller) => {
+chatsAPI.getUnread = async caller => {
 	const count = await messaging.getUnreadCount(caller.uid);
 	return { count };
 };
 
 chatsAPI.sortPublicRooms = async (caller, { roomIds, scores }) => {
-	[roomIds, scores].forEach((arr) => {
-		if (!Array.isArray(arr) || !arr.every((value) => isFinite(value))) {
+	[roomIds, scores].forEach(arr => {
+		if (!Array.isArray(arr) || !arr.every(value => isFinite(value))) {
 			throw new Error('[[error:invalid-data]]');
 		}
 	});
@@ -294,7 +294,7 @@ chatsAPI.users = async (caller, data) => {
 	if (!isUserInRoom) {
 		throw new Error('[[error:no-privileges]]');
 	}
-	users.forEach((user) => {
+	users.forEach(user => {
 		const isSelf = parseInt(user.uid, 10) === parseInt(caller.uid, 10);
 		user.canKick = isOwner && !isSelf;
 		user.canToggleOwner =
@@ -325,7 +325,7 @@ chatsAPI.invite = async (caller, data) => {
 		throw new Error('[[error:no-user]]');
 	}
 	await Promise.all(
-		data.uids.map((uid) => messaging.canMessageUser(caller.uid, uid))
+		data.uids.map(uid => messaging.canMessageUser(caller.uid, uid))
 	);
 	await messaging.addUsersToRoom(caller.uid, data.uids, data.roomId);
 

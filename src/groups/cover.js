@@ -77,7 +77,7 @@ module.exports = function (Groups) {
 		const fields = ['cover:url', 'cover:thumb:url'];
 		const values = await Groups.getGroupFields(data.groupName, fields);
 		await Promise.all(
-			fields.map((field) => {
+			fields.map(field => {
 				if (
 					!values[field] ||
 					!values[field].startsWith(

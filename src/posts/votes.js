@@ -90,8 +90,8 @@ module.exports = function (Posts) {
 			const data = pids.map(() => false);
 			return { upvotes: data, downvotes: data };
 		}
-		const upvoteSets = pids.map((pid) => `pid:${pid}:upvote`);
-		const downvoteSets = pids.map((pid) => `pid:${pid}:downvote`);
+		const upvoteSets = pids.map(pid => `pid:${pid}:upvote`);
+		const downvoteSets = pids.map(pid => `pid:${pid}:downvote`);
 		const data = await db.isMemberOfSets(upvoteSets.concat(downvoteSets), uid);
 		return {
 			upvotes: data.slice(0, pids.length),
@@ -100,7 +100,7 @@ module.exports = function (Posts) {
 	};
 
 	Posts.getUpvotedUidsByPids = async function (pids) {
-		return await db.getSetsMembers(pids.map((pid) => `pid:${pid}:upvote`));
+		return await db.getSetsMembers(pids.map(pid => `pid:${pid}:upvote`));
 	};
 
 	function voteInProgress(pid, uid) {
@@ -184,7 +184,7 @@ module.exports = function (Posts) {
 		const voterPerUserToday = meta.config[`${type}sPerUserPerDay`];
 		if (voterPerUserToday) {
 			const postData = await Posts.getPostsFields(votedPidsToday, ['uid']);
-			const targetUpVotes = postData.filter((p) => p.uid === targetUid).length;
+			const targetUpVotes = postData.filter(p => p.uid === targetUid).length;
 			if (targetUpVotes >= voterPerUserToday) {
 				throw new Error(
 					`[[error:too-many-${type}s-today-user, ${voterPerUserToday}]]`

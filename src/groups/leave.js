@@ -28,21 +28,21 @@ module.exports = function (Groups) {
 
 		await Promise.all([
 			db.sortedSetRemove(
-				groupsToLeave.map((groupName) => `group:${groupName}:members`),
+				groupsToLeave.map(groupName => `group:${groupName}:members`),
 				uid
 			),
 			db.setRemove(
-				groupsToLeave.map((groupName) => `group:${groupName}:owners`),
+				groupsToLeave.map(groupName => `group:${groupName}:owners`),
 				uid
 			),
 			db.decrObjectField(
-				groupsToLeave.map((groupName) => `group:${groupName}`),
+				groupsToLeave.map(groupName => `group:${groupName}`),
 				'memberCount'
 			),
 		]);
 
 		Groups.clearCache(uid, groupsToLeave);
-		cache.del(groupsToLeave.map((name) => `group:${name}:members`));
+		cache.del(groupsToLeave.map(name => `group:${name}:members`));
 
 		const groupData = await Groups.getGroupsFields(groupsToLeave, [
 			'name',
@@ -54,9 +54,9 @@ module.exports = function (Groups) {
 		}
 
 		const emptyPrivilegeGroups = groupData.filter(
-			(g) => g && Groups.isPrivilegeGroup(g.name) && g.memberCount === 0
+			g => g && Groups.isPrivilegeGroup(g.name) && g.memberCount === 0
 		);
-		const visibleGroups = groupData.filter((g) => g && !g.hidden);
+		const visibleGroups = groupData.filter(g => g && !g.hidden);
 
 		const promises = [];
 		if (emptyPrivilegeGroups.length) {
@@ -66,8 +66,8 @@ module.exports = function (Groups) {
 			promises.push(
 				db.sortedSetAdd,
 				'groups:visible:memberCount',
-				visibleGroups.map((groupData) => groupData.memberCount),
-				visibleGroups.map((groupData) => groupData.name)
+				visibleGroups.map(groupData => groupData.memberCount),
+				visibleGroups.map(groupData => groupData.name)
 			);
 		}
 
@@ -90,23 +90,21 @@ module.exports = function (Groups) {
 		);
 		const allRoomData = await messaging.getRoomsData(allRoomIds);
 		const roomData = allRoomData.filter(
-			(room) => room && room.groups.some((group) => groupNames.includes(group))
+			room => room && room.groups.some(group => groupNames.includes(group))
 		);
 		const isMemberOfAny = _.zipObject(
-			roomData.map((r) => r.roomId),
-			await Promise.all(
-				roomData.map((r) => Groups.isMemberOfAny(uid, r.groups))
-			)
+			roomData.map(r => r.roomId),
+			await Promise.all(roomData.map(r => Groups.isMemberOfAny(uid, r.groups)))
 		);
 		const roomIds = roomData
-			.filter((r) => isMemberOfAny[r.roomId])
-			.map((r) => r.roomId);
+			.filter(r => isMemberOfAny[r.roomId])
+			.map(r => r.roomId);
 		await messaging.leaveRooms(uid, roomIds);
 	}
 
 	async function clearGroupTitleIfSet(groupNames, uid) {
 		groupNames = groupNames.filter(
-			(groupName) =>
+			groupName =>
 				groupName !== 'registered-users' && !Groups.isPrivilegeGroup(groupName)
 		);
 		if (!groupNames.length) {
@@ -118,7 +116,7 @@ module.exports = function (Groups) {
 		}
 
 		const newTitleArray = userData.groupTitleArray.filter(
-			(groupTitle) => !groupNames.includes(groupTitle)
+			groupTitle => !groupNames.includes(groupTitle)
 		);
 		if (newTitleArray.length) {
 			await db.setObjectField(

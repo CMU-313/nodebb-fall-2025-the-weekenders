@@ -13,7 +13,7 @@ module.exports = {
 
 		await batch.processSortedSet(
 			'users:joindate',
-			async (uids) => {
+			async uids => {
 				async function updateHistory(uid, set, fieldName) {
 					const count = await db.sortedSetCard(set);
 					if (count <= 0) {
@@ -33,7 +33,7 @@ module.exports = {
 				}
 
 				await Promise.all(
-					uids.map(async (uid) => {
+					uids.map(async uid => {
 						await Promise.all([
 							updateHistory(uid, `user:${uid}:usernames`, 'username'),
 							updateHistory(uid, `user:${uid}:emails`, 'email'),

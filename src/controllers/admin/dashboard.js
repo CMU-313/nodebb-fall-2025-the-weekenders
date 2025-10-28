@@ -112,7 +112,7 @@ dashboardController.getAnalytics = async (req, res, next) => {
 	let sets;
 	if (req.query.sets) {
 		sets = Array.isArray(req.query.sets) ? req.query.sets : [req.query.sets];
-		sets = sets.filter((set) => validSets.includes(set));
+		sets = sets.filter(set => validSets.includes(set));
 	} else {
 		sets = validSets;
 	}
@@ -122,7 +122,7 @@ dashboardController.getAnalytics = async (req, res, next) => {
 			? analytics.getDailyStatsForSet
 			: analytics.getHourlyStatsForSet;
 	let payload = await Promise.all(
-		sets.map((set) => method(`analytics:${set}`, until, count))
+		sets.map(set => method(`analytics:${set}`, until, count))
 	);
 	payload = _.zipObject(sets, payload);
 
@@ -204,7 +204,7 @@ async function getStatsFromAnalytics(set, field) {
 		today,
 		60
 	);
-	const sum = (arr) => arr.reduce((memo, cur) => memo + cur, 0);
+	const sum = arr => arr.reduce((memo, cur) => memo + cur, 0);
 	const results = {
 		yesterday: sum(data.slice(-2)),
 		today: data.slice(-1)[0],
@@ -270,7 +270,7 @@ async function getPopularSearches() {
 		0,
 		9
 	);
-	return searches.map((s) => ({
+	return searches.map(s => ({
 		value: validator.escape(String(s.value)),
 		score: s.score,
 	}));
@@ -279,7 +279,7 @@ async function getPopularSearches() {
 dashboardController.getLogins = async (req, res) => {
 	let stats = await getStats();
 	stats = stats
-		.filter((stat) => stat.name === '[[admin/dashboard:logins]]')
+		.filter(stat => stat.name === '[[admin/dashboard:logins]]')
 		.map(({ ...stat }) => {
 			delete stat.href;
 			return stat;
@@ -301,9 +301,9 @@ dashboardController.getLogins = async (req, res) => {
 	);
 	const usersData = await user.getUsersData(uids);
 	let sessions = await Promise.all(
-		uids.map(async (uid) => {
+		uids.map(async uid => {
 			const sessions = await user.auth.getSessions(uid);
-			sessions.forEach((session) => {
+			sessions.forEach(session => {
 				session.user = usersData[uids.indexOf(uid)];
 			});
 
@@ -325,7 +325,7 @@ dashboardController.getLogins = async (req, res) => {
 dashboardController.getUsers = async (req, res) => {
 	let stats = await getStats();
 	stats = stats
-		.filter((stat) => stat.name === '[[admin/dashboard:new-users]]')
+		.filter(stat => stat.name === '[[admin/dashboard:new-users]]')
 		.map(({ ...stat }) => {
 			delete stat.href;
 			return stat;
@@ -366,7 +366,7 @@ dashboardController.getUsers = async (req, res) => {
 dashboardController.getTopics = async (req, res) => {
 	let stats = await getStats();
 	stats = stats
-		.filter((stat) => stat.name === '[[admin/dashboard:topics]]')
+		.filter(stat => stat.name === '[[admin/dashboard:topics]]')
 		.map(({ ...stat }) => {
 			delete stat.href;
 			return stat;
@@ -429,14 +429,14 @@ dashboardController.getSearches = async (req, res) => {
 		}
 
 		const daysData = await Promise.all(
-			daysArr.map(async (d) =>
+			daysArr.map(async d =>
 				db.getSortedSetRevRangeWithScores(`searches:${d.getTime()}`, 0, -1)
 			)
 		);
 
 		const map = {};
-		daysData.forEach((d) => {
-			d.forEach((search) => {
+		daysData.forEach(d => {
+			d.forEach(search => {
 				if (!map[search.value]) {
 					map[search.value] = search.score;
 				} else {
@@ -446,14 +446,14 @@ dashboardController.getSearches = async (req, res) => {
 		});
 
 		searches = Object.keys(map)
-			.map((key) => ({ value: key, score: map[key] }))
+			.map(key => ({ value: key, score: map[key] }))
 			.sort((a, b) => b.score - a.score);
 	} else {
 		searches = await db.getSortedSetRevRangeWithScores('searches:all', 0, 99);
 	}
 
 	res.render('admin/dashboard/searches', {
-		searches: searches.map((s) => ({
+		searches: searches.map(s => ({
 			value: validator.escape(String(s.value)),
 			score: s.score,
 		})),

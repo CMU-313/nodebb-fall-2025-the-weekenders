@@ -26,9 +26,7 @@ module.exports = function (Groups) {
 				groupData[idx].memberPostCidsArray.includes(postData.cid)
 		);
 
-		const keys = groupNames.map(
-			(groupName) => `group:${groupName}:member:pids`
-		);
+		const keys = groupNames.map(groupName => `group:${groupName}:member:pids`);
 		await db.sortedSetsAdd(keys, postData.timestamp, postData.pid);
 		await Promise.all(groupNames.map(truncateMemberPosts));
 	};
@@ -73,7 +71,7 @@ module.exports = function (Groups) {
 			stripTags: false,
 		});
 		return postData.filter(
-			(p) => p && p.topic && (!cids.length || cids.includes(p.topic.cid))
+			p => p && p.topic && (!cids.length || cids.includes(p.topic.cid))
 		);
 	};
 };

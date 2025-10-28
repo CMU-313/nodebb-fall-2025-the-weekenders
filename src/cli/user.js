@@ -170,7 +170,7 @@ function UserCmdHelpers() {
 			return parsedValue;
 		},
 		intArrayParse: (values, varName) =>
-			values.map((value) => argParsers.intParse(value, varName)),
+			values.map(value => argParsers.intParse(value, varName)),
 	};
 
 	return {
@@ -279,7 +279,7 @@ ${pwGenerated ? ` Generated password: ${password}` : ''}`);
 		uids = argParsers.intArrayParse(uids, 'uids');
 
 		const userExists = await user.exists(uids);
-		if (!userExists || userExists.some((r) => r === false)) {
+		if (!userExists || userExists.some(r => r === false)) {
 			return winston.error(
 				`[userCmd/reset] A user with given uid does not exists.`
 			);
@@ -290,19 +290,19 @@ ${pwGenerated ? ` Generated password: ${password}` : ''}`);
 
 		switch (type) {
 			case 'purge':
-				await Promise.all(uids.map((uid) => user.delete(adminUid, uid)));
+				await Promise.all(uids.map(uid => user.delete(adminUid, uid)));
 				winston.info(
 					`[userCmd/delete] User(s) with their content has been deleted.`
 				);
 				break;
 			case 'account':
-				await Promise.all(uids.map((uid) => user.deleteAccount(uid)));
+				await Promise.all(uids.map(uid => user.deleteAccount(uid)));
 				winston.info(
 					`[userCmd/delete] User(s) has been deleted, their content left intact.`
 				);
 				break;
 			case 'content':
-				await Promise.all(uids.map((uid) => user.deleteContent(adminUid, uid)));
+				await Promise.all(uids.map(uid => user.deleteContent(adminUid, uid)));
 				winston.info(`[userCmd/delete] User(s)' content has been deleted.`);
 				break;
 		}
@@ -310,14 +310,14 @@ ${pwGenerated ? ` Generated password: ${password}` : ''}`);
 
 	async function makeAdmin(uids) {
 		uids = argParsers.intArrayParse(uids, 'uids');
-		await Promise.all(uids.map((uid) => groups.join('administrators', uid)));
+		await Promise.all(uids.map(uid => groups.join('administrators', uid)));
 
 		winston.info('[userCmd/make/admin] User(s) added as administrators.');
 	}
 
 	async function makeGlobalMod(uids) {
 		uids = argParsers.intArrayParse(uids, 'uids');
-		await Promise.all(uids.map((uid) => groups.join('Global Moderators', uid)));
+		await Promise.all(uids.map(uid => groups.join('Global Moderators', uid)));
 
 		winston.info(
 			'[userCmd/make/globalMod] User(s) added as global moderators.'
@@ -340,7 +340,7 @@ ${pwGenerated ? ` Generated password: ${password}` : ''}`);
 		uids = argParsers.intArrayParse(uids, 'uids');
 
 		await Promise.all(
-			uids.map((uid) =>
+			uids.map(uid =>
 				groups.leave(['administrators', 'Global Moderators'], uid)
 			)
 		);

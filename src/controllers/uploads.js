@@ -53,7 +53,7 @@ uploadsController.upload = async function (req, res, filesIterator) {
 };
 
 uploadsController.uploadPost = async function (req, res) {
-	await uploadsController.upload(req, res, async (uploadedFile) => {
+	await uploadsController.upload(req, res, async uploadedFile => {
 		const isImage = uploadedFile.type.match(/image./);
 		if (isImage) {
 			return await uploadAsImage(req, uploadedFile);
@@ -142,7 +142,7 @@ uploadsController.uploadThumb = async function (req, res) {
 		);
 	}
 
-	return await uploadsController.upload(req, res, async (uploadedFile) => {
+	return await uploadsController.upload(req, res, async uploadedFile => {
 		if (!uploadedFile.type.match(/image./)) {
 			throw new Error('[[error:invalid-file]]');
 		}
@@ -227,7 +227,7 @@ async function saveFileToLocal(uid, folder, uploadedFile) {
 }
 
 function deleteTempFiles(files) {
-	files.forEach((fileObj) => file.delete(fileObj.path));
+	files.forEach(fileObj => file.delete(fileObj.path));
 }
 
 require('../promisify')(uploadsController, [

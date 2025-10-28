@@ -187,9 +187,9 @@ Events.get = async (tid, uid, reverse = false) => {
 		0,
 		-1
 	);
-	const keys = eventIds.map((obj) => `topicEvent:${obj.value}`);
-	const timestamps = eventIds.map((obj) => obj.score);
-	eventIds = eventIds.map((obj) => obj.value);
+	const keys = eventIds.map(obj => `topicEvent:${obj.value}`);
+	const timestamps = eventIds.map(obj => obj.score);
+	eventIds = eventIds.map(obj => obj.value);
 	let events = await db.getObjects(keys);
 	events.forEach((e, idx) => {
 		e.timestamp = timestamps[idx];
@@ -208,8 +208,8 @@ Events.find = async (tid, match) => {
 		0,
 		-1
 	);
-	const keys = eventIds.map((obj) => `topicEvent:${obj.value}`);
-	eventIds = eventIds.map((obj) => obj.value);
+	const keys = eventIds.map(obj => `topicEvent:${obj.value}`);
+	eventIds = eventIds.map(obj => obj.value);
 	const events = await db.getObjects(keys);
 	eventIds = eventIds.filter((id, idx) => _.isMatch(events[idx], match));
 
@@ -254,7 +254,7 @@ async function addEventsFromPostQueue(tid, uid, events) {
 			{ metadata: false }
 		);
 		events.push(
-			...queuedPosts.map((item) => ({
+			...queuedPosts.map(item => ({
 				type: 'post-queue',
 				href: `/post-queue/${item.id}`,
 				timestamp: item.data.timestamp || Date.now(),
@@ -266,34 +266,34 @@ async function addEventsFromPostQueue(tid, uid, events) {
 
 async function modifyEvent({ uid, events }) {
 	const [users, fromCategories, userSettings] = await Promise.all([
-		getUserInfo(events.map((event) => event.uid).filter(Boolean)),
-		getCategoryInfo(events.map((event) => event.fromCid).filter(Boolean)),
+		getUserInfo(events.map(event => event.uid).filter(Boolean)),
+		getCategoryInfo(events.map(event => event.fromCid).filter(Boolean)),
 		user.getSettings(uid),
 	]);
 
 	// Remove backlink events if backlinks are disabled
 	if (meta.config.topicBacklinks !== 1) {
-		events = events.filter((event) => event.type !== 'backlink');
+		events = events.filter(event => event.type !== 'backlink');
 	} else {
 		// remove backlinks that we dont have read permission
 		const backlinkPids = events
-			.filter((e) => e.type === 'backlink')
-			.map((e) => e.href.split('/').pop());
+			.filter(e => e.type === 'backlink')
+			.map(e => e.href.split('/').pop());
 		const pids = await privileges.posts.filter(
 			'topics:read',
 			backlinkPids,
 			uid
 		);
 		events = events.filter(
-			(e) => e.type !== 'backlink' || pids.includes(e.href.split('/').pop())
+			e => e.type !== 'backlink' || pids.includes(e.href.split('/').pop())
 		);
 	}
 
 	// Remove events whose types no longer exist (e.g. plugin uninstalled)
-	events = events.filter((event) => Events._types.hasOwnProperty(event.type));
+	events = events.filter(event => Events._types.hasOwnProperty(event.type));
 
 	// Add user & metadata
-	events.forEach((event) => {
+	events.forEach(event => {
 		event.timestampISO = utils.toISOString(event.timestamp);
 		event.uid = utils.isNumber(event.uid) ? parseInt(event.uid, 10) : event.uid;
 		if (event.hasOwnProperty('uid')) {
@@ -307,7 +307,7 @@ async function modifyEvent({ uid, events }) {
 	});
 
 	await Promise.all(
-		events.map(async (event) => {
+		events.map(async event => {
 			if (Events._types[event.type].translation) {
 				event.text = await Events._types[event.type].translation(
 					event,
@@ -362,12 +362,12 @@ Events.purge = async (tid, eventIds = []) => {
 		eventIds = eventIds.filter((id, index) => isTopicEvent[index]);
 		await Promise.all([
 			db.sortedSetRemove(`topic:${tid}:events`, eventIds),
-			db.deleteAll(eventIds.map((id) => `topicEvent:${id}`)),
+			db.deleteAll(eventIds.map(id => `topicEvent:${id}`)),
 		]);
 	} else {
 		const keys = [`topic:${tid}:events`];
 		const eventIds = await db.getSortedSetRange(keys[0], 0, -1);
-		keys.push(...eventIds.map((id) => `topicEvent:${id}`));
+		keys.push(...eventIds.map(id => `topicEvent:${id}`));
 
 		await db.deleteAll(keys);
 	}

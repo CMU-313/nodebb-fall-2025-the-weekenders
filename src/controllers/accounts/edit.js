@@ -53,7 +53,7 @@ editController.get = async function (req, res, next) {
 	userData.defaultAvatar = user.getDefaultAvatar();
 
 	userData.groups = _groups.filter(
-		(g) =>
+		g =>
 			g &&
 			g.userTitleEnabled &&
 			!groups.isPrivilegeGroup(g.name) &&
@@ -82,7 +82,7 @@ editController.get = async function (req, res, next) {
 		}
 		return i1 - i2;
 	});
-	userData.groups.forEach((group) => {
+	userData.groups.forEach(group => {
 		group.userTitle = group.userTitle || group.displayName;
 		group.selected = groupTitleArray.includes(group.name);
 	});

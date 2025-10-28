@@ -34,7 +34,7 @@ Controller.generate = async (req, res) => {
 		res.sendFile(swPath);
 	} else {
 		const urls = await Promise.all(
-			Array.from(scripts).map(async (pathname) => {
+			Array.from(scripts).map(async pathname => {
 				try {
 					const url = new URL(pathname, `${nconf.get('url')}/assets/plugins/`);
 					if (url.href.startsWith(nconf.get('url'))) {
@@ -55,7 +55,7 @@ Controller.generate = async (req, res) => {
 			})
 		);
 
-		const payload = urls.map((urlObj) => urlObj.href).join("', '");
+		const payload = urls.map(urlObj => urlObj.href).join("', '");
 		swContents += `\nimportScripts('${payload}')`;
 		res.send(swContents);
 	}

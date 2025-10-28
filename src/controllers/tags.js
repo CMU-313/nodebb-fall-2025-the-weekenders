@@ -108,7 +108,7 @@ tagsController.getTags = async function (req, res) {
 		req.uid,
 		'topics:read'
 	);
-	cids = cids.filter((cid) => cid !== -1);
+	cids = cids.filter(cid => cid !== -1);
 	const [canSearch, tags] = await Promise.all([
 		privileges.global.can('search:tags', req.uid),
 		topics.getCategoryTagsData(cids, 0, 99),

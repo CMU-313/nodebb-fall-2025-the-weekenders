@@ -68,7 +68,7 @@ function checkSetupFlagEnv() {
 
 	// Set setup values from env vars (if set)
 	const envKeys = Object.keys(process.env);
-	if (Object.keys(envConfMap).some((key) => envKeys.includes(key))) {
+	if (Object.keys(envConfMap).some(key => envKeys.includes(key))) {
 		winston.info(
 			'[install/checkSetupFlagEnv] checking env vars for setup info...'
 		);
@@ -190,7 +190,7 @@ async function setupConfig() {
 			...postgresQuestions,
 		];
 
-		allQuestions.forEach((question) => {
+		allQuestions.forEach(question => {
 			if (install.values.hasOwnProperty(question.name)) {
 				config[question.name] = install.values[question.name];
 			} else if (question.hasOwnProperty('default')) {
@@ -708,7 +708,7 @@ async function installPlugins() {
 	const pluginInstall = require('./plugins');
 	const nbbVersion = require(paths.currentPackage).version;
 	await Promise.all(
-		(await pluginInstall.getActive()).map(async (id) => {
+		(await pluginInstall.getActive()).map(async id => {
 			if (await pluginInstall.isInstalled(id)) return;
 			const version = await pluginInstall.suggest(id, nbbVersion);
 			await pluginInstall.toggleInstall(id, version.version);

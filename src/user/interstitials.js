@@ -21,7 +21,7 @@ Interstitials.get = async (req, userData) =>
 		interstitials: [],
 	});
 
-Interstitials.email = async (data) => {
+Interstitials.email = async data => {
 	if (!data.userData) {
 		throw new Error('[[error:invalid-data]]');
 	}
@@ -107,7 +107,7 @@ Interstitials.email = async (data) => {
 								email: formData.email,
 								force: true,
 							})
-							.catch((err) => {
+							.catch(err => {
 								winston.error(
 									`[user.interstitials.email] Validation email failed to send\n[emailer.send] ${err.stack}`
 								);

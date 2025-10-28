@@ -63,7 +63,7 @@ describe("Topic's", () => {
 			}
 		});
 
-		it('should create a new topic with proper parameters', (done) => {
+		it('should create a new topic with proper parameters', done => {
 			topics.post(
 				{
 					uid: topic.userId,
@@ -105,7 +105,7 @@ describe("Topic's", () => {
 			assert.equal(data.tid, topic.tid);
 		});
 
-		it('should fail to create new topic with invalid user id', (done) => {
+		it('should fail to create new topic with invalid user id', done => {
 			topics.post(
 				{
 					uid: null,
@@ -113,14 +113,14 @@ describe("Topic's", () => {
 					content: topic.content,
 					cid: topic.categoryId,
 				},
-				(err) => {
+				err => {
 					assert.equal(err.message, '[[error:no-privileges]]');
 					done();
 				}
 			);
 		});
 
-		it('should fail to create new topic with empty title', (done) => {
+		it('should fail to create new topic with empty title', done => {
 			topics.post(
 				{
 					uid: fooUid,
@@ -128,24 +128,24 @@ describe("Topic's", () => {
 					content: topic.content,
 					cid: topic.categoryId,
 				},
-				(err) => {
+				err => {
 					assert.ok(err);
 					done();
 				}
 			);
 		});
 
-		it('should fail to create new topic with empty content', (done) => {
+		it('should fail to create new topic with empty content', done => {
 			topics.post(
 				{ uid: fooUid, title: topic.title, content: '', cid: topic.categoryId },
-				(err) => {
+				err => {
 					assert.ok(err);
 					done();
 				}
 			);
 		});
 
-		it('should fail to create new topic with non-existant category id', (done) => {
+		it('should fail to create new topic with non-existant category id', done => {
 			topics.post(
 				{
 					uid: topic.userId,
@@ -153,7 +153,7 @@ describe("Topic's", () => {
 					content: topic.content,
 					cid: 99,
 				},
-				(err) => {
+				err => {
 					assert.equal(
 						err.message,
 						'[[error:no-category]]',
@@ -164,7 +164,7 @@ describe("Topic's", () => {
 			);
 		});
 
-		it('should return false for falsy uid', (done) => {
+		it('should return false for falsy uid', done => {
 			topics.isOwner(topic.tid, 0, (err, isOwner) => {
 				assert.ifError(err);
 				assert(!isOwner);
@@ -329,7 +329,7 @@ describe("Topic's", () => {
 		let newTopic;
 		let newPost;
 
-		before((done) => {
+		before(done => {
 			topics.post(
 				{
 					uid: topic.userId,
@@ -349,7 +349,7 @@ describe("Topic's", () => {
 			);
 		});
 
-		it('should create a new reply with proper parameters', (done) => {
+		it('should create a new reply with proper parameters', done => {
 			topics.reply(
 				{ uid: topic.userId, content: 'test post', tid: newTopic.tid },
 				(err, result) => {
@@ -390,31 +390,31 @@ describe("Topic's", () => {
 			});
 		});
 
-		it('should fail to create new reply with invalid user id', (done) => {
+		it('should fail to create new reply with invalid user id', done => {
 			topics.reply(
 				{ uid: null, content: 'test post', tid: newTopic.tid },
-				(err) => {
+				err => {
 					assert.strictEqual(err.message, '[[error:no-privileges]]');
 					done();
 				}
 			);
 		});
 
-		it('should fail to create new reply with empty content', (done) => {
-			topics.reply({ uid: fooUid, content: '', tid: newTopic.tid }, (err) => {
+		it('should fail to create new reply with empty content', done => {
+			topics.reply({ uid: fooUid, content: '', tid: newTopic.tid }, err => {
 				assert.strictEqual(err.message, '[[error:content-too-short, 8]]');
 				done();
 			});
 		});
 
-		it('should fail to create new reply with invalid topic id', (done) => {
-			topics.reply({ uid: null, content: 'test post', tid: 99 }, (err) => {
+		it('should fail to create new reply with invalid topic id', done => {
+			topics.reply({ uid: null, content: 'test post', tid: 99 }, err => {
 				assert.strictEqual(err.message, '[[error:no-topic]]');
 				done();
 			});
 		});
 
-		it('should fail to create new reply with invalid toPid', (done) => {
+		it('should fail to create new reply with invalid toPid', done => {
 			topics.reply(
 				{
 					uid: topic.userId,
@@ -422,7 +422,7 @@ describe("Topic's", () => {
 					tid: newTopic.tid,
 					toPid: '"onmouseover=alert(1);//',
 				},
-				(err) => {
+				err => {
 					assert.strictEqual(err.message, '[[error:invalid-pid]]');
 					done();
 				}
@@ -531,7 +531,7 @@ describe("Topic's", () => {
 		let newTopic;
 		let newPost;
 
-		before((done) => {
+		before(done => {
 			topics.post(
 				{
 					uid: topic.userId,
@@ -551,7 +551,7 @@ describe("Topic's", () => {
 			);
 		});
 
-		it('should not receive errors', (done) => {
+		it('should not receive errors', done => {
 			topics.getTopicData(newTopic.tid, (err, topicData) => {
 				assert.ifError(err);
 				assert(typeof topicData.tid === 'number');
@@ -572,7 +572,7 @@ describe("Topic's", () => {
 			});
 		});
 
-		it('should get a single field', (done) => {
+		it('should get a single field', done => {
 			topics.getTopicFields(newTopic.tid, ['slug'], (err, data) => {
 				assert.ifError(err);
 				assert(Object.keys(data).length === 1);
@@ -581,7 +581,7 @@ describe("Topic's", () => {
 			});
 		});
 
-		it('should get topic title by pid', (done) => {
+		it('should get topic title by pid', done => {
 			topics.getTitleByPid(newPost.pid, (err, title) => {
 				assert.ifError(err);
 				assert.equal(title, topic.title);
@@ -589,7 +589,7 @@ describe("Topic's", () => {
 			});
 		});
 
-		it('should get topic data by pid', (done) => {
+		it('should get topic data by pid', done => {
 			topics.getTopicDataByPid(newPost.pid, (err, data) => {
 				assert.ifError(err);
 				assert.equal(data.tid, newTopic.tid);
@@ -892,7 +892,7 @@ describe("Topic's", () => {
 	});
 
 	describe('Title escaping', () => {
-		it('should properly escape topic title', (done) => {
+		it('should properly escape topic title', done => {
 			const title = "\"<script>alert('ok1');</script> new topic test";
 			const titleEscaped = validator.escape(title);
 			topics.post(
@@ -939,7 +939,7 @@ describe("Topic's", () => {
 			}));
 		});
 
-		it('should load topic tools', (done) => {
+		it('should load topic tools', done => {
 			socketTopics.loadTopicTools(
 				{ uid: adminUid },
 				{ tid: newTopic.tid },
@@ -1005,11 +1005,11 @@ describe("Topic's", () => {
 			assert.strictEqual(pinned, 0);
 		});
 
-		it('should move all topics', (done) => {
+		it('should move all topics', done => {
 			socketTopics.moveAll(
 				{ uid: adminUid },
 				{ cid: moveCid, currentCid: categoryObj.cid },
-				(err) => {
+				err => {
 					assert.ifError(err);
 					topics.getTopicField(newTopic.tid, 'cid', (err, cid) => {
 						assert.ifError(err);
@@ -1020,11 +1020,11 @@ describe("Topic's", () => {
 			);
 		});
 
-		it('should move a topic', (done) => {
+		it('should move a topic', done => {
 			socketTopics.move(
 				{ uid: adminUid },
 				{ cid: categoryObj.cid, tids: [newTopic.tid] },
-				(err) => {
+				err => {
 					assert.ifError(err);
 					topics.getTopicField(newTopic.tid, 'cid', (err, cid) => {
 						assert.ifError(err);
@@ -1233,36 +1233,36 @@ describe("Topic's", () => {
 		});
 
 		const socketTopics = require('../src/socket.io/topics');
-		it('should error with invalid data', (done) => {
-			socketTopics.orderPinnedTopics({ uid: adminUid }, null, (err) => {
+		it('should error with invalid data', done => {
+			socketTopics.orderPinnedTopics({ uid: adminUid }, null, err => {
 				assert.equal(err.message, '[[error:invalid-data]]');
 				done();
 			});
 		});
 
-		it('should error with invalid data', (done) => {
-			socketTopics.orderPinnedTopics({ uid: adminUid }, [null, null], (err) => {
+		it('should error with invalid data', done => {
+			socketTopics.orderPinnedTopics({ uid: adminUid }, [null, null], err => {
 				assert.equal(err.message, '[[error:invalid-data]]');
 				done();
 			});
 		});
 
-		it('should error with unprivileged user', (done) => {
+		it('should error with unprivileged user', done => {
 			socketTopics.orderPinnedTopics(
 				{ uid: 0 },
 				{ tid: tid1, order: 1 },
-				(err) => {
+				err => {
 					assert.equal(err.message, '[[error:no-privileges]]');
 					done();
 				}
 			);
 		});
 
-		it('should not do anything if topics are not pinned', (done) => {
+		it('should not do anything if topics are not pinned', done => {
 			socketTopics.orderPinnedTopics(
 				{ uid: adminUid },
 				{ tid: tid3, order: 1 },
-				(err) => {
+				err => {
 					assert.ifError(err);
 					db.isSortedSetMember(
 						`cid:${topic.categoryId}:tids:pinned`,
@@ -1277,7 +1277,7 @@ describe("Topic's", () => {
 			);
 		});
 
-		it('should order pinned topics', (done) => {
+		it('should order pinned topics', done => {
 			db.getSortedSetRevRange(
 				`cid:${topic.categoryId}:tids:pinned`,
 				0,
@@ -1289,7 +1289,7 @@ describe("Topic's", () => {
 					socketTopics.orderPinnedTopics(
 						{ uid: adminUid },
 						{ tid: tid1, order: 0 },
-						(err) => {
+						err => {
 							assert.ifError(err);
 							db.getSortedSetRevRange(
 								`cid:${topic.categoryId}:tids:pinned`,
@@ -1335,7 +1335,7 @@ describe("Topic's", () => {
 				stop: -1,
 				filter: '',
 			});
-			const tids = topicData.map((topic) => topic.tid);
+			const tids = topicData.map(topic => topic.tid);
 			assert.equal(
 				tids.indexOf(newTid),
 				-1,
@@ -1378,7 +1378,7 @@ describe("Topic's", () => {
 				stop: -1,
 				filter: '',
 			});
-			const tids = results.topics.map((topic) => topic.tid);
+			const tids = results.topics.map(topic => topic.tid);
 			assert.ok(
 				tids.includes(newTid),
 				'The topic did not appear in the unread list.'
@@ -1413,34 +1413,34 @@ describe("Topic's", () => {
 				// eslint-disable-next-line no-await-in-loop
 				await postReply();
 			}
-			topicPids = replies.map((reply) => reply.pid);
+			topicPids = replies.map(reply => reply.pid);
 			await socketTopics.bookmark(
 				{ uid: topic.userId },
 				{ tid: newTopic.tid, index: originalBookmark }
 			);
 		});
 
-		it('should fail with invalid data', (done) => {
-			socketTopics.bookmark({ uid: topic.userId }, null, (err) => {
+		it('should fail with invalid data', done => {
+			socketTopics.bookmark({ uid: topic.userId }, null, err => {
 				assert.equal(err.message, '[[error:invalid-data]]');
 				done();
 			});
 		});
 
-		it('should have 12 replies', (done) => {
+		it('should have 12 replies', done => {
 			assert.equal(12, replies.length);
 			done();
 		});
 
-		it('should fail with invalid data', (done) => {
-			socketTopics.createTopicFromPosts({ uid: 0 }, null, (err) => {
+		it('should fail with invalid data', done => {
+			socketTopics.createTopicFromPosts({ uid: 0 }, null, err => {
 				assert.equal(err.message, '[[error:not-logged-in]]');
 				done();
 			});
 		});
 
-		it('should fail with invalid data', (done) => {
-			socketTopics.createTopicFromPosts({ uid: adminUid }, null, (err) => {
+		it('should fail with invalid data', done => {
+			socketTopics.createTopicFromPosts({ uid: adminUid }, null, err => {
 				assert.equal(err.message, '[[error:invalid-data]]');
 				done();
 			});
@@ -1533,7 +1533,7 @@ describe("Topic's", () => {
 	describe('controller', () => {
 		let topicData;
 
-		before((done) => {
+		before(done => {
 			topics.post(
 				{
 					uid: topic.userId,
@@ -1565,11 +1565,11 @@ describe("Topic's", () => {
 			);
 			assert.equal(response.statusCode, 200);
 			assert.strictEqual(
-				body._header.tags.meta.find((t) => t.name === 'description').content,
+				body._header.tags.meta.find(t => t.name === 'description').content,
 				'topic content'
 			);
 			assert.strictEqual(
-				body._header.tags.meta.find((t) => t.property === 'og:description')
+				body._header.tags.meta.find(t => t.property === 'og:description')
 					.content,
 				'topic content'
 			);
@@ -1714,7 +1714,7 @@ describe("Topic's", () => {
 	describe('infinitescroll', () => {
 		const socketTopics = require('../src/socket.io/topics');
 		let tid;
-		before((done) => {
+		before(done => {
 			topics.post(
 				{
 					uid: topic.userId,
@@ -1730,14 +1730,14 @@ describe("Topic's", () => {
 			);
 		});
 
-		it('should error with invalid data', (done) => {
-			socketTopics.loadMore({ uid: adminUid }, {}, (err) => {
+		it('should error with invalid data', done => {
+			socketTopics.loadMore({ uid: adminUid }, {}, err => {
 				assert.equal(err.message, '[[error:invalid-data]]');
 				done();
 			});
 		});
 
-		it('should infinite load topic posts', (done) => {
+		it('should infinite load topic posts', done => {
 			socketTopics.loadMore(
 				{ uid: adminUid },
 				{ tid: tid, after: 0, count: 10 },
@@ -1780,7 +1780,7 @@ describe("Topic's", () => {
 			tid3 = topic3.topicData.tid;
 		});
 
-		it('should return suggested topics', (done) => {
+		it('should return suggested topics', done => {
 			topics.getSuggestedTopics(tid1, adminUid, 0, -1, (err, topics) => {
 				assert.ifError(err);
 				assert(Array.isArray(topics));
@@ -1788,7 +1788,7 @@ describe("Topic's", () => {
 			});
 		});
 
-		it('should return suggested topics', (done) => {
+		it('should return suggested topics', done => {
 			topics.getSuggestedTopics(tid3, adminUid, 0, 2, (err, topics) => {
 				assert.ifError(err);
 				assert(Array.isArray(topics));
@@ -1832,15 +1832,15 @@ describe("Topic's", () => {
 			assert.strictEqual(hasRead, false);
 		});
 
-		it('should fail with invalid data', (done) => {
-			socketTopics.markAsRead({ uid: 0 }, null, (err) => {
+		it('should fail with invalid data', done => {
+			socketTopics.markAsRead({ uid: 0 }, null, err => {
 				assert.equal(err.message, '[[error:invalid-data]]');
 				done();
 			});
 		});
 
-		it('should mark topic read', (done) => {
-			socketTopics.markAsRead({ uid: adminUid }, [tid], (err) => {
+		it('should mark topic read', done => {
+			socketTopics.markAsRead({ uid: adminUid }, [tid], err => {
 				assert.ifError(err);
 				topics.hasReadTopic(tid, adminUid, (err, hasRead) => {
 					assert.ifError(err);
@@ -1850,8 +1850,8 @@ describe("Topic's", () => {
 			});
 		});
 
-		it('should fail with invalid data', (done) => {
-			socketTopics.markTopicNotificationsRead({ uid: 0 }, null, (err) => {
+		it('should fail with invalid data', done => {
+			socketTopics.markTopicNotificationsRead({ uid: 0 }, null, err => {
 				assert.equal(err.message, '[[error:invalid-data]]');
 				done();
 			});
@@ -1873,17 +1873,17 @@ describe("Topic's", () => {
 			assert.strictEqual(count, 0);
 		});
 
-		it('should fail with invalid data', (done) => {
-			socketTopics.markAllRead({ uid: 0 }, null, (err) => {
+		it('should fail with invalid data', done => {
+			socketTopics.markAllRead({ uid: 0 }, null, err => {
 				assert.equal(err.message, '[[error:invalid-uid]]');
 				done();
 			});
 		});
 
-		it('should mark all read', (done) => {
-			socketTopics.markUnread({ uid: adminUid }, tid, (err) => {
+		it('should mark all read', done => {
+			socketTopics.markUnread({ uid: adminUid }, tid, err => {
 				assert.ifError(err);
-				socketTopics.markAllRead({ uid: adminUid }, {}, (err) => {
+				socketTopics.markAllRead({ uid: adminUid }, {}, err => {
 					assert.ifError(err);
 					topics.hasReadTopic(tid, adminUid, (err, hasRead) => {
 						assert.ifError(err);
@@ -1894,13 +1894,13 @@ describe("Topic's", () => {
 			});
 		});
 
-		it('should mark category topics read', (done) => {
-			socketTopics.markUnread({ uid: adminUid }, tid, (err) => {
+		it('should mark category topics read', done => {
+			socketTopics.markUnread({ uid: adminUid }, tid, err => {
 				assert.ifError(err);
 				socketTopics.markCategoryTopicsRead(
 					{ uid: adminUid },
 					topic.categoryId,
-					(err) => {
+					err => {
 						assert.ifError(err);
 						topics.hasReadTopic(tid, adminUid, (err, hasRead) => {
 							assert.ifError(err);
@@ -1939,7 +1939,7 @@ describe("Topic's", () => {
 			assert.equal(regularRead, false);
 		});
 
-		it('should not do anything if tids is empty array', (done) => {
+		it('should not do anything if tids is empty array', done => {
 			socketTopics.markAsRead({ uid: adminUid }, [], (err, markedRead) => {
 				assert.ifError(err);
 				assert(!markedRead);
@@ -2057,7 +2057,7 @@ describe("Topic's", () => {
 			});
 		});
 
-		it('should return empty array if query is falsy', (done) => {
+		it('should return empty array if query is falsy', done => {
 			socketTopics.autocompleteTags(
 				{ uid: adminUid },
 				{ query: '' },
@@ -2069,13 +2069,13 @@ describe("Topic's", () => {
 			);
 		});
 
-		it('should autocomplete tags', (done) => {
+		it('should autocomplete tags', done => {
 			socketTopics.autocompleteTags(
 				{ uid: adminUid },
 				{ query: 'p' },
 				(err, data) => {
 					assert.ifError(err);
-					['php', 'psql', 'python'].forEach((tag) => {
+					['php', 'psql', 'python'].forEach(tag => {
 						assert.notEqual(data.indexOf(tag), -1);
 					});
 					done();
@@ -2083,7 +2083,7 @@ describe("Topic's", () => {
 			);
 		});
 
-		it('should return empty array if query is falsy', (done) => {
+		it('should return empty array if query is falsy', done => {
 			socketTopics.searchTags({ uid: adminUid }, { query: '' }, (err, data) => {
 				assert.ifError(err);
 				assert.deepEqual([], data);
@@ -2091,13 +2091,13 @@ describe("Topic's", () => {
 			});
 		});
 
-		it('should search tags', (done) => {
+		it('should search tags', done => {
 			socketTopics.searchTags(
 				{ uid: adminUid },
 				{ query: 'no' },
 				(err, data) => {
 					assert.ifError(err);
-					['nodebb', 'nodejs', 'nosql'].forEach((tag) => {
+					['nodebb', 'nodejs', 'nosql'].forEach(tag => {
 						assert.notEqual(data.indexOf(tag), -1);
 					});
 					done();
@@ -2105,7 +2105,7 @@ describe("Topic's", () => {
 			);
 		});
 
-		it('should return empty array if query is falsy', (done) => {
+		it('should return empty array if query is falsy', done => {
 			socketTopics.searchAndLoadTags(
 				{ uid: adminUid },
 				{ query: '' },
@@ -2119,7 +2119,7 @@ describe("Topic's", () => {
 			);
 		});
 
-		it('should search and load tags', (done) => {
+		it('should search and load tags', done => {
 			socketTopics.searchAndLoadTags(
 				{ uid: adminUid },
 				{ query: 'no' },
@@ -2171,14 +2171,14 @@ describe("Topic's", () => {
 			);
 		});
 
-		it('should return error if data is invalid', (done) => {
-			socketTopics.loadMoreTags({ uid: adminUid }, { after: 'asd' }, (err) => {
+		it('should return error if data is invalid', done => {
+			socketTopics.loadMoreTags({ uid: adminUid }, { after: 'asd' }, err => {
 				assert.equal(err.message, '[[error:invalid-data]]');
 				done();
 			});
 		});
 
-		it('should load more tags', (done) => {
+		it('should load more tags', done => {
 			socketTopics.loadMoreTags(
 				{ uid: adminUid },
 				{ after: 0 },
@@ -2191,29 +2191,29 @@ describe("Topic's", () => {
 			);
 		});
 
-		it('should error if data is invalid', (done) => {
-			socketAdmin.tags.create({ uid: adminUid }, null, (err) => {
+		it('should error if data is invalid', done => {
+			socketAdmin.tags.create({ uid: adminUid }, null, err => {
 				assert.equal(err.message, '[[error:invalid-data]]');
 				done();
 			});
 		});
 
-		it('should error if tag is invalid', (done) => {
-			socketAdmin.tags.create({ uid: adminUid }, { tag: '' }, (err) => {
+		it('should error if tag is invalid', done => {
+			socketAdmin.tags.create({ uid: adminUid }, { tag: '' }, err => {
 				assert.equal(err.message, '[[error:invalid-tag]]');
 				done();
 			});
 		});
 
-		it('should error if tag is too short', (done) => {
-			socketAdmin.tags.create({ uid: adminUid }, { tag: 'as' }, (err) => {
+		it('should error if tag is too short', done => {
+			socketAdmin.tags.create({ uid: adminUid }, { tag: 'as' }, err => {
 				assert.equal(err.message, '[[error:tag-too-short]]');
 				done();
 			});
 		});
 
-		it('should create empty tag', (done) => {
-			socketAdmin.tags.create({ uid: adminUid }, { tag: 'emptytag' }, (err) => {
+		it('should create empty tag', done => {
+			socketAdmin.tags.create({ uid: adminUid }, { tag: 'emptytag' }, err => {
 				assert.ifError(err);
 				db.sortedSetScore('tags:topic:count', 'emptytag', (err, score) => {
 					assert.ifError(err);
@@ -2223,8 +2223,8 @@ describe("Topic's", () => {
 			});
 		});
 
-		it('should do nothing if tag exists', (done) => {
-			socketAdmin.tags.create({ uid: adminUid }, { tag: 'emptytag' }, (err) => {
+		it('should do nothing if tag exists', done => {
+			socketAdmin.tags.create({ uid: adminUid }, { tag: 'emptytag' }, err => {
 				assert.ifError(err);
 				db.sortedSetScore('tags:topic:count', 'emptytag', (err, score) => {
 					assert.ifError(err);
@@ -2267,7 +2267,7 @@ describe("Topic's", () => {
 			assert.strictEqual(tags[0], 'plugins');
 		});
 
-		it('should return related topics', (done) => {
+		it('should return related topics', done => {
 			const meta = require('../src/meta');
 			meta.config.maximumRelatedTopics = 2;
 			const topicData = {
@@ -2282,41 +2282,37 @@ describe("Topic's", () => {
 			});
 		});
 
-		it('should return error with invalid data', (done) => {
-			socketAdmin.tags.deleteTags({ uid: adminUid }, null, (err) => {
+		it('should return error with invalid data', done => {
+			socketAdmin.tags.deleteTags({ uid: adminUid }, null, err => {
 				assert.equal(err.message, '[[error:invalid-data]]');
 				done();
 			});
 		});
 
-		it('should do nothing if arrays is empty', (done) => {
-			socketAdmin.tags.deleteTags({ uid: adminUid }, { tags: [] }, (err) => {
+		it('should do nothing if arrays is empty', done => {
+			socketAdmin.tags.deleteTags({ uid: adminUid }, { tags: [] }, err => {
 				assert.ifError(err);
 				done();
 			});
 		});
 
-		it('should delete tags', (done) => {
-			socketAdmin.tags.create(
-				{ uid: adminUid },
-				{ tag: 'emptytag2' },
-				(err) => {
-					assert.ifError(err);
-					socketAdmin.tags.deleteTags(
-						{ uid: adminUid },
-						{ tags: ['emptytag', 'emptytag2', 'nodebb', 'nodejs'] },
-						(err) => {
+		it('should delete tags', done => {
+			socketAdmin.tags.create({ uid: adminUid }, { tag: 'emptytag2' }, err => {
+				assert.ifError(err);
+				socketAdmin.tags.deleteTags(
+					{ uid: adminUid },
+					{ tags: ['emptytag', 'emptytag2', 'nodebb', 'nodejs'] },
+					err => {
+						assert.ifError(err);
+						db.getObjects(['tag:emptytag', 'tag:emptytag2'], (err, data) => {
 							assert.ifError(err);
-							db.getObjects(['tag:emptytag', 'tag:emptytag2'], (err, data) => {
-								assert.ifError(err);
-								assert(!data[0]);
-								assert(!data[1]);
-								done();
-							});
-						}
-					);
-				}
-			);
+							assert(!data[0]);
+							assert(!data[1]);
+							done();
+						});
+					}
+				);
+			});
 		});
 
 		it('should only delete one tag from topic', async () => {
@@ -2329,12 +2325,12 @@ describe("Topic's", () => {
 			});
 			await topics.deleteTag('deleteme2');
 			const topicData = await topics.getTopicData(result1.topicData.tid);
-			const tags = topicData.tags.map((t) => t.value);
+			const tags = topicData.tags.map(t => t.value);
 			assert.deepStrictEqual(tags, ['deleteme1', 'deleteme3']);
 		});
 
-		it('should delete tag', (done) => {
-			topics.deleteTag('javascript', (err) => {
+		it('should delete tag', done => {
+			topics.deleteTag('javascript', err => {
 				assert.ifError(err);
 				db.getObject('tag:javascript', (err, data) => {
 					assert.ifError(err);
@@ -2725,7 +2721,7 @@ describe("Topic's", () => {
 		const socketTopics = require('../src/socket.io/topics');
 		let tid;
 		let followerUid;
-		before((done) => {
+		before(done => {
 			User.create({ username: 'follower' }, (err, uid) => {
 				if (err) {
 					return done(err);
@@ -2777,7 +2773,7 @@ describe("Topic's", () => {
 			}
 		});
 
-		it('should follow topic', (done) => {
+		it('should follow topic', done => {
 			topics.toggleFollow(tid, followerUid, (err, isFollowing) => {
 				assert.ifError(err);
 				assert(isFollowing);
@@ -2817,7 +2813,7 @@ describe("Topic's", () => {
 		});
 	});
 
-	it('should check if user is moderator', (done) => {
+	it('should check if user is moderator', done => {
 		socketTopics.isModerator(
 			{ uid: adminUid },
 			topic.tid,
@@ -2935,12 +2931,12 @@ describe("Topic's", () => {
 			});
 		});
 
-		after((done) => {
+		after(done => {
 			meta.config.teaserPost = '';
 			done();
 		});
 
-		it('should return empty array if first param is empty', (done) => {
+		it('should return empty array if first param is empty', done => {
 			topics.getTeasers([], 1, (err, teasers) => {
 				assert.ifError(err);
 				assert.equal(0, teasers.length);
@@ -2948,7 +2944,7 @@ describe("Topic's", () => {
 			});
 		});
 
-		it('should get teasers with 2 params', (done) => {
+		it('should get teasers with 2 params', done => {
 			topics.getTeasers(
 				[topic1.topicData, topic2.topicData],
 				1,
@@ -2960,7 +2956,7 @@ describe("Topic's", () => {
 			);
 		});
 
-		it('should get teasers with first posts', (done) => {
+		it('should get teasers with first posts', done => {
 			meta.config.teaserPost = 'first';
 			topics.getTeasers(
 				[topic1.topicData, topic2.topicData],
@@ -2978,7 +2974,7 @@ describe("Topic's", () => {
 			);
 		});
 
-		it('should get teasers even if one topic is falsy', (done) => {
+		it('should get teasers even if one topic is falsy', done => {
 			topics.getTeasers([null, topic2.topicData], 1, (err, teasers) => {
 				assert.ifError(err);
 				assert.equal(2, teasers.length);
@@ -2991,7 +2987,7 @@ describe("Topic's", () => {
 			});
 		});
 
-		it('should get teasers with last posts', (done) => {
+		it('should get teasers with last posts', done => {
 			meta.config.teaserPost = 'last-post';
 			topics.reply(
 				{
@@ -3018,7 +3014,7 @@ describe("Topic's", () => {
 			);
 		});
 
-		it('should get teasers by tids', (done) => {
+		it('should get teasers by tids', done => {
 			topics.getTeasersByTids(
 				[topic2.topicData.tid, topic1.topicData.tid],
 				1,
@@ -3031,7 +3027,7 @@ describe("Topic's", () => {
 			);
 		});
 
-		it('should return empty array ', (done) => {
+		it('should return empty array ', done => {
 			topics.getTeasersByTids([], 1, (err, teasers) => {
 				assert.ifError(err);
 				assert.equal(0, teasers.length);
@@ -3039,7 +3035,7 @@ describe("Topic's", () => {
 			});
 		});
 
-		it('should get teaser by tid', (done) => {
+		it('should get teaser by tid', done => {
 			topics.getTeaser(topic2.topicData.tid, 1, (err, teaser) => {
 				assert.ifError(err);
 				assert(teaser);
@@ -3071,12 +3067,12 @@ describe("Topic's", () => {
 			cid = category.cid;
 		});
 
-		it('should fail to post if user does not have tag privilege', (done) => {
+		it('should fail to post if user does not have tag privilege', done => {
 			privileges.categories.rescind(
 				['groups:topics:tag'],
 				cid,
 				'registered-users',
-				(err) => {
+				err => {
 					assert.ifError(err);
 					topics.post(
 						{
@@ -3086,7 +3082,7 @@ describe("Topic's", () => {
 							title: 'topic with tags',
 							content: 'some content here',
 						},
-						(err) => {
+						err => {
 							assert.equal(err.message, '[[error:no-privileges]]');
 							done();
 						}
@@ -3095,7 +3091,7 @@ describe("Topic's", () => {
 			);
 		});
 
-		it('should fail to edit if user does not have tag privilege', (done) => {
+		it('should fail to edit if user does not have tag privilege', done => {
 			topics.post(
 				{
 					uid: uid,
@@ -3108,7 +3104,7 @@ describe("Topic's", () => {
 					const { pid } = result.postData;
 					posts.edit(
 						{ pid: pid, uid: uid, content: 'edited content', tags: ['tag2'] },
-						(err) => {
+						err => {
 							assert.equal(err.message, '[[error:no-privileges]]');
 							done();
 						}
@@ -3117,12 +3113,12 @@ describe("Topic's", () => {
 			);
 		});
 
-		it('should be able to edit topic and add tags if allowed', (done) => {
+		it('should be able to edit topic and add tags if allowed', done => {
 			privileges.categories.give(
 				['groups:topics:tag'],
 				cid,
 				'registered-users',
-				(err) => {
+				err => {
 					assert.ifError(err);
 					topics.post(
 						{
@@ -3143,7 +3139,7 @@ describe("Topic's", () => {
 								},
 								(err, result) => {
 									assert.ifError(err);
-									const tags = result.topic.tags.map((tag) => tag.value);
+									const tags = result.topic.tags.map(tag => tag.value);
 									assert(tags.includes('tag1'));
 									assert(tags.includes('tag2'));
 									done();
@@ -3201,18 +3197,18 @@ describe("Topic's", () => {
 			});
 		});
 
-		it('should error if data is not an array', (done) => {
-			socketTopics.merge({ uid: 0 }, null, (err) => {
+		it('should error if data is not an array', done => {
+			socketTopics.merge({ uid: 0 }, null, err => {
 				assert.equal(err.message, '[[error:invalid-data]]');
 				done();
 			});
 		});
 
-		it('should error if user does not have privileges', (done) => {
+		it('should error if user does not have privileges', done => {
 			socketTopics.merge(
 				{ uid: 0 },
 				{ tids: [topic2Data.tid, topic1Data.tid] },
-				(err) => {
+				err => {
 					assert.equal(err.message, '[[error:no-privileges]]');
 					done();
 				}
@@ -3386,7 +3382,7 @@ describe("Topic's", () => {
 		it('should get sorted topics in category', async () => {
 			const filters = ['', 'watched', 'unreplied', 'new'];
 			const data = await Promise.all(
-				filters.map(async (filter) =>
+				filters.map(async filter =>
 					topics.getSortedTopics({
 						cids: [category.cid],
 						uid: topic.userId,
@@ -3398,7 +3394,7 @@ describe("Topic's", () => {
 				)
 			);
 			assert(data);
-			data.forEach((filterTopics) => {
+			data.forEach(filterTopics => {
 				assert(Array.isArray(filterTopics.topics));
 			});
 		});
@@ -3510,7 +3506,7 @@ describe("Topic's", () => {
 				`${nconf.get('url')}/api/category/${categoryObj.slug}`
 			);
 			assert.strictEqual(
-				body.topics.filter((topic) => topic.tid === topicData.tid).length,
+				body.topics.filter(topic => topic.tid === topicData.tid).length,
 				0
 			);
 		});
@@ -3520,9 +3516,7 @@ describe("Topic's", () => {
 				`${nconf.get('url')}/api/category/${categoryObj.slug}`,
 				{ jar: adminJar }
 			);
-			const topic = body.topics.filter(
-				(topic) => topic.tid === topicData.tid
-			)[0];
+			const topic = body.topics.filter(topic => topic.tid === topicData.tid)[0];
 			assert.strictEqual(topic && topic.tid, topicData.tid);
 		});
 
@@ -3543,9 +3537,7 @@ describe("Topic's", () => {
 			const { body } = await request.get(
 				`${nconf.get('url')}/api/category/${categoryObj.slug}`
 			);
-			const topic = body.topics.filter(
-				(topic) => topic.tid === topicData.tid
-			)[0];
+			const topic = body.topics.filter(topic => topic.tid === topicData.tid)[0];
 			assert.strictEqual(topic && topic.tid, topicData.tid);
 		});
 
@@ -3666,7 +3658,7 @@ describe("Topic's", () => {
 				topicData.tid
 			);
 			assert(
-				scores.every((publishTime) => publishTime === editedTopic.timestamp)
+				scores.every(publishTime => publishTime === editedTopic.timestamp)
 			);
 		});
 
@@ -3731,7 +3723,7 @@ describe("Topics'", async () => {
 	});
 
 	it('subfolder tests', () => {
-		files.forEach((filePath) => {
+		files.forEach(filePath => {
 			require(filePath);
 		});
 	});

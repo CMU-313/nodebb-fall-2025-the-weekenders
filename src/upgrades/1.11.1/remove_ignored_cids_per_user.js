@@ -14,7 +14,7 @@ module.exports = {
 			'users:joindate',
 			(uids, next) => {
 				progress.incr(uids.length);
-				const keys = uids.map((uid) => `uid:${uid}:ignored:cids`);
+				const keys = uids.map(uid => `uid:${uid}:ignored:cids`);
 				db.deleteAll(keys, next);
 			},
 			{

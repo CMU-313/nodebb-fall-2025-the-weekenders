@@ -56,7 +56,7 @@ modsController.flags.list = async function (req, res) {
 	}
 
 	if (!isAdminOrGlobalMod && moderatedCids.length) {
-		res.locals.cids = moderatedCids.map((cid) => String(cid));
+		res.locals.cids = moderatedCids.map(cid => String(cid));
 	}
 
 	// Parse query string params for filters, eliminate non-valid filters
@@ -65,7 +65,7 @@ modsController.flags.list = async function (req, res) {
 			if (typeof req.query[cur] === 'string' && req.query[cur].trim() !== '') {
 				memo[cur] = validator.escape(String(req.query[cur].trim()));
 			} else if (Array.isArray(req.query[cur]) && req.query[cur].length) {
-				memo[cur] = req.query[cur].map((item) =>
+				memo[cur] = req.query[cur].map(item =>
 					validator.escape(String(item).trim())
 				);
 			}
@@ -82,7 +82,7 @@ modsController.flags.list = async function (req, res) {
 			filters.cid = res.locals.cids;
 		} else if (Array.isArray(filters.cid)) {
 			// Remove cids they do not moderate
-			filters.cid = filters.cid.filter((cid) =>
+			filters.cid = filters.cid.filter(cid =>
 				res.locals.cids.includes(String(cid))
 			);
 		} else if (!res.locals.cids.includes(String(filters.cid))) {
@@ -125,7 +125,7 @@ modsController.flags.list = async function (req, res) {
 	// Send back information for userFilter module
 	const selected = {};
 	await Promise.all(
-		['assignee', 'reporterId', 'targetUid'].map(async (filter) => {
+		['assignee', 'reporterId', 'targetUid'].map(async filter => {
 			let uids = filters[filter];
 			if (!uids) {
 				selected[filter] = [];
@@ -169,7 +169,7 @@ modsController.flags.detail = async function (req, res, next) {
 		moderatedCids: user.getModeratedCids(req.uid),
 		flagData: flags.get(req.params.flagId),
 		privileges: Promise.all(
-			['global', 'admin'].map(async (type) => privileges[type].get(req.uid))
+			['global', 'admin'].map(async type => privileges[type].get(req.uid))
 		),
 	});
 	results.privileges = { ...results.privileges[0], ...results.privileges[1] };
@@ -187,7 +187,7 @@ modsController.flags.detail = async function (req, res, next) {
 		}
 		if (results.flagData.type === 'post') {
 			const isFlagInModeratedCids = await db.isMemberOfSortedSets(
-				results.moderatedCids.map((cid) => `flags:byCid:${cid}`),
+				results.moderatedCids.map(cid => `flags:byCid:${cid}`),
 				results.flagData.flagId
 			);
 			if (!isFlagInModeratedCids.includes(true)) {
@@ -216,7 +216,7 @@ modsController.flags.detail = async function (req, res, next) {
 			}
 		}
 		const userData = await user.getUsersData(uids);
-		return userData.filter((u) => u && u.userslug);
+		return userData.filter(u => u && u.userslug);
 	}
 
 	const assignees = await getAssignees(results.flagData);
@@ -272,14 +272,14 @@ modsController.postQueue = async function (req, res, next) {
 			user.getModeratedCids(req.uid),
 			helpers.getSelectedCategory(cid),
 			Promise.all(
-				['global', 'admin'].map(async (type) => privileges[type].get(req.uid))
+				['global', 'admin'].map(async type => privileges[type].get(req.uid))
 			),
 		]);
 	_privileges = { ..._privileges[0], ..._privileges[1] };
 
 	postData = postData
 		.filter(
-			(p) =>
+			p =>
 				p &&
 				(!categoriesData.selectedCids.length ||
 					categoriesData.selectedCids.includes(p.category.cid)) &&
@@ -288,7 +288,7 @@ modsController.postQueue = async function (req, res, next) {
 					moderatedCids.includes(Number(p.category.cid)) ||
 					req.uid === p.user.uid)
 		)
-		.map((post) => {
+		.map(post => {
 			const isSelf = post.user.uid === req.uid;
 			post.canAccept =
 				!isSelf && (isAdmin || isGlobalMod || !!moderatedCids.length);

@@ -54,7 +54,7 @@ define('forum/unread', [
 				return;
 			}
 
-			Promise.all(tids.map(async (tid) => api.put(`/topics/${tid}/read`))).then(
+			Promise.all(tids.map(async tid => api.put(`/topics/${tid}/read`))).then(
 				() => {
 					doneRemovingTids(tids);
 				}

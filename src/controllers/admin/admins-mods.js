@@ -58,8 +58,8 @@ AdminsMods.get = async function (req, res) {
 
 async function getModeratorsOfCategories(categoryData) {
 	const [moderatorUids, childrenCounts] = await Promise.all([
-		categories.getModeratorUids(categoryData.map((c) => c.cid)),
-		db.sortedSetsCard(categoryData.map((c) => `cid:${c.cid}:children`)),
+		categories.getModeratorUids(categoryData.map(c => c.cid)),
+		db.sortedSetsCard(categoryData.map(c => `cid:${c.cid}:children`)),
 	]);
 
 	const uids = _.uniq(_.flatten(moderatorUids));
@@ -71,7 +71,7 @@ async function getModeratorsOfCategories(categoryData) {
 	]);
 	const moderatorMap = _.zipObject(uids, moderatorData);
 	categoryData.forEach((c, index) => {
-		c.moderators = moderatorUids[index].map((uid) => moderatorMap[uid]);
+		c.moderators = moderatorUids[index].map(uid => moderatorMap[uid]);
 		c.subCategoryCount = childrenCounts[index];
 	});
 	return categoryData;

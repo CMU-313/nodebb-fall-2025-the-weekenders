@@ -26,8 +26,8 @@ async function getActiveIds() {
 Data.getPluginPaths = async function () {
 	const plugins = await getActiveIds();
 	const pluginPaths = plugins
-		.filter((plugin) => plugin && typeof plugin === 'string')
-		.map((plugin) => path.join(paths.nodeModules, plugin));
+		.filter(plugin => plugin && typeof plugin === 'string')
+		.map(plugin => path.join(paths.nodeModules, plugin));
 	const exists = await Promise.all(pluginPaths.map(file.exists));
 	exists.forEach((exists, i) => {
 		if (!exists) {
@@ -86,7 +86,7 @@ function parseLicense(packageData) {
 
 Data.getActive = async function () {
 	const pluginPaths = await Data.getPluginPaths();
-	return await Promise.all(pluginPaths.map((p) => Data.loadPluginInfo(p)));
+	return await Promise.all(pluginPaths.map(p => Data.loadPluginInfo(p)));
 };
 
 Data.getStaticDirectories = async function (pluginData) {
@@ -149,7 +149,7 @@ Data.getStaticDirectories = async function (pluginData) {
 		}
 	}
 
-	await Promise.all(dirs.map((route) => processDir(route)));
+	await Promise.all(dirs.map(route => processDir(route)));
 	winston.verbose(
 		`[plugins] found ${Object.keys(staticDirs).length} static directories for ${pluginData.id}`
 	);
@@ -165,7 +165,7 @@ Data.getFiles = async function (pluginData, type) {
 		`[plugins] Found ${pluginData[type].length} ${type} file(s) for plugin ${pluginData.id}`
 	);
 
-	return pluginData[type].map((file) => path.join(pluginData.id, file));
+	return pluginData[type].map(file => path.join(pluginData.id, file));
 };
 
 /**
@@ -253,9 +253,7 @@ Data.getModules = async function getModules(pluginData) {
 		}
 	}
 
-	await Promise.all(
-		Object.keys(pluginModules).map((key) => processModule(key))
-	);
+	await Promise.all(Object.keys(pluginModules).map(key => processModule(key)));
 
 	const len = Object.keys(modules).length;
 	winston.verbose(
@@ -279,7 +277,7 @@ Data.getLanguageData = async function getLanguageData(pluginData) {
 	const namespaces = [];
 	const languages = [];
 
-	filepaths.forEach((p) => {
+	filepaths.forEach(p => {
 		const rel = path.relative(pathToFolder, p).split(/[/\\]/);
 		const language = rel.shift().replace('_', '-').replace('@', '-x-');
 		const namespace = rel.join('/').replace(/\.json$/, '');

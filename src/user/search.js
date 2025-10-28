@@ -11,11 +11,11 @@ const utils = require('../utils');
 
 module.exports = function (User) {
 	const filterFnMap = {
-		online: (user) =>
+		online: user =>
 			user.status !== 'offline' && Date.now() - user.lastonline < 300000,
-		flagged: (user) => parseInt(user.flags, 10) > 0,
-		verified: (user) => !!user['email:confirmed'],
-		unverified: (user) => !user['email:confirmed'],
+		flagged: user => parseInt(user.flags, 10) > 0,
+		verified: user => !!user['email:confirmed'],
+		unverified: user => !user['email:confirmed'],
 	};
 
 	const filterFieldMap = {
@@ -53,7 +53,7 @@ module.exports = function (User) {
 						if (assertion === true) {
 							uids = [handle ? await User.getUidByUserslug(handle) : query];
 						} else if (Array.isArray(assertion) && assertion.length) {
-							uids = assertion.map((u) => u.id);
+							uids = assertion.map(u => u.id);
 						}
 					}
 				}
@@ -108,7 +108,7 @@ module.exports = function (User) {
 		]);
 
 		if (blocks.length) {
-			userData.forEach((user) => {
+			userData.forEach(user => {
 				if (user) {
 					user.isBlocked = blocks.includes(user.uid);
 				}
@@ -118,7 +118,7 @@ module.exports = function (User) {
 		searchResult.timing = (process.elapsedTimeSince(startTime) / 1000).toFixed(
 			2
 		);
-		searchResult.users = userData.filter((user) =>
+		searchResult.users = userData.filter(user =>
 			user && utils.isNumber(user.uid)
 				? user.uid > 0
 				: activitypub.helpers.isUri(user.uid)
@@ -147,7 +147,7 @@ module.exports = function (User) {
 			hardCap
 		);
 		// const uids = data.map(data => data.split(':').pop());
-		const uids = data.map((data) => {
+		const uids = data.map(data => {
 			if (data.includes(':https:')) {
 				return data.substring(data.indexOf(':https:') + 1);
 			}
@@ -159,7 +159,7 @@ module.exports = function (User) {
 
 	async function filterAndSortUids(uids, data) {
 		uids = uids.filter(
-			(uid) => parseInt(uid, 10) || activitypub.helpers.isUri(uid)
+			uid => parseInt(uid, 10) || activitypub.helpers.isUri(uid)
 		);
 		let filters = data.filters || [];
 		filters = Array.isArray(filters) ? filters : [data.filters];
@@ -169,7 +169,7 @@ module.exports = function (User) {
 			fields.push(data.sortBy);
 		}
 
-		filters.forEach((filter) => {
+		filters.forEach(filter => {
 			if (filterFieldMap[filter]) {
 				fields.push(...filterFieldMap[filter]);
 			}
@@ -198,7 +198,7 @@ module.exports = function (User) {
 		fields.push('uid');
 		let userData = await User.getUsersFields(uids, fields);
 
-		filters.forEach((filter) => {
+		filters.forEach(filter => {
 			if (filterFnMap[filter]) {
 				userData = userData.filter(filterFnMap[filter]);
 			}
@@ -208,7 +208,7 @@ module.exports = function (User) {
 			sortUsers(userData, data.sortBy, data.sortDirection);
 		}
 
-		return userData.map((user) => user.uid);
+		return userData.map(user => user.uid);
 	}
 
 	function sortUsers(userData, sortBy, sortDirection) {

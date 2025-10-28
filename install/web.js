@@ -27,7 +27,7 @@ let server;
 
 const formats = [winston.format.colorize()];
 
-const timestampFormat = winston.format((info) => {
+const timestampFormat = winston.format(info => {
 	const dateString = `${new Date().toISOString()} [${global.process.pid}]`;
 	info.level = `${dateString} - ${info.level}`;
 	return info;
@@ -136,7 +136,7 @@ async function testDatabase(req, res) {
 		db = require(`../src/database/${dbName}`);
 
 		const opts = {};
-		keys.forEach((key) => {
+		keys.forEach(key => {
 			opts[key.replace(`${dbName}:`, '')] = req.query[key];
 		});
 
@@ -155,10 +155,10 @@ function ping(req, res) {
 
 function welcome(req, res) {
 	const dbs = ['mongo', 'redis', 'postgres'];
-	const databases = dbs.map((databaseName) => {
+	const databases = dbs.map(databaseName => {
 		const questions = require(
 			`../src/database/${databaseName}`
-		).questions.filter((question) => question && !question.hideOnWebInstall);
+		).questions.filter(question => question && !question.hideOnWebInstall);
 
 		return {
 			name: databaseName,
@@ -232,12 +232,12 @@ function install(req, res) {
 	const child = require('child_process').fork('app', ['--setup'], {
 		env: setupEnvVars,
 	});
-	child.on('error', (err) => {
+	child.on('error', err => {
 		error = true;
 		success = false;
 		winston.error(err.stack);
 	});
-	child.on('close', (data) => {
+	child.on('close', data => {
 		success = data === 0;
 		error = data !== 0;
 		launch();
@@ -275,7 +275,7 @@ async function launch() {
 		];
 		try {
 			await Promise.all(
-				filesToDelete.map((filename) => fs.promises.unlink(filename))
+				filesToDelete.map(filename => fs.promises.unlink(filename))
 			);
 		} catch (err) {
 			console.log(err.stack);

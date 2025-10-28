@@ -131,10 +131,10 @@ async function searchInContent(data) {
 		const mainPidsSet = new Set(mainPids);
 		const mainPidToTid = _.zipObject(mainPids, tids);
 		const pidsSet = new Set(pids);
-		const returnPids = allPids.filter((pid) => pidsSet.has(pid));
+		const returnPids = allPids.filter(pid => pidsSet.has(pid));
 		const returnTids = allPids
-			.filter((pid) => mainPidsSet.has(pid))
-			.map((pid) => mainPidToTid[pid]);
+			.filter(pid => mainPidsSet.has(pid))
+			.map(pid => mainPidToTid[pid]);
 		return { pids: returnPids, tids: returnTids };
 	}
 
@@ -202,7 +202,7 @@ async function searchInBookmarks(data, searchCids, searchUids) {
 	const allPids = [];
 	await batch.processSortedSet(
 		`uid:${uid}:bookmarks`,
-		async (pids) => {
+		async pids => {
 			if (Array.isArray(searchCids) && searchCids.length) {
 				pids = await posts.filterPidsByCid(pids, searchCids);
 			}
@@ -212,12 +212,12 @@ async function searchInBookmarks(data, searchCids, searchUids) {
 			if (query) {
 				const tokens = String(query).split(' ');
 				const postData = await db.getObjectsFields(
-					pids.map((pid) => `post:${pid}`),
+					pids.map(pid => `post:${pid}`),
 					['content', 'tid']
 				);
-				const tids = _.uniq(postData.map((p) => p.tid));
+				const tids = _.uniq(postData.map(p => p.tid));
 				const topicData = await db.getObjectsFields(
-					tids.map((tid) => `topic:${tid}`),
+					tids.map(tid => `topic:${tid}`),
 					['title']
 				);
 				const tidToTopic = _.zipObject(tids, topicData);
@@ -226,7 +226,7 @@ async function searchInBookmarks(data, searchCids, searchUids) {
 					const title = String(tidToTopic[postData[i].tid].title);
 					const method = matchWords === 'any' ? 'some' : 'every';
 					return tokens[method](
-						(token) => content.includes(token) || title.includes(token)
+						token => content.includes(token) || title.includes(token)
 					);
 				});
 			}
@@ -268,7 +268,7 @@ async function filterAndSort(pids, data) {
 		posts: postsData,
 		data: data,
 	});
-	return result.posts.map((post) => post && post.pid);
+	return result.posts.map(post => post && post.pid);
 }
 
 async function getMatchedPosts(pids, data) {
@@ -283,9 +283,9 @@ async function getMatchedPosts(pids, data) {
 	];
 
 	let postsData = await posts.getPostsFields(pids, postFields);
-	postsData = postsData.filter((post) => post && !post.deleted);
-	const uids = _.uniq(postsData.map((post) => post.uid));
-	const tids = _.uniq(postsData.map((post) => post.tid));
+	postsData = postsData.filter(post => post && !post.deleted);
+	const uids = _.uniq(postsData.map(post => post.uid));
+	const tids = _.uniq(postsData.map(post => post.tid));
 
 	const [users, topics] = await Promise.all([
 		getUsers(uids, data),
@@ -294,7 +294,7 @@ async function getMatchedPosts(pids, data) {
 
 	const tidToTopic = _.zipObject(tids, topics);
 	const uidToUser = _.zipObject(uids, users);
-	postsData.forEach((post) => {
+	postsData.forEach(post => {
 		if (topics && tidToTopic[post.tid]) {
 			post.topic = tidToTopic[post.tid];
 			if (post.topic && post.topic.category) {
@@ -307,7 +307,7 @@ async function getMatchedPosts(pids, data) {
 		}
 	});
 
-	return postsData.filter((post) => post && post.topic && !post.topic.deleted);
+	return postsData.filter(post => post && post.topic && !post.topic.deleted);
 }
 
 async function getUsers(uids, data) {
@@ -319,16 +319,16 @@ async function getUsers(uids, data) {
 
 async function getTopics(tids, data) {
 	const topicsData = await topics.getTopicsData(tids);
-	const cids = _.uniq(topicsData.map((topic) => topic && topic.cid));
+	const cids = _.uniq(topicsData.map(topic => topic && topic.cid));
 	const categories = await getCategories(cids, data);
 
 	const cidToCategory = _.zipObject(cids, categories);
-	topicsData.forEach((topic) => {
+	topicsData.forEach(topic => {
 		if (topic && categories && cidToCategory[topic.cid]) {
 			topic.category = cidToCategory[topic.cid];
 		}
 		if (topic && topic.tags) {
-			topic.tags = topic.tags.map((tag) => tag.value);
+			topic.tags = topic.tags.map(tag => tag.value);
 		}
 	});
 
@@ -346,7 +346,7 @@ async function getCategories(cids, data) {
 	}
 
 	return await db.getObjectsFields(
-		cids.map((cid) => `category:${cid}`),
+		cids.map(cid => `category:${cid}`),
 		categoryFields
 	);
 }
@@ -356,11 +356,11 @@ function filterByPostcount(posts, postCount, repliesFilter) {
 	if (postCount) {
 		if (repliesFilter === 'atleast') {
 			posts = posts.filter(
-				(post) => post.topic && post.topic.postcount >= postCount
+				post => post.topic && post.topic.postcount >= postCount
 			);
 		} else {
 			posts = posts.filter(
-				(post) => post.topic && post.topic.postcount <= postCount
+				post => post.topic && post.topic.postcount <= postCount
 			);
 		}
 	}
@@ -372,9 +372,9 @@ function filterByTimerange(posts, timeRange, timeFilter) {
 	if (timeRange) {
 		const time = Date.now() - timeRange;
 		if (timeFilter === 'newer') {
-			posts = posts.filter((post) => post.timestamp >= time);
+			posts = posts.filter(post => post.timestamp >= time);
 		} else {
-			posts = posts.filter((post) => post.timestamp <= time);
+			posts = posts.filter(post => post.timestamp <= time);
 		}
 	}
 	return posts;
@@ -382,7 +382,7 @@ function filterByTimerange(posts, timeRange, timeFilter) {
 
 function filterByTags(posts, hasTags) {
 	if (Array.isArray(hasTags) && hasTags.length) {
-		posts = posts.filter((post) => {
+		posts = posts.filter(post => {
 			let hasAllTags = false;
 			if (
 				post &&
@@ -390,7 +390,7 @@ function filterByTags(posts, hasTags) {
 				Array.isArray(post.topic.tags) &&
 				post.topic.tags.length
 			) {
-				hasAllTags = hasTags.every((tag) => post.topic.tags.includes(tag));
+				hasAllTags = hasTags.every(tag => post.topic.tags.includes(tag));
 			}
 			return hasAllTags;
 		});
@@ -473,7 +473,7 @@ async function getChildrenCids(data) {
 		return [];
 	}
 	const childrenCids = await Promise.all(
-		data.categories.map((cid) => categories.getChildrenCids(cid))
+		data.categories.map(cid => categories.getChildrenCids(cid))
 	);
 	return await privileges.categories.filterCids(
 		'find',

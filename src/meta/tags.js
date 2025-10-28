@@ -114,7 +114,7 @@ Tags.parse = async (req, data, meta, link) => {
 		}),
 	});
 
-	meta = results.tags.tags.concat(meta || []).map((tag) => {
+	meta = results.tags.tags.concat(meta || []).map(tag => {
 		if (!tag || typeof tag.content !== 'string') {
 			winston.warn('Invalid meta tag. ', tag);
 			return tag;
@@ -122,7 +122,7 @@ Tags.parse = async (req, data, meta, link) => {
 
 		if (!tag.noEscape) {
 			const attributes = Object.keys(tag);
-			attributes.forEach((attr) => {
+			attributes.forEach(attr => {
 				tag[attr] = utils.escapeHTML(String(tag[attr]));
 			});
 		}
@@ -142,12 +142,12 @@ Tags.parse = async (req, data, meta, link) => {
 	link = results.links.links.concat(link || []);
 	if (isAPI) {
 		const whitelist = ['canonical', 'alternate', 'up'];
-		link = link.filter((link) => whitelist.some((val) => val === link.rel));
+		link = link.filter(link => whitelist.some(val => val === link.rel));
 	}
-	link = link.map((tag) => {
+	link = link.map(tag => {
 		if (!tag.noEscape) {
 			const attributes = Object.keys(tag);
-			attributes.forEach((attr) => {
+			attributes.forEach(attr => {
 				tag[attr] = utils.escapeHTML(String(tag[attr]));
 			});
 		}
@@ -242,7 +242,7 @@ function addTouchIcons(defaultLinks) {
 }
 
 function addIfNotExists(meta, keyName, tagName, value) {
-	const exists = meta.some((tag) => tag[keyName] === tagName);
+	const exists = meta.some(tag => tag[keyName] === tagName);
 
 	if (!exists && value) {
 		meta.push({
@@ -278,7 +278,7 @@ async function addSiteOGImage(meta) {
 	});
 
 	const properties = ['url', 'secure_url', 'type', 'width', 'height', 'alt'];
-	images.forEach((image) => {
+	images.forEach(image => {
 		for (const property of properties) {
 			if (image.hasOwnProperty(property)) {
 				switch (property) {

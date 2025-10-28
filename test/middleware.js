@@ -20,7 +20,7 @@ describe('Middlewares', () => {
 			await groups.join('administrators', adminUid);
 		});
 
-		it('should expose res.locals.isAdmin = false', (done) => {
+		it('should expose res.locals.isAdmin = false', done => {
 			const middleware = require('../src/middleware');
 			const resMock = { locals: {} };
 			middleware.exposeAdmin({}, resMock, () => {
@@ -29,7 +29,7 @@ describe('Middlewares', () => {
 			});
 		});
 
-		it('should expose res.locals.isAdmin = true', (done) => {
+		it('should expose res.locals.isAdmin = true', done => {
 			const middleware = require('../src/middleware');
 			const reqMock = { user: { uid: adminUid } };
 			const resMock = { locals: {} };
@@ -39,7 +39,7 @@ describe('Middlewares', () => {
 			});
 		});
 
-		it('should expose privileges in res.locals.privileges and isSelf=true', (done) => {
+		it('should expose privileges in res.locals.privileges and isSelf=true', done => {
 			const middleware = require('../src/middleware');
 			const reqMock = { user: { uid: adminUid }, params: { uid: adminUid } };
 			const resMock = { locals: {} };
@@ -53,7 +53,7 @@ describe('Middlewares', () => {
 			});
 		});
 
-		it('should expose privileges in res.locals.privileges and isSelf=false', (done) => {
+		it('should expose privileges in res.locals.privileges and isSelf=false', done => {
 			const middleware = require('../src/middleware');
 			const reqMock = { user: { uid: 0 }, params: { uid: adminUid } };
 			const resMock = { locals: {} };
@@ -67,7 +67,7 @@ describe('Middlewares', () => {
 			});
 		});
 
-		it('should expose privilege set', (done) => {
+		it('should expose privilege set', done => {
 			const middleware = require('../src/middleware');
 			const reqMock = { user: { uid: adminUid } };
 			const resMock = { locals: {} };

@@ -30,7 +30,7 @@ module.exports = {
 
 		await batch.processSortedSet(
 			'users:banned',
-			async (uids) => {
+			async uids => {
 				progress.incr(uids.length);
 
 				await db.sortedSetAdd(

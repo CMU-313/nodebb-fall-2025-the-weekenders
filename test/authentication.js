@@ -17,9 +17,9 @@ const helpers = require('./helpers');
 describe('authentication', () => {
 	const jar = request.jar();
 	let regularUid;
-	const dummyEmailerHook = async (data) => {};
+	const dummyEmailerHook = async data => {};
 
-	before((done) => {
+	before(done => {
 		// Attach an emailer hook so related requests do not error
 		plugins.hooks.register('authentication-test', {
 			hook: 'static:email.send',

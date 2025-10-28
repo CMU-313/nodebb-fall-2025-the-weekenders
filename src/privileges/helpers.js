@@ -44,7 +44,7 @@ helpers.isUsersAllowedTo = async function (privilege, uids, cid) {
 helpers.isAllowedTo = async function (privilege, uidOrGroupName, cid) {
 	// Remote categories (non-numeric) inherit world privileges
 	if (Array.isArray(cid)) {
-		cid = cid.map((cid) => (utils.isNumber(cid) ? cid : -1));
+		cid = cid.map(cid => (utils.isNumber(cid) ? cid : -1));
 	} else {
 		cid = utils.isNumber(cid) ? cid : -1;
 	}
@@ -73,7 +73,7 @@ async function isAllowedToCids(privilege, uidOrGroupName, cids) {
 	}
 
 	const groupKeys = cids.map(
-		(cid) => `cid:${cid}:privileges:groups:${privilege}`
+		cid => `cid:${cid}:privileges:groups:${privilege}`
 	);
 
 	// Group handling
@@ -86,13 +86,13 @@ async function isAllowedToCids(privilege, uidOrGroupName, cids) {
 		return await isSystemGroupAllowedToCids(privilege, uidOrGroupName, cids);
 	}
 
-	const userKeys = cids.map((cid) => `cid:${cid}:privileges:${privilege}`);
+	const userKeys = cids.map(cid => `cid:${cid}:privileges:${privilege}`);
 	return await checkIfAllowedUser(uidOrGroupName, userKeys, groupKeys);
 }
 
 async function isAllowedToPrivileges(privileges, uidOrGroupName, cid) {
 	const groupKeys = privileges.map(
-		(privilege) => `cid:${cid}:privileges:groups:${privilege}`
+		privilege => `cid:${cid}:privileges:groups:${privilege}`
 	);
 	// Group handling
 	if (isNaN(parseInt(uidOrGroupName, 10)) && (uidOrGroupName || '').length) {
@@ -109,7 +109,7 @@ async function isAllowedToPrivileges(privileges, uidOrGroupName, cid) {
 	}
 
 	const userKeys = privileges.map(
-		(privilege) => `cid:${cid}:privileges:${privilege}`
+		privilege => `cid:${cid}:privileges:${privilege}`
 	);
 	return await checkIfAllowedUser(uidOrGroupName, userKeys, groupKeys);
 }
@@ -134,23 +134,23 @@ async function checkIfAllowedGroup(groupName, groupKeys) {
 
 async function isSystemGroupAllowedToCids(privilege, uid, cids) {
 	const groupKeys = cids.map(
-		(cid) => `cid:${cid}:privileges:groups:${privilege}`
+		cid => `cid:${cid}:privileges:groups:${privilege}`
 	);
 	return await groups.isMemberOfGroups(uidToSystemGroup[uid], groupKeys);
 }
 
 async function isSystemGroupAllowedToPrivileges(privileges, uid, cid) {
 	const groupKeys = privileges.map(
-		(privilege) => `cid:${cid}:privileges:groups:${privilege}`
+		privilege => `cid:${cid}:privileges:groups:${privilege}`
 	);
 	return await groups.isMemberOfGroups(uidToSystemGroup[uid], groupKeys);
 }
 
 helpers.getUserPrivileges = async function (cid, userPrivileges) {
 	let memberSets = await groups.getMembersOfGroups(
-		userPrivileges.map((privilege) => `cid:${cid}:privileges:${privilege}`)
+		userPrivileges.map(privilege => `cid:${cid}:privileges:${privilege}`)
 	);
-	memberSets = memberSets.map((set) => set.map((uid) => parseInt(uid, 10)));
+	memberSets = memberSets.map(set => set.map(uid => parseInt(uid, 10)));
 
 	const members = _.uniq(_.flatten(memberSets));
 	const memberData = await user.getUsersFields(members, [
@@ -159,7 +159,7 @@ helpers.getUserPrivileges = async function (cid, userPrivileges) {
 		'banned',
 	]);
 
-	memberData.forEach((member) => {
+	memberData.forEach(member => {
 		member.privileges = {};
 		for (let x = 0, numPrivs = userPrivileges.length; x < numPrivs; x += 1) {
 			member.privileges[userPrivileges[x]] = memberSets[x].includes(
@@ -179,7 +179,7 @@ helpers.getUserPrivileges = async function (cid, userPrivileges) {
 helpers.getGroupPrivileges = async function (cid, groupPrivileges) {
 	const [memberSets, allGroupNames] = await Promise.all([
 		groups.getMembersOfGroups(
-			groupPrivileges.map((privilege) => `cid:${cid}:privileges:${privilege}`)
+			groupPrivileges.map(privilege => `cid:${cid}:privileges:${privilege}`)
 		),
 		groups.getGroups('groups:createtime', 0, -1),
 	]);
@@ -187,7 +187,7 @@ helpers.getGroupPrivileges = async function (cid, groupPrivileges) {
 	const uniqueGroups = _.uniq(_.flatten(memberSets));
 
 	let groupNames = allGroupNames.filter(
-		(groupName) =>
+		groupName =>
 			!groupName.includes(':privileges:') && uniqueGroups.includes(groupName)
 	);
 
@@ -249,8 +249,8 @@ helpers.giveOrRescind = async function (method, privileges, cids, members) {
 	cids = Array.isArray(cids) ? cids : [cids];
 	for (const member of members) {
 		const groupKeys = [];
-		cids.forEach((cid) => {
-			privileges.forEach((privilege) => {
+		cids.forEach(cid => {
+			privileges.forEach(privilege => {
 				groupKeys.push(`cid:${cid}:privileges:${privilege}`);
 			});
 		});
@@ -265,7 +265,7 @@ helpers.userOrGroupPrivileges = async function (
 	privilegeList
 ) {
 	const groupNames = privilegeList.map(
-		(privilege) => `cid:${cid}:privileges:${privilege}`
+		privilege => `cid:${cid}:privileges:${privilege}`
 	);
 	const isMembers = await groups.isMemberOfGroups(uidOrGroup, groupNames);
 	return _.zipObject(privilegeList, isMembers);
@@ -274,7 +274,7 @@ helpers.userOrGroupPrivileges = async function (
 helpers.getUidsWithPrivilege = async (cids, privilege) => {
 	const disabled = (
 		await categories.getCategoriesFields(cids, ['disabled'])
-	).map((obj) => obj.disabled);
+	).map(obj => obj.disabled);
 
 	const groupNames = cids.reduce((memo, cid) => {
 		memo.push(`cid:${cid}:privileges:${privilege}`);
@@ -307,7 +307,7 @@ helpers.getUidsWithPrivilege = async (cids, privilege) => {
 
 		return _.uniq(
 			sets.uids[index].concat(
-				_.flatten(sets.groupNames[index].map((g) => map[g]))
+				_.flatten(sets.groupNames[index].map(g => map[g]))
 			)
 		);
 	});

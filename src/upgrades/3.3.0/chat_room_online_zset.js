@@ -13,16 +13,16 @@ module.exports = {
 
 		await batch.processSortedSet(
 			'chat:rooms',
-			async (roomIds) => {
+			async roomIds => {
 				progress.incr(roomIds.length);
 				const arrayOfUids = await db.getSortedSetsMembersWithScores(
-					roomIds.map((roomId) => `chat:room:${roomId}:uids`)
+					roomIds.map(roomId => `chat:room:${roomId}:uids`)
 				);
 
 				const bulkAdd = [];
 				arrayOfUids.forEach((uids, idx) => {
 					const roomId = roomIds[idx];
-					uids.forEach((uid) => {
+					uids.forEach(uid => {
 						bulkAdd.push([
 							`chat:room:${roomId}:uids:online`,
 							uid.score,

@@ -48,13 +48,13 @@ module.exports = function (Categories) {
 
 		Categories.getTree(categoryData, 0);
 		await Categories.getRecentTopicReplies(categoryData, uid, data.qs);
-		categoryData.forEach((category) => {
+		categoryData.forEach(category => {
 			if (category && Array.isArray(category.children)) {
 				category.children = category.children.slice(
 					0,
 					category.subCategoriesPerPage
 				);
-				category.children.forEach((child) => {
+				category.children.forEach(child => {
 					child.children = undefined;
 				});
 			}
@@ -69,7 +69,7 @@ module.exports = function (Categories) {
 		searchResult.timing = (process.elapsedTimeSince(startTime) / 1000).toFixed(
 			2
 		);
-		searchResult.categories = categoryData.filter((c) => cids.includes(c.cid));
+		searchResult.categories = categoryData.filter(c => cids.includes(c.cid));
 		return searchResult;
 	};
 
@@ -82,7 +82,7 @@ module.exports = function (Categories) {
 			match: `*${String(query).toLowerCase()}*`,
 			limit: hardCap || 500,
 		});
-		return data.map((data) => {
+		return data.map(data => {
 			const split = data.split(':');
 			split.shift();
 			const cid = split.join(':');
@@ -92,7 +92,7 @@ module.exports = function (Categories) {
 
 	async function getChildrenCids(cids, uid) {
 		const childrenCids = await Promise.all(
-			cids.map((cid) => Categories.getChildrenCids(cid))
+			cids.map(cid => Categories.getChildrenCids(cid))
 		);
 		return await privileges.categories.filterCids(
 			'find',

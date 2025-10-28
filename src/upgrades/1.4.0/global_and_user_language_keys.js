@@ -21,9 +21,9 @@ module.exports = {
 
 		await batch.processSortedSet(
 			'users:joindate',
-			async (ids) => {
+			async ids => {
 				await Promise.all(
-					ids.map(async (uid) => {
+					ids.map(async uid => {
 						progress.incr();
 						const language = await db.getObjectField(
 							`user:${uid}:settings`,

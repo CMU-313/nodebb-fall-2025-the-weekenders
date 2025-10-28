@@ -96,7 +96,7 @@ define('admin/settings/navigation', [
 		data.text = translator.escape(data.text);
 		data.groups = ajaxify.data.groups;
 
-		const renderNav = new Promise((resolve) => {
+		const renderNav = new Promise(resolve => {
 			Benchpress.parse(
 				'admin/settings/navigation',
 				'navigation',
@@ -111,7 +111,7 @@ define('admin/settings/navigation', [
 				}
 			);
 		});
-		const renderForm = new Promise((resolve) => {
+		const renderForm = new Promise(resolve => {
 			Benchpress.parse(
 				'admin/settings/navigation',
 				'enabled',

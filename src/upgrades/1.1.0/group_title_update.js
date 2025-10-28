@@ -20,9 +20,7 @@ module.exports = {
 						return next(err);
 					}
 					count += uids.length;
-					settings = settings.filter(
-						(setting) => setting && setting.groupTitle
-					);
+					settings = settings.filter(setting => setting && setting.groupTitle);
 
 					async.each(
 						settings,

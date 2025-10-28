@@ -121,7 +121,7 @@ Actors.replies = async function (req, res, next) {
 
 	// Convert pids to urls
 	if (replies.orderedItems) {
-		replies.orderedItems = replies.orderedItems.map((pid) =>
+		replies.orderedItems = replies.orderedItems.map(pid =>
 			utils.isNumber(pid) ? `${nconf.get('url')}/post/${pid}` : pid
 		);
 	}
@@ -184,23 +184,21 @@ Actors.topic = async function (req, res, next) {
 			return next(); // invalid page; 404
 		}
 		pids.push(mainPid);
-		pids = pids.map((pid) =>
+		pids = pids.map(pid =>
 			utils.isNumber(pid) ? `${nconf.get('url')}/post/${pid}` : pid
 		);
 		collection.totalItems += 1; // account for mainPid
 
 		// Generate digest for ETag
 		const digest = activitypub.helpers.generateDigest(new Set(pids));
-		const ifNoneMatch = (req.get('If-None-Match') || '')
-			.split(',')
-			.map((tag) => {
-				tag = tag.trim();
-				if (tag.startsWith('"') && tag.endsWith('"')) {
-					return tag.slice(1, tag.length - 1);
-				}
+		const ifNoneMatch = (req.get('If-None-Match') || '').split(',').map(tag => {
+			tag = tag.trim();
+			if (tag.startsWith('"') && tag.endsWith('"')) {
+				return tag.slice(1, tag.length - 1);
+			}
 
-				return tag;
-			});
+			return tag;
+		});
 		if (ifNoneMatch.includes(digest)) {
 			return res.sendStatus(304);
 		}
@@ -213,7 +211,7 @@ Actors.topic = async function (req, res, next) {
 				// add OP to collection
 				collection.orderedItems.unshift(mainPid);
 			}
-			collection.orderedItems = collection.orderedItems.map((pid) =>
+			collection.orderedItems = collection.orderedItems.map(pid =>
 				utils.isNumber(pid) ? `${nconf.get('url')}/post/${pid}` : pid
 			);
 		}

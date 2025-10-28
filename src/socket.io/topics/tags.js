@@ -52,12 +52,12 @@ module.exports = function (SocketTopics) {
 			'topics:read'
 		);
 		const result = await topics.autocompleteTags(data);
-		return result.map((tag) => tag.value);
+		return result.map(tag => tag.value);
 	};
 
 	SocketTopics.searchTags = async function (socket, data) {
 		const result = await searchTags(socket.uid, topics.searchTags, data);
-		return result.map((tag) => tag.value);
+		return result.map(tag => tag.value);
 	};
 
 	SocketTopics.searchAndLoadTags = async function (socket, data) {
@@ -84,7 +84,7 @@ module.exports = function (SocketTopics) {
 			uid,
 			'topics:read'
 		);
-		data.cids = data.cids.filter((cid) => cid !== -1);
+		data.cids = data.cids.filter(cid => cid !== -1);
 		return await method(data);
 	}
 
@@ -104,7 +104,7 @@ module.exports = function (SocketTopics) {
 				socket.uid,
 				'topics:read'
 			);
-			cids = cids.filter((cid) => cid !== -1);
+			cids = cids.filter(cid => cid !== -1);
 		}
 
 		let tags = [];
@@ -123,7 +123,7 @@ module.exports = function (SocketTopics) {
 			tags = await topics.getCategoryTagsData(cids, 0, 39);
 		}
 
-		return tags.filter((t) => t.score > 0);
+		return tags.filter(t => t.score > 0);
 	};
 
 	SocketTopics.loadMoreTags = async function (socket, data) {
@@ -138,7 +138,7 @@ module.exports = function (SocketTopics) {
 			socket.uid,
 			'topics:read'
 		);
-		cids = cids.filter((cid) => cid !== -1);
+		cids = cids.filter(cid => cid !== -1);
 		const tags = await topics.getCategoryTagsData(cids, start, stop);
 		return { tags: tags.filter(Boolean), nextStart: stop + 1 };
 	};

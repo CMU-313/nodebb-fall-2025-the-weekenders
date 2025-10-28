@@ -88,7 +88,7 @@ privsPosts.filter = async function (privilege, pids, uid) {
 
 	pids = _.uniq(pids);
 	const postData = await posts.getPostsFields(pids, ['uid', 'tid', 'deleted']);
-	const tids = _.uniq(postData.map((post) => post && post.tid).filter(Boolean));
+	const tids = _.uniq(postData.map(post => post && post.tid).filter(Boolean));
 	const topicData = await topics.getTopicsFields(tids, [
 		'deleted',
 		'scheduled',
@@ -105,7 +105,7 @@ privsPosts.filter = async function (privilege, pids, uid) {
 			}
 			return tidToTopic[post.tid] && tidToTopic[post.tid].cid;
 		})
-		.filter((cid) => (utils.isNumber(cid) ? parseInt(cid, 10) : cid));
+		.filter(cid => (utils.isNumber(cid) ? parseInt(cid, 10) : cid));
 
 	cids = _.uniq(cids);
 
@@ -122,7 +122,7 @@ privsPosts.filter = async function (privilege, pids, uid) {
 
 	pids = postData
 		.filter(
-			(post) =>
+			post =>
 				post.topic &&
 				cidsSet.has(post.topic.cid) &&
 				(privsTopics.canViewDeletedScheduled(
@@ -136,7 +136,7 @@ privsPosts.filter = async function (privilege, pids, uid) {
 				) ||
 					results.isAdmin)
 		)
-		.map((post) => post.pid);
+		.map(post => post.pid);
 
 	const data = await plugins.hooks.fire('filter:privileges.posts.filter', {
 		privilege: privilege,

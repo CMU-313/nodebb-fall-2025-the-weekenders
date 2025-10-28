@@ -34,7 +34,7 @@ async function recompute(uid) {
 	if (!pids.length) {
 		return await set(uid, 0);
 	}
-	const postKeys = pids.map((pid) => `post:${pid}`);
+	const postKeys = pids.map(pid => `post:${pid}`);
 	const postData = await db.getObjectsFields(postKeys, ['upvotes']);
 	const total = postData.reduce(
 		(sum, post) => sum + (Number(post && post.upvotes) || 0),

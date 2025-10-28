@@ -12,7 +12,7 @@ module.exports = function (module) {
 		if (!value.length) {
 			return;
 		}
-		value = value.map((v) => helpers.valueToString(v));
+		value = value.map(v => helpers.valueToString(v));
 
 		try {
 			await module.client.collection('objects').updateOne(
@@ -48,7 +48,7 @@ module.exports = function (module) {
 			value = [value];
 		}
 
-		value = value.map((v) => helpers.valueToString(v));
+		value = value.map(v => helpers.valueToString(v));
 
 		const bulk = module.client
 			.collection('objects')
@@ -82,7 +82,7 @@ module.exports = function (module) {
 			value = [value];
 		}
 
-		value = value.map((v) => helpers.valueToString(v));
+		value = value.map(v => helpers.valueToString(v));
 
 		await module.client.collection('objects').updateMany(
 			{
@@ -132,7 +132,7 @@ module.exports = function (module) {
 		if (!key || !Array.isArray(values) || !values.length) {
 			return [];
 		}
-		values = values.map((v) => helpers.valueToString(v));
+		values = values.map(v => helpers.valueToString(v));
 
 		const result = await module.client.collection('objects').findOne(
 			{
@@ -145,7 +145,7 @@ module.exports = function (module) {
 		const membersSet = new Set(
 			result && Array.isArray(result.members) ? result.members : []
 		);
-		return values.map((v) => membersSet.has(v));
+		return values.map(v => membersSet.has(v));
 	};
 
 	module.isMemberOfSets = async function (sets, value) {
@@ -168,11 +168,11 @@ module.exports = function (module) {
 			.toArray();
 
 		const map = {};
-		result.forEach((item) => {
+		result.forEach(item => {
 			map[item._key] = true;
 		});
 
-		return sets.map((set) => !!map[set]);
+		return sets.map(set => !!map[set]);
 	};
 
 	module.getSetMembers = async function (key) {
@@ -208,11 +208,11 @@ module.exports = function (module) {
 			.toArray();
 
 		const sets = {};
-		data.forEach((set) => {
+		data.forEach(set => {
 			sets[set._key] = set.members || [];
 		});
 
-		return keys.map((k) => sets[k] || []);
+		return keys.map(k => sets[k] || []);
 	};
 
 	module.setCount = async function (key) {
@@ -238,7 +238,7 @@ module.exports = function (module) {
 			])
 			.toArray();
 		const map = _.keyBy(data, '_key');
-		return keys.map((key) => (map.hasOwnProperty(key) ? map[key].count : 0));
+		return keys.map(key => (map.hasOwnProperty(key) ? map[key].count : 0));
 	};
 
 	module.setRemoveRandom = async function (key) {

@@ -11,7 +11,7 @@ define('admin/advanced/events', [
 		$('[data-action="clear"]').on('click', function () {
 			bootbox.confirm(
 				'[[admin/advanced/events:confirm-delete-all-events]]',
-				(confirm) => {
+				confirm => {
 					if (confirm) {
 						socket.emit('admin.deleteAllEvents', function (err) {
 							if (err) {

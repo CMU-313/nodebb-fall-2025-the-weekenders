@@ -120,7 +120,7 @@ events.getEvents = async function (options) {
 	if (Array.isArray(uids)) {
 		if (filter === '') {
 			eids = await db.getSortedSetRevRangeByScore(
-				uids.map((uid) => `events:time:uid:${uid}`),
+				uids.map(uid => `events:time:uid:${uid}`),
 				start,
 				stop === -1 ? -1 : stop - start + 1,
 				to,
@@ -128,7 +128,7 @@ events.getEvents = async function (options) {
 			);
 		} else {
 			eids = await Promise.all(
-				uids.map((uid) =>
+				uids.map(uid =>
 					db.getSortedSetRevIntersect({
 						sets: [`events:time:uid:${uid}`, `events:time:${filter}`],
 						start: 0,
@@ -141,13 +141,13 @@ events.getEvents = async function (options) {
 
 			eids = _.flatten(eids)
 				.filter(
-					(i) =>
+					i =>
 						(from === '-inf' || i.score >= from) &&
 						(to === '+inf' || i.score <= to)
 				)
 				.sort((a, b) => b.score - a.score)
 				.slice(start, stop + 1)
-				.map((i) => i.value);
+				.map(i => i.value);
 		}
 	} else {
 		eids = await db.getSortedSetRevRangeByScore(
@@ -162,19 +162,19 @@ events.getEvents = async function (options) {
 	return await events.getEventsByEventIds(eids);
 };
 
-events.getEventCount = async (options) => {
+events.getEventCount = async options => {
 	const { filter, uids, from, to } = options;
 
 	if (Array.isArray(uids)) {
 		if (filter === '') {
 			const counts = await Promise.all(
-				uids.map((uid) => db.sortedSetCount(`events:time:uid:${uid}`, from, to))
+				uids.map(uid => db.sortedSetCount(`events:time:uid:${uid}`, from, to))
 			);
 			return counts.reduce((prev, cur) => prev + cur, 0);
 		}
 
 		const eids = await Promise.all(
-			uids.map((uid) =>
+			uids.map(uid =>
 				db.getSortedSetRevIntersect({
 					sets: [`events:time:uid:${uid}`, `events:time:${filter}`],
 					start: 0,
@@ -186,7 +186,7 @@ events.getEventCount = async (options) => {
 		);
 
 		return _.flatten(eids).filter(
-			(i) =>
+			i =>
 				(from === '-inf' || i.score >= from) && (to === '+inf' || i.score <= to)
 		).length;
 	}
@@ -198,13 +198,13 @@ events.getEventCount = async (options) => {
 	);
 };
 
-events.getEventsByEventIds = async (eids) => {
-	let eventsData = await db.getObjects(eids.map((eid) => `event:${eid}`));
+events.getEventsByEventIds = async eids => {
+	let eventsData = await db.getObjects(eids.map(eid => `event:${eid}`));
 	eventsData = eventsData.filter(Boolean);
 	await addUserData(eventsData, 'uid', 'user');
 	await addUserData(eventsData, 'targetUid', 'targetUser');
-	eventsData.forEach((event) => {
-		Object.keys(event).forEach((key) => {
+	eventsData.forEach(event => {
+		Object.keys(event).forEach(key => {
 			if (typeof event[key] === 'string') {
 				event[key] = validator.escape(String(event[key] || ''));
 			}
@@ -222,7 +222,7 @@ events.getEventsByEventIds = async (eids) => {
 };
 
 async function addUserData(eventsData, field, objectName) {
-	const uids = _.uniq(eventsData.map((event) => event && event[field]));
+	const uids = _.uniq(eventsData.map(event => event && event[field]));
 
 	if (!uids.length) {
 		return eventsData;
@@ -239,7 +239,7 @@ async function addUserData(eventsData, field, objectName) {
 		map[user.uid] = user;
 	});
 
-	eventsData.forEach((event) => {
+	eventsData.forEach(event => {
 		if (map[event[field]]) {
 			event[objectName] = map[event[field]];
 		}
@@ -248,12 +248,12 @@ async function addUserData(eventsData, field, objectName) {
 }
 
 events.deleteEvents = async function (eids) {
-	const keys = eids.map((eid) => `event:${eid}`);
+	const keys = eids.map(eid => `event:${eid}`);
 	const eventData = await db.getObjectsFields(keys, ['type']);
 	const sets = _.uniq(
 		['events:time']
-			.concat(eventData.map((e) => `events:time:${e.type}`))
-			.concat(eventData.map((e) => `events:time:uid:${e.uid}`))
+			.concat(eventData.map(e => `events:time:${e.type}`))
+			.concat(eventData.map(e => `events:time:uid:${e.uid}`))
 	);
 	await Promise.all([db.deleteAll(keys), db.sortedSetRemove(sets, eids)]);
 };
@@ -261,7 +261,7 @@ events.deleteEvents = async function (eids) {
 events.deleteAll = async function () {
 	await batch.processSortedSet(
 		'events:time',
-		async (eids) => {
+		async eids => {
 			await events.deleteEvents(eids);
 		},
 		{ alwaysStartAt: 0, batch: 500 }

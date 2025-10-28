@@ -16,12 +16,12 @@ module.exports = {
 async function cleanPost(progress) {
 	await batch.processSortedSet(
 		'posts:pid',
-		async (pids) => {
+		async pids => {
 			progress.incr(pids.length);
 
-			const postData = await db.getObjects(pids.map((pid) => `post:${pid}`));
+			const postData = await db.getObjects(pids.map(pid => `post:${pid}`));
 			await Promise.all(
-				postData.map(async (post) => {
+				postData.map(async post => {
 					if (!post) {
 						return;
 					}
@@ -52,7 +52,7 @@ async function cleanPost(progress) {
 						'fav_button_class',
 						'edited-class',
 					];
-					legacyFields.forEach((field) => {
+					legacyFields.forEach(field => {
 						if (post.hasOwnProperty(field)) {
 							fieldsToDelete.push(field);
 						}
@@ -74,11 +74,11 @@ async function cleanPost(progress) {
 async function cleanTopic(progress) {
 	await batch.processSortedSet(
 		'topics:tid',
-		async (tids) => {
+		async tids => {
 			progress.incr(tids.length);
-			const topicData = await db.getObjects(tids.map((tid) => `topic:${tid}`));
+			const topicData = await db.getObjects(tids.map(tid => `topic:${tid}`));
 			await Promise.all(
-				topicData.map(async (topic) => {
+				topicData.map(async topic => {
 					if (!topic) {
 						return;
 					}
@@ -104,7 +104,7 @@ async function cleanTopic(progress) {
 
 					// cleanup legacy fields, these are not used anymore
 					const legacyFields = ['category_name', 'category_slug'];
-					legacyFields.forEach((field) => {
+					legacyFields.forEach(field => {
 						if (topic.hasOwnProperty(field)) {
 							fieldsToDelete.push(field);
 						}

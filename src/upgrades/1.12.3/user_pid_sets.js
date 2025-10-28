@@ -13,7 +13,7 @@ module.exports = {
 
 		await batch.processSortedSet(
 			'posts:pid',
-			async (pids) => {
+			async pids => {
 				progress.incr(pids.length);
 				const postData = await posts.getPostsFields(pids, [
 					'pid',
@@ -23,7 +23,7 @@ module.exports = {
 					'downvotes',
 					'timestamp',
 				]);
-				const tids = postData.map((p) => p.tid);
+				const tids = postData.map(p => p.tid);
 				const topicData = await topics.getTopicsFields(tids, ['cid']);
 				const bulk = [];
 				postData.forEach((p, index) => {

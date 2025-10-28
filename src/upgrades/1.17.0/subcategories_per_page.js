@@ -11,8 +11,8 @@ module.exports = {
 
 		await batch.processSortedSet(
 			'categories:cid',
-			async (cids) => {
-				const keys = cids.map((cid) => `category:${cid}`);
+			async cids => {
+				const keys = cids.map(cid => `category:${cid}`);
 				await db.setObject(keys, {
 					subCategoriesPerPage: 10,
 				});

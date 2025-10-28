@@ -20,17 +20,17 @@ module.exports = {
 
 		const files = (await fs.promises.readdir(folder, { withFileTypes: true }))
 			.filter(
-				(item) => !item.isDirectory() && String(item.name).match(userPicRegex)
+				item => !item.isDirectory() && String(item.name).match(userPicRegex)
 			)
-			.map((item) => item.name);
+			.map(item => item.name);
 
 		progress.total = files.length;
 		await batch.processArray(
 			files,
-			async (files) => {
+			async files => {
 				progress.incr(files.length);
 				await Promise.all(
-					files.map(async (file) => {
+					files.map(async file => {
 						const uid = file.split('-')[0];
 						if (parseInt(uid, 10) > 0) {
 							await mkdirp(path.join(folder, `uid-${uid}`));
@@ -49,11 +49,11 @@ module.exports = {
 
 		await batch.processSortedSet(
 			'users:joindate',
-			async (uids) => {
+			async uids => {
 				progress.incr(uids.length);
-				const usersData = await db.getObjects(uids.map((uid) => `user:${uid}`));
+				const usersData = await db.getObjects(uids.map(uid => `user:${uid}`));
 				const bulkSet = [];
-				usersData.forEach((userData) => {
+				usersData.forEach(userData => {
 					const setObj = {};
 					if (
 						userData &&

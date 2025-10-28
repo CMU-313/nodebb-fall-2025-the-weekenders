@@ -42,7 +42,7 @@ Templates.processImports = processImports;
 
 async function getTemplateDirs(activePlugins) {
 	const pluginTemplates = activePlugins
-		.map((id) => {
+		.map(id => {
 			if (themeNamePattern.test(id)) {
 				return nconf.get('theme_templates_path');
 			}
@@ -81,18 +81,18 @@ async function getTemplateDirs(activePlugins) {
 	);
 
 	templateDirs = await Promise.all(
-		templateDirs.map(async (path) => ((await file.exists(path)) ? path : false))
+		templateDirs.map(async path => ((await file.exists(path)) ? path : false))
 	);
 	return templateDirs.filter(Boolean);
 }
 
 async function getTemplateFiles(dirs) {
 	const buckets = await Promise.all(
-		dirs.map(async (dir) => {
+		dirs.map(async dir => {
 			let files = await file.walk(dir);
 			files = files
-				.filter((path) => path.endsWith('.tpl'))
-				.map((file) => ({
+				.filter(path => path.endsWith('.tpl'))
+				.map(file => ({
 					name: path.relative(dir, file).replace(/\\/g, '/'),
 					path: file,
 				}));
@@ -101,8 +101,8 @@ async function getTemplateFiles(dirs) {
 	);
 
 	const dict = {};
-	buckets.forEach((files) => {
-		files.forEach((file) => {
+	buckets.forEach(files => {
+		files.forEach(file => {
 			dict[file.name] = file.path;
 		});
 	});
@@ -113,7 +113,7 @@ async function getTemplateFiles(dirs) {
 async function compileTemplate(filename, source) {
 	let paths = await file.walk(viewsPath);
 	paths = _.fromPairs(
-		paths.map((p) => {
+		paths.map(p => {
 			const relative = path.relative(viewsPath, p).replace(/\\/g, '/');
 			return [relative, p];
 		})
@@ -137,7 +137,7 @@ async function compile() {
 	files = await getTemplateFiles(files);
 	const minify = process.env.NODE_ENV !== 'development';
 	await Promise.all(
-		Object.keys(files).map(async (name) => {
+		Object.keys(files).map(async name => {
 			const filePath = files[name];
 			let imported = await fs.promises.readFile(filePath, 'utf8');
 			imported = await processImports(files, name, imported);
@@ -148,7 +148,7 @@ async function compile() {
 			if (minify) {
 				imported = imported
 					.split('\n')
-					.map((line) => line.trim())
+					.map(line => line.trim())
 					.filter(Boolean)
 					.join('\n');
 			}

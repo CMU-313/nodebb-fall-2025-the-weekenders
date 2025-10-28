@@ -17,7 +17,7 @@ define('forum/chats/create', [
 			({ groups } = await api.get('/admin/groups'));
 			groups
 				.sort((a, b) => b.system - a.system)
-				.map((g) => {
+				.map(g => {
 					const { name, displayName } = g;
 					return { name, displayName };
 				});

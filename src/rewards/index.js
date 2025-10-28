@@ -17,14 +17,14 @@ rewards.checkConditionAndRewardUser = async function (params) {
 	let rewardData = await getRewardDataByIDs(ids);
 	// filter disabled
 	rewardData = rewardData.filter(
-		(r) => r && !(r.disabled === 'true' || r.disabled === true)
+		r => r && !(r.disabled === 'true' || r.disabled === true)
 	);
 	rewardData = await filterCompletedRewards(uid, rewardData);
 	if (!rewardData || !rewardData.length) {
 		return;
 	}
 	const eligible = await Promise.all(
-		rewardData.map((reward) => checkCondition(reward, method))
+		rewardData.map(reward => checkCondition(reward, method))
 	);
 	const eligibleRewards = rewardData.filter((reward, index) => eligible[index]);
 	await giveRewards(uid, eligibleRewards);
@@ -48,11 +48,11 @@ async function filterCompletedRewards(uid, rewards) {
 	);
 	const userRewards = {};
 
-	data.forEach((obj) => {
+	data.forEach(obj => {
 		userRewards[obj.value] = parseInt(obj.score, 10);
 	});
 
-	return rewards.filter((reward) => {
+	return rewards.filter(reward => {
 		if (!reward) {
 			return false;
 		}
@@ -67,12 +67,12 @@ async function filterCompletedRewards(uid, rewards) {
 }
 
 async function getRewardDataByIDs(ids) {
-	return await db.getObjects(ids.map((id) => `rewards:id:${id}`));
+	return await db.getObjects(ids.map(id => `rewards:id:${id}`));
 }
 
 async function getRewardsByRewardData(rewards) {
 	return await db.getObjects(
-		rewards.map((reward) => `rewards:id:${reward.id}:rewards`)
+		rewards.map(reward => `rewards:id:${reward.id}:rewards`)
 	);
 }
 

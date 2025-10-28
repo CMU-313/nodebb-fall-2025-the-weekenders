@@ -52,7 +52,7 @@ define('forum/chats', [
 			if (ajaxify.data.publicRooms) {
 				socket.emit(
 					'modules.chats.leavePublic',
-					ajaxify.data.publicRooms.map((r) => r.roomId)
+					ajaxify.data.publicRooms.map(r => r.roomId)
 				);
 			}
 		}
@@ -67,7 +67,7 @@ define('forum/chats', [
 		}
 		socket.emit(
 			'modules.chats.enterPublic',
-			ajaxify.data.publicRooms.map((r) => r.roomId)
+			ajaxify.data.publicRooms.map(r => r.roomId)
 		);
 		const env = utils.findBootstrapEnvironment();
 		chatNavWrapper = $('[component="chat/nav-wrapper"]');
@@ -254,7 +254,7 @@ define('forum/chats', [
 			callback: function (uploads) {
 				const inputEl = options.inputEl;
 				let text = inputEl.val();
-				uploads.forEach((upload) => {
+				uploads.forEach(upload => {
 					text =
 						text +
 						(!text.endsWith('\n') ? '\n' : '') +
@@ -393,7 +393,7 @@ define('forum/chats', [
 
 					api
 						.get(`/chats/${roomId}/messages`, { uid, start, direction })
-						.then((data) => {
+						.then(data => {
 							let messageData = data.messages;
 							if (!messageData) {
 								loading = false;
@@ -889,7 +889,7 @@ define('forum/chats', [
 			});
 		});
 
-		socket.on('event:chats.typing', async (data) => {
+		socket.on('event:chats.typing', async data => {
 			if (data.uid === app.user.uid || chatModule.isFromBlockedUser(data.uid)) {
 				return;
 			}
@@ -914,7 +914,7 @@ define('forum/chats', [
 		} else {
 			const { rooms } = await api.get(`/chats`, { start: 0, perPage: 2 });
 			const room = rooms.find(
-				(r) => parseInt(r.roomId, 10) === parseInt(roomId, 10)
+				r => parseInt(r.roomId, 10) === parseInt(roomId, 10)
 			);
 			if (room) {
 				const recentEl = components.get('chat/recent');

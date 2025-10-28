@@ -29,7 +29,7 @@ define('hooks', [], () => {
 
 	Hooks.logs.flush = () => {
 		if (Hooks.logs._collection && Hooks.logs._collection.size) {
-			Hooks.logs._collection.forEach((args) => {
+			Hooks.logs._collection.forEach(args => {
 				console.debug.apply(console, args);
 			});
 			console.groupEnd();
@@ -75,7 +75,7 @@ define('hooks', [], () => {
 	};
 	Hooks.onPage = Hooks.registerPage;
 	Hooks.register('action:ajaxify.start', () => {
-		Hooks.temporary.forEach((pair) => {
+		Hooks.temporary.forEach(pair => {
 			Hooks.unregister(pair.hookName, pair.method);
 			Hooks.temporary.delete(pair);
 		});
@@ -95,7 +95,7 @@ define('hooks', [], () => {
 	};
 	Hooks.off = Hooks.unregister;
 
-	Hooks.hasListeners = (hookName) =>
+	Hooks.hasListeners = hookName =>
 		Hooks.loaded[hookName] && Hooks.loaded[hookName].size > 0;
 
 	const _onHookError = (e, listener, data) => {
@@ -114,10 +114,10 @@ define('hooks', [], () => {
 		const listeners = Array.from(Hooks.loaded[hookName]);
 		return listeners.reduce(
 			(promise, listener) =>
-				promise.then((data) => {
+				promise.then(data => {
 					const result = listener(data);
 					return utils.isPromise(result)
-						? result.then((data) => Promise.resolve(data))
+						? result.then(data => Promise.resolve(data))
 						: result;
 				}),
 			Promise.resolve(data)
@@ -126,7 +126,7 @@ define('hooks', [], () => {
 
 	const _fireActionHook = (hookName, data) => {
 		if (Hooks.hasListeners(hookName)) {
-			Hooks.loaded[hookName].forEach((listener) => listener(data));
+			Hooks.loaded[hookName].forEach(listener => listener(data));
 		}
 
 		// Backwards compatibility (remove this when we eventually remove jQuery from NodeBB core)
@@ -140,7 +140,7 @@ define('hooks', [], () => {
 
 		const listeners = Array.from(Hooks.loaded[hookName]);
 		await Promise.allSettled(
-			listeners.map((listener) => {
+			listeners.map(listener => {
 				try {
 					return listener(data);
 				} catch (e) {
@@ -168,7 +168,7 @@ define('hooks', [], () => {
 				result = _fireStaticHook(hookName, data);
 				break;
 		}
-		Hooks.runOnce.forEach((pair) => {
+		Hooks.runOnce.forEach(pair => {
 			if (pair.hookName === hookName) {
 				Hooks.unregister(hookName, pair.method);
 				Hooks.runOnce.delete(pair);

@@ -44,7 +44,7 @@ module.exports = function (Plugins) {
 
 		let methods = {};
 		if (Array.isArray(fields)) {
-			fields.forEach((field) => {
+			fields.forEach(field => {
 				methods[field] = handlers[field];
 			});
 		} else {
@@ -85,10 +85,10 @@ module.exports = function (Plugins) {
 			languages: ['languageData'],
 		};
 
-		const fields = _.uniq(_.flatMap(targets, (target) => map[target] || []));
+		const fields = _.uniq(_.flatMap(targets, target => map[target] || []));
 
 		// clear old data before build
-		fields.forEach((field) => {
+		fields.forEach(field => {
 			switch (field) {
 				case 'clientScripts':
 				case 'acpScripts':
@@ -109,7 +109,7 @@ module.exports = function (Plugins) {
 			`[plugins] loading the following fields from plugin data: ${fields.join(', ')}`
 		);
 		const plugins = await Plugins.data.getActive();
-		await Promise.all(plugins.map((p) => registerPluginAssets(p, fields)));
+		await Promise.all(plugins.map(p => registerPluginAssets(p, fields)));
 	};
 
 	Plugins.loadPlugin = async function (pluginPath) {
@@ -175,7 +175,7 @@ module.exports = function (Plugins) {
 			}
 
 			if (Array.isArray(pluginData.hooks)) {
-				pluginData.hooks.forEach((hook) =>
+				pluginData.hooks.forEach(hook =>
 					Plugins.hooks.register(pluginData.id, hook)
 				);
 			}

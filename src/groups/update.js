@@ -31,7 +31,7 @@ module.exports = function (Groups) {
 			'hidden',
 			'disableJoinRequests',
 			'disableLeave',
-		].forEach((prop) => {
+		].forEach(prop => {
 			if (values.hasOwnProperty(prop) && typeof values[prop] !== 'boolean') {
 				values[prop] =
 					values[prop] === 'true' || parseInt(values[prop], 10) === 1;
@@ -89,10 +89,10 @@ module.exports = function (Groups) {
 			);
 			const cidsArray = values.memberPostCids
 				.split(',')
-				.map((cid) => parseInt(cid.trim(), 10))
+				.map(cid => parseInt(cid.trim(), 10))
 				.filter(Boolean);
 			payload.memberPostCids =
-				cidsArray.filter((cid) => validCids.includes(cid)).join(',') || '';
+				cidsArray.filter(cid => validCids.includes(cid)).join(',') || '';
 		}
 
 		await db.setObject(`group:${groupName}`, payload);
@@ -222,7 +222,7 @@ module.exports = function (Groups) {
 		}
 
 		const allGroups = await db.getSortedSetRange('groups:createtime', 0, -1);
-		const keys = allGroups.map((group) => `group:${group}:members`);
+		const keys = allGroups.map(group => `group:${group}:members`);
 		await renameGroupsMember(keys, oldName, newName);
 		cache.del(keys);
 
@@ -261,20 +261,20 @@ module.exports = function (Groups) {
 	async function updateMemberGroupTitles(oldName, newName) {
 		await batch.processSortedSet(
 			`group:${oldName}:members`,
-			async (uids) => {
+			async uids => {
 				let usersData = await user.getUsersData(uids);
 				usersData = usersData.filter(
-					(userData) => userData && userData.groupTitleArray.includes(oldName)
+					userData => userData && userData.groupTitleArray.includes(oldName)
 				);
 
-				usersData.forEach((userData) => {
-					userData.newTitleArray = userData.groupTitleArray.map((oldTitle) =>
+				usersData.forEach(userData => {
+					userData.newTitleArray = userData.groupTitleArray.map(oldTitle =>
 						oldTitle === oldName ? newName : oldTitle
 					);
 				});
 
 				await Promise.all(
-					usersData.map((u) =>
+					usersData.map(u =>
 						user.setUserField(
 							u.uid,
 							'groupTitle',
@@ -301,7 +301,7 @@ module.exports = function (Groups) {
 	async function updateNavigationItems(oldName, newName) {
 		const navigation = require('../navigation/admin');
 		const navItems = await navigation.get();
-		navItems.forEach((navItem) => {
+		navItems.forEach(navItem => {
 			if (
 				navItem &&
 				Array.isArray(navItem.groups) &&
@@ -320,9 +320,9 @@ module.exports = function (Groups) {
 
 		const data = await admin.get();
 
-		data.areas.forEach((area) => {
+		data.areas.forEach(area => {
 			area.widgets = area.data;
-			area.widgets.forEach((widget) => {
+			area.widgets.forEach(widget => {
 				if (
 					widget &&
 					widget.data &&
@@ -364,7 +364,7 @@ module.exports = function (Groups) {
 		const roomIds = await db.getSortedSetRange('chat:rooms:public', 0, -1);
 		const roomData = await messaging.getRoomsData(roomIds);
 		const bulkSet = [];
-		roomData.forEach((room) => {
+		roomData.forEach(room => {
 			if (
 				room &&
 				room.public &&

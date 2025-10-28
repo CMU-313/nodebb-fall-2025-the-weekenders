@@ -26,7 +26,7 @@ prestart.setupWinston();
 const db = require('../../database');
 const batch = require('../../batch');
 
-process.on('message', async (msg) => {
+process.on('message', async msg => {
 	if (msg && msg.uid) {
 		await db.init();
 
@@ -42,10 +42,10 @@ process.on('message', async (msg) => {
 		let payload = [];
 		await batch.processSortedSet(
 			`uid:${targetUid}:posts`,
-			async (pids) => {
+			async pids => {
 				let postData = await posts.getPostsData(pids);
 				// Remove empty post references and convert newlines in content
-				postData = postData.filter(Boolean).map((post) => {
+				postData = postData.filter(Boolean).map(post => {
 					post.content = `"${String(post.content || '')
 						.replace(/\n/g, '\\n')
 						.replace(/"/g, '\\"')}"`;

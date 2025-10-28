@@ -43,19 +43,19 @@ module.exports = function (Groups) {
 
 		const promises = [
 			db.sortedSetsAdd(
-				groupsToJoin.map((groupName) => `group:${groupName}:members`),
+				groupsToJoin.map(groupName => `group:${groupName}:members`),
 				Date.now(),
 				uid
 			),
 			db.incrObjectField(
-				groupsToJoin.map((groupName) => `group:${groupName}`),
+				groupsToJoin.map(groupName => `group:${groupName}`),
 				'memberCount'
 			),
 		];
 		if (isAdmin) {
 			promises.push(
 				db.setsAdd(
-					groupsToJoin.map((groupName) => `group:${groupName}:owners`),
+					groupsToJoin.map(groupName => `group:${groupName}:owners`),
 					uid
 				)
 			);
@@ -64,7 +64,7 @@ module.exports = function (Groups) {
 		await Promise.all(promises);
 
 		Groups.clearCache(uid, groupsToJoin);
-		cache.del(groupsToJoin.map((name) => `group:${name}:members`));
+		cache.del(groupsToJoin.map(name => `group:${name}:members`));
 
 		const groupData = await Groups.getGroupsFields(groupsToJoin, [
 			'name',
@@ -72,14 +72,14 @@ module.exports = function (Groups) {
 			'memberCount',
 		]);
 		const visibleGroups = groupData.filter(
-			(groupData) => groupData && !groupData.hidden
+			groupData => groupData && !groupData.hidden
 		);
 
 		if (visibleGroups.length) {
 			await db.sortedSetAdd(
 				'groups:visible:memberCount',
-				visibleGroups.map((groupData) => groupData.memberCount),
-				visibleGroups.map((groupData) => groupData.name)
+				visibleGroups.map(groupData => groupData.memberCount),
+				visibleGroups.map(groupData => groupData.name)
 			);
 		}
 
@@ -122,7 +122,7 @@ module.exports = function (Groups) {
 			Groups.BANNED_USERS,
 		];
 		groupNames = groupNames.filter(
-			(groupName) =>
+			groupName =>
 				!ignore.includes(groupName) && !Groups.isPrivilegeGroup(groupName)
 		);
 		if (!groupNames.length) {

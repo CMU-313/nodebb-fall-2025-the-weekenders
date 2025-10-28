@@ -17,7 +17,7 @@ define('userFilter', ['api', 'hooks', 'slugify', 'benchpress'], function (
 		let placeholderHtml;
 		let selectedUsers = [];
 		if (options.selectedUsers) {
-			selectedUsers = options.selectedUsers.map((u) => ({ ...u }));
+			selectedUsers = options.selectedUsers.map(u => ({ ...u }));
 		}
 		hooks.fire('action:user.filter.options', { el: el, options: options });
 
@@ -73,7 +73,7 @@ define('userFilter', ['api', 'hooks', 'slugify', 'benchpress'], function (
 			}
 			result.users = result.users.slice(0, 20);
 			const uidToUser = {};
-			result.users.forEach((user) => {
+			result.users.forEach(user => {
 				uidToUser[user.uid] = user;
 			});
 
@@ -90,7 +90,7 @@ define('userFilter', ['api', 'hooks', 'slugify', 'benchpress'], function (
 				'click',
 				async function () {
 					const clickedUid = parseInt($(this).attr('data-uid'), 10);
-					if (!selectedUsers.find((u) => u.uid === clickedUid)) {
+					if (!selectedUsers.find(u => u.uid === clickedUid)) {
 						selectedUsers.push(uidToUser[clickedUid]);
 						await onSelectionChange();
 					}
@@ -114,12 +114,12 @@ define('userFilter', ['api', 'hooks', 'slugify', 'benchpress'], function (
 		el.on('click', '[component="user/filter/delete"]', async function () {
 			const uid = $(this).attr('data-uid');
 			selectedUsers = selectedUsers.filter(
-				(u) => parseInt(u.uid, 10) !== parseInt(uid, 10)
+				u => parseInt(u.uid, 10) !== parseInt(uid, 10)
 			);
 			await onSelectionChange();
 		});
 
-		el.find('[component="user/filter/search"]').on('keyup', (e) => {
+		el.find('[component="user/filter/search"]').on('keyup', e => {
 			if (e.key === 'Enter' && !app.user.privileges['search:users']) {
 				doSearch();
 			}
@@ -138,7 +138,7 @@ define('userFilter', ['api', 'hooks', 'slugify', 'benchpress'], function (
 		// Pre-render placeholders for search
 		benchpress
 			.render(options.placeholderTemplate || 'partials/userFilter-placeholders')
-			.then((html) => {
+			.then(html => {
 				placeholderHtml = html;
 			});
 	};

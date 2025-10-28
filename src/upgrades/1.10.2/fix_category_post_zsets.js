@@ -12,15 +12,15 @@ module.exports = {
 		const { progress } = this;
 
 		const cids = await db.getSortedSetRange('categories:cid', 0, -1);
-		const keys = cids.map((cid) => `cid:${cid}:pids`);
+		const keys = cids.map(cid => `cid:${cid}:pids`);
 
 		await batch.processSortedSet(
 			'posts:pid',
-			async (postData) => {
-				const pids = postData.map((p) => p.value);
+			async postData => {
+				const pids = postData.map(p => p.value);
 				const topicData = await posts.getPostsFields(pids, ['tid']);
 				const categoryData = await topics.getTopicsFields(
-					topicData.map((t) => t.tid),
+					topicData.map(t => t.tid),
 					['cid']
 				);
 

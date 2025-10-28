@@ -116,7 +116,7 @@ privsTopics.filterTids = async function (privilege, tids, uid) {
 		'deleted',
 		'scheduled',
 	]);
-	const cids = _.uniq(topicsData.map((topic) => topic.cid));
+	const cids = _.uniq(topicsData.map(topic => topic.cid));
 	const results = await privsCategories.getBase(privilege, cids, uid);
 
 	const allowedCids = cids.filter(
@@ -131,7 +131,7 @@ privsTopics.filterTids = async function (privilege, tids, uid) {
 
 	tids = topicsData
 		.filter(
-			(t) =>
+			t =>
 				cidsSet.has(t.cid) &&
 				(results.isAdmin ||
 					privsTopics.canViewDeletedScheduled(
@@ -141,7 +141,7 @@ privsTopics.filterTids = async function (privilege, tids, uid) {
 						canViewScheduled[t.cid]
 					))
 		)
-		.map((t) => t.tid);
+		.map(t => t.tid);
 
 	const data = await plugins.hooks.fire('filter:privileges.topics.filter', {
 		privilege: privilege,

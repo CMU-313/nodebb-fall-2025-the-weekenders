@@ -14,8 +14,7 @@ const categories = require('../../src/categories');
 const file = require('../../src/file');
 const utils = require('../../src/utils');
 
-const md5 = (filename) =>
-	crypto.createHash('md5').update(filename).digest('hex');
+const md5 = filename => crypto.createHash('md5').update(filename).digest('hex');
 
 describe('uploads.js', () => {
 	describe('.associateUpload()', () => {

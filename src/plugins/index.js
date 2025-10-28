@@ -147,13 +147,13 @@ Plugins.reload = async function () {
 		winston.warn(
 			`[plugins/load] ${chalk.white.bgRed.bold('DEPRECATION')} The hook ${chalk.yellow(hook)} has been deprecated as of ${deprecation.since}, and slated for removal in ${deprecation.until}. ${replacement} The following plugins are still listening for this hook:`
 		);
-		deprecation.affected.forEach((id) =>
+		deprecation.affected.forEach(id =>
 			console.log(`  ${chalk.yellow('*')} ${id}`)
 		);
 	});
 
 	// Lower priority runs earlier
-	Object.keys(Plugins.loadedHooks).forEach((hook) => {
+	Object.keys(Plugins.loadedHooks).forEach(hook => {
 		Plugins.loadedHooks[hook].sort((a, b) => a.priority - b.priority);
 	});
 
@@ -180,7 +180,7 @@ Plugins.get = async function (id) {
 		throw new Error(`[[error:unable-to-load-plugin, ${id}]]`);
 	}
 	let normalised = await Plugins.normalise([body ? body.payload : {}]);
-	normalised = normalised.filter((plugin) => plugin.id === id);
+	normalised = normalised.filter(plugin => plugin.id === id);
 	return normalised.length ? normalised[0] : undefined;
 };
 
@@ -217,7 +217,7 @@ Plugins.normalise = async function (apiReturn) {
 	const pluginMap = {};
 	const { dependencies } = require(paths.currentPackage);
 	apiReturn = Array.isArray(apiReturn) ? apiReturn : [];
-	apiReturn.forEach((packageData) => {
+	apiReturn.forEach(packageData => {
 		packageData.id = packageData.name;
 		packageData.installed = false;
 		packageData.active = false;
@@ -229,10 +229,10 @@ Plugins.normalise = async function (apiReturn) {
 
 	let installedPlugins = await Plugins.showInstalled();
 	installedPlugins = installedPlugins.filter(
-		(plugin) => plugin && !plugin.system
+		plugin => plugin && !plugin.system
 	);
 
-	installedPlugins.forEach((plugin) => {
+	installedPlugins.forEach(plugin => {
 		// If it errored out because a package.json or plugin.json couldn't be read, no need to do this stuff
 		if (plugin.error) {
 			pluginMap[plugin.id] = pluginMap[plugin.id] || {};
@@ -278,7 +278,7 @@ Plugins.normalise = async function (apiReturn) {
 	});
 
 	if (nconf.get('plugins:active')) {
-		nconf.get('plugins:active').forEach((id) => {
+		nconf.get('plugins:active').forEach(id => {
 			pluginMap[id] = pluginMap[id] || {};
 			pluginMap[id].active = true;
 		});
@@ -304,9 +304,7 @@ Plugins.showInstalled = async function () {
 	const dirs = await fs.promises.readdir(Plugins.nodeModulesPath);
 
 	let pluginPaths = await findNodeBBModules(dirs);
-	pluginPaths = pluginPaths.map((dir) =>
-		path.join(Plugins.nodeModulesPath, dir)
-	);
+	pluginPaths = pluginPaths.map(dir => path.join(Plugins.nodeModulesPath, dir));
 
 	async function load(file) {
 		try {
@@ -322,14 +320,14 @@ Plugins.showInstalled = async function () {
 			winston.error(err.stack);
 		}
 	}
-	const plugins = await Promise.all(pluginPaths.map((file) => load(file)));
+	const plugins = await Promise.all(pluginPaths.map(file => load(file)));
 	return plugins.filter(Boolean);
 };
 
 async function findNodeBBModules(dirs) {
 	const pluginPaths = [];
 	await Promise.all(
-		dirs.map(async (dirname) => {
+		dirs.map(async dirname => {
 			const dirPath = path.join(Plugins.nodeModulesPath, dirname);
 			const isDir = await isDirectory(dirPath);
 			if (!isDir) {
@@ -343,7 +341,7 @@ async function findNodeBBModules(dirs) {
 			if (dirname[0] === '@') {
 				const subdirs = await fs.promises.readdir(dirPath);
 				await Promise.all(
-					subdirs.map(async (subdir) => {
+					subdirs.map(async subdir => {
 						if (!pluginNamePattern.test(subdir)) {
 							return;
 						}

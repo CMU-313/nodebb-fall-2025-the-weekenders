@@ -11,11 +11,9 @@ module.exports = {
 
 		await batch.processSortedSet(
 			'users:joindate',
-			async (uids) => {
+			async uids => {
 				progress.incr(uids.length);
-				await db.deleteAll(
-					uids.map((uid) => `uid:${uid}:sessionUUID:sessionId`)
-				);
+				await db.deleteAll(uids.map(uid => `uid:${uid}:sessionUUID:sessionId`));
 			},
 			{
 				batch: 500,

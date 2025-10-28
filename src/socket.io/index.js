@@ -44,7 +44,7 @@ Sockets.init = async function (server) {
 		transports: nconf.get('socket.io:transports') || ['polling', 'websocket'],
 		cookie: false,
 		allowRequest: (req, callback) => {
-			authorize(req, (err) => {
+			authorize(req, err => {
 				if (err) {
 					return callback(err);
 				}
@@ -251,7 +251,7 @@ function requireModules() {
 		'uploads',
 	];
 
-	modules.forEach((module) => {
+	modules.forEach(module => {
 		Namespaces[module] = require(`./${module}`);
 	});
 }
@@ -297,7 +297,7 @@ async function validateSession(socket, errorMsg) {
 }
 
 const cookieParserAsync = util.promisify((req, callback) =>
-	cookieParser(req, {}, (err) => callback(err))
+	cookieParser(req, {}, err => callback(err))
 );
 
 async function authorize(request, callback) {

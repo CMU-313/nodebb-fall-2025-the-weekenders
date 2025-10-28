@@ -26,7 +26,7 @@ define('admin/modules/checkboxRowSelector', function () {
 			.find('input:not([disabled]):visible')
 			.toArray();
 		const $toggler = $(checkboxes.shift());
-		const rowState = checkboxes.length && checkboxes.every((el) => el.checked);
+		const rowState = checkboxes.length && checkboxes.every(el => el.checked);
 		$toggler.prop('checked', rowState);
 	};
 

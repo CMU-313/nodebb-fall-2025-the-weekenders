@@ -43,7 +43,7 @@ define('quickreply', [
 		$(window).trigger('composer:autocomplete:init', data);
 		QuickReply._autocomplete = autocomplete.setup(data);
 
-		mousetrap.bind('ctrl+return', (e) => {
+		mousetrap.bind('ctrl+return', e => {
 			if (e.target === element.get(0)) {
 				components.get('topic/quickreply/button').get(0).click();
 			}
@@ -60,7 +60,7 @@ define('quickreply', [
 			route: '/api/post/upload',
 			callback: function (uploads) {
 				let text = element.val();
-				uploads.forEach((upload) => {
+				uploads.forEach(upload => {
 					text =
 						text +
 						(text ? '\n' : '') +
@@ -137,7 +137,7 @@ define('quickreply', [
 			}, 1000)
 		);
 
-		components.get('topic/quickreply/expand').on('click', (e) => {
+		components.get('topic/quickreply/expand').on('click', e => {
 			e.preventDefault();
 			storage.removeItem(qrDraftId);
 			const textEl = components.get('topic/quickreply/text');

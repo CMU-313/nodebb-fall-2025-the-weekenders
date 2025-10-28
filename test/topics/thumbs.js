@@ -35,7 +35,7 @@ describe('Topic thumbs', () => {
 		'https://example.org',
 	];
 
-	const relativeThumbPaths = thumbPaths.map((path) =>
+	const relativeThumbPaths = thumbPaths.map(path =>
 		path.replace(nconf.get('upload_path'), '')
 	);
 

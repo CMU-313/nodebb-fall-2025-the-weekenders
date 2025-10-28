@@ -24,7 +24,7 @@ ajaxify.widgets = { render: render };
 		history.scrollRestoration = 'manual';
 	}
 
-	ajaxify.check = (item) => {
+	ajaxify.check = item => {
 		/**
 		 * returns:
 		 *   true  (ajaxify OK)
@@ -53,7 +53,7 @@ ajaxify.widgets = { render: render };
 			config.relative_path
 		);
 
-		const hrefEmpty = (href) =>
+		const hrefEmpty = href =>
 			href === undefined || href === '' || href === 'javascript:;';
 
 		if (item instanceof Element) {
@@ -312,7 +312,7 @@ ajaxify.widgets = { render: render };
 		hooks.fire('action:ajaxify.loadingTemplates', {});
 		benchpress
 			.render(tpl_url, data)
-			.then((rendered) => translator.translate(rendered))
+			.then(rendered => translator.translate(rendered))
 			.then(function (translated) {
 				translated = translator.unescape(translated);
 				$('body').removeClass(previousBodyClass).addClass(data.bodyClass);
@@ -499,7 +499,7 @@ ajaxify.widgets = { render: render };
 
 		// Hint: useful if you want to load a module on a specific page (append module name to `scripts`)
 		hooks.fire('action:script.load', data);
-		hooks.fire('filter:script.load', data).then((data) => {
+		hooks.fire('filter:script.load', data).then(data => {
 			// Require and parse modules
 			let outstanding = data.scripts.length;
 
@@ -625,14 +625,14 @@ ajaxify.widgets = { render: render };
 			'[component="header/avatar"]',
 		]
 			.map(
-				(el) =>
+				el =>
 					document.querySelector(`${el} .dropdown-menu.show`) ||
 					document.querySelector(`${el} + .dropdown-menu.show`)
 			)
 			.filter(Boolean);
 
 		if (elements.length) {
-			elements.forEach((el) => {
+			elements.forEach(el => {
 				el.classList.remove('show');
 			});
 		}
@@ -648,7 +648,7 @@ ajaxify.widgets = { render: render };
 })();
 
 $(document).ready(function () {
-	window.addEventListener('popstate', (ev) => {
+	window.addEventListener('popstate', ev => {
 		if (ev !== null && ev.state) {
 			if (ev.state.url === null && ev.state.returnPath !== undefined) {
 				window.history.replaceState(

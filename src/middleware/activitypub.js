@@ -32,10 +32,7 @@ middleware.assertS2S = async function (req, res, next) {
 middleware.verify = async function (req, res, next) {
 	// Verifies the HTTP Signature if present (required for POST)
 	const passthrough = [/\/actor/, /\/uid\/\d+/];
-	if (
-		req.method === 'GET' &&
-		passthrough.some((regex) => regex.test(req.path))
-	) {
+	if (req.method === 'GET' && passthrough.some(regex => regex.test(req.path))) {
 		return next();
 	}
 
@@ -53,7 +50,7 @@ middleware.verify = async function (req, res, next) {
 	if (req.headers.signature) {
 		const keyId = req.headers.signature
 			.split(',')
-			.filter((line) => line.startsWith('keyId="'));
+			.filter(line => line.startsWith('keyId="'));
 		if (keyId.length) {
 			req.uid = keyId.shift().slice(7, -1).replace(/#.*$/, '');
 		}
@@ -73,7 +70,7 @@ middleware.assertPayload = async function (req, res, next) {
 
 	// Sanity-check payload schema
 	const required = ['id', 'type', 'actor', 'object'];
-	if (!required.every((prop) => req.body.hasOwnProperty(prop))) {
+	if (!required.every(prop => req.body.hasOwnProperty(prop))) {
 		activitypub.helpers.log(
 			'[middleware/activitypub] Request body missing required properties.'
 		);
@@ -100,7 +97,7 @@ middleware.assertPayload = async function (req, res, next) {
 		req.body.actor = actor;
 	}
 	if (Array.isArray(actor)) {
-		actor = actor.map((a) => (typeof a === 'string' ? a : a.id));
+		actor = actor.map(a => (typeof a === 'string' ? a : a.id));
 		req.body.actor = actor;
 	}
 
@@ -118,12 +115,12 @@ middleware.assertPayload = async function (req, res, next) {
 	// Origin checking
 	if (typeof object !== 'string' && object.hasOwnProperty('id')) {
 		const actorHostnames = Array.isArray(actor)
-			? actor.map((a) => new URL(a).hostname)
+			? actor.map(a => new URL(a).hostname)
 			: [new URL(actor).hostname];
 		const objectHostname = new URL(object.id).hostname;
 		// require that all actors have the same hostname as the object for now
 		if (
-			!actorHostnames.every((actorHostname) => actorHostname === objectHostname)
+			!actorHostnames.every(actorHostname => actorHostname === objectHostname)
 		) {
 			activitypub.helpers.log(
 				'[middleware/activitypub] Origin check failed, stripping object down to id.'
@@ -148,7 +145,7 @@ middleware.assertPayload = async function (req, res, next) {
 		signature
 			.split(',')
 			.filter(Boolean)
-			.map((v) => {
+			.map(v => {
 				const index = v.indexOf('=');
 				return [v.substring(0, index), v.slice(index + 1)];
 			})
@@ -172,7 +169,7 @@ middleware.resolveObjects = async function (req, res, next) {
 	if (
 		type !== 'Delete' &&
 		(typeof object === 'string' ||
-			(Array.isArray(object) && object.every((o) => typeof o === 'string')))
+			(Array.isArray(object) && object.every(o => typeof o === 'string')))
 	) {
 		activitypub.helpers.log('[middleware/activitypub] Resolving object(s)...');
 		try {
@@ -198,7 +195,7 @@ middleware.normalize = async function (req, res, next) {
 	const { object } = body;
 
 	// Ensure `to` and `cc` are arrays in the object
-	['to', 'cc'].forEach((prop) => {
+	['to', 'cc'].forEach(prop => {
 		if (object[prop] && typeof object[prop] === 'string') {
 			object[prop] = [object[prop]];
 		}

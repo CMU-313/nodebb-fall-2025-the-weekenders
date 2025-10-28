@@ -26,7 +26,7 @@ define('admin/extend/plugins', [
 			const btn = $(this);
 
 			const pluginData = ajaxify.data.installed.find(
-				(plugin) => plugin.id === pluginID
+				plugin => plugin.id === pluginID
 			);
 			if (!pluginData) {
 				return;
@@ -208,7 +208,7 @@ define('admin/extend/plugins', [
 				}
 
 				const tabEls = document.querySelectorAll('.plugins .tab-pane');
-				tabEls.forEach((tabEl) => {
+				tabEls.forEach(tabEl => {
 					const remaining = tabEl.querySelectorAll('li:not(.hide)').length;
 					const noticeEl = tabEl.querySelector('.no-plugins');
 					if (noticeEl) {
@@ -312,7 +312,7 @@ define('admin/extend/plugins', [
 	async function searchAllPlugins(term) {
 		const { download, incompatible } = ajaxify.data;
 		const all = term ? download.concat(incompatible) : download;
-		const found = all.filter((p) => p && p.name.includes(term)).slice(0, 100);
+		const found = all.filter(p => p && p.name.includes(term)).slice(0, 100);
 		const html = await app.parseAndTranslate(
 			'admin/extend/plugins',
 			'download',

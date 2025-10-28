@@ -31,7 +31,7 @@ define('forum/account/edit/username', [
 
 			api
 				.put('/users/' + userData.uid, userData)
-				.then((response) => {
+				.then(response => {
 					const userslug = slugify(userData.username);
 					if (
 						userData.username &&

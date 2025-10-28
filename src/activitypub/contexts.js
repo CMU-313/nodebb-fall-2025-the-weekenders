@@ -91,7 +91,7 @@ Contexts.getItems = async (uid, id, options) => {
 
 	if (items) {
 		items = await Promise.all(
-			items.map(async (item) =>
+			items.map(async item =>
 				activitypub.helpers.isUri(item)
 					? parseString(uid, item)
 					: parseItem(uid, item)
@@ -122,7 +122,7 @@ Contexts.getItems = async (uid, id, options) => {
 				root: false,
 				object: !isUrl && next,
 			})
-		).forEach((item) => {
+		).forEach(item => {
 			chain.add(item);
 		});
 
@@ -134,7 +134,7 @@ Contexts.getItems = async (uid, id, options) => {
 		? options.input
 		: options.input.id;
 	const inCollection = Array.from(chain)
-		.map((p) => p.pid)
+		.map(p => p.pid)
 		.includes(inputId);
 	if (!inCollection) {
 		const item = activitypub.helpers.isUri(options.input)

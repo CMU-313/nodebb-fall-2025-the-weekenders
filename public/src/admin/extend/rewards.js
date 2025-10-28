@@ -84,7 +84,7 @@ define('admin/extend/rewards', [
 		let html = '';
 
 		const selectedReward = available.find(
-			(reward) => reward.rid === el.attr('data-selected')
+			reward => reward.rid === el.attr('data-selected')
 		);
 		if (selectedReward) {
 			inputs = selectedReward.inputs;

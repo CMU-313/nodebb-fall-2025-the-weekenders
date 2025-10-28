@@ -103,7 +103,7 @@ privsGlobal.getType = function (privilege) {
 
 privsGlobal.getUserPrivilegeList = () => Array.from(_privilegeMap.keys());
 privsGlobal.getGroupPrivilegeList = () =>
-	Array.from(_privilegeMap.keys()).map((privilege) => `groups:${privilege}`);
+	Array.from(_privilegeMap.keys()).map(privilege => `groups:${privilege}`);
 privsGlobal.getPrivilegeList = async () => {
 	const [user, group] = await Promise.all([
 		privsGlobal.getUserPrivilegeList(),
@@ -138,7 +138,7 @@ privsGlobal.get = async function (uid) {
 		user.isAdministrator(uid),
 	]);
 
-	const combined = userPrivileges.map((allowed) => allowed || isAdministrator);
+	const combined = userPrivileges.map(allowed => allowed || isAdministrator);
 	const privData = _.zipObject(userPrivilegeList, combined);
 
 	return await plugins.hooks.fire('filter:privileges.global.get', privData);
@@ -151,7 +151,7 @@ privsGlobal.can = async function (privilege, uid) {
 		helpers.isAllowedTo(isArray ? privilege : [privilege], uid, 0),
 	]);
 	return isArray
-		? isUserAllowedTo.map((allowed) => isAdministrator || allowed)
+		? isUserAllowedTo.map(allowed => isAdministrator || allowed)
 		: isAdministrator || isUserAllowedTo[0];
 };
 

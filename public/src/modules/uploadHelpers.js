@@ -53,7 +53,7 @@ define('uploadHelpers', ['alerts'], function (alerts) {
 						uploadForm: formEl,
 						upload: {
 							files: files,
-							fileNames: Array.from(files).map((f) => f.name),
+							fileNames: Array.from(files).map(f => f.name),
 						},
 						callback: options.callback,
 					});

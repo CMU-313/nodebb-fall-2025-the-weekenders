@@ -56,7 +56,7 @@ categoriesController.getAll = async function (req, res) {
 		);
 		const childCids = _.flatten(
 			await Promise.all(
-				rootChildren.map((cid) => categories.getChildrenCids(cid))
+				rootChildren.map(cid => categories.getChildrenCids(cid))
 			)
 		);
 		return [rootCid].concat(rootChildren.concat(childCids));
@@ -114,7 +114,7 @@ categoriesController.getAll = async function (req, res) {
 				c.subCategoriesPerPage / meta.config.categoriesPerPage
 			);
 			c.children = c.children.slice(0, c.subCategoriesPerPage);
-			c.children.forEach((c) => trim(c));
+			c.children.forEach(c => trim(c));
 		}
 	}
 	if (rootCid && tree[0] && Array.isArray(tree[0].children)) {
@@ -157,9 +157,9 @@ async function buildBreadcrumbs(categoryData, url) {
 	const allCrumbs = await helpers.buildCategoryBreadcrumbs(
 		categoryData.parentCid
 	);
-	const crumbs = allCrumbs.filter((c) => c.cid);
+	const crumbs = allCrumbs.filter(c => c.cid);
 
-	crumbs.forEach((c) => {
+	crumbs.forEach(c => {
 		c.url = `${url}?cid=${c.cid}`;
 	});
 	crumbs.unshift({
@@ -196,7 +196,7 @@ categoriesController.getFederation = async function (req, res) {
 			helpers.getSelectedCategory(cid),
 		]);
 
-	const following = [..._following, ...pending].map((entry) => ({
+	const following = [..._following, ...pending].map(entry => ({
 		id: entry,
 		approved: !pending.includes(entry),
 	}));

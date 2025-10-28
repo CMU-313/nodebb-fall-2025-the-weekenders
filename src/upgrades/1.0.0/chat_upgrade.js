@@ -21,10 +21,10 @@ module.exports = {
 				let currentMid = 1;
 
 				async.whilst(
-					(next) => {
+					next => {
 						next(null, currentMid <= globalData.nextMid);
 					},
-					(next) => {
+					next => {
 						db.getObject(`message:${currentMid}`, (err, message) => {
 							if (err || !message) {
 								winston.verbose('skipping chat message ', currentMid);
@@ -68,7 +68,7 @@ module.exports = {
 								winston.verbose(
 									`adding message ${currentMid} to existing roomID ${roomId}`
 								);
-								addMessageToUids(rooms[pairID], (err) => {
+								addMessageToUids(rooms[pairID], err => {
 									if (err) {
 										return next(err);
 									}
@@ -109,7 +109,7 @@ module.exports = {
 											addMessageToUids(roomId, next);
 										},
 									],
-									(err) => {
+									err => {
 										if (err) {
 											return next(err);
 										}

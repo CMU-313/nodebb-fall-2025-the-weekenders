@@ -15,7 +15,7 @@ const slugify = require('../slugify');
 const translator = require('../translator');
 
 module.exports = function (Posts) {
-	pubsub.on('post:edit', (pid) => Posts.clearCachedPost(pid));
+	pubsub.on('post:edit', pid => Posts.clearCachedPost(pid));
 
 	Posts.edit = async function (data) {
 		const { _activitypub } = data;
@@ -152,7 +152,7 @@ module.exports = function (Posts) {
 			Array.isArray(data.tags) &&
 			!_.isEqual(
 				data.tags,
-				topicData.tags.map((tag) => tag.value)
+				topicData.tags.map(tag => tag.value)
 			);
 
 		if (tagsupdated) {

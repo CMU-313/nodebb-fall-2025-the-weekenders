@@ -11,9 +11,9 @@ module.exports = {
 
 		await batch.processSortedSet(
 			'topics:tid',
-			async (tids) => {
+			async tids => {
 				await Promise.all(
-					tids.map(async (tid) => {
+					tids.map(async tid => {
 						progress.incr();
 						const topicData = await db.getObjectFields(`topic:${tid}`, [
 							'cid',

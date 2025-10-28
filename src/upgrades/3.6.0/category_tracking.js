@@ -16,15 +16,15 @@ module.exports = {
 
 		await batch.processSortedSet(
 			`users:joindate`,
-			async (uids) => {
+			async uids => {
 				const userSettings = await db.getObjects(
-					uids.map((uid) => `user:${uid}:settings`)
+					uids.map(uid => `user:${uid}:settings`)
 				);
 				const change = userSettings.filter(
-					(s) => s && s.categoryWatchState === 'watching'
+					s => s && s.categoryWatchState === 'watching'
 				);
 				await db.setObjectBulk(
-					change.map((s) => [
+					change.map(s => [
 						`user:${s.uid}:settings`,
 						{ categoryWatchState: 'tracking' },
 					])

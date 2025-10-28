@@ -14,8 +14,8 @@ define('admin/appearance/skins', [
 		$.ajax({
 			method: 'get',
 			url: 'https://bootswatch.com/api/5.json',
-		}).done((bsData) => {
-			hooks.on('action:settings.sorted-list.loaded', (data) => {
+		}).done(bsData => {
+			hooks.on('action:settings.sorted-list.loaded', data => {
 				if (data.hash === 'custom-skins') {
 					// slugify all custom-skin ids after load
 					$('.custom-skin-settings [data-type="list"] [data-theme]').each(

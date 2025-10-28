@@ -13,11 +13,11 @@ module.exports = {
 
 		await batch.processSortedSet(
 			'users:joindate',
-			async (uids) => {
-				const keys = uids.map((uid) => `user:${uid}:settings`);
+			async uids => {
+				const keys = uids.map(uid => `user:${uid}:settings`);
 				const [userSettings, followingUids] = await Promise.all([
 					db.getObjects(keys),
-					db.getSortedSetsMembers(uids.map((uid) => `following:${uid}`)),
+					db.getSortedSetsMembers(uids.map(uid => `following:${uid}`)),
 				]);
 
 				const bulkSet = [];

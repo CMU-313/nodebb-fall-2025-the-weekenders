@@ -27,7 +27,7 @@ module.exports = function (Messaging) {
 			return [];
 		}
 
-		const keys = mids.map((mid) => `message:${mid}`);
+		const keys = mids.map(mid => `message:${mid}`);
 		const messages = await db.getObjects(keys, fields);
 
 		return await Promise.all(
@@ -71,7 +71,7 @@ module.exports = function (Messaging) {
 			.filter(Boolean);
 		messages = await user.blocks.filter(uid, 'fromuid', messages);
 		const users = await user.getUsersFields(
-			messages.map((msg) => msg && msg.fromuid),
+			messages.map(msg => msg && msg.fromuid),
 			['uid', 'username', 'userslug', 'picture', 'status', 'banned']
 		);
 
@@ -155,7 +155,7 @@ module.exports = function (Messaging) {
 
 	async function addParentMessages(messages, uid, roomId) {
 		let parentMids = messages
-			.map((msg) =>
+			.map(msg =>
 				msg && msg.hasOwnProperty('toMid') ? parseInt(msg.toMid, 10) : null
 			)
 			.filter(Boolean);
@@ -174,7 +174,7 @@ module.exports = function (Messaging) {
 			'timestamp',
 			'deleted',
 		]);
-		const parentUids = _.uniq(parentMessages.map((msg) => msg && msg.fromuid));
+		const parentUids = _.uniq(parentMessages.map(msg => msg && msg.fromuid));
 		const usersMap = _.zipObject(
 			parentUids,
 			await user.getUsersFields(parentUids, [
@@ -186,13 +186,13 @@ module.exports = function (Messaging) {
 		);
 
 		await Promise.all(
-			parentMessages.map(async (parentMsg) => {
+			parentMessages.map(async parentMsg => {
 				if (parentMsg.deleted && parentMsg.fromuid !== parseInt(uid, 10)) {
 					parentMsg.content = `<p>[[modules:chat.message-deleted]]</p>`;
 					return;
 				}
 				const foundMsg = messages.find(
-					(msg) => parseInt(msg.mid, 10) === parseInt(parentMsg.mid, 10)
+					msg => parseInt(msg.mid, 10) === parseInt(parentMsg.mid, 10)
 				);
 				if (foundMsg) {
 					parentMsg.content = foundMsg.content;
@@ -210,7 +210,7 @@ module.exports = function (Messaging) {
 			}
 		});
 
-		messages.forEach((msg) => {
+		messages.forEach(msg => {
 			if (parents[msg.toMid]) {
 				msg.parent = parents[msg.toMid];
 				msg.parent.mid = msg.toMid;
@@ -220,7 +220,7 @@ module.exports = function (Messaging) {
 
 	async function parseMessages(messages, uid, roomId, isNew) {
 		await Promise.all(
-			messages.map(async (msg) => {
+			messages.map(async msg => {
 				if (msg.deleted && !msg.isOwner) {
 					msg.content = `<p>[[modules:chat.message-deleted]]</p>`;
 					return;

@@ -40,13 +40,13 @@ module.exports = function (Topics) {
 		} else {
 			const pidsDatetime = (
 				await db.sortedSetScores(`tid:${fromTid}:posts`, pids)
-			).map((t) => t || 0);
+			).map(t => t || 0);
 			const map = pids.reduce(
 				(map, pid, idx) => map.set(pidsDatetime[idx], pid),
 				new Map()
 			);
 			pidsDatetime.sort((a, b) => a - b);
-			pids = pidsDatetime.map((key) => map.get(key));
+			pids = pidsDatetime.map(key => map.get(key));
 		}
 
 		const mainPid = pids[0];

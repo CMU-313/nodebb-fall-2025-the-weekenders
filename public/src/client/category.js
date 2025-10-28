@@ -97,7 +97,7 @@ define('forum/category', [
 			api.put(
 				`/categories/${encodeURIComponent(cid)}/watch`,
 				{ state },
-				(err) => {
+				err => {
 					if (err) {
 						return alerts.error(err);
 					}

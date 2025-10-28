@@ -12,7 +12,7 @@ module.exports = {
 
 		await batch.processSortedSet(
 			'posts:pid',
-			async (pids) => {
+			async pids => {
 				const postData = await posts.getPostsFields(pids, [
 					'pid',
 					'uid',

@@ -14,12 +14,12 @@ describe('ui: most helpful sort/badge', () => {
 			(u1, u2) => (u2.helpfulnessScore || 0) - (u1.helpfulnessScore || 0)
 		);
 		assert.deepStrictEqual(
-			users.map((u) => u.username),
+			users.map(u => u.username),
 			['b', 'c', 'a']
 		);
 
 		// Badge/neutral display logic
-		const badgeText = (score) => (score > 0 ? String(score) : '');
+		const badgeText = score => (score > 0 ? String(score) : '');
 		assert.strictEqual(badgeText(10), '10');
 		assert.strictEqual(badgeText(0), '');
 	});

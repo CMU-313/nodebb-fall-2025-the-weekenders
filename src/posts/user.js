@@ -23,7 +23,7 @@ module.exports = function (Posts) {
 				: privileges.categories.filterUids('signature', 0, uids),
 		]);
 		const uidsSignatureSet = new Set(
-			signatureUids.map((uid) => parseInt(uid, 10))
+			signatureUids.map(uid => parseInt(uid, 10))
 		);
 		const groupsMap = await getGroupsMap(userData);
 
@@ -40,7 +40,7 @@ module.exports = function (Posts) {
 		});
 
 		const result = await Promise.all(
-			userData.map(async (userData) => {
+			userData.map(async userData => {
 				const [isMemberOfGroups, signature, customProfileInfo] =
 					await Promise.all([
 						checkGroupMembership(userData.uid, userData.groupTitleArray),
@@ -133,11 +133,11 @@ module.exports = function (Posts) {
 
 	async function getGroupsMap(userData) {
 		const groupTitles = _.uniq(
-			_.flatten(userData.map((u) => u && u.groupTitleArray))
+			_.flatten(userData.map(u => u && u.groupTitleArray))
 		);
 		const groupsMap = {};
 		const groupsData = await groups.getGroupsData(groupTitles);
-		groupsData.forEach((group) => {
+		groupsData.forEach(group => {
 			if (group && group.userTitleEnabled && !group.hidden) {
 				groupsMap[group.name] = {
 					name: group.name,
@@ -187,7 +187,7 @@ module.exports = function (Posts) {
 			return isArray ? pids.map(() => false) : false;
 		}
 		const postData = await Posts.getPostsFields(pids, ['uid']);
-		const result = postData.map((post) => post && post.uid === uid);
+		const result = postData.map(post => post && post.uid === uid);
 		return isArray ? result : result[0];
 	};
 
@@ -214,8 +214,8 @@ module.exports = function (Posts) {
 			'upvotes',
 			'downvotes',
 		]);
-		postData = postData.filter((p) => p.pid && p.uid !== parseInt(toUid, 10));
-		pids = postData.map((p) => p.pid);
+		postData = postData.filter(p => p.pid && p.uid !== parseInt(toUid, 10));
+		pids = postData.map(p => p.pid);
 
 		const cids = await Posts.getCidsByPids(pids);
 
@@ -249,7 +249,7 @@ module.exports = function (Posts) {
 
 		await Promise.all([
 			db.setObjectField(
-				pids.map((pid) => `post:${pid}`),
+				pids.map(pid => `post:${pid}`),
 				'uid',
 				toUid
 			),
@@ -283,9 +283,9 @@ module.exports = function (Posts) {
 	}
 
 	async function updateTopicPosters(postData, toUid) {
-		const postsByTopic = _.groupBy(postData, (p) => String(p.tid));
+		const postsByTopic = _.groupBy(postData, p => String(p.tid));
 		await async.eachOf(postsByTopic, async (posts, tid) => {
-			const postsByUser = _.groupBy(posts, (p) => String(p.uid));
+			const postsByUser = _.groupBy(posts, p => String(p.uid));
 			await db.sortedSetIncrBy(`tid:${tid}:posters`, posts.length, toUid);
 			await async.eachOf(postsByUser, async (posts, uid) => {
 				await db.sortedSetIncrBy(`tid:${tid}:posters`, -posts.length, uid);
@@ -297,7 +297,7 @@ module.exports = function (Posts) {
 	}
 
 	async function handleMainPidOwnerChange(postData, toUid) {
-		const tids = _.uniq(postData.map((p) => p.tid));
+		const tids = _.uniq(postData.map(p => p.tid));
 		const topicData = await topics.getTopicsFields(tids, [
 			'tid',
 			'cid',
@@ -309,9 +309,7 @@ module.exports = function (Posts) {
 		]);
 		const tidToTopic = _.zipObject(tids, topicData);
 
-		const mainPosts = postData.filter(
-			(p) => p.pid === tidToTopic[p.tid].mainPid
-		);
+		const mainPosts = postData.filter(p => p.pid === tidToTopic[p.tid].mainPid);
 		if (!mainPosts.length) {
 			return;
 		}
@@ -319,7 +317,7 @@ module.exports = function (Posts) {
 		const bulkAdd = [];
 		const bulkRemove = [];
 		const postsByUser = {};
-		mainPosts.forEach((post) => {
+		mainPosts.forEach(post => {
 			bulkRemove.push([`cid:${post.cid}:uid:${post.uid}:tids`, post.tid]);
 			bulkRemove.push([`uid:${post.uid}:topics`, post.tid]);
 
@@ -339,7 +337,7 @@ module.exports = function (Posts) {
 
 		await Promise.all([
 			db.setObjectField(
-				mainPosts.map((p) => `topic:${p.tid}`),
+				mainPosts.map(p => `topic:${p.tid}`),
 				'uid',
 				toUid
 			),
@@ -349,7 +347,7 @@ module.exports = function (Posts) {
 			reduceTopicCounts(postsByUser),
 		]);
 
-		const changedTopics = mainPosts.map((p) => tidToTopic[p.tid]);
+		const changedTopics = mainPosts.map(p => tidToTopic[p.tid]);
 		plugins.hooks.fire('action:topic.changeOwner', {
 			topics: _.cloneDeep(changedTopics),
 			toUid: toUid,
@@ -357,7 +355,7 @@ module.exports = function (Posts) {
 	}
 
 	async function reduceTopicCounts(postsByUser) {
-		await async.eachSeries(Object.keys(postsByUser), async (uid) => {
+		await async.eachSeries(Object.keys(postsByUser), async uid => {
 			const posts = postsByUser[uid];
 			const exists = await user.exists(uid);
 			if (exists) {
@@ -375,7 +373,7 @@ module.exports = function (Posts) {
 			return await filterPidsBySingleUid(pids, uids);
 		}
 		const pidsArr = await Promise.all(
-			uids.map((uid) => Posts.filterPidsByUid(pids, uid))
+			uids.map(uid => Posts.filterPidsByUid(pids, uid))
 		);
 		return _.union(...pidsArr);
 	};

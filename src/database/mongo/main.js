@@ -31,11 +31,11 @@ module.exports = function (module) {
 				.toArray();
 
 			const map = Object.create(null);
-			data.forEach((item) => {
+			data.forEach(item => {
 				map[item._key] = true;
 			});
 
-			return key.map((key) => !!map[key]);
+			return key.map(key => !!map[key]);
 		}
 
 		const item = await module.client.collection('objects').findOne(
@@ -104,11 +104,11 @@ module.exports = function (module) {
 			.toArray();
 
 		const map = {};
-		data.forEach((d) => {
+		data.forEach(d => {
 			map[d._key] = d.data;
 		});
 
-		return keys.map((k) => (map.hasOwnProperty(k) ? map[k] : null));
+		return keys.map(k => (map.hasOwnProperty(k) ? map[k] : null));
 	};
 
 	module.set = async function (key, value) {

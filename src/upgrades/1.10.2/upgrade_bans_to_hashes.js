@@ -13,7 +13,7 @@ module.exports = {
 
 		await batch.processSortedSet(
 			'users:joindate',
-			async (uids) => {
+			async uids => {
 				for (const uid of uids) {
 					progress.incr();
 					const [bans, reasons, userData] = await Promise.all([
@@ -41,7 +41,7 @@ module.exports = {
 						// process ban history
 						for (const ban of bans) {
 							const reasonData = reasons.find(
-								(reasonData) => reasonData.score === ban.score
+								reasonData => reasonData.score === ban.score
 							);
 							const banKey = `uid:${uid}:ban:${ban.score}`;
 							const data = {

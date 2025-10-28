@@ -26,7 +26,7 @@ prestart.setupWinston();
 const db = require('../../database');
 const batch = require('../../batch');
 
-process.on('message', async (msg) => {
+process.on('message', async msg => {
 	if (msg && msg.uid) {
 		await db.init();
 		await db.initSessionStore();
@@ -71,9 +71,9 @@ process.on('message', async (msg) => {
 		let chatData = [];
 		await batch.processSortedSet(
 			`uid:${targetUid}:chat:rooms`,
-			async (roomIds) => {
+			async roomIds => {
 				const result = await Promise.all(
-					roomIds.map((roomId) => getRoomMessages(targetUid, roomId))
+					roomIds.map(roomId => getRoomMessages(targetUid, roomId))
 				);
 				chatData = chatData.concat(_.flatten(result));
 			},
@@ -112,14 +112,14 @@ async function getRoomMessages(uid, roomId) {
 	let data = [];
 	await batch.processSortedSet(
 		`chat:room:${roomId}:mids`,
-		async (mids) => {
+		async mids => {
 			const messageData = await db.getObjects(
-				mids.map((mid) => `message:${mid}`)
+				mids.map(mid => `message:${mid}`)
 			);
 			data = data.concat(
 				messageData
-					.filter((m) => m && m.fromuid === uid && !m.system)
-					.map((m) => ({ content: m.content, timestamp: m.timestamp }))
+					.filter(m => m && m.fromuid === uid && !m.system)
+					.map(m => ({ content: m.content, timestamp: m.timestamp }))
 			);
 		},
 		{ batch: 500, interval: 1000 }
@@ -133,21 +133,19 @@ async function getSetData(set, keyPrefix, uid) {
 	let data = [];
 	await batch.processSortedSet(
 		set,
-		async (ids) => {
+		async ids => {
 			if (keyPrefix === 'post:') {
 				ids = await privileges.posts.filter('topics:read', ids, uid);
 			} else if (keyPrefix === 'topic:') {
 				ids = await privileges.topics.filterTids('topics:read', ids, uid);
 			}
-			let objData = await db.getObjects(ids.map((id) => keyPrefix + id));
+			let objData = await db.getObjects(ids.map(id => keyPrefix + id));
 			if (keyPrefix === 'post:') {
-				objData = objData.map((o) =>
-					_.pick(o, ['pid', 'content', 'timestamp'])
-				);
+				objData = objData.map(o => _.pick(o, ['pid', 'content', 'timestamp']));
 			} else if (keyPrefix === 'topic:') {
-				objData = objData.map((o) => _.pick(o, ['tid', 'title', 'timestamp']));
+				objData = objData.map(o => _.pick(o, ['tid', 'title', 'timestamp']));
 			} else if (keyPrefix === 'user:') {
-				objData = objData.map((o) => _.pick(o, ['uid', 'username']));
+				objData = objData.map(o => _.pick(o, ['uid', 'username']));
 			}
 			data = data.concat(objData);
 		},

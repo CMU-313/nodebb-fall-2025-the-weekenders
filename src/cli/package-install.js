@@ -182,7 +182,7 @@ pkgInstall.preserveExtraneousPlugins = () => {
 
 	const packages = fs
 		.readdirSync(paths.nodeModules)
-		.filter((pkgName) => pluginNamePattern.test(pkgName));
+		.filter(pkgName => pluginNamePattern.test(pkgName));
 
 	const packageContents = JSON.parse(
 		fs.readFileSync(paths.currentPackage, 'utf8')
@@ -190,7 +190,7 @@ pkgInstall.preserveExtraneousPlugins = () => {
 
 	const extraneous = packages
 		// only extraneous plugins (ones not in package.json) which are not links
-		.filter((pkgName) => {
+		.filter(pkgName => {
 			const extraneous = !packageContents.dependencies.hasOwnProperty(pkgName);
 			const isLink = fs
 				.lstatSync(path.join(paths.nodeModules, pkgName))

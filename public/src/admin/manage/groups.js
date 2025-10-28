@@ -40,7 +40,7 @@ define('admin/manage/groups', [
 		$('#create').on('click', function () {
 			app
 				.parseAndTranslate('admin/partials/create_group_modal', {})
-				.then((html) => {
+				.then(html => {
 					html.modal('show');
 
 					html.on('shown.bs.modal', function () {
@@ -69,7 +69,7 @@ define('admin/manage/groups', [
 
 							api
 								.post('/groups', submitObj)
-								.then((response) => {
+								.then(response => {
 									createModalError.addClass('hide');
 									createGroupName.val('');
 									createModal.on('hidden.bs.modal', function () {
@@ -77,7 +77,7 @@ define('admin/manage/groups', [
 									});
 									createModal.modal('hide');
 								})
-								.catch((err) => {
+								.catch(err => {
 									if (!utils.hasLanguageKey(err.status.message)) {
 										err.status.message =
 											'[[admin/manage/groups:alerts.create-failure]]';

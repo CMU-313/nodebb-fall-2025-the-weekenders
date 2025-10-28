@@ -53,17 +53,17 @@ Scheduled.handleExpired = async function () {
 async function postTids(tids) {
 	let topicsData = await topics.getTopicsData(tids);
 	// Filter deleted
-	topicsData = topicsData.filter((topicData) => Boolean(topicData));
-	const uids = _.uniq(topicsData.map((topicData) => topicData.uid)).filter(
-		(uid) => uid
+	topicsData = topicsData.filter(topicData => Boolean(topicData));
+	const uids = _.uniq(topicsData.map(topicData => topicData.uid)).filter(
+		uid => uid
 	); // Filter guests topics
 
 	// Restore first to be not filtered for being deleted
 	// Restoring handles "updateRecentTid"
 	await Promise.all(
 		[].concat(
-			topicsData.map((topicData) => topics.restore(topicData.tid)),
-			topicsData.map((topicData) =>
+			topicsData.map(topicData => topics.restore(topicData.tid)),
+			topicsData.map(topicData =>
 				topics.updateLastPostTimeFromLastPid(topicData.tid)
 			)
 		)
@@ -75,7 +75,7 @@ async function postTids(tids) {
 			updateUserLastposttimes(uids, topicsData),
 			updateGroupPosts(topicsData),
 			federatePosts(uids, topicsData),
-			...topicsData.map((topicData) => unpin(topicData.tid, topicData))
+			...topicsData.map(topicData => unpin(topicData.tid, topicData))
 		)
 	);
 }
@@ -151,9 +151,7 @@ async function sendNotifications(uids, topicsData) {
 		uids.map((uid, idx) => [uid, userData[idx]])
 	);
 
-	let postsData = await posts.getPostsData(
-		topicsData.map((t) => t && t.mainPid)
-	);
+	let postsData = await posts.getPostsData(topicsData.map(t => t && t.mainPid));
 	topicsData = topicsData.filter((t, i) => t && postsData[i]);
 	postsData = postsData.filter(Boolean);
 	postsData.forEach((postData, idx) => {
@@ -172,10 +170,8 @@ async function sendNotifications(uids, topicsData) {
 					postsData[idx]
 				)
 			)
-			.concat(postsData.map((p) => topics.notifyTagFollowers(p, p.uid)))
-			.concat(
-				postsData.map((p) => categories.notifyCategoryFollowers(p, p.uid))
-			)
+			.concat(postsData.map(p => topics.notifyTagFollowers(p, p.uid)))
+			.concat(postsData.map(p => categories.notifyCategoryFollowers(p, p.uid)))
 			.concat(
 				topicsData.map((t, idx) =>
 					socketHelpers.notifyNew(t.uid, 'newTopic', {
@@ -193,17 +189,17 @@ async function sendNotifications(uids, topicsData) {
 
 async function updateUserLastposttimes(uids, topicsData) {
 	const lastposttimes = (await user.getUsersFields(uids, ['lastposttime'])).map(
-		(u) => u.lastposttime
+		u => u.lastposttime
 	);
 
 	let tstampByUid = {};
-	topicsData.forEach((tD) => {
+	topicsData.forEach(tD => {
 		tstampByUid[tD.uid] = tstampByUid[tD.uid]
 			? tstampByUid[tD.uid].concat(tD.lastposttime)
 			: [tD.lastposttime];
 	});
 	tstampByUid = Object.fromEntries(
-		Object.entries(tstampByUid).map((uidTimestamp) => [
+		Object.entries(tstampByUid).map(uidTimestamp => [
 			uidTimestamp[0],
 			Math.max(...uidTimestamp[1]),
 		])
@@ -213,7 +209,7 @@ async function updateUserLastposttimes(uids, topicsData) {
 		(uid, idx) => tstampByUid[uid] > lastposttimes[idx]
 	);
 	return Promise.all(
-		uidsToUpdate.map((uid) =>
+		uidsToUpdate.map(uid =>
 			user.setUserField(uid, 'lastposttime', tstampByUid[uid])
 		)
 	);
@@ -221,7 +217,7 @@ async function updateUserLastposttimes(uids, topicsData) {
 
 async function updateGroupPosts(topicsData) {
 	const postsData = await posts.getPostsData(
-		topicsData.map((t) => t && t.mainPid)
+		topicsData.map(t => t && t.mainPid)
 	);
 	await Promise.all(
 		postsData.map(async (post, i) => {

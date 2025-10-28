@@ -46,7 +46,7 @@ module.exports = function (User) {
 		const oldData = await User.getUserFields(updateUid, fields);
 		const updateData = {};
 		await Promise.all(
-			fields.map(async (field) => {
+			fields.map(async field => {
 				if (!(data[field] !== undefined && typeof data[field] === 'string')) {
 					return;
 				}
@@ -100,11 +100,11 @@ module.exports = function (User) {
 	async function validateCustomFields(data) {
 		const keys = await db.getSortedSetRange('user-custom-fields', 0, -1);
 		const fields = (
-			await db.getObjects(keys.map((k) => `user-custom-field:${k}`))
+			await db.getObjects(keys.map(k => `user-custom-field:${k}`))
 		).filter(Boolean);
 		const reputation = await User.getUserField(data.uid, 'reputation');
 
-		fields.forEach((field) => {
+		fields.forEach(field => {
 			const { key, type } = field;
 			if (data.hasOwnProperty(key)) {
 				const value = data[key];
@@ -160,7 +160,7 @@ module.exports = function (User) {
 					const values = JSON.parse(value || '[]');
 					if (
 						!Array.isArray(values) ||
-						!values.every((value) => opts.includes(value))
+						!values.every(value => opts.includes(value))
 					) {
 						throw new Error(
 							tx.compile(
@@ -228,7 +228,7 @@ module.exports = function (User) {
 			throw error;
 		}
 	}
-	User.checkUsername = async (username) => isUsernameAvailable({ username });
+	User.checkUsername = async username => isUsernameAvailable({ username });
 
 	async function isAboutMeValid(callerUid, data) {
 		if (!data.aboutme) {
@@ -294,7 +294,7 @@ module.exports = function (User) {
 			if (!Array.isArray(groupTitles)) {
 				throw new Error('[[error:invalid-group-title]]');
 			}
-			groupTitles.forEach((title) => checkTitle(title));
+			groupTitles.forEach(title => checkTitle(title));
 		} else {
 			groupTitles = [data.groupTitle];
 			checkTitle(data.groupTitle);
@@ -334,7 +334,7 @@ module.exports = function (User) {
 					email: newEmail,
 					force: 1,
 				})
-				.catch((err) =>
+				.catch(err =>
 					winston.error(
 						`[user.create] Validation email failed to send\n[emailer.send] ${err.stack}`
 					)

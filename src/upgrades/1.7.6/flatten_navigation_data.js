@@ -13,7 +13,7 @@ module.exports = {
 		);
 		const order = [];
 		const items = [];
-		data.forEach((item) => {
+		data.forEach(item => {
 			let navItem = JSON.parse(item.value);
 			const keys = Object.keys(navItem);
 			if (keys.length && parseInt(keys[0], 10) >= 0) {

@@ -82,7 +82,7 @@ define('forum/account/edit', [
 
 		api
 			.put('/users/' + userData.uid, userData)
-			.then((res) => {
+			.then(res => {
 				alerts.success('[[user:profile-update-success]]');
 
 				if (res.picture) {

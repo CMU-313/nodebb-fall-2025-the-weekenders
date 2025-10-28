@@ -59,7 +59,7 @@ UserReset.send = async function (email) {
 				template: 'reset',
 				uid: uid,
 			})
-			.catch((err) => winston.error(`[emailer.send] ${err.stack}`));
+			.catch(err => winston.error(`[emailer.send] ${err.stack}`));
 
 		return code;
 	} finally {
@@ -179,7 +179,7 @@ UserReset.cleanByUid = async function (uid) {
 
 	await batch.processSortedSet(
 		'reset:issueDate',
-		async (tokens) => {
+		async tokens => {
 			const results = await db.getObjectFields('reset:uid', tokens);
 			for (const [code, result] of Object.entries(results)) {
 				if (parseInt(result, 10) === uid) {

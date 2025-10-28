@@ -12,7 +12,7 @@ module.exports = {
 
 		const pids = await db.getSortedSetRange('posts:flagged', 0, -1);
 		const postData = await posts.getPostsFields(pids, ['tid']);
-		const tids = postData.map((t) => t.tid);
+		const tids = postData.map(t => t.tid);
 		const topicData = await topics.getTopicsFields(tids, ['deleted']);
 		const toDismiss = topicData
 			.map((t, idx) => (parseInt(t.deleted, 10) === 1 ? pids[idx] : null))
@@ -41,10 +41,10 @@ async function dismissFlag(pid) {
 		]);
 	}
 	const uids = await db.getSortedSetRange(`pid:${pid}:flag:uids`, 0, -1);
-	const nids = uids.map((uid) => `post_flag:${pid}:uid:${uid}`);
+	const nids = uids.map(uid => `post_flag:${pid}:uid:${uid}`);
 
 	await Promise.all([
-		db.deleteAll(nids.map((nid) => `notifications:${nid}`)),
+		db.deleteAll(nids.map(nid => `notifications:${nid}`)),
 		db.sortedSetRemove('notifications', nids),
 		db.delete(`pid:${pid}:flag:uids`),
 		db.sortedSetsRemove(

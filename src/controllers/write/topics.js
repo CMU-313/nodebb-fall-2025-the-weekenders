@@ -152,7 +152,7 @@ Topics.addThumb = async (req, res) => {
 	// Add uploaded files to topic zset
 	if (files && files.length) {
 		await Promise.all(
-			files.map(async (fileObj) => {
+			files.map(async fileObj => {
 				await topics.thumbs.associate({
 					id: req.params.tid,
 					path: fileObj.url,

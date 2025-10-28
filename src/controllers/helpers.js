@@ -66,7 +66,7 @@ helpers.addLinkTags = function (params) {
 		href: `${url}/${params.url}${page}`,
 	});
 
-	params.tags.forEach((rel) => {
+	params.tags.forEach(rel => {
 		rel.href = `${url}/${params.url}${rel.href}`;
 		params.res.locals.linkTags.push(rel);
 	});
@@ -253,7 +253,7 @@ helpers.buildBreadcrumbs = function (crumbs) {
 		},
 	];
 
-	crumbs.forEach((crumb) => {
+	crumbs.forEach(crumb => {
 		if (crumb) {
 			if (crumb.url) {
 				crumb.url = `${utils.isRelativeUrl(crumb.url) ? `${url}/` : ''}${crumb.url}`;
@@ -319,7 +319,7 @@ async function getCategoryData(cids, uid, selectedCid, states, privilege) {
 		['disabledClass']
 	);
 
-	categoriesData.forEach((category) => {
+	categoriesData.forEach(category => {
 		category.selected = selectData.selectedCids.includes(category.cid);
 	});
 	selectData.selectedCids.sort((a, b) => a - b);
@@ -369,7 +369,7 @@ helpers.getVisibleCategories = async function (params) {
 	const cidToCategory = _.zipObject(cids, categoriesData);
 	const cidToWatchState = _.zipObject(cids, watchState);
 
-	return categoriesData.filter((c) => {
+	return categoriesData.filter(c => {
 		if (!c) {
 			return false;
 		}
@@ -400,7 +400,7 @@ helpers.getVisibleCategories = async function (params) {
 		) {
 			cidToCategory[c.parent.cid].children = cidToCategory[
 				c.parent.cid
-			].children.filter((child) => child.cid !== c.cid);
+			].children.filter(child => child.cid !== c.cid);
 		}
 
 		return !shouldBeRemoved;
@@ -411,11 +411,9 @@ helpers.getSelectedCategory = async function (cids) {
 	if (cids && !Array.isArray(cids)) {
 		cids = [cids];
 	}
-	cids = cids && cids.map((cid) => parseInt(cid, 10));
+	cids = cids && cids.map(cid => parseInt(cid, 10));
 	let selectedCategories = await categories.getCategoriesData(cids);
-	const selectedCids = selectedCategories
-		.map((c) => c && c.cid)
-		.filter(Boolean);
+	const selectedCids = selectedCategories.map(c => c && c.cid).filter(Boolean);
 	if (selectedCategories.length > 1) {
 		selectedCategories = {
 			icon: 'fa-plus',
@@ -438,7 +436,7 @@ helpers.getSelectedTag = function (tags) {
 		tags = [tags];
 	}
 	tags = tags || [];
-	const tagData = tags.map((t) => String(t));
+	const tagData = tags.map(t => String(t));
 	let selectedTag = null;
 	if (tagData.length) {
 		selectedTag = {
@@ -457,7 +455,7 @@ helpers.trimChildren = function (category) {
 			0,
 			category.subCategoriesPerPage
 		);
-		category.children.forEach((child) => {
+		category.children.forEach(child => {
 			if (category.isSection) {
 				helpers.trimChildren(child);
 			} else {
@@ -491,7 +489,7 @@ function checkVisibleChildren(c, cidToAllowed, cidToWatchState, states) {
 		return false;
 	}
 	return c.children.some(
-		(c) =>
+		c =>
 			!c.disabled &&
 			((cidToAllowed[c.cid] && states.includes(cidToWatchState[c.cid])) ||
 				checkVisibleChildren(c, cidToAllowed, cidToWatchState, states))

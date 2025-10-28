@@ -639,7 +639,7 @@ module.exports = function (utils, load, warn) {
 				lang = null;
 			}
 			const translations = await Promise.all(
-				keys.map((key) => adaptor.translate(key, lang))
+				keys.map(key => adaptor.translate(key, lang))
 			);
 			if (typeof cb === 'function') {
 				return setTimeout(cb, 0, translations);

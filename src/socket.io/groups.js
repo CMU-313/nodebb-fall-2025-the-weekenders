@@ -82,7 +82,7 @@ SocketGroups.loadMoreMembers = async (socket, data) => {
 	return api.groups.listMembers(socket, data);
 };
 
-SocketGroups.getChatGroups = async (socket) => {
+SocketGroups.getChatGroups = async socket => {
 	sockets.warnDeprecated(socket, 'GET /api/v3/admin/groups');
 
 	const isAdmin = await user.isAdministrator(socket.uid);
@@ -94,7 +94,7 @@ SocketGroups.getChatGroups = async (socket) => {
 
 	// Float system groups to top and return only name/displayName
 	groups.sort((a, b) => b.system - a.system);
-	return groups.map((g) => ({ name: g.name, displayName: g.displayName }));
+	return groups.map(g => ({ name: g.name, displayName: g.displayName }));
 };
 
 SocketGroups.cover = {};

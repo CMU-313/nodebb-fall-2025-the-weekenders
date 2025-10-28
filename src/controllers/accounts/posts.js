@@ -36,7 +36,7 @@ const templateToData = {
 				callerUid,
 				'topics:read'
 			);
-			return cids.map((c) => `cid:${c}:uid:${userData.uid}:pids`);
+			return cids.map(c => `cid:${c}:uid:${userData.uid}:pids`);
 		},
 	},
 	'account/upvoted': {
@@ -65,7 +65,7 @@ const templateToData = {
 				callerUid,
 				'topics:read'
 			);
-			return cids.map((c) => `cid:${c}:uid:${userData.uid}:pids:votes`);
+			return cids.map(c => `cid:${c}:uid:${userData.uid}:pids:votes`);
 		},
 		getTopics: async (sets, req, start, stop) => {
 			let pids = await db.getSortedSetRevRangeByScore(
@@ -81,9 +81,9 @@ const templateToData = {
 			});
 			return { posts: postObjs, nextStart: stop + 1 };
 		},
-		getItemCount: async (sets) => {
+		getItemCount: async sets => {
 			const counts = await Promise.all(
-				sets.map((set) => db.sortedSetCount(set, 1, '+inf'))
+				sets.map(set => db.sortedSetCount(set, 1, '+inf'))
 			);
 			return counts.reduce((acc, val) => acc + val, 0);
 		},
@@ -98,7 +98,7 @@ const templateToData = {
 				callerUid,
 				'topics:read'
 			);
-			return cids.map((c) => `cid:${c}:uid:${userData.uid}:pids:votes`);
+			return cids.map(c => `cid:${c}:uid:${userData.uid}:pids:votes`);
 		},
 		getTopics: async (sets, req, start, stop) => {
 			let pids = await db.getSortedSetRangeByScore(
@@ -114,9 +114,9 @@ const templateToData = {
 			});
 			return { posts: postObjs, nextStart: stop + 1 };
 		},
-		getItemCount: async (sets) => {
+		getItemCount: async sets => {
 			const counts = await Promise.all(
-				sets.map((set) => db.sortedSetCount(set, '-inf', -1))
+				sets.map(set => db.sortedSetCount(set, '-inf', -1))
 			);
 			return counts.reduce((acc, val) => acc + val, 0);
 		},
@@ -148,7 +148,7 @@ const templateToData = {
 				.map((tid, i) => ({ tid: tid, score: scores[i] }))
 				.sort((a, b) => b.score - a.score)
 				.slice(start, stop + 1)
-				.map((t) => t.tid);
+				.map(t => t.tid);
 
 			const topicsData = await topics.getTopics(tids, req.uid);
 			topics.calculateTopicIndices(topicsData, start);
@@ -181,7 +181,7 @@ const templateToData = {
 				callerUid,
 				'topics:read'
 			);
-			return cids.map((c) => `cid:${c}:uid:${userData.uid}:tids`);
+			return cids.map(c => `cid:${c}:uid:${userData.uid}:tids`);
 		},
 	},
 	'account/shares': {
@@ -304,7 +304,7 @@ async function getPostsFromUserSet(template, req, res) {
 		{ url: `${baseUrl}?sort=lastpost`, name: '[[global:lastpost]]' },
 		{ url: `${baseUrl}?sort=firstpost`, name: '[[global:firstpost]]' },
 	];
-	payload.sortOptions.forEach((option) => {
+	payload.sortOptions.forEach(option => {
 		option.selected = option.url.includes(`sort=${req.query.sort}`);
 	});
 

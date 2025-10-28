@@ -26,7 +26,7 @@ define('forum/account/sessions', [
 					.then(() => {
 						parentEl.remove();
 					})
-					.catch((err) => {
+					.catch(err => {
 						try {
 							const errorObj = JSON.parse(err.responseText);
 							if (errorObj.loggedIn === false) {

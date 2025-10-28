@@ -12,9 +12,9 @@ module.exports = {
 
 		await batch.processSortedSet(
 			'flags:datetime',
-			async (flagIds) => {
+			async flagIds => {
 				await Promise.all(
-					flagIds.map(async (flagId) => {
+					flagIds.map(async flagId => {
 						const [reports, reporterUids] = await Promise.all([
 							db.getSortedSetRevRangeWithScores(
 								`flag:${flagId}:reports`,

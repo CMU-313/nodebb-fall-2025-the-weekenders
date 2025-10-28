@@ -80,10 +80,10 @@ Notifications.getMultiple = async function (nids) {
 		return [];
 	}
 
-	const keys = nids.map((nid) => `notifications:${nid}`);
+	const keys = nids.map(nid => `notifications:${nid}`);
 	const notifications = await db.getObjects(keys);
 
-	const userKeys = notifications.map((n) => n && n.from);
+	const userKeys = notifications.map(n => n && n.from);
 	const usersData = await User.getUsersFields(userKeys, [
 		'username',
 		'userslug',
@@ -92,7 +92,7 @@ Notifications.getMultiple = async function (nids) {
 
 	notifications.forEach((notification, index) => {
 		if (notification) {
-			intFields.forEach((field) => {
+			intFields.forEach(field => {
 				if (notification.hasOwnProperty(field)) {
 					notification[field] = utils.isNumber(notification[field])
 						? parseInt(notification[field], 10) || 0
@@ -144,12 +144,12 @@ Notifications.findRelated = async function (mergeIds, set) {
 	// A related notification is one in a zset that has the same mergeId
 	const nids = await db.getSortedSetMembers(set);
 
-	const keys = nids.map((nid) => `notifications:${nid}`);
+	const keys = nids.map(nid => `notifications:${nid}`);
 	const notificationData = await db.getObjectsFields(keys, ['mergeId']);
-	const notificationMergeIds = notificationData.map((notifObj) =>
+	const notificationMergeIds = notificationData.map(notifObj =>
 		String(notifObj.mergeId)
 	);
-	const mergeSet = new Set(mergeIds.map((id) => String(id)));
+	const mergeSet = new Set(mergeIds.map(id => String(id)));
 	return nids.filter((nid, idx) => mergeSet.has(notificationMergeIds[idx]));
 };
 
@@ -193,11 +193,11 @@ Notifications.push = async function (notification, uids) {
 	setTimeout(() => {
 		batch.processArray(
 			uids,
-			async (uids) => {
+			async uids => {
 				await pushToUids(uids, notification);
 			},
 			{ interval: 1000, batch: 500 },
-			(err) => {
+			err => {
 				if (err) {
 					winston.error(err.stack);
 				}
@@ -212,8 +212,8 @@ async function pushToUids(uids, notification) {
 			return;
 		}
 		const cutoff = Date.now() - notificationPruneCutoff;
-		const unreadKeys = uids.map((uid) => `uid:${uid}:notifications:unread`);
-		const readKeys = uids.map((uid) => `uid:${uid}:notifications:read`);
+		const unreadKeys = uids.map(uid => `uid:${uid}:notifications:unread`);
+		const readKeys = uids.map(uid => `uid:${uid}:notifications:read`);
 		await Promise.all([
 			db.sortedSetsAdd(unreadKeys, notification.datetime, notification.nid),
 			db.sortedSetsRemove(readKeys, notification.nid),
@@ -226,7 +226,7 @@ async function pushToUids(uids, notification) {
 		const websockets = require('./socket.io');
 		if (websockets.server) {
 			await Promise.all(
-				uids.map(async (uid) => {
+				uids.map(async uid => {
 					await plugins.hooks.fire('filter:sockets.sendNewNoticationToUid', {
 						uid,
 						notification,
@@ -243,7 +243,7 @@ async function pushToUids(uids, notification) {
 		const uidsToNotify = [];
 		const uidsToEmail = [];
 		const usersSettings = await User.getMultipleUserSettings(uids);
-		usersSettings.forEach((userSettings) => {
+		usersSettings.forEach(userSettings => {
 			const setting =
 				userSettings[`notificationType_${notification.type}`] || 'notification';
 
@@ -325,7 +325,7 @@ async function sendEmail({ uids, notification }, mergeId, reason) {
 	body = posts.relativeToAbsolute(body, posts.urlRegex);
 	body = posts.relativeToAbsolute(body, posts.imgRegex);
 	let errorLogged = false;
-	await async.eachLimit(uids, 3, async (uid) => {
+	await async.eachLimit(uids, 3, async uid => {
 		await emailer
 			.send('notification', uid, {
 				path: notification.path,
@@ -340,7 +340,7 @@ async function sendEmail({ uids, notification }, mergeId, reason) {
 				notification: notification,
 				showUnsubscribe: true,
 			})
-			.catch((err) => {
+			.catch(err => {
 				if (!errorLogged) {
 					winston.error(`[emailer.send] ${err.stack}`);
 					errorLogged = true;
@@ -372,7 +372,7 @@ Notifications.rescind = async function (nids) {
 	await plugins.hooks.fire('static:notifications.rescind', { nids });
 	await Promise.all([
 		db.sortedSetRemove('notifications', nids),
-		db.deleteAll(nids.map((nid) => `notifications:${nid}`)),
+		db.deleteAll(nids.map(nid => `notifications:${nid}`)),
 	]);
 	plugins.hooks.fire('action:notifications.rescind', { nids });
 };
@@ -410,29 +410,27 @@ Notifications.markReadMultiple = async function (nids, uid) {
 		return;
 	}
 
-	let notificationKeys = nids.map((nid) => `notifications:${nid}`);
+	let notificationKeys = nids.map(nid => `notifications:${nid}`);
 	let mergeIds = await db.getObjectsFields(notificationKeys, ['mergeId']);
 	// Isolate mergeIds and find related notifications
-	mergeIds = _.uniq(mergeIds.map((set) => set.mergeId));
+	mergeIds = _.uniq(mergeIds.map(set => set.mergeId));
 
 	const relatedNids = await Notifications.findRelated(
 		mergeIds,
 		`uid:${uid}:notifications:unread`
 	);
 	notificationKeys = _.union(nids, relatedNids).map(
-		(nid) => `notifications:${nid}`
+		nid => `notifications:${nid}`
 	);
 
 	let notificationData = await db.getObjectsFields(notificationKeys, [
 		'nid',
 		'datetime',
 	]);
-	notificationData = notificationData.filter((n) => n && n.nid);
+	notificationData = notificationData.filter(n => n && n.nid);
 
-	nids = notificationData.map((n) => n.nid);
-	const datetimes = notificationData.map(
-		(n) => (n && n.datetime) || Date.now()
-	);
+	nids = notificationData.map(n => n.nid);
+	const datetimes = notificationData.map(n => (n && n.datetime) || Date.now());
 	await Promise.all([
 		db.sortedSetRemove(`uid:${uid}:notifications:unread`, nids),
 		db.sortedSetAdd(`uid:${uid}:notifications:read`, datetimes, nids),
@@ -442,9 +440,9 @@ Notifications.markReadMultiple = async function (nids, uid) {
 Notifications.markAllRead = async function (uid) {
 	await batch.processSortedSet(
 		`uid:${uid}:notifications:unread`,
-		async (unreadNotifs) => {
-			const nids = unreadNotifs.map((n) => n && n.value);
-			const datetimes = unreadNotifs.map((n) => n && n.score);
+		async unreadNotifs => {
+			const nids = unreadNotifs.map(n => n && n.value);
+			const datetimes = unreadNotifs.map(n => n && n.score);
 			await Promise.all([
 				db.sortedSetRemove(`uid:${uid}:notifications:unread`, nids),
 				db.sortedSetAdd(`uid:${uid}:notifications:read`, datetimes, nids),
@@ -472,14 +470,14 @@ Notifications.prune = async function () {
 	try {
 		await Promise.all([
 			db.sortedSetRemove('notifications', nids),
-			db.deleteAll(nids.map((nid) => `notifications:${nid}`)),
+			db.deleteAll(nids.map(nid => `notifications:${nid}`)),
 		]);
 
 		await batch.processSortedSet(
 			'users:joindate',
-			async (uids) => {
-				const unread = uids.map((uid) => `uid:${uid}:notifications:unread`);
-				const read = uids.map((uid) => `uid:${uid}:notifications:read`);
+			async uids => {
+				const unread = uids.map(uid => `uid:${uid}:notifications:unread`);
+				const read = uids.map(uid => `uid:${uid}:notifications:read`);
 				await db.sortedSetsRemoveRangeByScore(
 					unread.concat(read),
 					'-inf',
@@ -512,7 +510,7 @@ Notifications.merge = async function (notifications) {
 
 	notifications = mergeIds.reduce((notifications, mergeId) => {
 		const isolated = notifications.filter(
-			(n) =>
+			n =>
 				n && n.hasOwnProperty('mergeId') && n.mergeId.split('|')[0] === mergeId
 		);
 		if (isolated.length <= 1) {
@@ -529,7 +527,7 @@ Notifications.merge = async function (notifications) {
 			return cur;
 		}, []);
 
-		differentiators.forEach((differentiator) => {
+		differentiators.forEach(differentiator => {
 			function typeFromLength(items) {
 				if (items.length === 2) {
 					return 'dual';
@@ -543,7 +541,7 @@ Notifications.merge = async function (notifications) {
 				set = isolated;
 			} else {
 				set = isolated.filter(
-					(n) => n.mergeId === `${mergeId}|${differentiator}`
+					n => n.mergeId === `${mergeId}|${differentiator}`
 				);
 			}
 
@@ -566,8 +564,7 @@ Notifications.merge = async function (notifications) {
 				case 'notifications:user-posted-in-public-room': {
 					const usernames = _.uniq(
 						set.map(
-							(notifObj) =>
-								notifObj && notifObj.user && notifObj.user.displayname
+							notifObj => notifObj && notifObj.user && notifObj.user.displayname
 						)
 					);
 					if (usernames.length === 2 || usernames.length === 3) {
@@ -588,7 +585,7 @@ Notifications.merge = async function (notifications) {
 					{
 						const usernames = _.uniq(
 							set.map(
-								(notifObj) =>
+								notifObj =>
 									notifObj && notifObj.user && notifObj.user.displayname
 							)
 						);

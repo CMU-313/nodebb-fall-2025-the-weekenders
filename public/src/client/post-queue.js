@@ -74,7 +74,7 @@ define('forum/post-queue', [
 	}
 
 	function confirmReject(msg) {
-		return new Promise((resolve) => {
+		return new Promise(resolve => {
 			bootbox.confirm(msg, resolve);
 		});
 	}
@@ -109,7 +109,7 @@ define('forum/post-queue', [
 						title: titleEdit ? textarea.val() : undefined,
 						content: titleEdit ? undefined : textarea.val(),
 					})
-					.then((data) => {
+					.then(data => {
 						if (titleEdit) {
 							preview.find('.title-text').text(data.postData.title);
 						} else {
@@ -168,7 +168,7 @@ define('forum/post-queue', [
 	function handleActions() {
 		const listEl = document.querySelector('.posts-list');
 		if (listEl) {
-			listEl.addEventListener('click', (e) => {
+			listEl.addEventListener('click', e => {
 				const subselector = e.target.closest('[data-action]');
 				if (subselector) {
 					const action = subselector.getAttribute('data-action');
@@ -262,7 +262,7 @@ define('forum/post-queue', [
 
 	async function doAction(action, id) {
 		function getMessage() {
-			return new Promise((resolve) => {
+			return new Promise(resolve => {
 				const modal = bootbox.dialog({
 					title: '[[post-queue:notify-user]]',
 					message: '<textarea class="form-control"></textarea>',
@@ -325,13 +325,13 @@ define('forum/post-queue', [
 					return;
 				}
 				const action = bulkAction.split('-')[0];
-				const promises = ids.map((id) => doAction(action, id));
+				const promises = ids.map(id => doAction(action, id));
 
 				Promise.allSettled(promises).then(function (results) {
 					const fulfilled = results.filter(
-						(res) => res.status === 'fulfilled'
+						res => res.status === 'fulfilled'
 					).length;
-					const errors = results.filter((res) => res.status === 'rejected');
+					const errors = results.filter(res => res.status === 'rejected');
 					if (fulfilled) {
 						alerts.success(
 							`[[post-queue:bulk-${action}-success, ${fulfilled}]]`
@@ -339,7 +339,7 @@ define('forum/post-queue', [
 						ajaxify.refresh();
 					}
 
-					errors.forEach((res) => alerts.error(res.reason));
+					errors.forEach(res => alerts.error(res.reason));
 				});
 			}
 		);

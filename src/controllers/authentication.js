@@ -208,13 +208,13 @@ authenticationController.registerComplete = async function (req, res) {
 		};
 
 		const results = await Promise.allSettled(
-			callbacks.map(async (cb) => {
+			callbacks.map(async cb => {
 				await cb(req.session.registration, req.body);
 			})
 		);
 		const errors = results
 			.map(
-				(result) =>
+				result =>
 					result.status === 'rejected' && result.reason && result.reason.message
 			)
 			.filter(Boolean);
@@ -247,7 +247,7 @@ authenticationController.registerComplete = async function (req, res) {
 			delete payload.uid;
 			delete payload.returnTo;
 
-			Object.keys(payload).forEach((prop) => {
+			Object.keys(payload).forEach(prop => {
 				if (typeof payload[prop] === 'boolean') {
 					payload[prop] = payload[prop] ? 1 : 0;
 				}
@@ -482,7 +482,7 @@ authenticationController.onSuccessfulLogin = async function (
 			version: req.useragent.version,
 		});
 		await Promise.all([
-			new Promise((resolve) => {
+			new Promise(resolve => {
 				req.session.save(resolve);
 			}),
 			trackSession ? user.auth.addSession(uid, req.sessionID) : undefined,
