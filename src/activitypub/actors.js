@@ -1,17 +1,17 @@
-"use strict";
+'use strict';
 
-const nconf = require("nconf");
-const winston = require("winston");
-const _ = require("lodash");
+const nconf = require('nconf');
+const winston = require('winston');
+const _ = require('lodash');
 
-const db = require("../database");
-const meta = require("../meta");
-const batch = require("../batch");
-const categories = require("../categories");
-const user = require("../user");
-const topics = require("../topics");
-const utils = require("../utils");
-const TTLCache = require("../cache/ttl");
+const db = require('../database');
+const meta = require('../meta');
+const batch = require('../batch');
+const categories = require('../categories');
+const user = require('../user');
+const topics = require('../topics');
+const utils = require('../utils');
+const TTLCache = require('../cache/ttl');
 
 const failedWebfingerCache = TTLCache({
 	max: 5000,
@@ -50,10 +50,10 @@ Actors.qualify = async (ids, options = {}) => {
 		ids.map(async (id) => {
 			const originalId = id;
 			if (activitypub.helpers.isWebfinger(id)) {
-				const host = id.replace(/^(acct:|@)/, "").split("@")[1];
-				if (host === nconf.get("url_parsed").host) {
+				const host = id.replace(/^(acct:|@)/, '').split('@')[1];
+				if (host === nconf.get('url_parsed').host) {
 					// do not assert loopback ids
-					return "loopback";
+					return 'loopback';
 				}
 
 				({ actorUri: id } = await activitypub.helpers.query(id));
@@ -64,7 +64,7 @@ Actors.qualify = async (ids, options = {}) => {
 				return;
 			}
 			return id;
-		}),
+		})
 	);
 
 	// Webfinger failures = assertion failure
@@ -76,8 +76,7 @@ Actors.qualify = async (ids, options = {}) => {
 	if (!meta.config.activitypubAllowLoopback) {
 		ids = ids.filter(
 			(uri) =>
-				uri !== "loopback" &&
-				new URL(uri).host !== nconf.get("url_parsed").host,
+				uri !== 'loopback' && new URL(uri).host !== nconf.get('url_parsed').host
 		);
 	}
 
@@ -97,10 +96,10 @@ Actors.qualify = async (ids, options = {}) => {
 		const upperBound =
 			Date.now() - 1000 * 60 * 60 * 24 * meta.config.activitypubUserPruneDays;
 		const lastCrawled = await db.sortedSetScores(
-			"usersRemote:lastCrawled",
+			'usersRemote:lastCrawled',
 			ids.map((id) =>
-				typeof id === "object" && id.hasOwnProperty("id") ? id.id : id,
-			),
+				typeof id === 'object' && id.hasOwnProperty('id') ? id.id : id
+			)
 		);
 		ids = ids.filter((id, idx) => {
 			const timestamp = lastCrawled[idx];
@@ -128,7 +127,7 @@ Actors.assert = async (ids, options = {}) => {
 	}
 
 	activitypub.helpers.log(
-		`[activitypub/actors] Asserting ${ids.length} actor(s)`,
+		`[activitypub/actors] Asserting ${ids.length} actor(s)`
 	);
 
 	// NOTE: MAKE SURE EVERY DB ADDITION HAS A CORRESPONDING REMOVAL IN ACTORS.REMOVE!
@@ -142,16 +141,16 @@ Actors.assert = async (ids, options = {}) => {
 			try {
 				activitypub.helpers.log(`[activitypub/actors] Processing ${id}`);
 				const actor =
-					typeof id === "object" && id.hasOwnProperty("id")
+					typeof id === 'object' && id.hasOwnProperty('id')
 						? id
-						: await activitypub.get("uid", 0, id, {
-								cache: process.env.CI === "true",
+						: await activitypub.get('uid', 0, id, {
+								cache: process.env.CI === 'true',
 							});
 
 				// webfinger backreference check
 				const { hostname: domain } = new URL(id);
 				const { actorUri: canonicalId } = await activitypub.helpers.query(
-					`${actor.preferredUsername}@${domain}`,
+					`${actor.preferredUsername}@${domain}`
 				);
 				if (id !== canonicalId) {
 					return null;
@@ -160,12 +159,12 @@ Actors.assert = async (ids, options = {}) => {
 				let typeOk = false;
 				if (Array.isArray(actor.type)) {
 					typeOk = actor.type.some((type) =>
-						activitypub._constants.acceptableActorTypes.has(type),
+						activitypub._constants.acceptableActorTypes.has(type)
 					);
 					if (
 						!typeOk &&
 						actor.type.some((type) =>
-							activitypub._constants.acceptableGroupTypes.has(type),
+							activitypub._constants.acceptableGroupTypes.has(type)
 						)
 					) {
 						categories.add(actor.id);
@@ -183,7 +182,7 @@ Actors.assert = async (ids, options = {}) => {
 				if (
 					!typeOk ||
 					!activitypub._constants.requiredActorProps.every((prop) =>
-						actor.hasOwnProperty(prop),
+						actor.hasOwnProperty(prop)
 					)
 				) {
 					return null;
@@ -193,10 +192,10 @@ Actors.assert = async (ids, options = {}) => {
 				try {
 					const [followers, following] = await Promise.all([
 						actor.followers
-							? activitypub.get("uid", 0, actor.followers)
+							? activitypub.get('uid', 0, actor.followers)
 							: { totalItems: 0 },
 						actor.following
-							? activitypub.get("uid", 0, actor.following)
+							? activitypub.get('uid', 0, actor.following)
 							: { totalItems: 0 },
 					]);
 					actor.followerCount = followers.totalItems;
@@ -204,7 +203,7 @@ Actors.assert = async (ids, options = {}) => {
 				} catch (e) {
 					// no action required
 					activitypub.helpers.log(
-						`[activitypub/actor.assert] Unable to retrieve follower counts for ${actor.id}`,
+						`[activitypub/actor.assert] Unable to retrieve follower counts for ${actor.id}`
 					);
 				}
 
@@ -216,7 +215,7 @@ Actors.assert = async (ids, options = {}) => {
 
 				// Save followers url for backreference
 				if (
-					actor.hasOwnProperty("followers") &&
+					actor.hasOwnProperty('followers') &&
 					activitypub.helpers.isUri(actor.followers)
 				) {
 					followersUrlMap.set(actor.followers, actor.id);
@@ -227,7 +226,7 @@ Actors.assert = async (ids, options = {}) => {
 
 				return actor;
 			} catch (e) {
-				if (e.code === "ap_get_410") {
+				if (e.code === 'ap_get_410') {
 					const exists = await user.exists(id);
 					if (exists) {
 						try {
@@ -240,7 +239,7 @@ Actors.assert = async (ids, options = {}) => {
 
 				return null;
 			}
-		}),
+		})
 	);
 	actors = actors.filter(Boolean); // remove unresolvable actors
 	if (!actors.length && !categories.size) {
@@ -257,20 +256,20 @@ Actors.assert = async (ids, options = {}) => {
 		return memo;
 	}, []);
 	if (urlMap.size) {
-		bulkSet.push(["remoteUrl:uid", Object.fromEntries(urlMap)]);
+		bulkSet.push(['remoteUrl:uid', Object.fromEntries(urlMap)]);
 	}
 	if (followersUrlMap.size) {
-		bulkSet.push(["followersUrl:uid", Object.fromEntries(followersUrlMap)]);
+		bulkSet.push(['followersUrl:uid', Object.fromEntries(followersUrlMap)]);
 	}
 
 	const exists = await db.isSortedSetMembers(
-		"usersRemote:lastCrawled",
-		profiles.map((p) => p.uid),
+		'usersRemote:lastCrawled',
+		profiles.map((p) => p.uid)
 	);
 	const uidsForCurrent = profiles.map((p, idx) => (exists[idx] ? p.uid : 0));
 	const current = await user.getUsersFields(uidsForCurrent, [
-		"username",
-		"fullname",
+		'username',
+		'fullname',
 	]);
 	const queries = profiles.reduce(
 		(memo, profile, idx) => {
@@ -279,14 +278,14 @@ Actors.assert = async (ids, options = {}) => {
 			if (options.update || username !== profile.username) {
 				if (uidsForCurrent[idx] !== 0) {
 					memo.searchRemove.push([
-						"ap.preferredUsername:sorted",
+						'ap.preferredUsername:sorted',
 						`${username.toLowerCase()}:${profile.uid}`,
 					]);
 					memo.handleRemove.push(username.toLowerCase());
 				}
 
 				memo.searchAdd.push([
-					"ap.preferredUsername:sorted",
+					'ap.preferredUsername:sorted',
 					0,
 					`${profile.username.toLowerCase()}:${profile.uid}`,
 				]);
@@ -299,13 +298,13 @@ Actors.assert = async (ids, options = {}) => {
 			) {
 				if (fullname && uidsForCurrent[idx] !== 0) {
 					memo.searchRemove.push([
-						"ap.name:sorted",
+						'ap.name:sorted',
 						`${fullname.toLowerCase()}:${profile.uid}`,
 					]);
 				}
 
 				memo.searchAdd.push([
-					"ap.name:sorted",
+					'ap.name:sorted',
 					0,
 					`${profile.fullname.toLowerCase()}:${profile.uid}`,
 				]);
@@ -313,25 +312,25 @@ Actors.assert = async (ids, options = {}) => {
 
 			return memo;
 		},
-		{ searchRemove: [], searchAdd: [], handleRemove: [], handleAdd: {} },
+		{ searchRemove: [], searchAdd: [], handleRemove: [], handleAdd: {} }
 	);
 
 	// Removals
 	await Promise.all([
 		db.sortedSetRemoveBulk(queries.searchRemove),
-		db.deleteObjectFields("handle:uid", queries.handleRemove),
+		db.deleteObjectFields('handle:uid', queries.handleRemove),
 	]);
 
 	// Additions
 	await Promise.all([
 		db.setObjectBulk(bulkSet),
 		db.sortedSetAdd(
-			"usersRemote:lastCrawled",
+			'usersRemote:lastCrawled',
 			profiles.map(() => now),
-			profiles.map((p) => p.uid),
+			profiles.map((p) => p.uid)
 		),
 		db.sortedSetAddBulk(queries.searchAdd),
-		db.setObject("handle:uid", queries.handleAdd),
+		db.setObject('handle:uid', queries.handleAdd),
 	]);
 
 	// Handle any actors that should be asserted as a group instead
@@ -369,7 +368,7 @@ Actors.assertGroup = async (ids, options = {}) => {
 	}
 
 	activitypub.helpers.log(
-		`[activitypub/actors] Asserting ${ids.length} group(s)`,
+		`[activitypub/actors] Asserting ${ids.length} group(s)`
 	);
 
 	// NOTE: MAKE SURE EVERY DB ADDITION HAS A CORRESPONDING REMOVAL IN ACTORS.REMOVEGROUP!
@@ -382,16 +381,16 @@ Actors.assertGroup = async (ids, options = {}) => {
 			try {
 				activitypub.helpers.log(`[activitypub/actors] Processing group ${id}`);
 				const actor =
-					typeof id === "object" && id.hasOwnProperty("id")
+					typeof id === 'object' && id.hasOwnProperty('id')
 						? id
-						: await activitypub.get("uid", 0, id, {
-								cache: process.env.CI === "true",
+						: await activitypub.get('uid', 0, id, {
+								cache: process.env.CI === 'true',
 							});
 
 				// webfinger backreference check
 				const { hostname: domain } = new URL(id);
 				const { actorUri: canonicalId } = await activitypub.helpers.query(
-					`${actor.preferredUsername}@${domain}`,
+					`${actor.preferredUsername}@${domain}`
 				);
 				if (id !== canonicalId) {
 					return null;
@@ -399,14 +398,14 @@ Actors.assertGroup = async (ids, options = {}) => {
 
 				const typeOk = Array.isArray(actor.type)
 					? actor.type.some((type) =>
-							activitypub._constants.acceptableGroupTypes.has(type),
+							activitypub._constants.acceptableGroupTypes.has(type)
 						)
 					: activitypub._constants.acceptableGroupTypes.has(actor.type);
 
 				if (
 					!typeOk ||
 					!activitypub._constants.requiredActorProps.every((prop) =>
-						actor.hasOwnProperty(prop),
+						actor.hasOwnProperty(prop)
 					)
 				) {
 					return null;
@@ -420,7 +419,7 @@ Actors.assertGroup = async (ids, options = {}) => {
 
 				// Save followers url for backreference
 				if (
-					actor.hasOwnProperty("followers") &&
+					actor.hasOwnProperty('followers') &&
 					activitypub.helpers.isUri(actor.followers)
 				) {
 					followersUrlMap.set(actor.followers, actor.id);
@@ -431,7 +430,7 @@ Actors.assertGroup = async (ids, options = {}) => {
 
 				return actor;
 			} catch (e) {
-				if (e.code === "ap_get_410") {
+				if (e.code === 'ap_get_410') {
 					const exists = await categories.exists(id);
 					if (exists) {
 						await categories.purge(id, 0);
@@ -440,13 +439,13 @@ Actors.assertGroup = async (ids, options = {}) => {
 
 				return null;
 			}
-		}),
+		})
 	);
 	groups = groups.filter(Boolean); // remove unresolvable actors
 
 	// Build userData object for storage
 	const categoryObjs = (await activitypub.mocks.category(groups)).filter(
-		Boolean,
+		Boolean
 	);
 	const now = Date.now();
 
@@ -456,21 +455,21 @@ Actors.assertGroup = async (ids, options = {}) => {
 		return memo;
 	}, []);
 	if (urlMap.size) {
-		bulkSet.push(["remoteUrl:cid", Object.fromEntries(urlMap)]);
+		bulkSet.push(['remoteUrl:cid', Object.fromEntries(urlMap)]);
 	}
 	if (followersUrlMap.size) {
-		bulkSet.push(["followersUrl:cid", Object.fromEntries(followersUrlMap)]);
+		bulkSet.push(['followersUrl:cid', Object.fromEntries(followersUrlMap)]);
 	}
 
 	const exists = await db.isSortedSetMembers(
-		"usersRemote:lastCrawled",
-		categoryObjs.map((p) => p.cid),
+		'usersRemote:lastCrawled',
+		categoryObjs.map((p) => p.cid)
 	);
 	const cidsForCurrent = categoryObjs.map((p, idx) =>
-		exists[idx] ? p.cid : 0,
+		exists[idx] ? p.cid : 0
 	);
 	const current = await categories.getCategoriesFields(cidsForCurrent, [
-		"slug",
+		'slug',
 	]);
 	const queries = categoryObjs.reduce(
 		(memo, profile, idx) => {
@@ -483,7 +482,7 @@ Actors.assertGroup = async (ids, options = {}) => {
 				}
 
 				memo.searchAdd.push([
-					"categories:name",
+					'categories:name',
 					0,
 					`${profile.slug.slice(0, 200).toLowerCase()}:${profile.cid}`,
 				]);
@@ -493,13 +492,13 @@ Actors.assertGroup = async (ids, options = {}) => {
 			if (options.update || (profile.name && name !== profile.name)) {
 				if (name && cidsForCurrent[idx] !== 0) {
 					memo.searchRemove.push([
-						"categories:name",
+						'categories:name',
 						`${name.toLowerCase()}:${profile.cid}`,
 					]);
 				}
 
 				memo.searchAdd.push([
-					"categories:name",
+					'categories:name',
 					0,
 					`${profile.name.toLowerCase()}:${profile.cid}`,
 				]);
@@ -507,24 +506,24 @@ Actors.assertGroup = async (ids, options = {}) => {
 
 			return memo;
 		},
-		{ searchRemove: [], searchAdd: [], handleRemove: [], handleAdd: {} },
+		{ searchRemove: [], searchAdd: [], handleRemove: [], handleAdd: {} }
 	);
 
 	// Removals
 	await Promise.all([
 		db.sortedSetRemoveBulk(queries.searchRemove),
-		db.deleteObjectFields("handle:cid", queries.handleRemove),
+		db.deleteObjectFields('handle:cid', queries.handleRemove),
 	]);
 
 	await Promise.all([
 		db.setObjectBulk(bulkSet),
 		db.sortedSetAdd(
-			"usersRemote:lastCrawled",
+			'usersRemote:lastCrawled',
 			groups.map(() => now),
-			groups.map((p) => p.id),
+			groups.map((p) => p.id)
 		),
 		db.sortedSetAddBulk(queries.searchAdd),
-		db.setObject("handle:cid", queries.handleAdd),
+		db.setObject('handle:cid', queries.handleAdd),
 		_migratePersonToGroup(categoryObjs),
 	]);
 
@@ -535,7 +534,7 @@ async function _migratePersonToGroup(categoryObjs) {
 	// 4.0.0-4.1.x asserted as:Group as users. This moves relevant stuff over and deletes the now-duplicate user.
 	let ids = categoryObjs.map((category) => category.cid);
 	const slugs = categoryObjs.map((category) => category.slug);
-	const isUser = await db.isObjectFields("handle:uid", slugs);
+	const isUser = await db.isObjectFields('handle:uid', slugs);
 	ids = ids.filter((id, idx) => isUser[idx]);
 	if (!ids.length) {
 		return;
@@ -544,7 +543,7 @@ async function _migratePersonToGroup(categoryObjs) {
 	await Promise.all(
 		ids.map(async (id) => {
 			const shares = await db.getSortedSetMembers(`uid:${id}:shares`);
-			let cids = await topics.getTopicsFields(shares, ["cid"]);
+			let cids = await topics.getTopicsFields(shares, ['cid']);
 			cids = cids.map((o) => o.cid);
 			await Promise.all(
 				shares.map(async (share, idx) => {
@@ -552,22 +551,22 @@ async function _migratePersonToGroup(categoryObjs) {
 					if (cid === -1) {
 						await topics.tools.move(share, {
 							cid: id,
-							uid: "system",
+							uid: 'system',
 						});
 					}
-				}),
+				})
 			);
 
 			const followers = await db.getSortedSetMembersWithScores(
-				`followersRemote:${id}`,
+				`followersRemote:${id}`
 			);
 			await db.sortedSetAdd(
 				`cid:${id}:uid:watch:state`,
 				followers.map(() => categories.watchStates.tracking),
-				followers.map(({ value }) => value),
+				followers.map(({ value }) => value)
 			);
 			await user.deleteAccount(id);
-		}),
+		})
 	);
 	await categories.onTopicsMoved(ids);
 }
@@ -594,7 +593,7 @@ Actors.getLocalFollowers = async (id) => {
 		members.forEach((id) => {
 			if (utils.isNumber(id)) {
 				response.uids.add(parseInt(id, 10));
-			} else if (id.startsWith("cid|") && utils.isNumber(id.slice(4))) {
+			} else if (id.startsWith('cid|') && utils.isNumber(id.slice(4))) {
 				response.cids.add(parseInt(id.slice(4), 10));
 			}
 		});
@@ -604,7 +603,7 @@ Actors.getLocalFollowers = async (id) => {
 			0,
 			-1,
 			categories.watchStates.tracking,
-			categories.watchStates.watching,
+			categories.watchStates.watching
 		);
 		members.forEach((uid) => {
 			response.uids.add(uid);
@@ -621,7 +620,7 @@ Actors.getLocalFollowCounts = async (actors) => {
 	}
 
 	const validActors = actors.filter((actor) =>
-		activitypub.helpers.isUri(actor),
+		activitypub.helpers.isUri(actor)
 	);
 	const followerKeys = validActors.map((actor) => `followersRemote:${actor}`);
 	const followingKeys = validActors.map((actor) => `followingRemote:${actor}`);
@@ -635,7 +634,7 @@ Actors.getLocalFollowCounts = async (actors) => {
 		validActors.map((a, idx) => ({
 			followers: followersCounts[idx],
 			following: followingCounts[idx],
-		})),
+		}))
 	);
 	const results = actors.map((actor) => {
 		if (!actorToCounts.hasOwnProperty(actor)) {
@@ -656,35 +655,35 @@ Actors.remove = async (id) => {
 	 *
 	 * Note: don't call this directly! It is called as part of user.deleteAccount
 	 */
-	const exists = await db.isSortedSetMember("usersRemote:lastCrawled", id);
+	const exists = await db.isSortedSetMember('usersRemote:lastCrawled', id);
 	if (!exists) {
 		return false;
 	}
 
 	let { username, fullname, url, followersUrl } = await user.getUserFields(id, [
-		"username",
-		"fullname",
-		"url",
-		"followersUrl",
+		'username',
+		'fullname',
+		'url',
+		'followersUrl',
 	]);
 	username = username.toLowerCase();
 
-	const bulkRemove = [["ap.preferredUsername:sorted", `${username}:${id}`]];
+	const bulkRemove = [['ap.preferredUsername:sorted', `${username}:${id}`]];
 	if (fullname) {
-		bulkRemove.push(["ap.name:sorted", `${fullname.toLowerCase()}:${id}`]);
+		bulkRemove.push(['ap.name:sorted', `${fullname.toLowerCase()}:${id}`]);
 	}
 
 	await Promise.all([
 		db.sortedSetRemoveBulk(bulkRemove),
-		db.deleteObjectField("handle:uid", username),
-		db.deleteObjectField("followersUrl:uid", followersUrl),
-		db.deleteObjectField("remoteUrl:uid", url),
+		db.deleteObjectField('handle:uid', username),
+		db.deleteObjectField('followersUrl:uid', followersUrl),
+		db.deleteObjectField('remoteUrl:uid', url),
 		db.delete(`userRemote:${id}:keys`),
 	]);
 
 	await Promise.all([
 		db.delete(`userRemote:${id}`),
-		db.sortedSetRemove("usersRemote:lastCrawled", id),
+		db.sortedSetRemove('usersRemote:lastCrawled', id),
 	]);
 };
 
@@ -694,33 +693,33 @@ Actors.removeGroup = async (id) => {
 	 *
 	 * Note: don't call this directly! It is called as part of categories.purge
 	 */
-	const exists = await db.isSortedSetMember("usersRemote:lastCrawled", id);
+	const exists = await db.isSortedSetMember('usersRemote:lastCrawled', id);
 	if (!exists) {
 		return false;
 	}
 
 	let { slug, name, url, followersUrl } = await categories.getCategoryFields(
 		id,
-		["slug", "name", "url", "followersUrl"],
+		['slug', 'name', 'url', 'followersUrl']
 	);
 	slug = slug.toLowerCase();
 
-	const bulkRemove = [["categories:name", `${slug}:${id}`]];
+	const bulkRemove = [['categories:name', `${slug}:${id}`]];
 	if (name) {
-		bulkRemove.push(["categories:name", `${name.toLowerCase()}:${id}`]);
+		bulkRemove.push(['categories:name', `${name.toLowerCase()}:${id}`]);
 	}
 
 	await Promise.all([
 		db.sortedSetRemoveBulk(bulkRemove),
-		db.deleteObjectField("handle:cid", slug),
-		db.deleteObjectField("followersUrl:cid", followersUrl),
-		db.deleteObjectField("remoteUrl:cid", url),
+		db.deleteObjectField('handle:cid', slug),
+		db.deleteObjectField('followersUrl:cid', followersUrl),
+		db.deleteObjectField('remoteUrl:cid', url),
 		db.delete(`categoryRemote:${id}:keys`),
 	]);
 
 	await Promise.all([
 		db.delete(`categoryRemote:${id}`),
-		db.sortedSetRemove("usersRemote:lastCrawled", id),
+		db.sortedSetRemove('usersRemote:lastCrawled', id),
 	]);
 };
 
@@ -729,21 +728,21 @@ Actors.prune = async () => {
 	 * Clear out remote user accounts that do not have content on the forum anywhere
 	 */
 	activitypub.helpers.log(
-		"[actors/prune] Started scheduled pruning of remote user accounts and categories",
+		'[actors/prune] Started scheduled pruning of remote user accounts and categories'
 	);
 
 	const days = parseInt(meta.config.activitypubUserPruneDays, 10);
 	const timestamp = Date.now() - 1000 * 60 * 60 * 24 * days;
 	const ids = await db.getSortedSetRangeByScore(
-		"usersRemote:lastCrawled",
+		'usersRemote:lastCrawled',
 		0,
 		500,
-		"-inf",
-		timestamp,
+		'-inf',
+		timestamp
 	);
 	if (!ids.length) {
 		activitypub.helpers.log(
-			"[actors/prune] No remote actors to prune, all done.",
+			'[actors/prune] No remote actors to prune, all done.'
 		);
 		return {
 			counts: {
@@ -756,7 +755,7 @@ Actors.prune = async () => {
 	}
 
 	activitypub.helpers.log(
-		`[actors/prune] Found ${ids.length} remote actors last crawled more than ${days} days ago`,
+		`[actors/prune] Found ${ids.length} remote actors last crawled more than ${days} days ago`
 	);
 	let deletionCount = 0;
 	let deletionCountNonExisting = 0;
@@ -808,7 +807,7 @@ Actors.prune = async () => {
 					const roomCount = roomCounts[idx];
 					if (
 						[postCount, roomCount, followers, following].every(
-							(metric) => metric < 1,
+							(metric) => metric < 1
 						)
 					) {
 						try {
@@ -821,11 +820,11 @@ Actors.prune = async () => {
 						notDeletedDueToLocalContent += 1;
 						preservedIds.push(uid);
 					}
-				}),
+				})
 			);
 
 			// Remote categories
-			let counts = await categories.getCategoriesFields(cids, ["topic_count"]);
+			let counts = await categories.getCategoriesFields(cids, ['topic_count']);
 			counts = counts.map((count) => count.topic_count);
 			await Promise.all(
 				cids.map(async (cid, idx) => {
@@ -841,28 +840,28 @@ Actors.prune = async () => {
 						notDeletedDueToLocalContent += 1;
 						preservedIds.push(cid);
 					}
-				}),
+				})
 			);
 
 			deletionCountNonExisting += missing.size;
-			await db.sortedSetRemove("usersRemote:lastCrawled", Array.from(missing));
+			await db.sortedSetRemove('usersRemote:lastCrawled', Array.from(missing));
 			// update timestamp in usersRemote:lastCrawled so we don't try to delete users
 			// with content over and over
 			const now = Date.now();
 			await db.sortedSetAdd(
-				"usersRemote:lastCrawled",
+				'usersRemote:lastCrawled',
 				preservedIds.map(() => now),
-				preservedIds,
+				preservedIds
 			);
 		},
 		{
 			batch: 50,
 			interval: 1000,
-		},
+		}
 	);
 
 	activitypub.helpers.log(
-		`[actors/prune] ${deletionCount} remote users pruned. ${deletionCountNonExisting} did not exist. ${notDeletedDueToLocalContent} not deleted due to local content`,
+		`[actors/prune] ${deletionCount} remote users pruned. ${deletionCountNonExisting} did not exist. ${notDeletedDueToLocalContent} not deleted due to local content`
 	);
 	return {
 		counts: {

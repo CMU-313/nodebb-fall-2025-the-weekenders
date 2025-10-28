@@ -1,8 +1,8 @@
-"use strict";
+'use strict';
 
-const user = require("../../user");
-const api = require("../../api");
-const helpers = require("../helpers");
+const user = require('../../user');
+const api = require('../../api');
+const helpers = require('../helpers');
 
 const Flags = module.exports;
 
@@ -17,7 +17,7 @@ Flags.create = async (req, res) => {
 	helpers.formatApiResponse(
 		200,
 		res,
-		(await user.isPrivileged(req.uid)) ? flagObj : undefined,
+		(await user.isPrivileged(req.uid)) ? flagObj : undefined
 	);
 };
 
@@ -61,6 +61,6 @@ Flags.deleteNote = async (req, res) => {
 	helpers.formatApiResponse(
 		200,
 		res,
-		await api.flags.deleteNote(req, req.params),
+		await api.flags.deleteNote(req, req.params)
 	);
 };

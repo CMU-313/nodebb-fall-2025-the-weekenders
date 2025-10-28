@@ -1,6 +1,6 @@
-"use strict";
+'use strict';
 
-const db = require("../database");
+const db = require('../database');
 
 module.exports = function (Posts) {
 	// Endorse a post by setting an endorsed flag and timestamp

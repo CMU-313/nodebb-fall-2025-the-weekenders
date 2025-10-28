@@ -1,21 +1,21 @@
-"use strict";
+'use strict';
 
-const user = require("../user");
+const user = require('../user');
 
-const ICON_BG = "#6c757d";
-const ICON_TEXT = "?";
+const ICON_BG = '#6c757d';
+const ICON_TEXT = '?';
 
 function toBoolean(value) {
-	return value === true || value === 1 || value === "1";
+	return value === true || value === 1 || value === '1';
 }
 
 function buildAnonymousUser() {
 	const anonUser = {
 		uid: 0,
-		username: "Anonymous",
-		displayname: "Anonymous",
-		"icon:bgColor": ICON_BG,
-		"icon:text": ICON_TEXT,
+		username: 'Anonymous',
+		displayname: 'Anonymous',
+		'icon:bgColor': ICON_BG,
+		'icon:text': ICON_TEXT,
 	};
 	const defaultAvatar = user.getDefaultAvatar();
 	if (defaultAvatar) {
@@ -40,8 +40,8 @@ function applyAnonymousMask(post, viewerUid, isStaff) {
 	const anonUser = buildAnonymousUser();
 	post.uid = 0;
 	post.user = anonUser;
-	post["icon:bgColor"] = anonUser["icon:bgColor"];
-	post["icon:text"] = anonUser["icon:text"];
+	post['icon:bgColor'] = anonUser['icon:bgColor'];
+	post['icon:text'] = anonUser['icon:text'];
 	if (anonUser.picture) {
 		post.picture = anonUser.picture;
 	} else {

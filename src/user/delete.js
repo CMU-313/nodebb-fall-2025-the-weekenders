@@ -1,21 +1,21 @@
-"use strict";
+'use strict';
 
-const async = require("async");
-const _ = require("lodash");
-const path = require("path");
-const nconf = require("nconf");
-const { rimraf } = require("rimraf");
+const async = require('async');
+const _ = require('lodash');
+const path = require('path');
+const nconf = require('nconf');
+const { rimraf } = require('rimraf');
 
-const db = require("../database");
-const posts = require("../posts");
-const flags = require("../flags");
-const topics = require("../topics");
-const groups = require("../groups");
-const messaging = require("../messaging");
-const plugins = require("../plugins");
-const activitypub = require("../activitypub");
-const batch = require("../batch");
-const utils = require("../utils");
+const db = require('../database');
+const posts = require('../posts');
+const flags = require('../flags');
+const topics = require('../topics');
+const groups = require('../groups');
+const messaging = require('../messaging');
+const plugins = require('../plugins');
+const activitypub = require('../activitypub');
+const batch = require('../batch');
+const utils = require('../utils');
 
 module.exports = function (User) {
 	const deletesInProgress = {};
@@ -27,12 +27,12 @@ module.exports = function (User) {
 
 	User.deleteContent = async function (callerUid, uid) {
 		if (utils.isNumber(uid) && parseInt(uid, 10) <= 0) {
-			throw new Error("[[error:invalid-uid]]");
+			throw new Error('[[error:invalid-uid]]');
 		}
 		if (deletesInProgress[uid]) {
-			throw new Error("[[error:already-deleting]]");
+			throw new Error('[[error:already-deleting]]');
 		}
-		deletesInProgress[uid] = "user.delete";
+		deletesInProgress[uid] = 'user.delete';
 		await deletePosts(callerUid, uid);
 		await deleteTopics(callerUid, uid);
 		await deleteUploads(callerUid, uid);
@@ -46,7 +46,7 @@ module.exports = function (User) {
 			async (pids) => {
 				await posts.purge(pids, callerUid);
 			},
-			{ alwaysStartAt: 0, batch: 500 },
+			{ alwaysStartAt: 0, batch: 500 }
 		);
 	}
 
@@ -58,7 +58,7 @@ module.exports = function (User) {
 					await topics.purge(tid, callerUid);
 				});
 			},
-			{ alwaysStartAt: 0 },
+			{ alwaysStartAt: 0 }
 		);
 	}
 
@@ -70,7 +70,7 @@ module.exports = function (User) {
 	async function deleteQueued(uid) {
 		let deleteIds = [];
 		await batch.processSortedSet(
-			"post:queue",
+			'post:queue',
 			async (ids) => {
 				const data = await db.getObjects(ids.map((id) => `post:queue:${id}`));
 				const userQueuedIds = data
@@ -78,7 +78,7 @@ module.exports = function (User) {
 					.map((d) => d.id);
 				deleteIds = deleteIds.concat(userQueuedIds);
 			},
-			{ batch: 500 },
+			{ batch: 500 }
 		);
 		await async.eachSeries(deleteIds, posts.removeFromQueue);
 	}
@@ -86,39 +86,39 @@ module.exports = function (User) {
 	async function removeFromSortedSets(uid) {
 		await db.sortedSetsRemove(
 			[
-				"users:joindate",
-				"users:postcount",
-				"users:reputation",
-				"users:banned",
-				"users:banned:expire",
-				"users:flags",
-				"users:online",
-				"digest:day:uids",
-				"digest:week:uids",
-				"digest:biweek:uids",
-				"digest:month:uids",
+				'users:joindate',
+				'users:postcount',
+				'users:reputation',
+				'users:banned',
+				'users:banned:expire',
+				'users:flags',
+				'users:online',
+				'digest:day:uids',
+				'digest:week:uids',
+				'digest:biweek:uids',
+				'digest:month:uids',
 			],
-			uid,
+			uid
 		);
 	}
 
 	User.deleteAccount = async function (uid) {
-		if (deletesInProgress[uid] === "user.deleteAccount") {
-			throw new Error("[[error:already-deleting]]");
+		if (deletesInProgress[uid] === 'user.deleteAccount') {
+			throw new Error('[[error:already-deleting]]');
 		}
-		deletesInProgress[uid] = "user.deleteAccount";
+		deletesInProgress[uid] = 'user.deleteAccount';
 
 		await removeFromSortedSets(uid);
 		const userData = await db.getObject(
-			utils.isNumber(uid) ? `user:${uid}` : `userRemote:${uid}`,
+			utils.isNumber(uid) ? `user:${uid}` : `userRemote:${uid}`
 		);
 
 		if (!userData || !userData.username) {
 			delete deletesInProgress[uid];
-			throw new Error("[[error:no-user]]");
+			throw new Error('[[error:no-user]]');
 		}
 
-		await plugins.hooks.fire("static:user.delete", {
+		await plugins.hooks.fire('static:user.delete', {
 			uid: uid,
 			userData: userData,
 		});
@@ -152,31 +152,31 @@ module.exports = function (User) {
 		];
 
 		const bulkRemove = [
-			["username:uid", userData.username],
-			["username:sorted", `${userData.username.toLowerCase()}:${uid}`],
-			["userslug:uid", userData.userslug],
-			["fullname:uid", userData.fullname],
+			['username:uid', userData.username],
+			['username:sorted', `${userData.username.toLowerCase()}:${uid}`],
+			['userslug:uid', userData.userslug],
+			['fullname:uid', userData.fullname],
 		];
 		if (userData.email) {
-			bulkRemove.push(["email:uid", userData.email.toLowerCase()]);
+			bulkRemove.push(['email:uid', userData.email.toLowerCase()]);
 			bulkRemove.push([
-				"email:sorted",
+				'email:sorted',
 				`${userData.email.toLowerCase()}:${uid}`,
 			]);
 		}
 
 		if (userData.fullname) {
 			bulkRemove.push([
-				"fullname:sorted",
+				'fullname:sorted',
 				`${userData.fullname.toLowerCase()}:${uid}`,
 			]);
 		}
 
 		await Promise.all([
 			db.sortedSetRemoveBulk(bulkRemove),
-			utils.isNumber(uid) ? db.decrObjectField("global", "userCount") : null,
+			utils.isNumber(uid) ? db.decrObjectField('global', 'userCount') : null,
 			db.deleteAll(keys),
-			db.setRemove("invitation:uids", uid),
+			db.setRemove('invitation:uids', uid),
 			deleteUserIps(uid),
 			deleteUserFromFollowers(uid),
 			deleteUserFromFollowedTopics(uid),
@@ -184,7 +184,7 @@ module.exports = function (User) {
 			deleteUserFromFollowedTags(uid),
 			deleteImages(uid),
 			groups.leaveAllGroups(uid),
-			flags.resolveFlag("user", uid, uid),
+			flags.resolveFlag('user', uid, uid),
 			User.reset.cleanByUid(uid),
 			User.email.expireValidation(uid),
 			activitypub.actors.remove(uid),
@@ -195,7 +195,7 @@ module.exports = function (User) {
 			`uid:${uid}:followed_tags`,
 			`uid:${uid}:followed_tids`,
 			`uid:${uid}:ignored_tids`,
-			`${utils.isNumber(uid) ? "user" : "userRemote"}:${uid}`,
+			`${utils.isNumber(uid) ? 'user' : 'userRemote'}:${uid}`,
 		]);
 		delete deletesInProgress[uid];
 		return userData;
@@ -205,7 +205,7 @@ module.exports = function (User) {
 		const tids = await db.getSortedSetRange(`uid:${uid}:followed_tids`, 0, -1);
 		await db.setsRemove(
 			tids.map((tid) => `tid:${tid}:followers`),
-			uid,
+			uid
 		);
 	}
 
@@ -213,7 +213,7 @@ module.exports = function (User) {
 		const tids = await db.getSortedSetRange(`uid:${uid}:ignored_tids`, 0, -1);
 		await db.setsRemove(
 			tids.map((tid) => `tid:${tid}:ignorers`),
-			uid,
+			uid
 		);
 	}
 
@@ -221,7 +221,7 @@ module.exports = function (User) {
 		const tags = await db.getSortedSetRange(`uid:${uid}:followed_tags`, 0, -1);
 		await db.sortedSetsRemove(
 			tags.map((tag) => `tag:${tag}:followers`),
-			uid,
+			uid
 		);
 	}
 
@@ -240,7 +240,7 @@ module.exports = function (User) {
 		const roomIds = await db.getSortedSetRange(
 			[`uid:${uid}:chat:rooms`, `chat:rooms:public`],
 			0,
-			-1,
+			-1
 		);
 		await messaging.leaveRooms(uid, roomIds);
 	}
@@ -249,7 +249,7 @@ module.exports = function (User) {
 		const ips = await db.getSortedSetRange(`uid:${uid}:ip`, 0, -1);
 		await db.sortedSetsRemove(
 			ips.map((ip) => `ip:${ip}:uid`),
-			uid,
+			uid
 		);
 		await db.delete(`uid:${uid}:ip`);
 	}
@@ -273,7 +273,7 @@ module.exports = function (User) {
 				},
 				{
 					batch: 500,
-				},
+				}
 			);
 		}
 
@@ -282,17 +282,17 @@ module.exports = function (User) {
 
 		await db.sortedSetsRemove(followerSets.concat(followingSets), uid);
 		await Promise.all([
-			updateCount(following, "followers:", "followerCount"),
-			updateCount(followers, "following:", "followingCount"),
+			updateCount(following, 'followers:', 'followerCount'),
+			updateCount(followers, 'following:', 'followingCount'),
 		]);
 	}
 
 	async function deleteImages(uid) {
 		if (utils.isNumber(uid)) {
 			const folder = path.join(
-				nconf.get("upload_path"),
-				"profile",
-				`uid-${uid}`,
+				nconf.get('upload_path'),
+				'profile',
+				`uid-${uid}`
 			);
 			await rimraf(folder);
 		}

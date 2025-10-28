@@ -1,30 +1,30 @@
-"use strict";
+'use strict';
 
-const db = require("../../database");
-const batch = require("../../batch");
+const db = require('../../database');
+const batch = require('../../batch');
 
 module.exports = {
-	name: "Create chat:room:<room_id>:owners zset",
+	name: 'Create chat:room:<room_id>:owners zset',
 	timestamp: Date.UTC(2023, 6, 17),
 	method: async function () {
 		const { progress } = this;
 
-		progress.total = await db.sortedSetCard("chat:rooms");
+		progress.total = await db.sortedSetCard('chat:rooms');
 		const users = await db.getSortedSetRangeWithScores(`users:joindate`, 0, 0);
 		const timestamp = users.length ? users[0].score : Date.now();
 
 		await batch.processSortedSet(
-			"chat:rooms",
+			'chat:rooms',
 			async (roomIds) => {
 				progress.incr(roomIds.length);
 				const roomData = await db.getObjects(
-					roomIds.map((id) => `chat:room:${id}`),
+					roomIds.map((id) => `chat:room:${id}`)
 				);
 
 				const arrayOfUids = await Promise.all(
 					roomIds.map((roomId) =>
-						db.getSortedSetRangeWithScores(`chat:room:${roomId}:uids`, 0, 0),
-					),
+						db.getSortedSetRangeWithScores(`chat:room:${roomId}:uids`, 0, 0)
+					)
 				);
 
 				const bulkAdd = [];
@@ -48,7 +48,7 @@ module.exports = {
 			},
 			{
 				batch: 500,
-			},
+			}
 		);
 	},
 };

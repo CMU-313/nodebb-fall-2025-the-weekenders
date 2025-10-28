@@ -1,9 +1,9 @@
-"use strict";
+'use strict';
 
-const db = require("../database");
-const user = require("../user");
-const activitypub = require("../activitypub");
-const utils = require("../utils");
+const db = require('../database');
+const user = require('../user');
+const activitypub = require('../activitypub');
+const utils = require('../utils');
 
 module.exports = function (Categories) {
 	Categories.watchStates = {
@@ -37,7 +37,7 @@ module.exports = function (Categories) {
 		const fallbacks = cids.map((cid) =>
 			utils.isNumber(cid)
 				? Categories.watchStates[userSettings.categoryWatchState]
-				: Categories.watchStates.notwatching,
+				: Categories.watchStates.notwatching
 		);
 
 		return states.map((state, idx) => state || fallbacks[idx]);
@@ -50,14 +50,14 @@ module.exports = function (Categories) {
 			start,
 			count,
 			Categories.watchStates.ignoring,
-			Categories.watchStates.ignoring,
+			Categories.watchStates.ignoring
 		);
 	};
 
 	Categories.filterIgnoringUids = async function (cid, uids) {
 		const states = await Categories.getUidsWatchStates(cid, uids);
 		const readingUids = uids.filter(
-			(uid, index) => uid && states[index] !== Categories.watchStates.ignoring,
+			(uid, index) => uid && states[index] !== Categories.watchStates.ignoring
 		);
 		return readingUids;
 	};
@@ -69,7 +69,7 @@ module.exports = function (Categories) {
 		]);
 		return states.map(
 			(state, index) =>
-				state || Categories.watchStates[userSettings[index].categoryWatchState],
+				state || Categories.watchStates[userSettings[index].categoryWatchState]
 		);
 	};
 };

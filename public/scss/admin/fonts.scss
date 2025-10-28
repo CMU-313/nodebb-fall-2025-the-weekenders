@@ -1,5 +1,5 @@
-@use "@fontsource/inter/scss/mixins" as Inter;
-@use "@fontsource/poppins/scss/mixins" as Poppins;
+@use '@fontsource/inter/scss/mixins' as Inter;
+@use '@fontsource/poppins/scss/mixins' as Poppins;
 
 $weights:
   $font-weight-light, $font-weight-normal, $font-weight-semibold,
@@ -10,13 +10,13 @@ $subsets: (latin, latin-ext);
   $weights: $weights,
   $subsets: $subsets,
   $display: fallback,
-  $directory: "./plugins/core/inter"
+  $directory: './plugins/core/inter'
 );
 @include Poppins.faces(
   $weights: $weights,
   $subsets: $subsets,
   $display: fallback,
-  $directory: "./plugins/core/poppins"
+  $directory: './plugins/core/poppins'
 );
 
 .ff-base {

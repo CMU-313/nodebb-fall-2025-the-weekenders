@@ -1,12 +1,12 @@
-"use strict";
+'use strict';
 
-const _ = require("lodash");
+const _ = require('lodash');
 
-const db = require("../database");
-const plugins = require("../plugins");
-const Meta = require("./index");
-const pubsub = require("../pubsub");
-const cache = require("../cache");
+const db = require('../database');
+const plugins = require('../plugins');
+const Meta = require('./index');
+const pubsub = require('../pubsub');
+const cache = require('../cache');
 
 const Settings = module.exports;
 
@@ -25,10 +25,10 @@ Settings.get = async function (hash) {
 			const members = await db.getSortedSetRange(
 				`settings:${hash}:sorted-list:${list}`,
 				0,
-				-1,
+				-1
 			);
 			const keys = members.map(
-				(order) => `settings:${hash}:sorted-list:${list}:${order}`,
+				(order) => `settings:${hash}:sorted-list:${list}:${order}`
 			);
 
 			values[list] = [];
@@ -37,10 +37,10 @@ Settings.get = async function (hash) {
 			objects.forEach((obj) => {
 				values[list].push(obj);
 			});
-		}),
+		})
 	);
 
-	const result = await plugins.hooks.fire("filter:settings.get", {
+	const result = await plugins.hooks.fire('filter:settings.get', {
 		plugin: hash,
 		values: values,
 	});
@@ -60,7 +60,7 @@ Settings.set = async function (hash, values, quiet) {
 		plugin: hash,
 		settings: values,
 		quiet,
-	} = await plugins.hooks.fire("filter:settings.set", {
+	} = await plugins.hooks.fire('filter:settings.set', {
 		plugin: hash,
 		settings: values,
 		quiet,
@@ -68,7 +68,7 @@ Settings.set = async function (hash, values, quiet) {
 
 	const sortedListData = {};
 	for (const [key, value] of Object.entries(values)) {
-		if (Array.isArray(value) && typeof value[0] !== "string") {
+		if (Array.isArray(value) && typeof value[0] !== 'string') {
 			sortedListData[key] = value;
 			delete values[key];
 		}
@@ -79,21 +79,21 @@ Settings.set = async function (hash, values, quiet) {
 		// Remove provided (but empty) sorted lists from the hash set
 		await db.setRemove(
 			`settings:${hash}:sorted-lists`,
-			sortedLists.filter((list) => !sortedListData[list].length),
+			sortedLists.filter((list) => !sortedListData[list].length)
 		);
 		await db.setAdd(`settings:${hash}:sorted-lists`, sortedLists);
 
 		await Promise.all(
 			sortedLists.map(async (list) => {
 				const numItems = await db.sortedSetCard(
-					`settings:${hash}:sorted-list:${list}`,
+					`settings:${hash}:sorted-list:${list}`
 				);
 				const deleteKeys = [`settings:${hash}:sorted-list:${list}`];
 				for (let x = 0; x < numItems; x++) {
 					deleteKeys.push(`settings:${hash}:sorted-list:${list}:${x}`);
 				}
 				await db.deleteAll(deleteKeys);
-			}),
+			})
 		);
 
 		const sortedSetData = [];
@@ -125,7 +125,7 @@ Settings.set = async function (hash, values, quiet) {
 
 	cache.del(`settings:${hash}`);
 
-	plugins.hooks.fire("action:settings.set", {
+	plugins.hooks.fire('action:settings.set', {
 		plugin: hash,
 		settings: { ...values, ...sortedListData }, // Add back sorted list data to values hash
 		quiet,

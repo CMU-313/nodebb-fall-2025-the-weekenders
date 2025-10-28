@@ -1,12 +1,12 @@
-"use strict";
+'use strict';
 
-const validator = require("validator");
-const _ = require("lodash");
-const db = require("../database");
-const meta = require("../meta");
-const events = require("../events");
-const batch = require("../batch");
-const utils = require("../utils");
+const validator = require('validator');
+const _ = require('lodash');
+const db = require('../database');
+const meta = require('../meta');
+const events = require('../events');
+const batch = require('../batch');
+const utils = require('../utils');
 
 module.exports = function (User) {
 	User.auth = {};
@@ -17,34 +17,34 @@ module.exports = function (User) {
 		}
 		const exists = await db.exists(`lockout:${uid}`);
 		if (exists) {
-			throw new Error("[[error:account-locked]]");
+			throw new Error('[[error:account-locked]]');
 		}
 		const attempts = await db.increment(`loginAttempts:${uid}`);
 		if (attempts <= meta.config.loginAttempts) {
 			return await db.pexpire(`loginAttempts:${uid}`, 1000 * 60 * 60);
 		}
 		// Lock out the account
-		await db.set(`lockout:${uid}`, "");
+		await db.set(`lockout:${uid}`, '');
 		const duration = 1000 * 60 * meta.config.lockoutDuration;
 
 		await db.delete(`loginAttempts:${uid}`);
 		await db.pexpire(`lockout:${uid}`, duration);
 		await events.log({
-			type: "account-locked",
+			type: 'account-locked',
 			uid: uid,
 			ip: ip,
 		});
-		throw new Error("[[error:account-locked]]");
+		throw new Error('[[error:account-locked]]');
 	};
 
 	User.auth.getFeedToken = async function (uid) {
 		if (!(parseInt(uid, 10) > 0)) {
 			return;
 		}
-		const _token = await db.getObjectField(`user:${uid}`, "rss_token");
+		const _token = await db.getObjectField(`user:${uid}`, 'rss_token');
 		const token = _token || utils.generateUUID();
 		if (!_token) {
-			await User.setUserField(uid, "rss_token", token);
+			await User.setUserField(uid, 'rss_token', token);
 		}
 		return token;
 	};
@@ -61,14 +61,14 @@ module.exports = function (User) {
 		await cleanExpiredSessions(uid);
 		const sids = await db.getSortedSetRevRange(`uid:${uid}:sessions`, 0, 19);
 		let sessions = await Promise.all(
-			sids.map((sid) => db.sessionStoreGet(sid)),
+			sids.map((sid) => db.sessionStoreGet(sid))
 		);
 		sessions = sessions
 			.map((sessObj, idx) => {
 				if (sessObj && sessObj.meta) {
 					sessObj.meta.current = curSessionId === sids[idx];
 					sessObj.meta.datetimeISO = new Date(
-						sessObj.meta.datetime,
+						sessObj.meta.datetime
 					).toISOString();
 					sessObj.meta.ip = validator.escape(String(sessObj.meta.ip));
 				}
@@ -91,15 +91,15 @@ module.exports = function (User) {
 				const sessionObj = await db.sessionStoreGet(sid);
 				const expired =
 					!sessionObj ||
-					!sessionObj.hasOwnProperty("passport") ||
-					!sessionObj.passport.hasOwnProperty("user") ||
+					!sessionObj.hasOwnProperty('passport') ||
+					!sessionObj.passport.hasOwnProperty('user') ||
 					parseInt(sessionObj.passport.user, 10) !== parseInt(uid, 10);
 				if (expired) {
 					expiredSids.push(sid);
 				} else {
 					activeSids.push(sid);
 				}
-			}),
+			})
 		);
 
 		await db.sortedSetRemove(`uid:${uid}:sessions`, expiredSids);
@@ -123,7 +123,7 @@ module.exports = function (User) {
 		) {
 			const sessionsToRevoke = activeSids.slice(
 				0,
-				activeSids.length - meta.config.maxUserSessions,
+				activeSids.length - meta.config.maxUserSessions
 			);
 			await User.auth.revokeSession(sessionsToRevoke, uid);
 		}
@@ -142,7 +142,7 @@ module.exports = function (User) {
 	User.auth.revokeAllSessions = async function (uids, except) {
 		uids = Array.isArray(uids) ? uids : [uids];
 		const sids = await db.getSortedSetsMembers(
-			uids.map((uid) => `uid:${uid}:sessions`),
+			uids.map((uid) => `uid:${uid}:sessions`)
 		);
 		const promises = [];
 		uids.forEach((uid, index) => {
@@ -156,7 +156,7 @@ module.exports = function (User) {
 
 	User.auth.deleteAllSessions = async function () {
 		await batch.processSortedSet(
-			"users:joindate",
+			'users:joindate',
 			async (uids) => {
 				const sessionKeys = uids.map((uid) => `uid:${uid}:sessions`);
 				const sids = _.flatten(await db.getSortedSetRange(sessionKeys, 0, -1));
@@ -166,7 +166,7 @@ module.exports = function (User) {
 					...sids.map((sid) => db.sessionStoreDestroy(sid)),
 				]);
 			},
-			{ batch: 1000 },
+			{ batch: 1000 }
 		);
 	};
 };

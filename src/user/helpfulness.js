@@ -1,8 +1,8 @@
-"use strict";
+'use strict';
 
-const db = require("../database");
-const FIELD = "helpfulnessScore";
-const SORTED_SET = "users:helpfulness";
+const db = require('../database');
+const FIELD = 'helpfulnessScore';
+const SORTED_SET = 'users:helpfulness';
 
 //  This function gets a user's helpfulness score
 async function get(uid) {
@@ -35,10 +35,10 @@ async function recompute(uid) {
 		return await set(uid, 0);
 	}
 	const postKeys = pids.map((pid) => `post:${pid}`);
-	const postData = await db.getObjectsFields(postKeys, ["upvotes"]);
+	const postData = await db.getObjectsFields(postKeys, ['upvotes']);
 	const total = postData.reduce(
 		(sum, post) => sum + (Number(post && post.upvotes) || 0),
-		0,
+		0
 	);
 	return await set(uid, total);
 }

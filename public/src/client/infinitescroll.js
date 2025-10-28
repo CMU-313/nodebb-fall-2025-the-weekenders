@@ -1,9 +1,9 @@
-"use strict";
+'use strict';
 
-define("forum/infinitescroll", ["hooks", "alerts", "api"], function (
+define('forum/infinitescroll', ['hooks', 'alerts', 'api'], function (
 	hooks,
 	alerts,
-	api,
+	api
 ) {
 	const scroll = {};
 	let callback;
@@ -13,8 +13,8 @@ define("forum/infinitescroll", ["hooks", "alerts", "api"], function (
 	let scrollTimeout = 0;
 
 	scroll.init = function (el, cb) {
-		const $body = $("body");
-		if (typeof el === "function") {
+		const $body = $('body');
+		if (typeof el === 'function') {
 			callback = el;
 			container = $body;
 		} else {
@@ -23,11 +23,11 @@ define("forum/infinitescroll", ["hooks", "alerts", "api"], function (
 		}
 		previousScrollTop = $(window).scrollTop();
 		$(window)
-			.off("scroll", startScrollTimeout)
-			.on("scroll", startScrollTimeout);
+			.off('scroll', startScrollTimeout)
+			.on('scroll', startScrollTimeout);
 		if (
 			$body.height() <= $(window).height() &&
-			(!ajaxify.data.hasOwnProperty("pageCount") || ajaxify.data.pageCount > 1)
+			(!ajaxify.data.hasOwnProperty('pageCount') || ajaxify.data.pageCount > 1)
 		) {
 			callback(1);
 		}
@@ -46,7 +46,7 @@ define("forum/infinitescroll", ["hooks", "alerts", "api"], function (
 	function onScroll() {
 		const bsEnv = utils.findBootstrapEnvironment();
 		const mobileComposerOpen =
-			(bsEnv === "xs" || bsEnv === "sm") && $("html").hasClass("composing");
+			(bsEnv === 'xs' || bsEnv === 'sm') && $('html').hasClass('composing');
 		if (loadingMore || mobileComposerOpen || app.flags._glance) {
 			return;
 		}
@@ -80,9 +80,9 @@ define("forum/infinitescroll", ["hooks", "alerts", "api"], function (
 		loadingMore = true;
 
 		const hookData = { method: method, data: data };
-		hooks.fire("action:infinitescroll.loadmore", hookData);
+		hooks.fire('action:infinitescroll.loadmore', hookData);
 
-		const call = hookData.method.startsWith("/") ? api.get : socket.emit;
+		const call = hookData.method.startsWith('/') ? api.get : socket.emit;
 
 		call(hookData.method, hookData.data, function (err, data) {
 			if (err) {
@@ -102,10 +102,10 @@ define("forum/infinitescroll", ["hooks", "alerts", "api"], function (
 		loadingMore = true;
 		const url =
 			config.relative_path +
-			"/api" +
-			location.pathname.replace(new RegExp("^" + config.relative_path), "");
+			'/api' +
+			location.pathname.replace(new RegExp('^' + config.relative_path), '');
 		const hookData = { url: url, data: data };
-		hooks.fire("action:infinitescroll.loadmore.xhr", hookData);
+		hooks.fire('action:infinitescroll.loadmore.xhr', hookData);
 
 		$.get(url, data, function (data) {
 			callback(data, function () {
@@ -113,7 +113,7 @@ define("forum/infinitescroll", ["hooks", "alerts", "api"], function (
 			});
 		}).fail(function (jqXHR) {
 			loadingMore = false;
-			alerts.error(String(jqXHR.responseJSON || "[[error:no-connection]]"));
+			alerts.error(String(jqXHR.responseJSON || '[[error:no-connection]]'));
 		});
 	};
 

@@ -1,24 +1,24 @@
-"use strict";
+'use strict';
 
-const validator = require("validator");
+const validator = require('validator');
 
-const user = require("../user");
-const topics = require("../topics");
-const categories = require("../categories");
-const posts = require("../posts");
-const meta = require("../meta");
-const privileges = require("../privileges");
-const events = require("../events");
-const batch = require("../batch");
-const activitypub = require("../activitypub");
+const user = require('../user');
+const topics = require('../topics');
+const categories = require('../categories');
+const posts = require('../posts');
+const meta = require('../meta');
+const privileges = require('../privileges');
+const events = require('../events');
+const batch = require('../batch');
+const activitypub = require('../activitypub');
 
-const activitypubApi = require("./activitypub");
-const apiHelpers = require("./helpers");
+const activitypubApi = require('./activitypub');
+const apiHelpers = require('./helpers');
 
 const { doTopicAction } = apiHelpers;
 
-const websockets = require("../socket.io");
-const socketHelpers = require("../socket.io/helpers");
+const websockets = require('../socket.io');
+const socketHelpers = require('../socket.io/helpers');
 
 const topicsAPI = module.exports;
 
@@ -29,12 +29,12 @@ topicsAPI._checkThumbPrivileges = async function ({ tid, uid }) {
 
 	// Sanity-check the tid if it's strictly not a uuid
 	if (!isUUID && (isNaN(parseInt(tid, 10)) || !(await topics.exists(tid)))) {
-		throw new Error("[[error:no-topic]]");
+		throw new Error('[[error:no-topic]]');
 	}
 
 	// While drafts are not protected, tids are
 	if (!isUUID && !(await privileges.topics.canEdit(tid, uid))) {
-		throw new Error("[[error:no-privileges]]");
+		throw new Error('[[error:no-privileges]]');
 	}
 };
 
@@ -46,7 +46,7 @@ topicsAPI.get = async function (caller, data) {
 	if (
 		!topic ||
 		!userPrivileges.read ||
-		!userPrivileges["topics:read"] ||
+		!userPrivileges['topics:read'] ||
 		!privileges.topics.canViewDeletedScheduled(topic, userPrivileges)
 	) {
 		return null;
@@ -57,7 +57,7 @@ topicsAPI.get = async function (caller, data) {
 
 topicsAPI.create = async function (caller, data) {
 	if (!data) {
-		throw new Error("[[error:invalid-data]]");
+		throw new Error('[[error:invalid-data]]');
 	}
 
 	const payload = { ...data };
@@ -67,11 +67,11 @@ topicsAPI.create = async function (caller, data) {
 	const isScheduling = parseInt(data.timestamp, 10) > payload.timestamp;
 	if (isScheduling) {
 		if (
-			await privileges.categories.can("topics:schedule", data.cid, caller.uid)
+			await privileges.categories.can('topics:schedule', data.cid, caller.uid)
 		) {
 			payload.timestamp = parseInt(data.timestamp, 10);
 		} else {
-			throw new Error("[[error:no-privileges]]");
+			throw new Error('[[error:no-privileges]]');
 		}
 	}
 
@@ -86,25 +86,25 @@ topicsAPI.create = async function (caller, data) {
 	// DEBUG: log the username returned by topics.post before emitting
 	try {
 		console.error(
-			"[DEBUG] api.topics.create - result.postData.user:",
-			result && result.postData && result.postData.user,
+			'[DEBUG] api.topics.create - result.postData.user:',
+			result && result.postData && result.postData.user
 		);
 		console.error(
-			"[DEBUG] api.topics.create - result.topicData.user:",
-			result && result.topicData && result.topicData.user,
+			'[DEBUG] api.topics.create - result.topicData.user:',
+			result && result.topicData && result.topicData.user
 		);
 	} catch (err) {
 		console.error(
-			"[DEBUG] api.topics.create - logging error",
-			err && err.stack ? err.stack : err,
+			'[DEBUG] api.topics.create - logging error',
+			err && err.stack ? err.stack : err
 		);
 	}
 
-	socketHelpers.emitToUids("event:new_post", { posts: [result.postData] }, [
+	socketHelpers.emitToUids('event:new_post', { posts: [result.postData] }, [
 		caller.uid,
 	]);
-	socketHelpers.emitToUids("event:new_topic", result.topicData, [caller.uid]);
-	socketHelpers.notifyNew(caller.uid, "newTopic", {
+	socketHelpers.emitToUids('event:new_topic', result.topicData, [caller.uid]);
+	socketHelpers.notifyNew(caller.uid, 'newTopic', {
 		posts: [result.postData],
 		topic: result.topicData,
 	});
@@ -122,7 +122,7 @@ topicsAPI.reply = async function (caller, data) {
 		!data.tid ||
 		(meta.config.minimumPostLength !== 0 && !data.content)
 	) {
-		throw new Error("[[error:invalid-data]]");
+		throw new Error('[[error:invalid-data]]');
 	}
 	const payload = { ...data };
 	delete payload.pid;
@@ -140,67 +140,67 @@ topicsAPI.reply = async function (caller, data) {
 
 	const result = {
 		posts: [postData],
-		"reputation:disabled": meta.config["reputation:disabled"] === 1,
-		"downvote:disabled": meta.config["downvote:disabled"] === 1,
+		'reputation:disabled': meta.config['reputation:disabled'] === 1,
+		'downvote:disabled': meta.config['downvote:disabled'] === 1,
 	};
 
 	user.updateOnlineUsers(caller.uid);
 	if (caller.uid) {
-		socketHelpers.emitToUids("event:new_post", result, [caller.uid]);
+		socketHelpers.emitToUids('event:new_post', result, [caller.uid]);
 	} else if (caller.uid === 0) {
-		websockets.in("online_guests").emit("event:new_post", result);
+		websockets.in('online_guests').emit('event:new_post', result);
 	}
 
-	socketHelpers.notifyNew(caller.uid, "newPost", result);
+	socketHelpers.notifyNew(caller.uid, 'newPost', result);
 	await activitypubApi.create.note(caller, { post: postData });
 
 	return postData;
 };
 
 topicsAPI.delete = async function (caller, data) {
-	await doTopicAction("delete", "event:topic_deleted", caller, {
+	await doTopicAction('delete', 'event:topic_deleted', caller, {
 		tids: data.tids,
 	});
 };
 
 topicsAPI.restore = async function (caller, data) {
-	await doTopicAction("restore", "event:topic_restored", caller, {
+	await doTopicAction('restore', 'event:topic_restored', caller, {
 		tids: data.tids,
 	});
 };
 
 topicsAPI.purge = async function (caller, data) {
-	await doTopicAction("purge", "event:topic_purged", caller, {
+	await doTopicAction('purge', 'event:topic_purged', caller, {
 		tids: data.tids,
 	});
 };
 
 topicsAPI.pin = async function (caller, { tids, expiry }) {
-	await doTopicAction("pin", "event:topic_pinned", caller, { tids });
+	await doTopicAction('pin', 'event:topic_pinned', caller, { tids });
 
 	if (expiry) {
 		await Promise.all(
 			tids.map(async (tid) =>
-				topics.tools.setPinExpiry(tid, expiry, caller.uid),
-			),
+				topics.tools.setPinExpiry(tid, expiry, caller.uid)
+			)
 		);
 	}
 };
 
 topicsAPI.unpin = async function (caller, data) {
-	await doTopicAction("unpin", "event:topic_unpinned", caller, {
+	await doTopicAction('unpin', 'event:topic_unpinned', caller, {
 		tids: data.tids,
 	});
 };
 
 topicsAPI.lock = async function (caller, data) {
-	await doTopicAction("lock", "event:topic_locked", caller, {
+	await doTopicAction('lock', 'event:topic_locked', caller, {
 		tids: data.tids,
 	});
 };
 
 topicsAPI.unlock = async function (caller, data) {
-	await doTopicAction("unlock", "event:topic_unlocked", caller, {
+	await doTopicAction('unlock', 'event:topic_unlocked', caller, {
 		tids: data.tids,
 	});
 };
@@ -219,10 +219,10 @@ topicsAPI.unfollow = async function (caller, data) {
 
 topicsAPI.updateTags = async (caller, { tid, tags }) => {
 	if (!(await privileges.topics.canEdit(tid, caller.uid))) {
-		throw new Error("[[error:no-privileges]]");
+		throw new Error('[[error:no-privileges]]');
 	}
 
-	const cid = await topics.getTopicField(tid, "cid");
+	const cid = await topics.getTopicField(tid, 'cid');
 	await topics.validateTags(tags, cid, caller.uid, tid);
 	await topics.updateTopicTags(tid, tags);
 	return await topics.getTopicTagsObjects(tid);
@@ -230,10 +230,10 @@ topicsAPI.updateTags = async (caller, { tid, tags }) => {
 
 topicsAPI.addTags = async (caller, { tid, tags }) => {
 	if (!(await privileges.topics.canEdit(tid, caller.uid))) {
-		throw new Error("[[error:no-privileges]]");
+		throw new Error('[[error:no-privileges]]');
 	}
 
-	const cid = await topics.getTopicField(tid, "cid");
+	const cid = await topics.getTopicField(tid, 'cid');
 	await topics.validateTags(tags, cid, caller.uid, tid);
 	tags = await topics.filterTags(tags, cid);
 
@@ -243,7 +243,7 @@ topicsAPI.addTags = async (caller, { tid, tags }) => {
 
 topicsAPI.deleteTags = async (caller, { tid }) => {
 	if (!(await privileges.topics.canEdit(tid, caller.uid))) {
-		throw new Error("[[error:no-privileges]]");
+		throw new Error('[[error:no-privileges]]');
 	}
 
 	await topics.deleteTopicTags(tid);
@@ -254,13 +254,13 @@ topicsAPI.getThumbs = async (caller, { tid, thumbsOnly }) => {
 		// post_uuids can be passed in occasionally, in that case no checks are necessary
 		const [exists, canRead] = await Promise.all([
 			topics.exists(tid),
-			privileges.topics.can("topics:read", tid, caller.uid),
+			privileges.topics.can('topics:read', tid, caller.uid),
 		]);
 		if (!exists) {
-			throw new Error("[[error:not-found]]");
+			throw new Error('[[error:not-found]]');
 		}
 		if (!canRead) {
-			throw new Error("[[error:not-allowed]]");
+			throw new Error('[[error:not-allowed]]');
 		}
 	}
 
@@ -288,7 +288,7 @@ topicsAPI.reorderThumbs = async (caller, { tid, path, order }) => {
 
 	const exists = await topics.thumbs.exists(tid, path);
 	if (!exists) {
-		throw new Error("[[error:invalid-data]]");
+		throw new Error('[[error:invalid-data]]');
 	}
 
 	await topics.thumbs.associate({
@@ -299,8 +299,8 @@ topicsAPI.reorderThumbs = async (caller, { tid, path, order }) => {
 };
 
 topicsAPI.getEvents = async (caller, { tid }) => {
-	if (!(await privileges.topics.can("topics:read", tid, caller.uid))) {
-		throw new Error("[[error:no-privileges]]");
+	if (!(await privileges.topics.can('topics:read', tid, caller.uid))) {
+		throw new Error('[[error:no-privileges]]');
 	}
 
 	return await topics.events.get(tid, caller.uid);
@@ -308,7 +308,7 @@ topicsAPI.getEvents = async (caller, { tid }) => {
 
 topicsAPI.deleteEvent = async (caller, { tid, eventId }) => {
 	if (!(await privileges.topics.isAdminOrMod(tid, caller.uid))) {
-		throw new Error("[[error:no-privileges]]");
+		throw new Error('[[error:no-privileges]]');
 	}
 
 	await topics.events.purge(tid, [eventId]);
@@ -325,7 +325,7 @@ topicsAPI.markRead = async (caller, { tid }) => {
 
 topicsAPI.markUnread = async (caller, { tid }) => {
 	if (!tid || caller.uid <= 0) {
-		throw new Error("[[error:invalid-data]]");
+		throw new Error('[[error:invalid-data]]');
 	}
 	await topics.markUnread(tid, caller.uid);
 	topics.pushUnreadCount(caller.uid);
@@ -333,11 +333,11 @@ topicsAPI.markUnread = async (caller, { tid }) => {
 
 topicsAPI.bump = async (caller, { tid }) => {
 	if (!tid) {
-		throw new Error("[[error:invalid-tid]]");
+		throw new Error('[[error:invalid-tid]]');
 	}
 	const isAdminOrMod = await privileges.topics.isAdminOrMod(tid, caller.uid);
 	if (!isAdminOrMod) {
-		throw new Error("[[error:no-privileges]]");
+		throw new Error('[[error:no-privileges]]');
 	}
 
 	await topics.markAsUnreadForAll(tid);
@@ -347,11 +347,11 @@ topicsAPI.bump = async (caller, { tid }) => {
 topicsAPI.move = async (caller, { tid, cid }) => {
 	const canMove = await privileges.categories.isAdminOrMod(cid, caller.uid);
 	if (!canMove) {
-		throw new Error("[[error:no-privileges]]");
+		throw new Error('[[error:no-privileges]]');
 	}
 
 	const tids = Array.isArray(tid) ? tid : [tid];
-	const uids = await user.getUidsFromSet("users:online", 0, -1);
+	const uids = await user.getUidsFromSet('users:online', 0, -1);
 	const cids = [parseInt(cid, 10)];
 
 	await batch.processArray(
@@ -361,14 +361,14 @@ topicsAPI.move = async (caller, { tid, cid }) => {
 				tids.map(async (tid) => {
 					const canMove = await privileges.topics.isAdminOrMod(tid, caller.uid);
 					if (!canMove) {
-						throw new Error("[[error:no-privileges]]");
+						throw new Error('[[error:no-privileges]]');
 					}
 					const topicData = await topics.getTopicFields(tid, [
-						"tid",
-						"cid",
-						"mainPid",
-						"slug",
-						"deleted",
+						'tid',
+						'cid',
+						'mainPid',
+						'slug',
+						'deleted',
 					]);
 					if (!cids.includes(topicData.cid)) {
 						cids.push(topicData.cid);
@@ -379,22 +379,22 @@ topicsAPI.move = async (caller, { tid, cid }) => {
 					});
 
 					const notifyUids = await privileges.categories.filterUids(
-						"topics:read",
+						'topics:read',
 						topicData.cid,
-						uids,
+						uids
 					);
-					socketHelpers.emitToUids("event:topic_moved", topicData, notifyUids);
+					socketHelpers.emitToUids('event:topic_moved', topicData, notifyUids);
 					if (!topicData.deleted) {
 						socketHelpers.sendNotificationToTopicOwner(
 							tid,
 							caller.uid,
-							"move",
-							"notifications:moved-your-topic",
+							'move',
+							'notifications:moved-your-topic'
 						);
 						activitypubApi.announce.note(caller, { tid });
 						const { activity } = await activitypub.mocks.activities.create(
 							topicData.mainPid,
-							caller.uid,
+							caller.uid
 						);
 						await activitypub.feps.announce(topicData.mainPid, activity);
 					}
@@ -407,10 +407,10 @@ topicsAPI.move = async (caller, { tid, cid }) => {
 						fromCid: topicData.cid,
 						toCid: cid,
 					});
-				}),
+				})
 			);
 		},
-		{ batch: 10 },
+		{ batch: 10 }
 	);
 
 	await categories.onTopicsMoved(cids);

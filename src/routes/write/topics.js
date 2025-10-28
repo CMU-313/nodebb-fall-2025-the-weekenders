@@ -1,9 +1,9 @@
-"use strict";
+'use strict';
 
-const router = require("express").Router();
-const middleware = require("../../middleware");
-const controllers = require("../../controllers");
-const routeHelpers = require("../helpers");
+const router = require('express').Router();
+const middleware = require('../../middleware');
+const controllers = require('../../controllers');
+const routeHelpers = require('../helpers');
 
 const { setupApiRoute } = routeHelpers;
 
@@ -11,10 +11,10 @@ const { setupApiRoute } = routeHelpers;
 function normalizeIsAnonymous(req, res, next) {
 	if (
 		req.body &&
-		Object.prototype.hasOwnProperty.call(req.body, "isAnonymous")
+		Object.prototype.hasOwnProperty.call(req.body, 'isAnonymous')
 	) {
 		const v = req.body.isAnonymous;
-		req.body.isAnonymous = v === true || v === "true" || v === 1 || v === "1";
+		req.body.isAnonymous = v === true || v === 'true' || v === 1 || v === '1';
 	}
 	return next();
 }
@@ -22,224 +22,224 @@ function normalizeIsAnonymous(req, res, next) {
 module.exports = function () {
 	const middlewares = [middleware.ensureLoggedIn];
 
-	const multipart = require("connect-multiparty");
+	const multipart = require('connect-multiparty');
 	const multipartMiddleware = multipart();
 
 	setupApiRoute(
 		router,
-		"post",
-		"/",
-		[middleware.checkRequired.bind(null, ["cid", "title", "content"])],
-		controllers.write.topics.create,
+		'post',
+		'/',
+		[middleware.checkRequired.bind(null, ['cid', 'title', 'content'])],
+		controllers.write.topics.create
 	);
-	setupApiRoute(router, "get", "/:tid", [], controllers.write.topics.get);
+	setupApiRoute(router, 'get', '/:tid', [], controllers.write.topics.get);
 	setupApiRoute(
 		router,
-		"post",
-		"/:tid",
+		'post',
+		'/:tid',
 		[
-			middleware.checkRequired.bind(null, ["content"]),
+			middleware.checkRequired.bind(null, ['content']),
 			middleware.assert.topic,
 			normalizeIsAnonymous, // added
 		],
-		controllers.write.topics.reply,
+		controllers.write.topics.reply
 	);
 	setupApiRoute(
 		router,
-		"delete",
-		"/:tid",
+		'delete',
+		'/:tid',
 		[...middlewares],
-		controllers.write.topics.purge,
+		controllers.write.topics.purge
 	);
 
 	setupApiRoute(
 		router,
-		"put",
-		"/:tid/state",
+		'put',
+		'/:tid/state',
 		[...middlewares],
-		controllers.write.topics.restore,
+		controllers.write.topics.restore
 	);
 	setupApiRoute(
 		router,
-		"delete",
-		"/:tid/state",
+		'delete',
+		'/:tid/state',
 		[...middlewares],
-		controllers.write.topics.delete,
+		controllers.write.topics.delete
 	);
 
 	setupApiRoute(
 		router,
-		"put",
-		"/:tid/pin",
+		'put',
+		'/:tid/pin',
 		[...middlewares, middleware.assert.topic],
-		controllers.write.topics.pin,
+		controllers.write.topics.pin
 	);
 	setupApiRoute(
 		router,
-		"delete",
-		"/:tid/pin",
+		'delete',
+		'/:tid/pin',
 		[...middlewares],
-		controllers.write.topics.unpin,
+		controllers.write.topics.unpin
 	);
 
 	setupApiRoute(
 		router,
-		"put",
-		"/:tid/lock",
+		'put',
+		'/:tid/lock',
 		[...middlewares],
-		controllers.write.topics.lock,
+		controllers.write.topics.lock
 	);
 	setupApiRoute(
 		router,
-		"delete",
-		"/:tid/lock",
+		'delete',
+		'/:tid/lock',
 		[...middlewares],
-		controllers.write.topics.unlock,
+		controllers.write.topics.unlock
 	);
 
 	setupApiRoute(
 		router,
-		"put",
-		"/:tid/follow",
+		'put',
+		'/:tid/follow',
 		[...middlewares, middleware.assert.topic],
-		controllers.write.topics.follow,
+		controllers.write.topics.follow
 	);
 	setupApiRoute(
 		router,
-		"delete",
-		"/:tid/follow",
+		'delete',
+		'/:tid/follow',
 		[...middlewares, middleware.assert.topic],
-		controllers.write.topics.unfollow,
+		controllers.write.topics.unfollow
 	);
 	setupApiRoute(
 		router,
-		"put",
-		"/:tid/ignore",
+		'put',
+		'/:tid/ignore',
 		[...middlewares, middleware.assert.topic],
-		controllers.write.topics.ignore,
+		controllers.write.topics.ignore
 	);
 	setupApiRoute(
 		router,
-		"delete",
-		"/:tid/ignore",
+		'delete',
+		'/:tid/ignore',
 		[...middlewares, middleware.assert.topic],
-		controllers.write.topics.unfollow,
+		controllers.write.topics.unfollow
 	); // intentional, unignore == unfollow
 
 	setupApiRoute(
 		router,
-		"put",
-		"/:tid/tags",
+		'put',
+		'/:tid/tags',
 		[
 			...middlewares,
-			middleware.checkRequired.bind(null, ["tags"]),
+			middleware.checkRequired.bind(null, ['tags']),
 			middleware.assert.topic,
 		],
-		controllers.write.topics.updateTags,
+		controllers.write.topics.updateTags
 	);
 	setupApiRoute(
 		router,
-		"patch",
-		"/:tid/tags",
+		'patch',
+		'/:tid/tags',
 		[
 			...middlewares,
-			middleware.checkRequired.bind(null, ["tags"]),
+			middleware.checkRequired.bind(null, ['tags']),
 			middleware.assert.topic,
 		],
-		controllers.write.topics.addTags,
+		controllers.write.topics.addTags
 	);
 	setupApiRoute(
 		router,
-		"delete",
-		"/:tid/tags",
+		'delete',
+		'/:tid/tags',
 		[...middlewares, middleware.assert.topic],
-		controllers.write.topics.deleteTags,
+		controllers.write.topics.deleteTags
 	);
 
 	setupApiRoute(
 		router,
-		"get",
-		"/:tid/thumbs",
+		'get',
+		'/:tid/thumbs',
 		[],
-		controllers.write.topics.getThumbs,
+		controllers.write.topics.getThumbs
 	);
 	setupApiRoute(
 		router,
-		"post",
-		"/:tid/thumbs",
+		'post',
+		'/:tid/thumbs',
 		[
 			multipartMiddleware,
 			middleware.validateFiles,
 			middleware.uploads.ratelimit,
 			...middlewares,
 		],
-		controllers.write.topics.addThumb,
+		controllers.write.topics.addThumb
 	);
 	setupApiRoute(
 		router,
-		"put",
-		"/:tid/thumbs",
-		[...middlewares, middleware.checkRequired.bind(null, ["tid"])],
-		controllers.write.topics.migrateThumbs,
+		'put',
+		'/:tid/thumbs',
+		[...middlewares, middleware.checkRequired.bind(null, ['tid'])],
+		controllers.write.topics.migrateThumbs
 	);
 	setupApiRoute(
 		router,
-		"delete",
-		"/:tid/thumbs",
-		[...middlewares, middleware.checkRequired.bind(null, ["path"])],
-		controllers.write.topics.deleteThumb,
+		'delete',
+		'/:tid/thumbs',
+		[...middlewares, middleware.checkRequired.bind(null, ['path'])],
+		controllers.write.topics.deleteThumb
 	);
 	setupApiRoute(
 		router,
-		"put",
-		"/:tid/thumbs/order",
-		[...middlewares, middleware.checkRequired.bind(null, ["path", "order"])],
-		controllers.write.topics.reorderThumbs,
+		'put',
+		'/:tid/thumbs/order',
+		[...middlewares, middleware.checkRequired.bind(null, ['path', 'order'])],
+		controllers.write.topics.reorderThumbs
 	);
 
 	setupApiRoute(
 		router,
-		"get",
-		"/:tid/events",
+		'get',
+		'/:tid/events',
 		[middleware.assert.topic],
-		controllers.write.topics.getEvents,
+		controllers.write.topics.getEvents
 	);
 	setupApiRoute(
 		router,
-		"delete",
-		"/:tid/events/:eventId",
+		'delete',
+		'/:tid/events/:eventId',
 		[middleware.assert.topic],
-		controllers.write.topics.deleteEvent,
+		controllers.write.topics.deleteEvent
 	);
 
 	setupApiRoute(
 		router,
-		"put",
-		"/:tid/read",
+		'put',
+		'/:tid/read',
 		[...middlewares, middleware.assert.topic],
-		controllers.write.topics.markRead,
+		controllers.write.topics.markRead
 	);
 	setupApiRoute(
 		router,
-		"delete",
-		"/:tid/read",
+		'delete',
+		'/:tid/read',
 		[...middlewares, middleware.assert.topic],
-		controllers.write.topics.markUnread,
+		controllers.write.topics.markUnread
 	);
 	setupApiRoute(
 		router,
-		"put",
-		"/:tid/bump",
+		'put',
+		'/:tid/bump',
 		[...middlewares, middleware.assert.topic],
-		controllers.write.topics.bump,
+		controllers.write.topics.bump
 	);
 
 	setupApiRoute(
 		router,
-		"put",
-		"/:tid/move",
+		'put',
+		'/:tid/move',
 		[...middlewares, middleware.assert.topic],
-		controllers.write.topics.move,
+		controllers.write.topics.move
 	);
 
 	return router;

@@ -1,7 +1,7 @@
-"use strict";
+'use strict';
 
-const api = require("../../api");
-const helpers = require("../helpers");
+const api = require('../../api');
+const helpers = require('../helpers');
 
 const Chats = module.exports;
 
@@ -9,7 +9,7 @@ Chats.list = async (req, res) => {
 	let stop;
 	let { page, perPage, start, uid } = req.query;
 	[page, perPage, start, uid] = [page, perPage, start, uid].map(
-		(value) => isFinite(value) && parseInt(value, 10),
+		(value) => isFinite(value) && parseInt(value, 10)
 	);
 	page = page || 1;
 	perPage = Math.min(100, perPage || 20);
@@ -54,7 +54,7 @@ Chats.get = async (req, res) => {
 		await api.chats.get(req, {
 			uid: req.query.uid || req.uid,
 			roomId: req.params.roomId,
-		}),
+		})
 	);
 };
 
@@ -86,7 +86,7 @@ Chats.rename = async (req, res) => {
 };
 
 Chats.mark = async (req, res) => {
-	const state = req.method === "PUT" ? 1 : 0;
+	const state = req.method === 'PUT' ? 1 : 0;
 	await api.chats.mark(req, {
 		roomId: req.params.roomId,
 		state,
@@ -97,7 +97,7 @@ Chats.mark = async (req, res) => {
 
 Chats.watch = async (req, res) => {
 	const state =
-		req.method === "DELETE" ? -1 : parseInt(req.body.value, 10) || -1;
+		req.method === 'DELETE' ? -1 : parseInt(req.body.value, 10) || -1;
 
 	await api.chats.watch(req, { state, ...req.params });
 	helpers.formatApiResponse(200, res);
@@ -149,7 +149,7 @@ Chats.kickUser = async (req, res) => {
 };
 
 Chats.toggleOwner = async (req, res) => {
-	const state = req.method === "PUT";
+	const state = req.method === 'PUT';
 	await api.chats.toggleOwner(req, { state, ...req.params });
 	helpers.formatApiResponse(200, res);
 };
@@ -176,7 +176,7 @@ Chats.messages.getPinned = async (req, res) => {
 	helpers.formatApiResponse(
 		200,
 		res,
-		await api.chats.getPinnedMessages(req, { start, ...req.params }),
+		await api.chats.getPinnedMessages(req, { start, ...req.params })
 	);
 };
 
@@ -186,7 +186,7 @@ Chats.messages.get = async (req, res) => {
 	helpers.formatApiResponse(
 		200,
 		res,
-		await api.chats.getMessage(req, { mid, roomId }),
+		await api.chats.getMessage(req, { mid, roomId })
 	);
 };
 
@@ -194,7 +194,7 @@ Chats.messages.getRaw = async (req, res) => {
 	helpers.formatApiResponse(
 		200,
 		res,
-		await api.chats.getRawMessage(req, { ...req.params }),
+		await api.chats.getRawMessage(req, { ...req.params })
 	);
 };
 
@@ -202,7 +202,7 @@ Chats.messages.getIpAddress = async (req, res) => {
 	helpers.formatApiResponse(
 		200,
 		res,
-		await api.chats.getIpAddress(req, { ...req.params }),
+		await api.chats.getIpAddress(req, { ...req.params })
 	);
 };
 
@@ -214,7 +214,7 @@ Chats.messages.edit = async (req, res) => {
 	helpers.formatApiResponse(
 		200,
 		res,
-		await api.chats.getMessage(req, { mid, roomId }),
+		await api.chats.getMessage(req, { mid, roomId })
 	);
 };
 

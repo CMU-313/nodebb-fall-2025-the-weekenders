@@ -1,25 +1,25 @@
-"use strict";
+'use strict';
 
-const path = require("path");
-const fs = require("fs").promises;
-const nconf = require("nconf");
+const path = require('path');
+const fs = require('fs').promises;
+const nconf = require('nconf');
 
-const db = require("../../database");
-const batch = require("../../batch");
-const file = require("../../file");
+const db = require('../../database');
+const batch = require('../../batch');
+const file = require('../../file');
 
 module.exports = {
-	name: "Clean up leftover topic thumb sorted sets and files for since-purged topics",
+	name: 'Clean up leftover topic thumb sorted sets and files for since-purged topics',
 	timestamp: Date.UTC(2022, 1, 7),
 	method: async function () {
 		const { progress } = this;
-		const nextTid = await db.getObjectField("global", "nextTid");
+		const nextTid = await db.getObjectField('global', 'nextTid');
 		const tids = [];
 		for (let x = 1; x < nextTid; x++) {
 			tids.push(x);
 		}
 
-		const purgedTids = (await db.isSortedSetMembers("topics:tid", tids))
+		const purgedTids = (await db.isSortedSetMembers('topics:tid', tids))
 			.map((exists, idx) => (exists ? false : tids[idx]))
 			.filter(Boolean);
 
@@ -37,10 +37,10 @@ module.exports = {
 				await Promise.all(
 					tids.map(async (tid) => {
 						const relativePaths = await db.getSortedSetMembers(
-							`topic:${tid}:thumbs`,
+							`topic:${tid}:thumbs`
 						);
 						const absolutePaths = relativePaths.map((relativePath) =>
-							path.join(nconf.get("upload_path"), relativePath),
+							path.join(nconf.get('upload_path'), relativePath)
 						);
 
 						await Promise.all(
@@ -49,17 +49,17 @@ module.exports = {
 								if (exists) {
 									await fs.unlink(absolutePath);
 								}
-							}),
+							})
 						);
 						await db.delete(`topic:${tid}:thumbs`);
 						progress.incr();
-					}),
+					})
 				);
 			},
 			{
 				progress,
 				batch: 100,
-			},
+			}
 		);
 	},
 };

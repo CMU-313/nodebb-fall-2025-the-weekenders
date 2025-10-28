@@ -1,12 +1,12 @@
 /* eslint-disable no-await-in-loop */
 
-"use strict";
+'use strict';
 
-const db = require("../../database");
-const batch = require("../../batch");
+const db = require('../../database');
+const batch = require('../../batch');
 
 module.exports = {
-	name: "Set mid on message objects and create messages:mid",
+	name: 'Set mid on message objects and create messages:mid',
 	timestamp: Date.UTC(2023, 6, 27),
 	method: async function () {
 		const { progress } = this;
@@ -20,7 +20,7 @@ module.exports = {
 				`chat:room:${roomId}:mids`,
 				async (mids) => {
 					let messageData = await db.getObjects(
-						mids.map((mid) => `message:${mid}`),
+						mids.map((mid) => `message:${mid}`)
 					);
 					messageData.forEach((m, idx) => {
 						if (m) {
@@ -36,19 +36,19 @@ module.exports = {
 
 					await db.setObjectBulk(bulkSet);
 					await db.sortedSetAdd(
-						"messages:mid",
+						'messages:mid',
 						messageData.map((msg) => msg.timestamp),
-						messageData.map((msg) => msg.mid),
+						messageData.map((msg) => msg.mid)
 					);
 				},
 				{
 					batch: 500,
-				},
+				}
 			);
 			progress.incr(1);
 		}
 
 		const count = await db.sortedSetCard(`messages:mid`);
-		await db.setObjectField("global", "messageCount", count);
+		await db.setObjectField('global', 'messageCount', count);
 	},
 };

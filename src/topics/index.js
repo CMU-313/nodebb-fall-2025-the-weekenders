@@ -1,45 +1,45 @@
-"use strict";
+'use strict';
 
-const _ = require("lodash");
-const validator = require("validator");
+const _ = require('lodash');
+const validator = require('validator');
 
-const db = require("../database");
-const posts = require("../posts");
-const utils = require("../utils");
-const plugins = require("../plugins");
-const meta = require("../meta");
-const user = require("../user");
-const categories = require("../categories");
-const activitypub = require("../activitypub");
-const privileges = require("../privileges");
-const social = require("../social");
-const { applyAnonymousMask, toBoolean } = require("./anonymous");
+const db = require('../database');
+const posts = require('../posts');
+const utils = require('../utils');
+const plugins = require('../plugins');
+const meta = require('../meta');
+const user = require('../user');
+const categories = require('../categories');
+const activitypub = require('../activitypub');
+const privileges = require('../privileges');
+const social = require('../social');
+const { applyAnonymousMask, toBoolean } = require('./anonymous');
 
 const Topics = module.exports;
 
-require("./data")(Topics);
-require("./create")(Topics);
-require("./delete")(Topics);
-require("./sorted")(Topics);
-require("./unread")(Topics);
-require("./recent")(Topics);
-require("./user")(Topics);
-require("./fork")(Topics);
-require("./posts")(Topics);
-require("./follow")(Topics);
-require("./tags")(Topics);
-require("./teaser")(Topics);
-Topics.scheduled = require("./scheduled");
-require("./suggested")(Topics);
-require("./tools")(Topics);
-Topics.thumbs = require("./thumbs");
-require("./bookmarks")(Topics);
-require("./merge")(Topics);
-Topics.events = require("./events");
+require('./data')(Topics);
+require('./create')(Topics);
+require('./delete')(Topics);
+require('./sorted')(Topics);
+require('./unread')(Topics);
+require('./recent')(Topics);
+require('./user')(Topics);
+require('./fork')(Topics);
+require('./posts')(Topics);
+require('./follow')(Topics);
+require('./tags')(Topics);
+require('./teaser')(Topics);
+Topics.scheduled = require('./scheduled');
+require('./suggested')(Topics);
+require('./tools')(Topics);
+Topics.thumbs = require('./thumbs');
+require('./bookmarks')(Topics);
+require('./merge')(Topics);
+Topics.events = require('./events');
 
 Topics.exists = async function (tids) {
 	return await db.exists(
-		Array.isArray(tids) ? tids.map((tid) => `topic:${tid}`) : `topic:${tids}`,
+		Array.isArray(tids) ? tids.map((tid) => `topic:${tid}`) : `topic:${tids}`
 	);
 };
 
@@ -52,11 +52,11 @@ Topics.getTopicsFromSet = async function (set, uid, start, stop) {
 
 Topics.getTopics = async function (tids, options) {
 	let uid = options;
-	if (typeof options === "object") {
+	if (typeof options === 'object') {
 		uid = options.uid;
 	}
 
-	tids = await privileges.topics.filterTids("topics:read", tids, uid);
+	tids = await privileges.topics.filterTids('topics:read', tids, uid);
 	return await Topics.getTopicsByTids(tids, options);
 };
 
@@ -65,7 +65,7 @@ Topics.getTopicsByTids = async function (tids, options) {
 		return [];
 	}
 	let uid = options;
-	if (typeof options === "object") {
+	if (typeof options === 'object') {
 		uid = options.uid;
 	}
 
@@ -74,7 +74,7 @@ Topics.getTopicsByTids = async function (tids, options) {
 		const uids = _.uniq(
 			topics
 				.map((t) => t && t.uid && t.uid.toString())
-				.filter((v) => utils.isNumber(v) || activitypub.helpers.isUri(v)),
+				.filter((v) => utils.isNumber(v) || activitypub.helpers.isUri(v))
 		);
 		const cids = _.uniq(topics.map((t) => t && t.cid && t.cid.toString()));
 		const guestTopics = topics.filter((t) => t && t.uid === 0);
@@ -84,7 +84,7 @@ Topics.getTopicsByTids = async function (tids, options) {
 
 		async function loadGuestHandles() {
 			const mainPids = guestTopics.map((t) => t.mainPid);
-			const postData = await posts.getPostsFields(mainPids, ["handle"]);
+			const postData = await posts.getPostsFields(mainPids, ['handle']);
 			return postData.map((p) => p.handle);
 		}
 
@@ -93,8 +93,8 @@ Topics.getTopicsByTids = async function (tids, options) {
 				return {};
 			}
 			const postData = await posts.getPostsFields(mainPids, [
-				"pid",
-				"isAnonymous",
+				'pid',
+				'isAnonymous',
 			]);
 			const map = {};
 			postData.forEach((post) => {
@@ -111,7 +111,7 @@ Topics.getTopicsByTids = async function (tids, options) {
 			}
 			const data = await db.getObjectsFields(
 				uids.map((uid) => `user:${uid}:settings`),
-				["showfullname"],
+				['showfullname']
 			);
 			data.forEach((settings) => {
 				settings.showfullname = parseInt(settings.showfullname, 10) === 1;
@@ -130,31 +130,31 @@ Topics.getTopicsByTids = async function (tids, options) {
 		] = await Promise.all([
 			Topics.getTeasers(topics, options),
 			user.getUsersFields(uids, [
-				"uid",
-				"username",
-				"fullname",
-				"userslug",
-				"reputation",
-				"helpfulnessScore",
-				"postcount",
-				"picture",
-				"signature",
-				"banned",
-				"status",
-				"icon:bgColor",
-				"icon:text",
+				'uid',
+				'username',
+				'fullname',
+				'userslug',
+				'reputation',
+				'helpfulnessScore',
+				'postcount',
+				'picture',
+				'signature',
+				'banned',
+				'status',
+				'icon:bgColor',
+				'icon:text',
 			]),
 			loadShowfullnameSettings(),
 			categories.getCategoriesFields(cids, [
-				"cid",
-				"name",
-				"slug",
-				"icon",
-				"backgroundImage",
-				"imageClass",
-				"bgColor",
-				"color",
-				"disabled",
+				'cid',
+				'name',
+				'slug',
+				'icon',
+				'backgroundImage',
+				'imageClass',
+				'bgColor',
+				'color',
+				'disabled',
 			]),
 			loadGuestHandles(),
 			Topics.thumbs.load(topics),
@@ -163,22 +163,22 @@ Topics.getTopicsByTids = async function (tids, options) {
 		// DEBUG: log maps used for anonymous masking
 		try {
 			console.error(
-				"[DEBUG] Topics.getTopicsByTids - mainAnonMap:",
-				JSON.stringify(mainAnonMap),
+				'[DEBUG] Topics.getTopicsByTids - mainAnonMap:',
+				JSON.stringify(mainAnonMap)
 			);
 			console.error(
-				"[DEBUG] Topics.getTopicsByTids - tidToGuestHandle:",
+				'[DEBUG] Topics.getTopicsByTids - tidToGuestHandle:',
 				JSON.stringify(
 					_.zipObject(
 						guestTopics.map((t) => t.tid),
-						guestHandles,
-					),
-				),
+						guestHandles
+					)
+				)
 			);
 		} catch (err) {
 			console.error(
-				"[DEBUG] Topics.getTopicsByTids - logging error",
-				err && err.stack ? err.stack : err,
+				'[DEBUG] Topics.getTopicsByTids - logging error',
+				err && err.stack ? err.stack : err
 			);
 		}
 
@@ -196,7 +196,7 @@ Topics.getTopicsByTids = async function (tids, options) {
 			categoriesMap: _.zipObject(cids, categoriesData),
 			tidToGuestHandle: _.zipObject(
 				guestTopics.map((t) => t.tid),
-				guestHandles,
+				guestHandles
 			),
 			thumbs,
 			mainAnonMap,
@@ -220,7 +220,7 @@ Topics.getTopicsByTids = async function (tids, options) {
 		viewerUid > 0 ? user.isPrivileged(viewerUid) : false,
 	]);
 
-	const sortNewToOld = callerSettings.topicPostSort === "newest_to_oldest";
+	const sortNewToOld = callerSettings.topicPostSort === 'newest_to_oldest';
 	result.topics.forEach((topic, i) => {
 		if (topic) {
 			topic.thumbs = result.thumbs[i];
@@ -235,10 +235,10 @@ Topics.getTopicsByTids = async function (tids, options) {
 			applyAnonymousMask(topicForMask, uid, !!isStaffViewer);
 			topic.uid = topicForMask.uid;
 			topic.user = topicForMask.user;
-			topic["icon:bgColor"] = topic.user
-				? topic.user["icon:bgColor"]
+			topic['icon:bgColor'] = topic.user
+				? topic.user['icon:bgColor']
 				: undefined;
-			topic["icon:text"] = topic.user ? topic.user["icon:text"] : undefined;
+			topic['icon:text'] = topic.user ? topic.user['icon:text'] : undefined;
 			const topicIsAnonymous = toBoolean(result.mainAnonMap[topic.mainPid]);
 			if (
 				!topicIsAnonymous &&
@@ -246,7 +246,7 @@ Topics.getTopicsByTids = async function (tids, options) {
 				topic.user
 			) {
 				topic.user.username = validator.escape(
-					result.tidToGuestHandle[topic.tid],
+					result.tidToGuestHandle[topic.tid]
 				);
 				topic.user.displayname = topic.user.username;
 			}
@@ -268,10 +268,10 @@ Topics.getTopicsByTids = async function (tids, options) {
 	});
 
 	const filteredTopics = result.topics.filter(
-		(topic) => topic && topic.category && !topic.category.disabled,
+		(topic) => topic && topic.category && !topic.category.disabled
 	);
 
-	const hookResult = await plugins.hooks.fire("filter:topics.get", {
+	const hookResult = await plugins.hooks.fire('filter:topics.get', {
 		topics: filteredTopics,
 		uid: uid,
 	});
@@ -284,7 +284,7 @@ Topics.getTopicWithPosts = async function (
 	uid,
 	start,
 	stop,
-	reverse,
+	reverse
 ) {
 	const [
 		posts,
@@ -304,7 +304,7 @@ Topics.getTopicWithPosts = async function (
 		Topics.getTopicPosts(topicData, set, start, stop, uid, reverse),
 		categories.getCategoryData(topicData.cid),
 		categories.getTagWhitelist([topicData.cid]),
-		plugins.hooks.fire("filter:topic.thread_tools", {
+		plugins.hooks.fire('filter:topic.thread_tools', {
 			topic: topicData,
 			uid: uid,
 			tools: [],
@@ -324,8 +324,7 @@ Topics.getTopicWithPosts = async function (
 	topicData.posts = posts;
 	topicData.posts.forEach((p) => {
 		p.events = events.filter(
-			(event) =>
-				event.timestamp >= p.eventStart && event.timestamp < p.eventEnd,
+			(event) => event.timestamp >= p.eventStart && event.timestamp < p.eventEnd
 		);
 		p.eventStart = undefined;
 		p.eventEnd = undefined;
@@ -346,7 +345,7 @@ Topics.getTopicWithPosts = async function (
 	topicData.deleter = deleter;
 	if (deleter) {
 		topicData.deletedTimestampISO = utils.toISOString(
-			topicData.deletedTimestamp,
+			topicData.deletedTimestamp
 		);
 	}
 	topicData.merger = merger;
@@ -361,7 +360,7 @@ Topics.getTopicWithPosts = async function (
 	topicData.unreplied = topicData.postcount === 1;
 	topicData.icons = [];
 
-	const result = await plugins.hooks.fire("filter:topic.get", {
+	const result = await plugins.hooks.fire('filter:topic.get', {
 		topic: topicData,
 		uid: uid,
 	});
@@ -371,11 +370,11 @@ Topics.getTopicWithPosts = async function (
 function mergeConsecutiveShareEvents(arr) {
 	return arr.reduce((acc, curr) => {
 		const last = acc[acc.length - 1];
-		if (last && last.type === curr.type && last.type === "share") {
+		if (last && last.type === curr.type && last.type === 'share') {
 			if (!last.items) {
 				last.items = [{ ...last }];
-				["user", "text", "timestamp", "timestampISO"].forEach(
-					(field) => delete last[field],
+				['user', 'text', 'timestamp', 'timestampISO'].forEach(
+					(field) => delete last[field]
 				);
 			}
 			last.items.push(curr);
@@ -391,9 +390,9 @@ async function getDeleter(topicData) {
 		return null;
 	}
 	return await user.getUserFields(topicData.deleterUid, [
-		"username",
-		"userslug",
-		"picture",
+		'username',
+		'userslug',
+		'picture',
 	]);
 }
 
@@ -403,11 +402,11 @@ async function getMerger(topicData) {
 	}
 	const [merger, mergedIntoTitle] = await Promise.all([
 		user.getUserFields(topicData.mergerUid, [
-			"username",
-			"userslug",
-			"picture",
+			'username',
+			'userslug',
+			'picture',
 		]),
-		Topics.getTopicField(topicData.mergeIntoTid, "title"),
+		Topics.getTopicField(topicData.mergeIntoTid, 'title'),
 	]);
 	merger.mergedIntoTitle = mergedIntoTitle;
 	return merger;
@@ -419,11 +418,11 @@ async function getForker(topicData) {
 	}
 	const [forker, forkedFromTitle] = await Promise.all([
 		user.getUserFields(topicData.forkerUid, [
-			"username",
-			"userslug",
-			"picture",
+			'username',
+			'userslug',
+			'picture',
 		]),
-		Topics.getTopicField(topicData.forkedFromTid, "title"),
+		Topics.getTopicField(topicData.forkedFromTid, 'title'),
 	]);
 	forker.forkedFromTitle = forkedFromTitle;
 	return forker;
@@ -438,7 +437,7 @@ Topics.getMainPids = async function (tids) {
 	if (!Array.isArray(tids) || !tids.length) {
 		return [];
 	}
-	const topicData = await Topics.getTopicsFields(tids, ["mainPid"]);
+	const topicData = await Topics.getTopicsFields(tids, ['mainPid']);
 	return topicData.map((topic) => topic && topic.mainPid);
 };
 
@@ -459,15 +458,15 @@ async function getMainPosts(mainPids, uid) {
 }
 
 Topics.isLocked = async function (tid) {
-	const locked = await Topics.getTopicField(tid, "locked");
+	const locked = await Topics.getTopicField(tid, 'locked');
 	return locked === 1;
 };
 
 Topics.search = async function (tid, term) {
 	if (!tid || !term) {
-		throw new Error("[[error:invalid-data]]");
+		throw new Error('[[error:invalid-data]]');
 	}
-	const result = await plugins.hooks.fire("filter:topic.search", {
+	const result = await plugins.hooks.fire('filter:topic.search', {
 		tid: tid,
 		term: term,
 		ids: [],
@@ -475,4 +474,4 @@ Topics.search = async function (tid, term) {
 	return Array.isArray(result) ? result : result.ids;
 };
 
-require("../promisify")(Topics);
+require('../promisify')(Topics);

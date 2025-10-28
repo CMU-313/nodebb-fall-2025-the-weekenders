@@ -1,15 +1,15 @@
-"use strict";
+'use strict';
 
-const assert = require("assert");
-const db = require("../mocks/databasemock");
-const posts = require("../../src/posts");
-const topics = require("../../src/topics");
-const categories = require("../../src/categories");
-const user = require("../../src/user");
-const groups = require("../../src/groups");
-const api = require("../../src/api");
+const assert = require('assert');
+const db = require('../mocks/databasemock');
+const posts = require('../../src/posts');
+const topics = require('../../src/topics');
+const categories = require('../../src/categories');
+const user = require('../../src/user');
+const groups = require('../../src/groups');
+const api = require('../../src/api');
 
-describe("Post Endorsement", () => {
+describe('Post Endorsement', () => {
 	let adminUid;
 	let regularUid;
 	let category;
@@ -18,35 +18,35 @@ describe("Post Endorsement", () => {
 	before(async () => {
 		// Create test users
 		adminUid = await user.create({
-			username: "endorseadmin",
-			password: "123456",
+			username: 'endorseadmin',
+			password: '123456',
 		});
 		regularUid = await user.create({
-			username: "regularuser",
-			password: "123456",
+			username: 'regularuser',
+			password: '123456',
 		});
-		await groups.join("administrators", adminUid);
+		await groups.join('administrators', adminUid);
 
 		// Create test category and post
-		category = await categories.create({ name: "Test Category" });
+		category = await categories.create({ name: 'Test Category' });
 		const result = await topics.post({
 			uid: regularUid,
 			cid: category.cid,
-			title: "Test Topic",
-			content: "Test post content",
+			title: 'Test Topic',
+			content: 'Test post content',
 		});
 		pid = result.postData.pid;
 	});
 
-	it("should endorse a post", async () => {
+	it('should endorse a post', async () => {
 		const result = await posts.endorse(pid);
 
 		assert.strictEqual(result.endorsed, true);
-		assert(result.endorsed_at, "should have timestamp");
+		assert(result.endorsed_at, 'should have timestamp');
 		assert.strictEqual(result.pid, Number(pid));
 	});
 
-	it("should unendorse a post", async () => {
+	it('should unendorse a post', async () => {
 		await posts.endorse(pid);
 		const result = await posts.unendorse(pid);
 
@@ -54,53 +54,53 @@ describe("Post Endorsement", () => {
 		assert.strictEqual(result.endorsed_at, null);
 	});
 
-	it("should include endorsement data in post", async () => {
+	it('should include endorsement data in post', async () => {
 		await posts.endorse(pid);
 		const post = await posts.getPostData(pid);
 
-		assert(post.hasOwnProperty("endorsed"));
-		assert(post.hasOwnProperty("endorsed_at"));
-		assert(post.hasOwnProperty("endorsed_atISO"));
+		assert(post.hasOwnProperty('endorsed'));
+		assert(post.hasOwnProperty('endorsed_at'));
+		assert(post.hasOwnProperty('endorsed_atISO'));
 	});
 
-	it("should allow admins to endorse posts", async () => {
+	it('should allow admins to endorse posts', async () => {
 		await posts.unendorse(pid);
 		const result = await api.posts.endorse({ uid: adminUid }, { pid });
 
 		assert.strictEqual(result.endorsed, true);
 	});
 
-	it("should allow admins to unendorse posts", async () => {
+	it('should allow admins to unendorse posts', async () => {
 		await posts.endorse(pid);
 		const result = await api.posts.unendorse({ uid: adminUid }, { pid });
 
 		assert.strictEqual(result.endorsed, false);
 	});
 
-	it("should deny regular users from endorsing", async () => {
+	it('should deny regular users from endorsing', async () => {
 		try {
 			await api.posts.endorse({ uid: regularUid }, { pid });
-			assert.fail("Should have thrown error");
+			assert.fail('Should have thrown error');
 		} catch (err) {
-			assert.strictEqual(err.message, "[[error:no-privileges]]");
+			assert.strictEqual(err.message, '[[error:no-privileges]]');
 		}
 	});
 
-	it("should handle non-existent post", async () => {
+	it('should handle non-existent post', async () => {
 		try {
 			await api.posts.endorse({ uid: adminUid }, { pid: 99999 });
-			assert.fail("Should have thrown error");
+			assert.fail('Should have thrown error');
 		} catch (err) {
-			assert.strictEqual(err.message, "[[error:no-post]]");
+			assert.strictEqual(err.message, '[[error:no-post]]');
 		}
 	});
 
-	it("should handle missing pid", async () => {
+	it('should handle missing pid', async () => {
 		try {
 			await api.posts.endorse({ uid: adminUid }, {});
-			assert.fail("Should have thrown error");
+			assert.fail('Should have thrown error');
 		} catch (err) {
-			assert.strictEqual(err.message, "[[error:invalid-data]]");
+			assert.strictEqual(err.message, '[[error:invalid-data]]');
 		}
 	});
 });

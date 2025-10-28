@@ -1,11 +1,11 @@
-"use strict";
+'use strict';
 
-const categories = require("../../categories");
+const categories = require('../../categories');
 
 const Categories = module.exports;
 
 Categories.getNames = async function () {
-	return await categories.getAllCategoryFields(["cid", "name"]);
+	return await categories.getAllCategoryFields(['cid', 'name']);
 };
 
 Categories.copyPrivilegesToChildren = async function (socket, data) {
@@ -17,7 +17,7 @@ Categories.copyPrivilegesToChildren = async function (socket, data) {
 			data.cid,
 			child,
 			data.group,
-			data.filter,
+			data.filter
 		);
 	}
 };
@@ -26,7 +26,7 @@ async function copyPrivilegesToChildrenRecursive(
 	parentCid,
 	category,
 	group,
-	filter,
+	filter
 ) {
 	await categories.copyPrivilegesFrom(parentCid, category.cid, group, filter);
 	for (const child of category.children) {
@@ -39,7 +39,7 @@ Categories.copySettingsFrom = async function (socket, data) {
 	return await categories.copySettingsFrom(
 		data.fromCid,
 		data.toCid,
-		data.copyParent,
+		data.copyParent
 	);
 };
 
@@ -48,12 +48,12 @@ Categories.copyPrivilegesFrom = async function (socket, data) {
 		data.fromCid,
 		data.toCid,
 		data.group,
-		data.filter,
+		data.filter
 	);
 };
 
 Categories.copyPrivilegesToAllCategories = async function (socket, data) {
-	let cids = await categories.getAllCidsFromSet("categories:cid");
+	let cids = await categories.getAllCidsFromSet('categories:cid');
 	cids = cids.filter((cid) => parseInt(cid, 10) !== parseInt(data.cid, 10));
 	for (const toCid of cids) {
 		// eslint-disable-next-line no-await-in-loop
@@ -61,7 +61,7 @@ Categories.copyPrivilegesToAllCategories = async function (socket, data) {
 			data.cid,
 			toCid,
 			data.group,
-			data.filter,
+			data.filter
 		);
 	}
 };

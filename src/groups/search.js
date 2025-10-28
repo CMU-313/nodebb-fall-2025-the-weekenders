@@ -1,7 +1,7 @@
-"use strict";
+'use strict';
 
-const user = require("../user");
-const db = require("../database");
+const user = require('../user');
+const db = require('../database');
 
 module.exports = function (Groups) {
 	Groups.search = async function (query, options) {
@@ -12,7 +12,7 @@ module.exports = function (Groups) {
 		const excludeGroups = Array.isArray(options.excludeGroups)
 			? options.excludeGroups
 			: [];
-		let groupNames = Object.values(await db.getObject("groupslug:groupname"));
+		let groupNames = Object.values(await db.getObject('groupslug:groupname'));
 		if (!options.hideEphemeralGroups) {
 			groupNames = Groups.ephemeralGroups.concat(groupNames);
 		}
@@ -20,7 +20,7 @@ module.exports = function (Groups) {
 			(name) =>
 				name.toLowerCase().includes(query) &&
 				name !== Groups.BANNED_USERS && // hide banned-users in searches
-				!excludeGroups.includes(name),
+				!excludeGroups.includes(name)
 		);
 		groupNames = groupNames.slice(0, 100);
 
@@ -39,17 +39,17 @@ module.exports = function (Groups) {
 
 	Groups.sort = function (strategy, groups) {
 		switch (strategy) {
-			case "count":
+			case 'count':
 				groups
 					.sort((a, b) => a.slug > b.slug)
 					.sort((a, b) => b.memberCount - a.memberCount);
 				break;
 
-			case "date":
+			case 'date':
 				groups.sort((a, b) => b.createtime - a.createtime);
 				break;
 
-			case "alpha": // intentional fall-through
+			case 'alpha': // intentional fall-through
 			default:
 				groups.sort((a, b) => (a.slug > b.slug ? 1 : -1));
 		}
@@ -63,10 +63,10 @@ module.exports = function (Groups) {
 				data.groupName,
 				data.uid,
 				0,
-				19,
+				19
 			);
 			const matchCount = users.length;
-			const timing = "0.00";
+			const timing = '0.00';
 			return { users, matchCount, timing };
 		}
 

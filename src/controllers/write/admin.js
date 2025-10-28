@@ -1,9 +1,9 @@
-"use strict";
+'use strict';
 
-const api = require("../../api");
-const helpers = require("../helpers");
-const messaging = require("../../messaging");
-const events = require("../../events");
+const api = require('../../api');
+const helpers = require('../helpers');
+const messaging = require('../../messaging');
+const events = require('../../events');
 
 const Admin = module.exports;
 
@@ -31,7 +31,7 @@ Admin.getAnalyticsData = async (req, res) => {
 			until: parseInt(req.query.until, 10) || Date.now(),
 			amount: req.query.amount,
 			units: req.query.units,
-		}),
+		})
 	);
 };
 
@@ -45,7 +45,7 @@ Admin.getToken = async (req, res) => {
 	helpers.formatApiResponse(
 		200,
 		res,
-		await api.utils.tokens.get(req.params.token),
+		await api.utils.tokens.get(req.params.token)
 	);
 };
 
@@ -56,7 +56,7 @@ Admin.updateToken = async (req, res) => {
 	helpers.formatApiResponse(
 		200,
 		res,
-		await api.utils.tokens.update(token, { uid, description }),
+		await api.utils.tokens.update(token, { uid, description })
 	);
 };
 
@@ -77,12 +77,12 @@ Admin.chats = {};
 Admin.chats.deleteRoom = async (req, res) => {
 	const roomData = await messaging.getRoomData(req.params.roomId);
 	if (!roomData) {
-		throw new Error("[[error:no-room]]");
+		throw new Error('[[error:no-room]]');
 	}
 	await messaging.deleteRooms([req.params.roomId]);
 
 	events.log({
-		type: "chat-room-deleted",
+		type: 'chat-room-deleted',
 		roomId: req.params.roomId,
 		roomName: roomData.roomName ? roomData.roomName : `No room name`,
 		uid: req.uid,

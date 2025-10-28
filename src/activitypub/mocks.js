@@ -1,23 +1,23 @@
-"use strict";
+'use strict';
 
-const nconf = require("nconf");
-const mime = require("mime");
-const path = require("path");
-const validator = require("validator");
-const sanitize = require("sanitize-html");
+const nconf = require('nconf');
+const mime = require('mime');
+const path = require('path');
+const validator = require('validator');
+const sanitize = require('sanitize-html');
 
-const db = require("../database");
-const user = require("../user");
-const categories = require("../categories");
-const posts = require("../posts");
-const topics = require("../topics");
-const messaging = require("../messaging");
-const plugins = require("../plugins");
-const slugify = require("../slugify");
-const translator = require("../translator");
-const utils = require("../utils");
+const db = require('../database');
+const user = require('../user');
+const categories = require('../categories');
+const posts = require('../posts');
+const topics = require('../topics');
+const messaging = require('../messaging');
+const plugins = require('../plugins');
+const slugify = require('../slugify');
+const translator = require('../translator');
+const utils = require('../utils');
 
-const accountHelpers = require("../controllers/accounts/helpers");
+const accountHelpers = require('../controllers/accounts/helpers');
 
 const isEmojiShortcode = /^:[\w]+:$/;
 
@@ -30,17 +30,17 @@ const Mocks = module.exports;
  */
 const sanitizeConfig = {
 	allowedTags: sanitize.defaults.allowedTags.concat([
-		"img",
-		"picture",
-		"source",
+		'img',
+		'picture',
+		'source',
 	]),
 	allowedClasses: {
-		"*": [],
+		'*': [],
 	},
 	allowedAttributes: {
-		a: ["href", "rel"],
-		source: ["type", "src", "srcset", "sizes", "media", "height", "width"],
-		img: ["alt", "height", "ismap", "src", "usemap", "width", "srcset"],
+		a: ['href', 'rel'],
+		source: ['type', 'src', 'srcset', 'sizes', 'media', 'height', 'width'],
+		img: ['alt', 'height', 'ismap', 'src', 'usemap', 'width', 'srcset'],
 	},
 };
 
@@ -63,12 +63,12 @@ Mocks._normalize = async (object) => {
 	) {
 		case Array.isArray(attributedTo): {
 			attributedTo = attributedTo.reduce((valid, cur) => {
-				if (typeof cur === "string") {
+				if (typeof cur === 'string') {
 					valid.push(cur);
-				} else if (typeof cur === "object") {
-					if (cur.type === "Person" && cur.id) {
+				} else if (typeof cur === 'object') {
+					if (cur.type === 'Person' && cur.id) {
 						valid.push(cur.id);
-					} else if (cur.type === "Group" && cur.id) {
+					} else if (cur.type === 'Group' && cur.id) {
 						// Add any groups found to cc where it is expected
 						cc = Array.isArray(cc) ? cc : [cc];
 						cc.push(cur.id);
@@ -81,40 +81,40 @@ Mocks._normalize = async (object) => {
 			break;
 		}
 
-		case typeof attributedTo === "object" &&
-			attributedTo.hasOwnProperty("id"): {
+		case typeof attributedTo === 'object' &&
+			attributedTo.hasOwnProperty('id'): {
 			attributedTo = attributedTo.id;
 		}
 	}
 
 	let sourceContent =
-		source && source.mediaType === "text/markdown" ? source.content : undefined;
+		source && source.mediaType === 'text/markdown' ? source.content : undefined;
 	if (sourceContent) {
 		content = null;
 		sourceContent = await activitypub.helpers.remoteAnchorToLocalProfile(
 			sourceContent,
-			true,
+			true
 		);
-	} else if (mediaType === "text/markdown") {
+	} else if (mediaType === 'text/markdown') {
 		sourceContent = await activitypub.helpers.remoteAnchorToLocalProfile(
 			content,
-			true,
+			true
 		);
 		content = null;
 	} else if (content && content.length) {
 		content = sanitize(content, sanitizeConfig);
 		content = await activitypub.helpers.remoteAnchorToLocalProfile(content);
 	} else {
-		content = "<em>This post did not contain any content.</em>";
+		content = '<em>This post did not contain any content.</em>';
 	}
 
 	switch (true) {
-		case image && image.hasOwnProperty("url") && !!image.url: {
+		case image && image.hasOwnProperty('url') && !!image.url: {
 			image = image.url;
 			break;
 		}
 
-		case image && typeof image === "string": {
+		case image && typeof image === 'string': {
 			// no change
 			break;
 		}
@@ -125,9 +125,9 @@ Mocks._normalize = async (object) => {
 	}
 	if (image) {
 		const parsed = new URL(image);
-		if (!mime.getType(parsed.pathname).startsWith("image/")) {
+		if (!mime.getType(parsed.pathname).startsWith('image/')) {
 			activitypub.helpers.log(
-				`[activitypub/mocks.post] Received image not identified as image due to MIME type: ${image}`,
+				`[activitypub/mocks.post] Received image not identified as image due to MIME type: ${image}`
 			);
 			image = null;
 		}
@@ -137,19 +137,19 @@ Mocks._normalize = async (object) => {
 		// Handle url array
 		if (Array.isArray(url)) {
 			// Special handling for Video type (from PeerTube specifically)
-			if (type === "Video") {
+			if (type === 'Video') {
 				const stream = url.reduce((memo, { type, mediaType, tag }) => {
 					if (!memo) {
-						if (type === "Link" && mediaType === "application/x-mpegURL") {
+						if (type === 'Link' && mediaType === 'application/x-mpegURL') {
 							memo = tag.reduce(
 								(memo, { type, mediaType, href, width, height }) => {
-									if (!memo && type === "Link" && mediaType === "video/mp4") {
+									if (!memo && type === 'Link' && mediaType === 'video/mp4') {
 										memo = { mediaType, href, width, height };
 									}
 
 									return memo;
 								},
-								null,
+								null
 							);
 						}
 					}
@@ -164,13 +164,13 @@ Mocks._normalize = async (object) => {
 			}
 
 			url = url.reduce((valid, cur) => {
-				if (typeof cur === "string") {
+				if (typeof cur === 'string') {
 					valid.push(cur);
-				} else if (typeof cur === "object") {
-					if (cur.type === "Link" && cur.href) {
+				} else if (typeof cur === 'object') {
+					if (cur.type === 'Link' && cur.href) {
 						if (
 							!cur.mediaType ||
-							(cur.mediaType && cur.mediaType === "text/html")
+							(cur.mediaType && cur.mediaType === 'text/html')
 						) {
 							valid.push(cur.href);
 						}
@@ -230,13 +230,13 @@ Mocks.profile = async (actors) => {
 
 			let picture;
 			if (icon) {
-				picture = typeof icon === "string" ? icon : icon.url;
+				picture = typeof icon === 'string' ? icon : icon.url;
 			}
 			const iconBackgrounds = await user.getIconBackgrounds();
 			let bgColor = Array.prototype.reduce.call(
 				preferredUsername,
 				(cur, next) => cur + next.charCodeAt(),
-				0,
+				0
 			);
 			bgColor = iconBackgrounds[bgColor % iconBackgrounds.length];
 
@@ -245,16 +245,16 @@ Mocks.profile = async (actors) => {
 				tag
 					.filter(
 						(tag) =>
-							tag.type === "Emoji" &&
+							tag.type === 'Emoji' &&
 							isEmojiShortcode.test(tag.name) &&
 							tag.icon &&
 							tag.icon.mediaType &&
-							tag.icon.mediaType.startsWith("image/"),
+							tag.icon.mediaType.startsWith('image/')
 					)
 					.forEach((tag) => {
 						summary = summary.replace(
-							new RegExp(tag.name, "g"),
-							`<img class="not-responsive emoji" src="${tag.icon.url}" title="${tag.name}" />`,
+							new RegExp(tag.name, 'g'),
+							`<img class="not-responsive emoji" src="${tag.icon.url}" title="${tag.name}" />`
 						);
 					});
 			}
@@ -267,28 +267,28 @@ Mocks.profile = async (actors) => {
 					? actor.attachment
 							.filter((attachment) =>
 								activitypub._constants.acceptable.customFields.has(
-									attachment.type,
-								),
+									attachment.type
+								)
 							)
 							.reduce((map, { type, name, value, href, content }) => {
 								// Defer to new style (per FEP fb2a)
-								if (map.has(name) && type === "PropertyValue") {
+								if (map.has(name) && type === 'PropertyValue') {
 									return map;
 								}
 
 								// Strip html from received values (for security)
 								switch (type) {
-									case "Note": {
+									case 'Note': {
 										value = utils.stripHTMLTags(content);
 										break;
 									}
 
-									case "Link": {
+									case 'Link': {
 										value = utils.stripHTMLTags(href);
 										break;
 									}
 
-									case "PropertyValue": {
+									case 'PropertyValue': {
 										value = utils.stripHTMLTags(value);
 										break;
 									}
@@ -306,12 +306,12 @@ Mocks.profile = async (actors) => {
 				fullname: name,
 				joindate: new Date(published).getTime() || Date.now(),
 				picture,
-				status: "offline",
-				"icon:text": (preferredUsername[0] || "").toUpperCase(),
-				"icon:bgColor": bgColor,
+				status: 'offline',
+				'icon:text': (preferredUsername[0] || '').toUpperCase(),
+				'icon:bgColor': bgColor,
 				uploadedpicture: undefined,
-				"cover:url": !image || typeof image === "string" ? image : image.url,
-				"cover:position": "50% 50%",
+				'cover:url': !image || typeof image === 'string' ? image : image.url,
+				'cover:position': '50% 50%',
 				aboutme: posts.sanitize(summary),
 				followerCount,
 				followingCount,
@@ -325,7 +325,7 @@ Mocks.profile = async (actors) => {
 			};
 
 			return payload;
-		}),
+		})
 	);
 
 	return profiles;
@@ -374,28 +374,28 @@ Mocks.category = async (actors) => {
 			let bgColor = Array.prototype.reduce.call(
 				preferredUsername,
 				(cur, next) => cur + next.charCodeAt(),
-				0,
+				0
 			);
 			bgColor = iconBackgrounds[bgColor % iconBackgrounds.length];
 
 			const backgroundImage =
-				!icon || typeof icon === "string" ? icon : icon.url;
+				!icon || typeof icon === 'string' ? icon : icon.url;
 
 			// Replace emoji in summary
 			if (tag && Array.isArray(tag)) {
 				tag
 					.filter(
 						(tag) =>
-							tag.type === "Emoji" &&
+							tag.type === 'Emoji' &&
 							isEmojiShortcode.test(tag.name) &&
 							tag.icon &&
 							tag.icon.mediaType &&
-							tag.icon.mediaType.startsWith("image/"),
+							tag.icon.mediaType.startsWith('image/')
 					)
 					.forEach((tag) => {
 						summary = summary.replace(
-							new RegExp(tag.name, "g"),
-							`<img class="not-responsive emoji" src="${tag.icon.url}" title="${tag.name}" />`,
+							new RegExp(tag.name, 'g'),
+							`<img class="not-responsive emoji" src="${tag.icon.url}" title="${tag.name}" />`
 						);
 					});
 			}
@@ -407,11 +407,11 @@ Mocks.category = async (actors) => {
 				slug: `${preferredUsername}@${hostname}`,
 				description: summary,
 				descriptionParsed: posts.sanitize(summary),
-				icon: backgroundImage ? "fa-none" : "fa-comments",
-				color: "#fff",
+				icon: backgroundImage ? 'fa-none' : 'fa-comments',
+				color: '#fff',
 				bgColor,
 				backgroundImage,
-				imageClass: "cover",
+				imageClass: 'cover',
 				numRecentReplies: 1,
 				// followerCount,
 				// followingCount,
@@ -423,7 +423,7 @@ Mocks.category = async (actors) => {
 			};
 
 			return payload;
-		}),
+		})
 	);
 
 	return categories;
@@ -468,7 +468,7 @@ Mocks.post = async (objects) => {
 			await activitypub.actors.assert(uid);
 
 			const resolved = await activitypub.helpers.resolveLocalId(toPid);
-			if (resolved.type === "post") {
+			if (resolved.type === 'post') {
 				toPid = resolved.id;
 			}
 
@@ -493,7 +493,7 @@ Mocks.post = async (objects) => {
 			};
 
 			return payload;
-		}),
+		})
 	);
 
 	return single ? posts.pop() : posts;
@@ -524,33 +524,33 @@ Mocks.actors.user = async (uid) => {
 		joindate,
 		aboutme,
 		picture,
-		"cover:url": cover,
+		'cover:url': cover,
 	} = userData;
 	let fields = await accountHelpers.getCustomUserFields(0, userData);
-	const publicKey = await activitypub.getPublicKey("uid", uid);
+	const publicKey = await activitypub.getPublicKey('uid', uid);
 
-	let aboutmeParsed = "";
+	let aboutmeParsed = '';
 	if (aboutme) {
-		aboutme = validator.escape(String(aboutme || ""));
-		aboutmeParsed = await plugins.hooks.fire("filter:parse.aboutme", aboutme);
+		aboutme = validator.escape(String(aboutme || ''));
+		aboutmeParsed = await plugins.hooks.fire('filter:parse.aboutme', aboutme);
 		aboutmeParsed = translator.escape(aboutmeParsed);
 	}
 
 	if (picture) {
 		const imagePath = await user.getLocalAvatarPath(uid);
 		picture = {
-			type: "Image",
+			type: 'Image',
 			mediaType: mime.getType(imagePath),
-			url: `${nconf.get("url")}${picture}`,
+			url: `${nconf.get('url')}${picture}`,
 		};
 	}
 
 	if (cover) {
 		const imagePath = await user.getLocalCoverPath(uid);
 		cover = {
-			type: "Image",
+			type: 'Image',
 			mediaType: mime.getType(imagePath),
-			url: `${nconf.get("url")}${cover}`,
+			url: `${nconf.get('url')}${cover}`,
 		};
 	}
 
@@ -564,19 +564,19 @@ Mocks.actors.user = async (uid) => {
 			]);
 			field = { ...field, ...{ name, value } };
 			return field;
-		}),
+		})
 	);
 	fields.forEach(({ type, name, value }) => {
 		if (value) {
-			if (type === "input-link") {
+			if (type === 'input-link') {
 				attachment.push({
-					type: "Link",
+					type: 'Link',
 					name,
 					href: value,
 				});
 			} else {
 				attachment.push({
-					type: "Note",
+					type: 'Note',
 					name,
 					content: value,
 				});
@@ -584,7 +584,7 @@ Mocks.actors.user = async (uid) => {
 
 			// Backwards compatibility
 			attachment.push({
-				type: "PropertyValue",
+				type: 'PropertyValue',
 				name,
 				value,
 			});
@@ -592,18 +592,18 @@ Mocks.actors.user = async (uid) => {
 	});
 
 	return {
-		"@context": [
-			"https://www.w3.org/ns/activitystreams",
-			"https://w3id.org/security/v1",
+		'@context': [
+			'https://www.w3.org/ns/activitystreams',
+			'https://w3id.org/security/v1',
 		],
-		id: `${nconf.get("url")}/uid/${uid}`,
-		url: `${nconf.get("url")}/user/${userslug}`,
-		followers: `${nconf.get("url")}/uid/${uid}/followers`,
-		following: `${nconf.get("url")}/uid/${uid}/following`,
-		inbox: `${nconf.get("url")}/uid/${uid}/inbox`,
-		outbox: `${nconf.get("url")}/uid/${uid}/outbox`,
+		id: `${nconf.get('url')}/uid/${uid}`,
+		url: `${nconf.get('url')}/user/${userslug}`,
+		followers: `${nconf.get('url')}/uid/${uid}/followers`,
+		following: `${nconf.get('url')}/uid/${uid}/following`,
+		inbox: `${nconf.get('url')}/uid/${uid}/inbox`,
+		outbox: `${nconf.get('url')}/uid/${uid}/outbox`,
 
-		type: "Person",
+		type: 'Person',
 		name: username !== displayname ? fullname : username, // displayname is escaped, fullname is not
 		preferredUsername: userslug,
 		summary: aboutmeParsed,
@@ -613,13 +613,13 @@ Mocks.actors.user = async (uid) => {
 		attachment,
 
 		publicKey: {
-			id: `${nconf.get("url")}/uid/${uid}#key`,
-			owner: `${nconf.get("url")}/uid/${uid}`,
+			id: `${nconf.get('url')}/uid/${uid}#key`,
+			owner: `${nconf.get('url')}/uid/${uid}`,
 			publicKeyPem: publicKey,
 		},
 
 		endpoints: {
-			sharedInbox: `${nconf.get("url")}/inbox`,
+			sharedInbox: `${nconf.get('url')}/inbox`,
 		},
 	};
 };
@@ -633,53 +633,53 @@ Mocks.actors.category = async (cid) => {
 		federatedDescription,
 		backgroundImage,
 	} = await categories.getCategoryFields(cid, [
-		"name",
-		"handle",
-		"slug",
-		"description",
-		"descriptionParsed",
-		"federatedDescription",
-		"backgroundImage",
+		'name',
+		'handle',
+		'slug',
+		'description',
+		'descriptionParsed',
+		'federatedDescription',
+		'backgroundImage',
 	]);
-	const publicKey = await activitypub.getPublicKey("cid", cid);
+	const publicKey = await activitypub.getPublicKey('cid', cid);
 
 	let icon;
 	if (backgroundImage) {
 		const filename = path.basename(utils.decodeHTMLEntities(backgroundImage));
 		icon = {
-			type: "Image",
+			type: 'Image',
 			mediaType: mime.getType(filename),
-			url: `${nconf.get("url")}${utils.decodeHTMLEntities(backgroundImage)}`,
+			url: `${nconf.get('url')}${utils.decodeHTMLEntities(backgroundImage)}`,
 		};
 	} else {
 		icon = await categories.icons.get(cid);
-		icon = icon.get("png");
+		icon = icon.get('png');
 		icon = {
-			type: "Image",
-			mediaType: "image/png",
-			url: `${nconf.get("url")}${icon}`,
+			type: 'Image',
+			mediaType: 'image/png',
+			url: `${nconf.get('url')}${icon}`,
 		};
 	}
 
 	// Append federated desc.
 	const fallback = await translator.translate(
-		"[[admin/manage/categories:federatedDescription.default]]",
+		'[[admin/manage/categories:federatedDescription.default]]'
 	);
 	summary += `<hr /><p dir="auto">${federatedDescription || fallback}</p>\n`;
 
 	return {
-		"@context": [
-			"https://www.w3.org/ns/activitystreams",
-			"https://w3id.org/security/v1",
+		'@context': [
+			'https://www.w3.org/ns/activitystreams',
+			'https://w3id.org/security/v1',
 		],
-		id: `${nconf.get("url")}/category/${cid}`,
-		url: `${nconf.get("url")}/category/${slug}`,
+		id: `${nconf.get('url')}/category/${cid}`,
+		url: `${nconf.get('url')}/category/${slug}`,
 		// followers: ,
 		//  following: ,
-		inbox: `${nconf.get("url")}/category/${cid}/inbox`,
-		outbox: `${nconf.get("url")}/category/${cid}/outbox`,
+		inbox: `${nconf.get('url')}/category/${cid}/inbox`,
+		outbox: `${nconf.get('url')}/category/${cid}/outbox`,
 
-		type: "Group",
+		type: 'Group',
 		name,
 		preferredUsername,
 		summary,
@@ -687,13 +687,13 @@ Mocks.actors.category = async (cid) => {
 		icon,
 
 		publicKey: {
-			id: `${nconf.get("url")}/category/${cid}#key`,
-			owner: `${nconf.get("url")}/category/${cid}`,
+			id: `${nconf.get('url')}/category/${cid}#key`,
+			owner: `${nconf.get('url')}/category/${cid}`,
 			publicKeyPem: publicKey,
 		},
 
 		endpoints: {
-			sharedInbox: `${nconf.get("url")}/inbox`,
+			sharedInbox: `${nconf.get('url')}/inbox`,
 		},
 	};
 };
@@ -701,16 +701,16 @@ Mocks.actors.category = async (cid) => {
 Mocks.notes = {};
 
 Mocks.notes.public = async (post) => {
-	const id = `${nconf.get("url")}/post/${post.pid}`;
+	const id = `${nconf.get('url')}/post/${post.pid}`;
 
 	// Return a tombstone for a deleted post
 	if (post.deleted === true) {
 		return Mocks.tombstone({
 			id,
-			formerType: "Note",
-			attributedTo: `${nconf.get("url")}/uid/${post.user.uid}`,
-			context: `${nconf.get("url")}/topic/${post.topic.tid}`,
-			audience: `${nconf.get("url")}/category/${post.category.cid}`,
+			formerType: 'Note',
+			attributedTo: `${nconf.get('url')}/uid/${post.user.uid}`,
+			context: `${nconf.get('url')}/topic/${post.topic.tid}`,
+			audience: `${nconf.get('url')}/category/${post.category.cid}`,
 		});
 	}
 
@@ -718,7 +718,7 @@ Mocks.notes.public = async (post) => {
 	const updated = post.edited ? post.editedISO : null;
 
 	const to = new Set([activitypub._constants.publicAddress]);
-	const cc = new Set([`${nconf.get("url")}/uid/${post.user.uid}/followers`]);
+	const cc = new Set([`${nconf.get('url')}/uid/${post.user.uid}/followers`]);
 
 	let inReplyTo = null;
 	let tag = null;
@@ -726,40 +726,40 @@ Mocks.notes.public = async (post) => {
 	const isMainPost = post.pid === post.topic.mainPid;
 
 	let name = null;
-	({ titleRaw: name } = await topics.getTopicFields(post.tid, ["title"]));
+	({ titleRaw: name } = await topics.getTopicFields(post.tid, ['title']));
 
 	if (post.toPid) {
 		// direct reply
 		inReplyTo = utils.isNumber(post.toPid)
-			? `${nconf.get("url")}/post/${post.toPid}`
+			? `${nconf.get('url')}/post/${post.toPid}`
 			: post.toPid;
 		name = `Re: ${name}`;
 
-		const parentId = await posts.getPostField(post.toPid, "uid");
-		followersUrl = await user.getUserField(parentId, "followersUrl");
+		const parentId = await posts.getPostField(post.toPid, 'uid');
+		followersUrl = await user.getUserField(parentId, 'followersUrl');
 		to.add(
 			utils.isNumber(parentId)
-				? `${nconf.get("url")}/uid/${parentId}`
-				: parentId,
+				? `${nconf.get('url')}/uid/${parentId}`
+				: parentId
 		);
 	} else if (!post.isMainPost) {
 		// reply to OP
 		inReplyTo = utils.isNumber(post.topic.mainPid)
-			? `${nconf.get("url")}/post/${post.topic.mainPid}`
+			? `${nconf.get('url')}/post/${post.topic.mainPid}`
 			: post.topic.mainPid;
 		name = `Re: ${name}`;
 
 		to.add(
 			utils.isNumber(post.topic.uid)
-				? `${nconf.get("url")}/uid/${post.topic.uid}`
-				: post.topic.uid,
+				? `${nconf.get('url')}/uid/${post.topic.uid}`
+				: post.topic.uid
 		);
-		followersUrl = await user.getUserField(post.topic.uid, "followersUrl");
+		followersUrl = await user.getUserField(post.topic.uid, 'followersUrl');
 	} else {
 		// new topic
 		tag = post.topic.tags.map((tag) => ({
-			type: "Hashtag",
-			href: `${nconf.get("url")}/tags/${tag.valueEncoded}`,
+			type: 'Hashtag',
+			href: `${nconf.get('url')}/tags/${tag.valueEncoded}`,
 			name: `#${tag.value}`,
 		}));
 	}
@@ -768,32 +768,32 @@ Mocks.notes.public = async (post) => {
 		cc.add(followersUrl);
 	}
 
-	const content = await posts.getPostField(post.pid, "content");
+	const content = await posts.getPostField(post.pid, 'content');
 	post.content = content; // re-send raw content into parsePost
-	const parsed = await posts.parsePost(post, "activitypub.note");
+	const parsed = await posts.parsePost(post, 'activitypub.note');
 	post.content = sanitize(parsed.content, sanitizeConfig);
 	post.content = posts.relativeToAbsolute(post.content, posts.urlRegex);
 	post.content = posts.relativeToAbsolute(post.content, posts.imgRegex);
 
 	let source = null;
 	const [markdownEnabled, mentionsEnabled] = await Promise.all([
-		plugins.isActive("nodebb-plugin-markdown"),
-		plugins.isActive("nodebb-plugin-mentions"),
+		plugins.isActive('nodebb-plugin-markdown'),
+		plugins.isActive('nodebb-plugin-mentions'),
 	]);
 	if (markdownEnabled) {
 		// Re-parse for markdown
 		const _post = { ...post };
-		const raw = await posts.getPostField(post.pid, "content");
+		const raw = await posts.getPostField(post.pid, 'content');
 		_post.content = raw;
-		let { content } = await posts.parsePost(_post, "markdown");
+		let { content } = await posts.parsePost(_post, 'markdown');
 		content = posts.relativeToAbsolute(content, posts.mdImageUrlRegex);
 		source = {
 			content,
-			mediaType: "text/markdown",
+			mediaType: 'text/markdown',
 		};
 	}
 	if (mentionsEnabled) {
-		const mentions = require.main.require("nodebb-plugin-mentions");
+		const mentions = require.main.require('nodebb-plugin-mentions');
 		const matches = await mentions.getMatches(content);
 
 		if (matches.size) {
@@ -803,16 +803,16 @@ Mocks.notes.public = async (post) => {
 					if (utils.isNumber(href)) {
 						// local ref
 						name = name.toLowerCase(); // local slugs are always lowercase
-						href = `${nconf.get("url")}/${type === "uid" ? "user" : `category/${href}`}/${name.slice(1)}`;
-						name = `${name}@${nconf.get("url_parsed").hostname}`;
+						href = `${nconf.get('url')}/${type === 'uid' ? 'user' : `category/${href}`}/${name.slice(1)}`;
+						name = `${name}@${nconf.get('url_parsed').hostname}`;
 					}
 
 					return {
-						type: "Mention",
+						type: 'Mention',
 						href,
 						name,
 					};
-				}),
+				})
 			);
 
 			Array.from(matches)
@@ -833,13 +833,13 @@ Mocks.notes.public = async (post) => {
 			let type;
 
 			switch (true) {
-				case mediaType && mediaType.startsWith("image"): {
-					type = "Image";
+				case mediaType && mediaType.startsWith('image'): {
+					type = 'Image';
 					break;
 				}
 
 				default: {
-					type = "Link";
+					type = 'Link';
 					break;
 				}
 			}
@@ -859,11 +859,11 @@ Mocks.notes.public = async (post) => {
 	const uploads = await posts.uploads.listWithSizes(post.pid);
 	const isThumb = await db.isSortedSetMembers(
 		`topic:${post.tid}:thumbs`,
-		uploads.map((u) => u.name),
+		uploads.map((u) => u.name)
 	);
 	uploads.forEach(({ name, width, height }, idx) => {
 		const mediaType = mime.getType(name);
-		const url = `${nconf.get("url") + nconf.get("upload_url")}/${name}`;
+		const url = `${nconf.get('url') + nconf.get('upload_url')}/${name}`;
 		(noteAttachment || attachment).push({ mediaType, url, width, height });
 		if (isThumb[idx] && noteAttachment) {
 			attachment.push({ mediaType, url, width, height });
@@ -875,7 +875,7 @@ Mocks.notes.public = async (post) => {
 	while (match !== null) {
 		if (match[1]) {
 			const { hostname, pathname, href: url } = new URL(match[1]);
-			if (hostname !== nconf.get("url_parsed").hostname) {
+			if (hostname !== nconf.get('url_parsed').hostname) {
 				const mediaType = mime.getType(pathname);
 				(noteAttachment || attachment).push({ mediaType, url });
 			}
@@ -888,8 +888,8 @@ Mocks.notes.public = async (post) => {
 	let summary = null;
 	if (isMainPost) {
 		preview = {
-			type: "Note",
-			attributedTo: `${nconf.get("url")}/uid/${post.user.uid}`,
+			type: 'Note',
+			attributedTo: `${nconf.get('url')}/uid/${post.user.uid}`,
 			content: post.content,
 			published,
 			attachment: normalizeAttachment(noteAttachment),
@@ -898,15 +898,15 @@ Mocks.notes.public = async (post) => {
 		summary = post.content;
 	}
 
-	let context = await posts.getPostField(post.pid, "context");
-	context = context || `${nconf.get("url")}/topic/${post.topic.tid}`;
+	let context = await posts.getPostField(post.pid, 'context');
+	context = context || `${nconf.get('url')}/topic/${post.topic.tid}`;
 
 	/**
 	 * audience is exposed as part of 1b12 but is now ignored by Lemmy.
 	 * Remove this and most references to audience in 2026.
 	 */
 	let audience = utils.isNumber(post.category.cid) // default
-		? `${nconf.get("url")}/category/${post.category.cid}`
+		? `${nconf.get('url')}/category/${post.category.cid}`
 		: post.category.cid;
 	if (inReplyTo) {
 		const chain = await activitypub.notes.getParentChain(post.uid, inReplyTo);
@@ -917,16 +917,16 @@ Mocks.notes.public = async (post) => {
 	to.add(audience);
 
 	let object = {
-		"@context": "https://www.w3.org/ns/activitystreams",
+		'@context': 'https://www.w3.org/ns/activitystreams',
 		id,
-		type: isMainPost ? "Article" : "Note",
+		type: isMainPost ? 'Article' : 'Note',
 		to: Array.from(to),
 		cc: Array.from(cc),
 		inReplyTo,
 		published,
 		updated,
 		url: id,
-		attributedTo: `${nconf.get("url")}/uid/${post.user.uid}`,
+		attributedTo: `${nconf.get('url')}/uid/${post.user.uid}`,
 		context,
 		audience,
 		summary,
@@ -939,7 +939,7 @@ Mocks.notes.public = async (post) => {
 		replies: `${id}/replies`,
 	};
 
-	({ object } = await plugins.hooks.fire("filter:activitypub.mocks.note", {
+	({ object } = await plugins.hooks.fire('filter:activitypub.mocks.note', {
 		object,
 		post,
 		private: false,
@@ -948,14 +948,14 @@ Mocks.notes.public = async (post) => {
 };
 
 Mocks.notes.private = async ({ messageObj }) => {
-	const id = `${nconf.get("url")}/message/${messageObj.mid}`;
+	const id = `${nconf.get('url')}/message/${messageObj.mid}`;
 
 	// Return a tombstone for a deleted message
 	if (messageObj.deleted === 1) {
 		return Mocks.tombstone({
 			id,
-			formerType: "Note",
-			attributedTo: `${nconf.get("url")}/uid/${messageObj.fromuid}`,
+			formerType: 'Note',
+			attributedTo: `${nconf.get('url')}/uid/${messageObj.fromuid}`,
 			// context: `${nconf.get('url')}/topic/${post.topic.tid}`,
 		});
 	}
@@ -964,77 +964,77 @@ Mocks.notes.private = async ({ messageObj }) => {
 	uids = uids.filter((uid) => String(uid) !== String(messageObj.fromuid)); // no author
 	const to = new Set(
 		uids.map((uid) =>
-			utils.isNumber(uid) ? `${nconf.get("url")}/uid/${uid}` : uid,
-		),
+			utils.isNumber(uid) ? `${nconf.get('url')}/uid/${uid}` : uid
+		)
 	);
 	const published = messageObj.timestampISO;
 	const updated = messageObj.edited ? messageObj.editedISO : undefined;
 
 	let source;
-	const markdownEnabled = await plugins.isActive("nodebb-plugin-markdown");
+	const markdownEnabled = await plugins.isActive('nodebb-plugin-markdown');
 	if (markdownEnabled) {
 		let { content } = messageObj;
 		content = posts.relativeToAbsolute(content, posts.mdImageUrlRegex);
 
 		source = {
 			content,
-			mediaType: "text/markdown",
+			mediaType: 'text/markdown',
 		};
 	}
 
-	const mentions = await user.getUsersFields(uids, ["uid", "userslug"]);
+	const mentions = await user.getUsersFields(uids, ['uid', 'userslug']);
 	const tag = [];
 	tag.push(
 		...mentions.map(({ uid, userslug }) => ({
-			type: "Mention",
-			href: utils.isNumber(uid) ? `${nconf.get("url")}/uid/${uid}` : uid,
+			type: 'Mention',
+			href: utils.isNumber(uid) ? `${nconf.get('url')}/uid/${uid}` : uid,
 			name: utils.isNumber(uid)
-				? `${userslug}@${nconf.get("url_parsed").hostname}`
+				? `${userslug}@${nconf.get('url_parsed').hostname}`
 				: userslug,
-		})),
+		}))
 	);
 
 	let inReplyTo;
 	if (messageObj.toMid) {
 		inReplyTo = utils.isNumber(messageObj.toMid)
-			? `${nconf.get("url")}/message/${messageObj.toMid}`
+			? `${nconf.get('url')}/message/${messageObj.toMid}`
 			: messageObj.toMid;
 	}
 	if (!inReplyTo) {
 		// Get immediately preceding message
 		const index = await db.sortedSetRank(
 			`chat:room:${messageObj.roomId}:mids`,
-			messageObj.mid,
+			messageObj.mid
 		);
 		if (index > 0) {
 			const mids = await db.getSortedSetRevRange(
 				`chat:room:${messageObj.roomId}:mids`,
 				1,
-				-1,
+				-1
 			);
-			let isSystem = await messaging.getMessagesFields(mids, ["system"]);
+			let isSystem = await messaging.getMessagesFields(mids, ['system']);
 			isSystem = isSystem.map((o) => o.system);
 			inReplyTo = mids.reduce(
 				(memo, mid, idx) => memo || (!isSystem[idx] ? mid : undefined),
-				undefined,
+				undefined
 			);
 			inReplyTo = utils.isNumber(inReplyTo)
-				? `${nconf.get("url")}/message/${inReplyTo}`
+				? `${nconf.get('url')}/message/${inReplyTo}`
 				: inReplyTo;
 		}
 	}
 
 	let object = {
-		"@context": "https://www.w3.org/ns/activitystreams",
+		'@context': 'https://www.w3.org/ns/activitystreams',
 		id,
-		type: "Note",
+		type: 'Note',
 		to: Array.from(to),
 		cc: [],
 		inReplyTo,
 		published,
 		updated,
 		url: id,
-		attributedTo: `${nconf.get("url")}/uid/${messageObj.fromuid}`,
+		attributedTo: `${nconf.get('url')}/uid/${messageObj.fromuid}`,
 		// context: `${nconf.get('url')}/topic/${post.topic.tid}`,
 		// audience: `${nconf.get('url')}/category/${post.category.cid}`,
 		summary: null,
@@ -1046,7 +1046,7 @@ Mocks.notes.private = async ({ messageObj }) => {
 		// replies: `${id}/replies`, // todo
 	};
 
-	({ object } = await plugins.hooks.fire("filter:activitypub.mocks.note", {
+	({ object } = await plugins.hooks.fire('filter:activitypub.mocks.note', {
 		object,
 		post: messageObj,
 		private: false,
@@ -1059,7 +1059,7 @@ Mocks.activities = {};
 Mocks.activities.create = async (pid, uid, post) => {
 	// Local objects only, post optional
 	if (!utils.isNumber(pid)) {
-		throw new Error("[[error:invalid-pid]]");
+		throw new Error('[[error:invalid-pid]]');
 	}
 
 	if (!post) {
@@ -1067,7 +1067,7 @@ Mocks.activities.create = async (pid, uid, post) => {
 			await posts.getPostSummaryByPids([pid], uid, { stripTags: false })
 		).pop();
 		if (!post) {
-			throw new Error("[[error:invalid-pid]]");
+			throw new Error('[[error:invalid-pid]]');
 		}
 	}
 
@@ -1081,7 +1081,7 @@ Mocks.activities.create = async (pid, uid, post) => {
 
 	const activity = {
 		id: `${object.id}#activity/create/${Date.now()}`,
-		type: "Create",
+		type: 'Create',
 		actor: object.attributedTo,
 		to,
 		cc,
@@ -1092,7 +1092,7 @@ Mocks.activities.create = async (pid, uid, post) => {
 };
 
 Mocks.tombstone = async (properties) => ({
-	"@context": "https://www.w3.org/ns/activitystreams",
-	type: "Tombstone",
+	'@context': 'https://www.w3.org/ns/activitystreams',
+	type: 'Tombstone',
 	...properties,
 });

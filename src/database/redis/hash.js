@@ -1,9 +1,9 @@
-"use strict";
+'use strict';
 
 module.exports = function (module) {
-	const helpers = require("./helpers");
+	const helpers = require('./helpers');
 
-	const cache = require("../cache").create("redis");
+	const cache = require('../cache').create('redis');
 
 	module.objectCache = cache;
 
@@ -12,8 +12,8 @@ module.exports = function (module) {
 			return;
 		}
 
-		if (data.hasOwnProperty("")) {
-			delete data[""];
+		if (data.hasOwnProperty('')) {
+			delete data[''];
 		}
 
 		Object.keys(data).forEach((key) => {
@@ -43,7 +43,7 @@ module.exports = function (module) {
 		}
 		if (Array.isArray(args[1])) {
 			console.warn(
-				"[deprecated] db.setObjectBulk(keys, data) usage is deprecated, please use db.setObjectBulk(data)",
+				'[deprecated] db.setObjectBulk(keys, data) usage is deprecated, please use db.setObjectBulk(data)'
 			);
 			// conver old format to new format for backwards compatibility
 			data = args[0].map((key, i) => [key, args[1][i]]);
@@ -141,7 +141,7 @@ module.exports = function (module) {
 
 		if (!Array.isArray(fields) || !fields.length) {
 			return keys.map((key) =>
-				cachedData[key] ? { ...cachedData[key] } : null,
+				cachedData[key] ? { ...cachedData[key] } : null
 			);
 		}
 		return keys.map((key) => {

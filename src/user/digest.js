@@ -1,27 +1,27 @@
-"use strict";
+'use strict';
 
-const winston = require("winston");
-const nconf = require("nconf");
+const winston = require('winston');
+const nconf = require('nconf');
 
-const db = require("../database");
-const batch = require("../batch");
-const meta = require("../meta");
-const user = require("./index");
-const topics = require("../topics");
-const messaging = require("../messaging");
-const plugins = require("../plugins");
-const emailer = require("../emailer");
-const utils = require("../utils");
+const db = require('../database');
+const batch = require('../batch');
+const meta = require('../meta');
+const user = require('./index');
+const topics = require('../topics');
+const messaging = require('../messaging');
+const plugins = require('../plugins');
+const emailer = require('../emailer');
+const utils = require('../utils');
 
 const Digest = module.exports;
 
-const baseUrl = nconf.get("base_url");
+const baseUrl = nconf.get('base_url');
 
 Digest.execute = async function (payload) {
 	const digestsDisabled = meta.config.disableEmailSubscriptions === 1;
 	if (digestsDisabled) {
 		winston.info(
-			`[user/jobs] Did not send digests (${payload.interval}) because subscription system is disabled.`,
+			`[user/jobs] Did not send digests (${payload.interval}) because subscription system is disabled.`
 		);
 		return false;
 	}
@@ -34,7 +34,7 @@ Digest.execute = async function (payload) {
 	}
 	try {
 		winston.info(
-			`[user/jobs] Digest (${payload.interval}) scheduling completed (${subscribers.length} subscribers). Sending emails; this may take some time...`,
+			`[user/jobs] Digest (${payload.interval}) scheduling completed (${subscribers.length} subscribers). Sending emails; this may take some time...`
 		);
 		await Digest.send({
 			interval: payload.interval,
@@ -44,7 +44,7 @@ Digest.execute = async function (payload) {
 		return true;
 	} catch (err) {
 		winston.error(
-			`[user/jobs] Could not send digests (${payload.interval})\n${err.stack}`,
+			`[user/jobs] Could not send digests (${payload.interval})\n${err.stack}`
 		);
 		throw err;
 	}
@@ -59,11 +59,11 @@ Digest.getUsersInterval = async (uids) => {
 	}
 
 	const settings = await db.getObjects(
-		uids.map((uid) => `user:${uid}:settings`),
+		uids.map((uid) => `user:${uid}:settings`)
 	);
 	const interval = uids.map(
 		(uid, index) =>
-			(settings[index] && settings[index].dailyDigestFreq) || false,
+			(settings[index] && settings[index].dailyDigestFreq) || false
 	);
 	return single ? interval[0] : interval;
 };
@@ -72,7 +72,7 @@ Digest.getSubscribers = async function (interval) {
 	let subscribers = [];
 
 	await batch.processSortedSet(
-		"users:joindate",
+		'users:joindate',
 		async (uids) => {
 			const settings = await user.getMultipleUserSettings(uids);
 			let subUids = [];
@@ -87,10 +87,10 @@ Digest.getSubscribers = async function (interval) {
 		{
 			interval: 1000,
 			batch: 500,
-		},
+		}
 	);
 
-	const results = await plugins.hooks.fire("filter:digest.subscribers", {
+	const results = await plugins.hooks.fire('filter:digest.subscribers', {
 		interval: interval,
 		subscribers: subscribers,
 	});
@@ -108,24 +108,24 @@ Digest.send = async function (data) {
 		data.subscribers,
 		async (uids) => {
 			let userData = await user.getUsersFields(uids, [
-				"uid",
-				"email",
-				"email:confirmed",
-				"username",
-				"userslug",
-				"lastonline",
+				'uid',
+				'email',
+				'email:confirmed',
+				'username',
+				'userslug',
+				'lastonline',
 			]);
 			userData = userData.filter(
 				(u) =>
 					u &&
 					u.email &&
-					(meta.config.includeUnverifiedEmails || u["email:confirmed"]),
+					(meta.config.includeUnverifiedEmails || u['email:confirmed'])
 			);
 			if (!userData.length) {
 				return;
 			}
 			const userSettings = await user.getMultipleUserSettings(
-				userData.map((u) => u.uid),
+				userData.map((u) => u.uid)
 			);
 			await Promise.all(
 				userData.map(async (userObj, index) => {
@@ -148,11 +148,11 @@ Digest.send = async function (data) {
 					}
 
 					unreadNotifs.forEach((n) => {
-						if (n.image && !n.image.startsWith("http")) {
+						if (n.image && !n.image.startsWith('http')) {
 							n.image = baseUrl + n.image;
 						}
 						if (n.path) {
-							n.notification_url = n.path.startsWith("http")
+							n.notification_url = n.path.startsWith('http')
 								? n.path
 								: baseUrl + n.path;
 						}
@@ -160,7 +160,7 @@ Digest.send = async function (data) {
 
 					emailsSent += 1;
 					await emailer
-						.send("digest", userObj.uid, {
+						.send('digest', userObj.uid, {
 							subject: `[[email:digest.subject, ${date.toLocaleDateString(userSetting.userLang)}]]`,
 							username: userObj.username,
 							userslug: userObj.userslug,
@@ -175,53 +175,53 @@ Digest.send = async function (data) {
 						.catch((err) => {
 							if (!errorLogged) {
 								winston.error(
-									`[user/jobs] Could not send digest email\n[emailer.send] ${err.stack}`,
+									`[user/jobs] Could not send digest email\n[emailer.send] ${err.stack}`
 								);
 								errorLogged = true;
 							}
 						});
-				}),
+				})
 			);
-			if (data.interval !== "alltime") {
+			if (data.interval !== 'alltime') {
 				const now = Date.now();
 				await db.sortedSetAdd(
-					"digest:delivery",
+					'digest:delivery',
 					userData.map(() => now),
-					userData.map((u) => u.uid),
+					userData.map((u) => u.uid)
 				);
 			}
 		},
 		{
 			interval: 1000,
 			batch: 100,
-		},
+		}
 	);
 	winston.info(
-		`[user/jobs] Digest (${data.interval}) sending completed. ${emailsSent} emails sent.`,
+		`[user/jobs] Digest (${data.interval}) sending completed. ${emailsSent} emails sent.`
 	);
 	return emailsSent;
 };
 
 Digest.getDeliveryTimes = async (start, stop) => {
-	const count = await db.sortedSetCard("users:joindate");
-	const uids = await user.getUidsFromSet("users:joindate", start, stop);
+	const count = await db.sortedSetCard('users:joindate');
+	const uids = await user.getUidsFromSet('users:joindate', start, stop);
 	if (!uids.length) {
 		return [];
 	}
 
 	const [scores, settings] = await Promise.all([
 		// Grab the last time a digest was successfully delivered to these uids
-		db.sortedSetScores("digest:delivery", uids),
+		db.sortedSetScores('digest:delivery', uids),
 		// Get users' digest settings
 		Digest.getUsersInterval(uids),
 	]);
 
 	// Populate user data
-	let userData = await user.getUsersFields(uids, ["username", "picture"]);
+	let userData = await user.getUsersFields(uids, ['username', 'picture']);
 	userData = userData.map((user, idx) => {
 		user.lastDelivery = scores[idx]
 			? new Date(scores[idx]).toISOString()
-			: "[[admin/manage/digest:null]]";
+			: '[[admin/manage/digest:null]]';
 		user.setting = settings[idx];
 		return user;
 	});
@@ -238,8 +238,8 @@ async function getTermTopics(term, uid) {
 		start: 0,
 		stop: 199,
 		term: term,
-		sort: "posts",
-		teaserPost: "first",
+		sort: 'posts',
+		teaserPost: 'first',
 	});
 	data.topics = data.topics.filter((topic) => topic && !topic.deleted);
 
@@ -271,7 +271,7 @@ async function getTermTopics(term, uid) {
 			}
 			// Fix relative paths in topic data
 			const user =
-				topicObj.hasOwnProperty("teaser") &&
+				topicObj.hasOwnProperty('teaser') &&
 				topicObj.teaser &&
 				topicObj.teaser.user
 					? topicObj.teaser.user

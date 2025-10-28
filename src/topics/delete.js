@@ -1,19 +1,19 @@
-"use strict";
+'use strict';
 
-const db = require("../database");
+const db = require('../database');
 
-const user = require("../user");
-const posts = require("../posts");
-const categories = require("../categories");
-const flags = require("../flags");
-const plugins = require("../plugins");
-const batch = require("../batch");
-const utils = require("../utils");
+const user = require('../user');
+const posts = require('../posts');
+const categories = require('../categories');
+const flags = require('../flags');
+const plugins = require('../plugins');
+const batch = require('../batch');
+const utils = require('../utils');
 
 module.exports = function (Topics) {
 	Topics.delete = async function (tid, uid) {
 		const [cid, pids] = await Promise.all([
-			Topics.getTopicField(tid, "cid"),
+			Topics.getTopicField(tid, 'cid'),
 			Topics.getPids(tid),
 		]);
 		await Promise.all([
@@ -33,28 +33,28 @@ module.exports = function (Topics) {
 		await batch.processArray(
 			pids,
 			async (pids) => {
-				const postData = await posts.getPostsFields(pids, ["pid", "flagId"]);
+				const postData = await posts.getPostsFields(pids, ['pid', 'flagId']);
 				const flaggedPosts = postData.filter(
-					(p) => p && parseInt(p.flagId, 10),
+					(p) => p && parseInt(p.flagId, 10)
 				);
 				await Promise.all(
 					flaggedPosts.map((p) =>
-						flags.update(p.flagId, uid, { state: "resolved" }),
-					),
+						flags.update(p.flagId, uid, { state: 'resolved' })
+					)
 				);
 			},
 			{
 				batch: 500,
-			},
+			}
 		);
 	}
 
 	async function addTopicPidsToCid(tid, cid) {
 		const pids = await Topics.getPids(tid);
 		let postData = await posts.getPostsFields(pids, [
-			"pid",
-			"timestamp",
-			"deleted",
+			'pid',
+			'timestamp',
+			'deleted',
 		]);
 		postData = postData.filter((post) => post && !post.deleted);
 		const pidsToAdd = postData.map((post) => post.pid);
@@ -63,24 +63,24 @@ module.exports = function (Topics) {
 	}
 
 	Topics.restore = async function (tid) {
-		const cid = await Topics.getTopicField(tid, "cid");
+		const cid = await Topics.getTopicField(tid, 'cid');
 		await Promise.all([
-			Topics.deleteTopicFields(tid, ["deleterUid", "deletedTimestamp"]),
+			Topics.deleteTopicFields(tid, ['deleterUid', 'deletedTimestamp']),
 			addTopicPidsToCid(tid, cid),
 		]);
-		await Topics.setTopicField(tid, "deleted", 0);
+		await Topics.setTopicField(tid, 'deleted', 0);
 		await categories.updateRecentTidForCid(cid);
 	};
 
 	Topics.purgePostsAndTopic = async function (tid, uid) {
-		const mainPid = await Topics.getTopicField(tid, "mainPid");
+		const mainPid = await Topics.getTopicField(tid, 'mainPid');
 		await batch.processSortedSet(
 			`tid:${tid}:posts`,
 			async (pids) => {
 				await posts.purge(pids, uid);
 				await db.sortedSetRemove(`tid:${tid}:posts`, pids); // Guard against infinite loop if pid already does not exist in db
 			},
-			{ alwaysStartAt: 0, batch: 500 },
+			{ alwaysStartAt: 0, batch: 500 }
 		);
 		await posts.purge(mainPid, uid);
 		await Topics.purge(tid, uid);
@@ -107,15 +107,14 @@ module.exports = function (Topics) {
 				`tid:${tid}:posters`,
 			]),
 			db.sortedSetsRemove(
-				["topics:tid", "topics:recent", "topics:scheduled"],
-				tid,
+				['topics:tid', 'topics:recent', 'topics:scheduled'],
+				tid
 			),
 			db.sortedSetsRemove(
-				["views", "posts", "votes"].map(
-					(prop) =>
-						`${utils.isNumber(tid) ? "topics" : "topicsRemote"}:${prop}`,
+				['views', 'posts', 'votes'].map(
+					(prop) => `${utils.isNumber(tid) ? 'topics' : 'topicsRemote'}:${prop}`
 				),
-				tid,
+				tid
 			),
 			deleteTopicFromCategoryAndUser(tid),
 			Topics.deleteTopicTags(tid),
@@ -123,7 +122,7 @@ module.exports = function (Topics) {
 			Topics.thumbs.deleteAll(tid),
 			reduceCounters(tid),
 		]);
-		plugins.hooks.fire("action:topic.purge", { topic: deletedTopic, uid: uid });
+		plugins.hooks.fire('action:topic.purge', { topic: deletedTopic, uid: uid });
 		await db.delete(`topic:${tid}`);
 	};
 
@@ -138,7 +137,7 @@ module.exports = function (Topics) {
 	}
 
 	async function deleteTopicFromCategoryAndUser(tid) {
-		const topicData = await Topics.getTopicFields(tid, ["cid", "uid"]);
+		const topicData = await Topics.getTopicFields(tid, ['cid', 'uid']);
 		await Promise.all([
 			db.sortedSetsRemove(
 				[
@@ -153,9 +152,9 @@ module.exports = function (Topics) {
 					`cid:${topicData.cid}:uid:${topicData.uid}:tids`,
 					`uid:${topicData.uid}:topics`,
 				],
-				tid,
+				tid
 			),
-			user.decrementUserFieldBy(topicData.uid, "topiccount", 1),
+			user.decrementUserFieldBy(topicData.uid, 'topiccount', 1),
 		]);
 		await categories.updateRecentTidForCid(topicData.cid);
 	}
@@ -163,21 +162,21 @@ module.exports = function (Topics) {
 	async function reduceCounters(tid) {
 		const incr = -1;
 		if (utils.isNumber(tid)) {
-			await db.incrObjectFieldBy("global", "topicCount", incr);
+			await db.incrObjectFieldBy('global', 'topicCount', incr);
 		}
-		const topicData = await Topics.getTopicFields(tid, ["cid", "postcount"]);
+		const topicData = await Topics.getTopicFields(tid, ['cid', 'postcount']);
 		const postCountChange = incr * topicData.postcount;
 		await Promise.all([
-			db.incrObjectFieldBy("global", "postCount", postCountChange),
+			db.incrObjectFieldBy('global', 'postCount', postCountChange),
 			db.incrObjectFieldBy(
-				`${utils.isNumber(topicData.cid) ? "category" : "categoryRemote"}:${topicData.cid}`,
-				"post_count",
-				postCountChange,
+				`${utils.isNumber(topicData.cid) ? 'category' : 'categoryRemote'}:${topicData.cid}`,
+				'post_count',
+				postCountChange
 			),
 			db.incrObjectFieldBy(
-				`${utils.isNumber(topicData.cid) ? "category" : "categoryRemote"}:${topicData.cid}`,
-				"topic_count",
-				incr,
+				`${utils.isNumber(topicData.cid) ? 'category' : 'categoryRemote'}:${topicData.cid}`,
+				'topic_count',
+				incr
 			),
 		]);
 	}

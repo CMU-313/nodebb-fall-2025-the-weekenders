@@ -1,10 +1,10 @@
-"use strict";
+'use strict';
 
-const db = require("../../database");
-const batch = require("../../batch");
+const db = require('../../database');
+const batch = require('../../batch');
 
 module.exports = {
-	name: "Add user filter to acp events",
+	name: 'Add user filter to acp events',
 	timestamp: Date.UTC(2024, 3, 1),
 	method: async function () {
 		const { progress } = this;
@@ -13,11 +13,11 @@ module.exports = {
 			`events:time`,
 			async (eids) => {
 				const eventData = await db.getObjects(
-					eids.map((eid) => `event:${eid}`),
+					eids.map((eid) => `event:${eid}`)
 				);
 				const bulkAdd = [];
 				eventData.forEach((event) => {
-					if (event && event.hasOwnProperty("uid") && event.uid && event.eid) {
+					if (event && event.hasOwnProperty('uid') && event.uid && event.eid) {
 						bulkAdd.push([
 							`events:time:uid:${event.uid}`,
 							event.timestamp || Date.now(),
@@ -31,7 +31,7 @@ module.exports = {
 			{
 				batch: 500,
 				progress,
-			},
+			}
 		);
 	},
 };

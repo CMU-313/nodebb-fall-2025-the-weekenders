@@ -1,8 +1,8 @@
-"use strict";
+'use strict';
 
-const db = require("../database");
-const utils = require("../utils");
-const io = require("../socket.io");
+const db = require('../database');
+const utils = require('../utils');
+const io = require('../socket.io');
 
 module.exports = function (Messaging) {
 	Messaging.getUnreadCount = async (uid) => {
@@ -19,7 +19,7 @@ module.exports = function (Messaging) {
 		}
 		uids = uids.filter((uid) => parseInt(uid, 10) > 0);
 		uids.forEach((uid) => {
-			io.in(`uid_${uid}`).emit("event:unread.updateChatCount", data);
+			io.in(`uid_${uid}`).emit('event:unread.updateChatCount', data);
 		});
 	};
 
@@ -46,7 +46,7 @@ module.exports = function (Messaging) {
 			const [userTimestamps, mids] = await Promise.all([
 				db.getObjectsFields(
 					uids.map((uid) => `uid:${uid}:chat:rooms:read`),
-					[roomId],
+					[roomId]
 				),
 				db.getSortedSetRevRangeWithScores(`chat:room:${roomId}:mids`, 0, 0),
 			]);
@@ -55,12 +55,12 @@ module.exports = function (Messaging) {
 				(uid, index) =>
 					!userTimestamps[index] ||
 					!userTimestamps[index][roomId] ||
-					parseInt(userTimestamps[index][roomId], 10) > lastMsgTimestamp,
+					parseInt(userTimestamps[index][roomId], 10) > lastMsgTimestamp
 			);
 		}
 		const isMembers = await db.isMemberOfSortedSets(
 			uids.map((uid) => `uid:${uid}:chat:rooms:unread`),
-			roomId,
+			roomId
 		);
 		return uids.map((uid, index) => !isMembers[index]);
 	};

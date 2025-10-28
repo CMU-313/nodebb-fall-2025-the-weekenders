@@ -1,9 +1,9 @@
-"use strict";
+'use strict';
 
-const db = require("../database");
+const db = require('../database');
 
-const user = require("../user");
-const srcUtils = require("../utils");
+const user = require('../user');
+const srcUtils = require('../utils');
 
 const utils = module.exports;
 
@@ -16,12 +16,12 @@ utils.tokens.list = async (start = 0, stop = -1) => {
 	return await utils.tokens.get(tokens);
 };
 
-utils.tokens.count = async () => await db.sortedSetCard("tokens:createtime");
+utils.tokens.count = async () => await db.sortedSetCard('tokens:createtime');
 
 utils.tokens.get = async (tokens) => {
 	// Validation handled at higher level
 	if (!tokens) {
-		throw new Error("[[error:invalid-data]]");
+		throw new Error('[[error:invalid-data]]');
 	}
 
 	let singular = false;
@@ -46,7 +46,7 @@ utils.tokens.get = async (tokens) => {
 			? new Date(lastSeen[idx]).toISOString()
 			: null;
 		tokenObj.timestampISO = new Date(
-			parseInt(tokenObj.timestamp, 10),
+			parseInt(tokenObj.timestamp, 10)
 		).toISOString();
 
 		return tokenObj;
@@ -57,12 +57,12 @@ utils.tokens.get = async (tokens) => {
 
 utils.tokens.generate = async ({ uid, description }) => {
 	if (!srcUtils.isNumber(uid)) {
-		throw new Error("[[error:invalid-uid]]");
+		throw new Error('[[error:invalid-uid]]');
 	}
 	if (parseInt(uid, 10) !== 0) {
 		const uidExists = await user.exists(uid);
 		if (!uidExists) {
-			throw new Error("[[error:no-user]]");
+			throw new Error('[[error:no-user]]');
 		}
 	}
 
@@ -75,11 +75,11 @@ utils.tokens.generate = async ({ uid, description }) => {
 utils.tokens.add = async ({
 	token,
 	uid,
-	description = "",
+	description = '',
 	timestamp = Date.now(),
 }) => {
 	if (!token || uid === undefined || !srcUtils.isNumber(uid)) {
-		throw new Error("[[error:invalid-data]]");
+		throw new Error('[[error:invalid-data]]');
 	}
 
 	await Promise.all([
@@ -93,7 +93,7 @@ utils.tokens.add = async ({
 
 utils.tokens.update = async (token, { uid, description }) => {
 	if (!srcUtils.isNumber(uid)) {
-		throw new Error("[[error:invalid-uid]]");
+		throw new Error('[[error:invalid-uid]]');
 	}
 	await Promise.all([
 		db.setObject(`token:${token}`, { uid, description }),
@@ -106,7 +106,7 @@ utils.tokens.update = async (token, { uid, description }) => {
 utils.tokens.roll = async (token) => {
 	const [createTime, uid, lastSeen] = await db.sortedSetsScore(
 		[`tokens:createtime`, `tokens:uid`, `tokens:lastSeen`],
-		token,
+		token
 	);
 	const newToken = srcUtils.generateUUID();
 
@@ -114,7 +114,7 @@ utils.tokens.roll = async (token) => {
 		db.rename(`token:${token}`, `token:${newToken}`),
 		db.sortedSetsRemove(
 			[`tokens:createtime`, `tokens:uid`, `tokens:lastSeen`],
-			token,
+			token
 		),
 		db.sortedSetAdd(`tokens:createtime`, createTime, newToken),
 		db.sortedSetAdd(`tokens:uid`, uid, newToken),
@@ -134,14 +134,14 @@ utils.tokens.delete = async (token) => {
 		db.delete(`token:${token}`),
 		db.sortedSetsRemove(
 			[`tokens:createtime`, `tokens:uid`, `tokens:lastSeen`],
-			token,
+			token
 		),
 	]);
 };
 
 utils.tokens.log = async (token) => {
-	await db.sortedSetAdd("tokens:lastSeen", Date.now(), token);
+	await db.sortedSetAdd('tokens:lastSeen', Date.now(), token);
 };
 
 utils.tokens.getLastSeen = async (tokens) =>
-	await db.sortedSetScores("tokens:lastSeen", tokens);
+	await db.sortedSetScores('tokens:lastSeen', tokens);

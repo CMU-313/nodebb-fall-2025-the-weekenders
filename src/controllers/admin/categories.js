@@ -1,17 +1,17 @@
-"use strict";
+'use strict';
 
-const _ = require("lodash");
-const nconf = require("nconf");
-const db = require("../../database");
-const user = require("../../user");
-const categories = require("../../categories");
-const analytics = require("../../analytics");
-const plugins = require("../../plugins");
-const translator = require("../../translator");
-const meta = require("../../meta");
-const activitypub = require("../../activitypub");
-const helpers = require("../helpers");
-const pagination = require("../../pagination");
+const _ = require('lodash');
+const nconf = require('nconf');
+const db = require('../../database');
+const user = require('../../user');
+const categories = require('../../categories');
+const analytics = require('../../analytics');
+const plugins = require('../../plugins');
+const translator = require('../../translator');
+const meta = require('../../meta');
+const activitypub = require('../../activitypub');
+const helpers = require('../helpers');
+const pagination = require('../../pagination');
 
 const categoriesController = module.exports;
 
@@ -29,7 +29,7 @@ categoriesController.get = async function (req, res, next) {
 
 	category.parent = parent[0];
 
-	const data = await plugins.hooks.fire("filter:admin.category.get", {
+	const data = await plugins.hooks.fire('filter:admin.category.get', {
 		req: req,
 		res: res,
 		category: category,
@@ -37,10 +37,10 @@ categoriesController.get = async function (req, res, next) {
 	});
 	data.category.name = translator.escape(String(data.category.name));
 	data.category.description = translator.escape(
-		String(data.category.description),
+		String(data.category.description)
 	);
 
-	res.render("admin/manage/category", {
+	res.render('admin/manage/category', {
 		category: data.category,
 		selectedCategory: selectedData.selectedCategory,
 		customClasses: data.customClasses,
@@ -52,12 +52,12 @@ categoriesController.getAll = async function (req, res) {
 	const rootCid = parseInt(req.query.cid, 10) || 0;
 	async function getRootAndChildren() {
 		const rootChildren = await categories.getAllCidsFromSet(
-			`cid:${rootCid}:children`,
+			`cid:${rootCid}:children`
 		);
 		const childCids = _.flatten(
 			await Promise.all(
-				rootChildren.map((cid) => categories.getChildrenCids(cid)),
-			),
+				rootChildren.map((cid) => categories.getChildrenCids(cid))
+			)
 		);
 		return [rootCid].concat(rootChildren.concat(childCids));
 	}
@@ -65,30 +65,30 @@ categoriesController.getAll = async function (req, res) {
 	// Categories list will be rendered on client side with recursion, etc.
 	const cids = await (rootCid
 		? getRootAndChildren()
-		: categories.getAllCidsFromSet("categories:cid"));
+		: categories.getAllCidsFromSet('categories:cid'));
 
 	let rootParent = 0;
 	if (rootCid) {
-		rootParent = (await categories.getCategoryField(rootCid, "parentCid")) || 0;
+		rootParent = (await categories.getCategoryField(rootCid, 'parentCid')) || 0;
 	}
 
 	const fields = [
-		"cid",
-		"name",
-		"icon",
-		"parentCid",
-		"disabled",
-		"link",
-		"order",
-		"color",
-		"bgColor",
-		"backgroundImage",
-		"imageClass",
-		"subCategoriesPerPage",
-		"description",
+		'cid',
+		'name',
+		'icon',
+		'parentCid',
+		'disabled',
+		'link',
+		'order',
+		'color',
+		'bgColor',
+		'backgroundImage',
+		'imageClass',
+		'subCategoriesPerPage',
+		'description',
 	];
 	const categoriesData = await categories.getCategoriesFields(cids, fields);
-	const result = await plugins.hooks.fire("filter:admin.categories.get", {
+	const result = await plugins.hooks.fire('filter:admin.categories.get', {
 		categories: categoriesData,
 		fields: fields,
 	});
@@ -97,7 +97,7 @@ categoriesController.getAll = async function (req, res) {
 
 	const pageCount = Math.max(
 		1,
-		Math.ceil(cidsCount / meta.config.categoriesPerPage),
+		Math.ceil(cidsCount / meta.config.categoriesPerPage)
 	);
 	const page = Math.min(parseInt(req.query.page, 10) || 1, pageCount);
 	const start = Math.max(0, (page - 1) * meta.config.categoriesPerPage);
@@ -107,11 +107,11 @@ categoriesController.getAll = async function (req, res) {
 		if (c.children) {
 			c.subCategoriesLeft = Math.max(
 				0,
-				c.children.length - c.subCategoriesPerPage,
+				c.children.length - c.subCategoriesPerPage
 			);
 			c.hasMoreSubCategories = c.children.length > c.subCategoriesPerPage;
 			c.showMorePage = Math.ceil(
-				c.subCategoriesPerPage / meta.config.categoriesPerPage,
+				c.subCategoriesPerPage / meta.config.categoriesPerPage
 			);
 			c.children = c.children.slice(0, c.subCategoriesPerPage);
 			c.children.forEach((c) => trim(c));
@@ -131,15 +131,15 @@ categoriesController.getAll = async function (req, res) {
 	}
 	const crumbs = await buildBreadcrumbs(
 		selectedCategory,
-		"/admin/manage/categories",
+		'/admin/manage/categories'
 	);
-	res.render("admin/manage/categories", {
+	res.render('admin/manage/categories', {
 		categoriesTree: tree,
 		selectedCategory: selectedCategory,
 		breadcrumbs: crumbs,
 		pagination: pagination.create(page, pageCount, req.query),
 		categoriesPerPage: meta.config.categoriesPerPage,
-		selectCategoryLabel: "[[admin/manage/categories:jump-to]]",
+		selectCategoryLabel: '[[admin/manage/categories:jump-to]]',
 	});
 };
 
@@ -150,12 +150,12 @@ async function buildBreadcrumbs(categoryData, url) {
 	const breadcrumbs = [
 		{
 			text: categoryData.name,
-			url: `${nconf.get("relative_path")}${url}?cid=${categoryData.cid}`,
+			url: `${nconf.get('relative_path')}${url}?cid=${categoryData.cid}`,
 			cid: categoryData.cid,
 		},
 	];
 	const allCrumbs = await helpers.buildCategoryBreadcrumbs(
-		categoryData.parentCid,
+		categoryData.parentCid
 	);
 	const crumbs = allCrumbs.filter((c) => c.cid);
 
@@ -163,7 +163,7 @@ async function buildBreadcrumbs(categoryData, url) {
 		c.url = `${url}?cid=${c.cid}`;
 	});
 	crumbs.unshift({
-		text: "[[admin/manage/categories:top-level]]",
+		text: '[[admin/manage/categories:top-level]]',
 		url: url,
 	});
 
@@ -174,11 +174,11 @@ categoriesController.buildBreadCrumbs = buildBreadcrumbs;
 
 categoriesController.getAnalytics = async function (req, res) {
 	const [name, analyticsData, selectedData] = await Promise.all([
-		categories.getCategoryField(req.params.category_id, "name"),
+		categories.getCategoryField(req.params.category_id, 'name'),
 		analytics.getCategoryAnalytics(req.params.category_id),
 		helpers.getSelectedCategory(req.params.category_id),
 	]);
-	res.render("admin/manage/category-analytics", {
+	res.render('admin/manage/category-analytics', {
 		name: name,
 		analytics: analyticsData,
 		selectedCategory: selectedData.selectedCategory,
@@ -192,7 +192,7 @@ categoriesController.getFederation = async function (req, res) {
 			db.getSortedSetMembers(`cid:${cid}:following`),
 			db.getSortedSetMembers(`followRequests:cid.${cid}`),
 			activitypub.notes.getCategoryFollowers(cid),
-			categories.getCategoryField(cid, "name"),
+			categories.getCategoryField(cid, 'name'),
 			helpers.getSelectedCategory(cid),
 		]);
 
@@ -202,9 +202,9 @@ categoriesController.getFederation = async function (req, res) {
 	}));
 
 	await activitypub.actors.assert(followers);
-	followers = await user.getUsersFields(followers, ["userslug", "picture"]);
+	followers = await user.getUsersFields(followers, ['userslug', 'picture']);
 
-	res.render("admin/manage/category-federation", {
+	res.render('admin/manage/category-federation', {
 		cid: cid,
 		enabled: meta.config.activitypubEnabled,
 		name,

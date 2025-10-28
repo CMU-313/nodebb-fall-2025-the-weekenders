@@ -1,12 +1,12 @@
-"use strict";
+'use strict';
 
-const db = require("../database");
+const db = require('../database');
 
 module.exports = function (Messaging) {
 	Messaging.pinMessage = async (mid, roomId) => {
 		const isMessageInRoom = await db.isSortedSetMember(
 			`chat:room:${roomId}:mids`,
-			mid,
+			mid
 		);
 		if (isMessageInRoom) {
 			await db.sortedSetAdd(`chat:room:${roomId}:mids:pinned`, Date.now(), mid);
@@ -17,7 +17,7 @@ module.exports = function (Messaging) {
 	Messaging.unpinMessage = async (mid, roomId) => {
 		const isMessageInRoom = await db.isSortedSetMember(
 			`chat:room:${roomId}:mids`,
-			mid,
+			mid
 		);
 		if (isMessageInRoom) {
 			await db.sortedSetRemove(`chat:room:${roomId}:mids:pinned`, mid);
@@ -29,7 +29,7 @@ module.exports = function (Messaging) {
 		const mids = await db.getSortedSetRevRange(
 			`chat:room:${roomId}:mids:pinned`,
 			start,
-			stop,
+			stop
 		);
 		if (!mids.length) {
 			return [];
@@ -39,7 +39,7 @@ module.exports = function (Messaging) {
 			mids,
 			uid,
 			roomId,
-			true,
+			true
 		);
 		messageData.forEach((msg, i) => {
 			if (msg) {

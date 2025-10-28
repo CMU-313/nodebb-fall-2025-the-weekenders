@@ -1,7 +1,7 @@
-"use strict";
+'use strict';
 
-define("admin/settings/notifications", ["autocomplete"], function (
-	autocomplete,
+define('admin/settings/notifications', ['autocomplete'], function (
+	autocomplete
 ) {
 	const Notifications = {};
 

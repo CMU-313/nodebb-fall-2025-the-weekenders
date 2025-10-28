@@ -1,36 +1,36 @@
-"use strict";
+'use strict';
 
-const winston = require("winston");
-const passport = require("passport");
-const nconf = require("nconf");
-const path = require("path");
-const util = require("util");
+const winston = require('winston');
+const passport = require('passport');
+const nconf = require('nconf');
+const path = require('path');
+const util = require('util');
 
-const meta = require("../meta");
-const user = require("../user");
-const groups = require("../groups");
-const topics = require("../topics");
-const privileges = require("../privileges");
-const privilegeHelpers = require("../privileges/helpers");
-const plugins = require("../plugins");
-const helpers = require("./helpers");
-const auth = require("../routes/authentication");
-const writeRouter = require("../routes/write");
-const accountHelpers = require("../controllers/accounts/helpers");
+const meta = require('../meta');
+const user = require('../user');
+const groups = require('../groups');
+const topics = require('../topics');
+const privileges = require('../privileges');
+const privilegeHelpers = require('../privileges/helpers');
+const plugins = require('../plugins');
+const helpers = require('./helpers');
+const auth = require('../routes/authentication');
+const writeRouter = require('../routes/write');
+const accountHelpers = require('../controllers/accounts/helpers');
 
 const controllers = {
-	helpers: require("../controllers/helpers"),
-	authentication: require("../controllers/authentication"),
+	helpers: require('../controllers/helpers'),
+	authentication: require('../controllers/authentication'),
 };
 
 const passportAuthenticateAsync = function (req, res) {
 	return new Promise((resolve, reject) => {
-		passport.authenticate("core.api", (err, user) => {
+		passport.authenticate('core.api', (err, user) => {
 			if (err) {
 				reject(err);
 			} else {
 				resolve(user);
-				res.on("finish", writeRouter.cleanup.bind(null, req));
+				res.on('finish', writeRouter.cleanup.bind(null, req));
 			}
 		})(req, res);
 	});
@@ -49,7 +49,7 @@ module.exports = function (middleware) {
 
 		if (
 			res.locals.isAPI &&
-			(req.loggedIn || !req.headers.hasOwnProperty("authorization"))
+			(req.loggedIn || !req.headers.hasOwnProperty('authorization'))
 		) {
 			// If authenticated via cookie (express-session), protect routes with CSRF checking
 			await middleware.applyCSRFasync(req, res);
@@ -57,33 +57,33 @@ module.exports = function (middleware) {
 
 		if (req.loggedIn) {
 			return true;
-		} else if (req.headers.hasOwnProperty("authorization")) {
+		} else if (req.headers.hasOwnProperty('authorization')) {
 			const user = await passportAuthenticateAsync(req, res);
 			if (!user) {
 				return true;
 			}
 
-			if (user.hasOwnProperty("uid")) {
+			if (user.hasOwnProperty('uid')) {
 				return await finishLogin(req, user);
-			} else if (user.hasOwnProperty("master") && user.master === true) {
+			} else if (user.hasOwnProperty('master') && user.master === true) {
 				// If the token received was a master token, a _uid must also be present for all calls
 				const body = req.body || {};
-				if (body.hasOwnProperty("_uid") || req.query.hasOwnProperty("_uid")) {
+				if (body.hasOwnProperty('_uid') || req.query.hasOwnProperty('_uid')) {
 					user.uid = body._uid || req.query._uid;
 					delete user.master;
 					return await finishLogin(req, user);
 				}
 
-				throw new Error("[[error:api.master-token-no-uid]]");
+				throw new Error('[[error:api.master-token-no-uid]]');
 			} else {
 				winston.warn(
-					"[api/authenticate] Unable to find user after verifying token",
+					'[api/authenticate] Unable to find user after verifying token'
 				);
 				return true;
 			}
 		}
 
-		await plugins.hooks.fire("response:middleware.authenticate", {
+		await plugins.hooks.fire('response:middleware.authenticate', {
 			req: req,
 			res: res,
 			next: function () {}, // no-op for backwards compatibility
@@ -97,19 +97,19 @@ module.exports = function (middleware) {
 
 	middleware.authenticateRequest = helpers.try(async (req, res, next) => {
 		const { skip } = await plugins.hooks.fire(
-			"filter:middleware.authenticate",
+			'filter:middleware.authenticate',
 			{
 				skip: {
 					// get: [],
-					post: ["/api/v3/utilities/login"],
+					post: ['/api/v3/utilities/login'],
 					// etc...
 				},
-			},
+			}
 		);
 
 		const mountedPath = path
 			.join(req.baseUrl, req.path)
-			.replace(nconf.get("relative_path"), "");
+			.replace(nconf.get('relative_path'), '');
 		const method = req.method.toLowerCase();
 		if (skip[method] && skip[method].includes(mountedPath)) {
 			return next();
@@ -124,7 +124,7 @@ module.exports = function (middleware) {
 	middleware.ensureSelfOrGlobalPrivilege = helpers.try(
 		async (req, res, next) => {
 			await ensureSelfOrMethod(user.isAdminOrGlobalMod, req, res, next);
-		},
+		}
 	);
 
 	middleware.ensureSelfOrPrivileged = helpers.try(async (req, res, next) => {
@@ -154,7 +154,7 @@ module.exports = function (middleware) {
 		if (parseInt(res.locals.uid, 10) === req.uid) {
 			return next();
 		}
-		const canView = await privileges.global.can("view:users", req.uid);
+		const canView = await privileges.global.can('view:users', req.uid);
 		if (canView) {
 			return next();
 		}
@@ -162,7 +162,7 @@ module.exports = function (middleware) {
 	});
 
 	middleware.canViewGroups = helpers.try(async (req, res, next) => {
-		const canView = await privileges.global.can("view:groups", req.uid);
+		const canView = await privileges.global.can('view:groups', req.uid);
 		if (canView) {
 			return next();
 		}
@@ -171,8 +171,8 @@ module.exports = function (middleware) {
 
 	middleware.canChat = helpers.try(async (req, res, next) => {
 		const canChat = await privileges.global.can(
-			["chat", "chat:privileged"],
-			req.uid,
+			['chat', 'chat:privileged'],
+			req.uid
 		);
 		if (canChat.includes(true)) {
 			return next();
@@ -189,7 +189,7 @@ module.exports = function (middleware) {
 		}
 
 		if (
-			!["uid", "userslug"].some((param) => req.params.hasOwnProperty(param))
+			!['uid', 'userslug'].some((param) => req.params.hasOwnProperty(param))
 		) {
 			return controllers.helpers.notAllowed(req, res);
 		}
@@ -202,7 +202,7 @@ module.exports = function (middleware) {
 		}
 
 		if (/user\/.+\/info$/.test(req.path)) {
-			allowed = await privileges.global.can("view:users:info", req.uid);
+			allowed = await privileges.global.can('view:users:info', req.uid);
 		}
 		if (allowed) {
 			return next();
@@ -216,9 +216,9 @@ module.exports = function (middleware) {
 			if (req.session.forceLogin || req.uid <= 0) {
 				return next();
 			}
-			const userslug = await user.getUserField(req.uid, "userslug");
+			const userslug = await user.getUserField(req.uid, 'userslug');
 			controllers.helpers.redirect(res, `/user/${userslug}`);
-		},
+		}
 	);
 
 	middleware.redirectUidToUserslug = helpers.try(async (req, res, next) => {
@@ -227,21 +227,21 @@ module.exports = function (middleware) {
 			return next();
 		}
 		const [canView, userslug] = await Promise.all([
-			privileges.global.can("view:users", req.uid),
-			user.getUserField(uid, "userslug"),
+			privileges.global.can('view:users', req.uid),
+			user.getUserField(uid, 'userslug'),
 		]);
 
 		if (!userslug || (!canView && req.uid !== uid)) {
 			return next();
 		}
 		const path = req.url
-			.replace(/^\/api/, "")
+			.replace(/^\/api/, '')
 			.replace(`/uid/${uid}`, () => `/user/${userslug}`);
 		controllers.helpers.redirect(res, path, true);
 	});
 
 	middleware.redirectMeToUserslug = helpers.try(async (req, res) => {
-		const userslug = await user.getUserField(req.uid, "userslug");
+		const userslug = await user.getUserField(req.uid, 'userslug');
 		if (!userslug) {
 			return controllers.helpers.notAllowed(req, res);
 		}
@@ -254,7 +254,7 @@ module.exports = function (middleware) {
 			const canLoginIfBanned = await user.bans.canLoginIfBanned(req.uid);
 			if (!canLoginIfBanned) {
 				req.logout(() => {
-					res.redirect("/");
+					res.redirect('/');
 				});
 				return;
 			}
@@ -268,7 +268,7 @@ module.exports = function (middleware) {
 			return next();
 		}
 
-		res.status(403).render("403", { title: "[[global:403.title]]" });
+		res.status(403).render('403', { title: '[[global:403.title]]' });
 	};
 
 	middleware.buildAccountData = async (req, res, next) => {
@@ -280,23 +280,23 @@ module.exports = function (middleware) {
 			} else {
 				const newPath = req.path.replace(
 					`/${req.params.userslug}`,
-					() => `/${lowercaseSlug}`,
+					() => `/${lowercaseSlug}`
 				);
-				return res.redirect(`${nconf.get("relative_path")}${newPath}`);
+				return res.redirect(`${nconf.get('relative_path')}${newPath}`);
 			}
 		}
 		try {
 			res.locals.userData = await accountHelpers.getUserDataByUserSlug(
 				req.params.userslug,
 				req.uid,
-				req.query,
+				req.query
 			);
 		} catch (err) {
 			return next(err);
 		}
 
 		if (!res.locals.userData) {
-			return next("route");
+			return next('route');
 		}
 		next();
 	};
@@ -304,15 +304,15 @@ module.exports = function (middleware) {
 	middleware.registrationComplete = async function registrationComplete(
 		req,
 		res,
-		next,
+		next
 	) {
 		/**
 		 * Redirect the user to complete registration if:
 		 *   * user's session contains registration data
 		 *   * email is required and they have no confirmed email (pending doesn't count, but admins are OK)
 		 */
-		const path = req.path.startsWith("/api/")
-			? req.path.replace("/api", "")
+		const path = req.path.startsWith('/api/')
+			? req.path.replace('/api', '')
 			: req.path;
 
 		if (
@@ -326,15 +326,15 @@ module.exports = function (middleware) {
 			};
 		}
 
-		if (!req.session.hasOwnProperty("registration")) {
+		if (!req.session.hasOwnProperty('registration')) {
 			return setImmediate(next);
 		}
 
 		const { allowed } = await plugins.hooks.fire(
-			"filter:middleware.registrationComplete",
+			'filter:middleware.registrationComplete',
 			{
-				allowed: ["/register/complete", "/confirm/"],
-			},
+				allowed: ['/register/complete', '/confirm/'],
+			}
 		);
 		if (allowed.includes(path) || allowed.some((p) => path.startsWith(p))) {
 			return setImmediate(next);
@@ -343,7 +343,7 @@ module.exports = function (middleware) {
 		// Append user data if present
 		req.session.registration.uid = req.session.registration.uid || req.uid;
 
-		controllers.helpers.redirect(res, "/register/complete");
+		controllers.helpers.redirect(res, '/register/complete');
 	};
 
 	async function requiresEmailConfirmation(req) {
@@ -360,7 +360,7 @@ module.exports = function (middleware) {
 
 		// Extract tid or cid
 		const [confirmed, isAdmin] = await Promise.all([
-			groups.isMember(req.uid, "verified-users"),
+			groups.isMember(req.uid, 'verified-users'),
 			user.isAdministrator(req.uid),
 		]);
 		if (confirmed || isAdmin) {
@@ -369,19 +369,19 @@ module.exports = function (middleware) {
 
 		let cid;
 		let privilege;
-		if (req.params.hasOwnProperty("category_id")) {
+		if (req.params.hasOwnProperty('category_id')) {
 			cid = req.params.category_id;
-			privilege = "read";
-		} else if (req.params.hasOwnProperty("topic_id")) {
-			cid = await topics.getTopicField(req.params.topic_id, "cid");
-			privilege = "topics:read";
+			privilege = 'read';
+		} else if (req.params.hasOwnProperty('topic_id')) {
+			cid = await topics.getTopicField(req.params.topic_id, 'cid');
+			privilege = 'topics:read';
 		} else {
 			return false; // not a category or topic url, no check required
 		}
 
 		const [registeredAllowed, verifiedAllowed] = await Promise.all([
-			privilegeHelpers.isAllowedTo([privilege], "registered-users", cid),
-			privilegeHelpers.isAllowedTo([privilege], "verified-users", cid),
+			privilegeHelpers.isAllowedTo([privilege], 'registered-users', cid),
+			privilegeHelpers.isAllowedTo([privilege], 'verified-users', cid),
 		]);
 
 		return !registeredAllowed.pop() && verifiedAllowed.pop();

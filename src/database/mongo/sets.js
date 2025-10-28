@@ -1,9 +1,9 @@
-"use strict";
+'use strict';
 
 module.exports = function (module) {
-	const _ = require("lodash");
-	const helpers = require("./helpers");
-	const { secureRandom } = require("../../utils");
+	const _ = require('lodash');
+	const helpers = require('./helpers');
+	const { secureRandom } = require('../../utils');
 
 	module.setAdd = async function (key, value) {
 		if (!Array.isArray(value)) {
@@ -15,7 +15,7 @@ module.exports = function (module) {
 		value = value.map((v) => helpers.valueToString(v));
 
 		try {
-			await module.client.collection("objects").updateOne(
+			await module.client.collection('objects').updateOne(
 				{
 					_key: key,
 				},
@@ -28,11 +28,11 @@ module.exports = function (module) {
 				},
 				{
 					upsert: true,
-				},
+				}
 			);
 		} catch (err) {
-			if (err && err.message.includes("E11000 duplicate key error")) {
-				console.log(new Error("e11000").stack, key, value);
+			if (err && err.message.includes('E11000 duplicate key error')) {
+				console.log(new Error('e11000').stack, key, value);
 				return await module.setAdd(key, value);
 			}
 			throw err;
@@ -51,7 +51,7 @@ module.exports = function (module) {
 		value = value.map((v) => helpers.valueToString(v));
 
 		const bulk = module.client
-			.collection("objects")
+			.collection('objects')
 			.initializeUnorderedBulkOp();
 
 		for (let i = 0; i < keys.length; i += 1) {
@@ -69,8 +69,8 @@ module.exports = function (module) {
 		try {
 			await bulk.execute();
 		} catch (err) {
-			if (err && err.message.includes("E11000 duplicate key error")) {
-				console.log(new Error("e11000").stack, keys, value);
+			if (err && err.message.includes('E11000 duplicate key error')) {
+				console.log(new Error('e11000').stack, keys, value);
 				return await module.setsAdd(keys, value);
 			}
 			throw err;
@@ -84,13 +84,13 @@ module.exports = function (module) {
 
 		value = value.map((v) => helpers.valueToString(v));
 
-		await module.client.collection("objects").updateMany(
+		await module.client.collection('objects').updateMany(
 			{
 				_key: Array.isArray(key) ? { $in: key } : key,
 			},
 			{
 				$pullAll: { members: value },
-			},
+			}
 		);
 	};
 
@@ -100,13 +100,13 @@ module.exports = function (module) {
 		}
 		value = helpers.valueToString(value);
 
-		await module.client.collection("objects").updateMany(
+		await module.client.collection('objects').updateMany(
 			{
 				_key: { $in: keys },
 			},
 			{
 				$pull: { members: value },
-			},
+			}
 		);
 	};
 
@@ -116,14 +116,14 @@ module.exports = function (module) {
 		}
 		value = helpers.valueToString(value);
 
-		const item = await module.client.collection("objects").findOne(
+		const item = await module.client.collection('objects').findOne(
 			{
 				_key: key,
 				members: value,
 			},
 			{
 				projection: { _id: 0, members: 0 },
-			},
+			}
 		);
 		return item !== null && item !== undefined;
 	};
@@ -134,16 +134,16 @@ module.exports = function (module) {
 		}
 		values = values.map((v) => helpers.valueToString(v));
 
-		const result = await module.client.collection("objects").findOne(
+		const result = await module.client.collection('objects').findOne(
 			{
 				_key: key,
 			},
 			{
 				projection: { _id: 0, _key: 0 },
-			},
+			}
 		);
 		const membersSet = new Set(
-			result && Array.isArray(result.members) ? result.members : [],
+			result && Array.isArray(result.members) ? result.members : []
 		);
 		return values.map((v) => membersSet.has(v));
 	};
@@ -155,7 +155,7 @@ module.exports = function (module) {
 		value = helpers.valueToString(value);
 
 		const result = await module.client
-			.collection("objects")
+			.collection('objects')
 			.find(
 				{
 					_key: { $in: sets },
@@ -163,7 +163,7 @@ module.exports = function (module) {
 				},
 				{
 					projection: { _id: 0, members: 0 },
-				},
+				}
 			)
 			.toArray();
 
@@ -180,13 +180,13 @@ module.exports = function (module) {
 			return [];
 		}
 
-		const data = await module.client.collection("objects").findOne(
+		const data = await module.client.collection('objects').findOne(
 			{
 				_key: key,
 			},
 			{
 				projection: { _id: 0, _key: 0 },
-			},
+			}
 		);
 		return data ? data.members : [];
 	};
@@ -196,14 +196,14 @@ module.exports = function (module) {
 			return [];
 		}
 		const data = await module.client
-			.collection("objects")
+			.collection('objects')
 			.find(
 				{
 					_key: { $in: keys },
 				},
 				{
 					projection: { _id: 0 },
-				},
+				}
 			)
 			.toArray();
 
@@ -220,10 +220,10 @@ module.exports = function (module) {
 			return 0;
 		}
 		const data = await module.client
-			.collection("objects")
+			.collection('objects')
 			.aggregate([
 				{ $match: { _key: key } },
-				{ $project: { _id: 0, count: { $size: "$members" } } },
+				{ $project: { _id: 0, count: { $size: '$members' } } },
 			])
 			.toArray();
 		return Array.isArray(data) && data.length ? data[0].count : 0;
@@ -231,19 +231,19 @@ module.exports = function (module) {
 
 	module.setsCount = async function (keys) {
 		const data = await module.client
-			.collection("objects")
+			.collection('objects')
 			.aggregate([
 				{ $match: { _key: { $in: keys } } },
-				{ $project: { _id: 0, _key: 1, count: { $size: "$members" } } },
+				{ $project: { _id: 0, _key: 1, count: { $size: '$members' } } },
 			])
 			.toArray();
-		const map = _.keyBy(data, "_key");
+		const map = _.keyBy(data, '_key');
 		return keys.map((key) => (map.hasOwnProperty(key) ? map[key].count : 0));
 	};
 
 	module.setRemoveRandom = async function (key) {
 		const data = await module.client
-			.collection("objects")
+			.collection('objects')
 			.findOne({ _key: key });
 		if (!data) {
 			return;

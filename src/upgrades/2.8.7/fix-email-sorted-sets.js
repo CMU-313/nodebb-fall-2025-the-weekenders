@@ -1,20 +1,20 @@
-"use strict";
+'use strict';
 
-const db = require("../../database");
-const batch = require("../../batch");
+const db = require('../../database');
+const batch = require('../../batch');
 
 module.exports = {
-	name: "Fix user email sorted sets",
+	name: 'Fix user email sorted sets',
 	timestamp: Date.UTC(2023, 1, 4),
 	method: async function () {
 		const { progress } = this;
 		const bulkRemove = [];
 		await batch.processSortedSet(
-			"email:uid",
+			'email:uid',
 			async (data) => {
 				progress.incr(data.length);
 				const usersData = await db.getObjects(
-					data.map((d) => `user:${d.score}`),
+					data.map((d) => `user:${d.score}`)
 				);
 				data.forEach((emailData, index) => {
 					const { score: uid, value: email } = emailData;
@@ -22,8 +22,8 @@ module.exports = {
 					// user no longer exists or doesn't have email set in user hash
 					// remove the email/uid pair from email:uid, email:sorted
 					if (!userData || !userData.email) {
-						bulkRemove.push(["email:uid", email]);
-						bulkRemove.push(["email:sorted", `${email.toLowerCase()}:${uid}`]);
+						bulkRemove.push(['email:uid', email]);
+						bulkRemove.push(['email:sorted', `${email.toLowerCase()}:${uid}`]);
 						return;
 					}
 
@@ -32,8 +32,8 @@ module.exports = {
 						userData.email &&
 						userData.email.toLowerCase() !== email.toLowerCase()
 					) {
-						bulkRemove.push(["email:uid", email]);
-						bulkRemove.push(["email:sorted", `${email.toLowerCase()}:${uid}`]);
+						bulkRemove.push(['email:uid', email]);
+						bulkRemove.push(['email:sorted', `${email.toLowerCase()}:${uid}`]);
 					}
 				});
 			},
@@ -41,7 +41,7 @@ module.exports = {
 				batch: 500,
 				withScores: true,
 				progress: progress,
-			},
+			}
 		);
 
 		await batch.processArray(
@@ -51,7 +51,7 @@ module.exports = {
 			},
 			{
 				batch: 500,
-			},
+			}
 		);
 	},
 };

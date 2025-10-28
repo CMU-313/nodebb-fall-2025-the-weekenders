@@ -1,7 +1,7 @@
-"use strict";
+'use strict';
 
 module.exports = function (module) {
-	const helpers = require("./helpers");
+	const helpers = require('./helpers');
 
 	module.flushdb = async function () {
 		await module.pool.query(`DROP SCHEMA "public" CASCADE`);
@@ -23,14 +23,14 @@ module.exports = function (module) {
 
 		async function checkIfzSetsExist(keys) {
 			const members = await Promise.all(
-				keys.map((key) => module.getSortedSetRange(key, 0, 0)),
+				keys.map((key) => module.getSortedSetRange(key, 0, 0))
 			);
 			return members.map((member) => member.length > 0);
 		}
 
 		async function checkIfKeysExist(keys) {
 			const res = await module.pool.query({
-				name: "existsArray",
+				name: 'existsArray',
 				text: `
 				SELECT o."_key" k
   				FROM "legacy_object_live" o
@@ -43,8 +43,8 @@ module.exports = function (module) {
 		// Redis/Mongo consider empty zsets as non-existent, match that behaviour
 		if (isArray) {
 			const types = await Promise.all(key.map(module.type));
-			const zsetKeys = key.filter((_key, i) => types[i] === "zset");
-			const otherKeys = key.filter((_key, i) => types[i] !== "zset");
+			const zsetKeys = key.filter((_key, i) => types[i] === 'zset');
+			const otherKeys = key.filter((_key, i) => types[i] !== 'zset');
 			const [zsetExits, otherExists] = await Promise.all([
 				checkIfzSetsExist(zsetKeys),
 				checkIfKeysExist(otherKeys),
@@ -59,12 +59,12 @@ module.exports = function (module) {
 			return key.map((k) => existsMap[k]);
 		}
 		const type = await module.type(key);
-		if (type === "zset") {
+		if (type === 'zset') {
 			const members = await module.getSortedSetRange(key, 0, 0);
 			return members.length > 0;
 		}
 		const res = await module.pool.query({
-			name: "exists",
+			name: 'exists',
 			text: `
 			SELECT EXISTS(SELECT *
 					FROM "legacy_object_live"
@@ -78,10 +78,10 @@ module.exports = function (module) {
 
 	module.scan = async function (params) {
 		let { match } = params;
-		if (match.startsWith("*")) {
+		if (match.startsWith('*')) {
 			match = `%${match.substring(1)}`;
 		}
-		if (match.endsWith("*")) {
+		if (match.endsWith('*')) {
 			match = `${match.substring(0, match.length - 1)}%`;
 		}
 
@@ -101,7 +101,7 @@ module.exports = function (module) {
 		}
 
 		await module.pool.query({
-			name: "delete",
+			name: 'delete',
 			text: `
 DELETE FROM "legacy_object"
  WHERE "_key" = $1::TEXT`,
@@ -115,7 +115,7 @@ DELETE FROM "legacy_object"
 		}
 
 		await module.pool.query({
-			name: "deleteAll",
+			name: 'deleteAll',
 			text: `
 DELETE FROM "legacy_object"
  WHERE "_key" = ANY($1::TEXT[])`,
@@ -129,7 +129,7 @@ DELETE FROM "legacy_object"
 		}
 
 		const res = await module.pool.query({
-			name: "get",
+			name: 'get',
 			text: `
 SELECT s."data" t
   FROM "legacy_object_live" o
@@ -150,7 +150,7 @@ SELECT s."data" t
 		}
 
 		const res = await module.pool.query({
-			name: "mget",
+			name: 'mget',
 			text: `
 SELECT s."data", s."_key"
   FROM "legacy_object_live" o
@@ -174,9 +174,9 @@ SELECT s."data", s."_key"
 		}
 
 		await module.transaction(async (client) => {
-			await helpers.ensureLegacyObjectType(client, key, "string");
+			await helpers.ensureLegacyObjectType(client, key, 'string');
 			await client.query({
-				name: "set",
+				name: 'set',
 				text: `
 INSERT INTO "legacy_string" ("_key", "data")
 VALUES ($1::TEXT, $2::TEXT)
@@ -193,9 +193,9 @@ DO UPDATE SET "data" = $2::TEXT`,
 		}
 
 		return await module.transaction(async (client) => {
-			await helpers.ensureLegacyObjectType(client, key, "string");
+			await helpers.ensureLegacyObjectType(client, key, 'string');
 			const res = await client.query({
-				name: "increment",
+				name: 'increment',
 				text: `
 INSERT INTO "legacy_string" ("_key", "data")
 VALUES ($1::TEXT, '1')
@@ -211,14 +211,14 @@ RETURNING "data" d`,
 	module.rename = async function (oldKey, newKey) {
 		await module.transaction(async (client) => {
 			await client.query({
-				name: "deleteRename",
+				name: 'deleteRename',
 				text: `
 	DELETE FROM "legacy_object"
 	 WHERE "_key" = $1::TEXT`,
 				values: [newKey],
 			});
 			await client.query({
-				name: "rename",
+				name: 'rename',
 				text: `
 UPDATE "legacy_object"
 SET "_key" = $2::TEXT
@@ -230,7 +230,7 @@ WHERE "_key" = $1::TEXT`,
 
 	module.type = async function (key) {
 		const res = await module.pool.query({
-			name: "type",
+			name: 'type',
 			text: `
 SELECT "type"::TEXT t
   FROM "legacy_object_live"
@@ -244,7 +244,7 @@ SELECT "type"::TEXT t
 
 	async function doExpire(key, date) {
 		await module.pool.query({
-			name: "expire",
+			name: 'expire',
 			text: `
 UPDATE "legacy_object"
    SET "expireAt" = $2::TIMESTAMPTZ
@@ -271,7 +271,7 @@ UPDATE "legacy_object"
 
 	async function getExpire(key) {
 		const res = await module.pool.query({
-			name: "ttl",
+			name: 'ttl',
 			text: `
 SELECT "expireAt"::TEXT
   FROM "legacy_object"

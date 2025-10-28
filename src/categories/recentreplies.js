@@ -1,28 +1,28 @@
-"use strict";
+'use strict';
 
-const winston = require("winston");
-const _ = require("lodash");
+const winston = require('winston');
+const _ = require('lodash');
 
-const db = require("../database");
-const posts = require("../posts");
-const topics = require("../topics");
-const privileges = require("../privileges");
-const plugins = require("../plugins");
-const batch = require("../batch");
-const utils = require("../utils");
+const db = require('../database');
+const posts = require('../posts');
+const topics = require('../topics');
+const privileges = require('../privileges');
+const plugins = require('../plugins');
+const batch = require('../batch');
+const utils = require('../utils');
 
 module.exports = function (Categories) {
 	Categories.getRecentReplies = async function (cid, uid, start, stop) {
 		// backwards compatibility, treat start as count
 		if (stop === undefined && start > 0) {
 			winston.warn(
-				"[Categories.getRecentReplies] 3 params deprecated please use Categories.getRecentReplies(cid, uid, start, stop)",
+				'[Categories.getRecentReplies] 3 params deprecated please use Categories.getRecentReplies(cid, uid, start, stop)'
 			);
 			stop = start - 1;
 			start = 0;
 		}
 		let pids = await db.getSortedSetRevRange(`cid:${cid}:pids`, start, stop);
-		pids = await privileges.posts.filter("topics:read", pids, uid);
+		pids = await privileges.posts.filter('topics:read', pids, uid);
 		return await posts.getPostSummaryByPids(pids, uid, { stripTags: true });
 	};
 
@@ -30,8 +30,8 @@ module.exports = function (Categories) {
 		const [count, numRecentReplies] = await Promise.all([
 			db.sortedSetCard(`cid:${cid}:recent_tids`),
 			db.getObjectField(
-				`${utils.isNumber(cid) ? "category" : "categoryRemote"}:${cid}`,
-				"numRecentReplies",
+				`${utils.isNumber(cid) ? 'category' : 'categoryRemote'}:${cid}`,
+				'numRecentReplies'
 			),
 		]);
 
@@ -39,7 +39,7 @@ module.exports = function (Categories) {
 			const data = await db.getSortedSetRangeWithScores(
 				`cid:${cid}:recent_tids`,
 				0,
-				count - numRecentReplies,
+				count - numRecentReplies
 			);
 			const shouldRemove = !(
 				data.length === 1 &&
@@ -49,15 +49,15 @@ module.exports = function (Categories) {
 			if (data.length && shouldRemove) {
 				await db.sortedSetsRemoveRangeByScore(
 					[`cid:${cid}:recent_tids`],
-					"-inf",
-					data[data.length - 1].score,
+					'-inf',
+					data[data.length - 1].score
 				);
 			}
 		}
 		if (numRecentReplies > 0) {
 			await db.sortedSetAdd(`cid:${cid}:recent_tids`, Date.now(), tid);
 		}
-		await plugins.hooks.fire("action:categories.updateRecentTid", {
+		await plugins.hooks.fire('action:categories.updateRecentTid', {
 			cid: cid,
 			tid: tid,
 		});
@@ -72,12 +72,12 @@ module.exports = function (Categories) {
 			const pids = await db.getSortedSetRevRange(
 				`cid:${cid}:pids`,
 				index,
-				index,
+				index
 			);
 			if (!pids.length) {
 				return;
 			}
-			postData = await posts.getPostFields(pids[0], ["tid", "deleted"]);
+			postData = await posts.getPostFields(pids[0], ['tid', 'deleted']);
 
 			if (postData && postData.tid && !postData.deleted) {
 				topicData = await topics.getTopicData(postData.tid);
@@ -95,18 +95,18 @@ module.exports = function (Categories) {
 			return;
 		}
 		const categoriesToLoad = categoryData.filter(
-			(c) => c && c.numRecentReplies && parseInt(c.numRecentReplies, 10) > 0,
+			(c) => c && c.numRecentReplies && parseInt(c.numRecentReplies, 10) > 0
 		);
 		let keys = [];
-		if (plugins.hooks.hasListeners("filter:categories.getRecentTopicReplies")) {
+		if (plugins.hooks.hasListeners('filter:categories.getRecentTopicReplies')) {
 			const result = await plugins.hooks.fire(
-				"filter:categories.getRecentTopicReplies",
+				'filter:categories.getRecentTopicReplies',
 				{
 					categories: categoriesToLoad,
 					uid: uid,
 					query: query,
 					keys: [],
-				},
+				}
 			);
 			keys = result.keys;
 		} else {
@@ -116,7 +116,7 @@ module.exports = function (Categories) {
 		const results = await db.getSortedSetsMembers(keys);
 		let tids = _.uniq(_.flatten(results).filter(Boolean));
 
-		tids = await privileges.topics.filterTids("topics:read", tids, uid);
+		tids = await privileges.topics.filterTids('topics:read', tids, uid);
 		const topics = await getTopics(tids, uid);
 		assignTopicsToCategories(categoryData, topics);
 
@@ -125,13 +125,13 @@ module.exports = function (Categories) {
 
 	async function getTopics(tids, uid) {
 		const topicData = await topics.getTopicsFields(tids, [
-			"tid",
-			"mainPid",
-			"slug",
-			"title",
-			"teaserPid",
-			"cid",
-			"postcount",
+			'tid',
+			'mainPid',
+			'slug',
+			'title',
+			'teaserPid',
+			'cid',
+			'postcount',
 		]);
 		topicData.forEach((topic) => {
 			if (topic) {
@@ -139,7 +139,7 @@ module.exports = function (Categories) {
 			}
 		});
 		const cids = _.uniq(
-			topicData.map((t) => t && t.cid).filter((cid) => parseInt(cid, 10)),
+			topicData.map((t) => t && t.cid).filter((cid) => parseInt(cid, 10))
 		);
 		const getToRoot = async () =>
 			await Promise.all(cids.map(Categories.getParentCids));
@@ -173,7 +173,7 @@ module.exports = function (Categories) {
 						(t) =>
 							t.cid &&
 							(t.cid === category.cid ||
-								(t.parentCids && t.parentCids.includes(category.cid))),
+								(t.parentCids && t.parentCids.includes(category.cid)))
 					)
 					.sort((a, b) => b.timestamp - a.timestamp)
 					.slice(0, parseInt(category.numRecentReplies, 10));
@@ -213,19 +213,19 @@ module.exports = function (Categories) {
 	Categories.moveRecentReplies = async function (tid, oldCid, cid) {
 		const [pids, topicDeleted] = await Promise.all([
 			topics.getPids(tid),
-			topics.getTopicField(tid, "deleted"),
+			topics.getTopicField(tid, 'deleted'),
 		]);
 
 		await batch.processArray(
 			pids,
 			async (pids) => {
 				const postData = await posts.getPostsFields(pids, [
-					"pid",
-					"deleted",
-					"uid",
-					"timestamp",
-					"upvotes",
-					"downvotes",
+					'pid',
+					'deleted',
+					'uid',
+					'timestamp',
+					'upvotes',
+					'downvotes',
 				]);
 
 				const bulkRemove = [];
@@ -251,7 +251,7 @@ module.exports = function (Categories) {
 				});
 
 				const postsToReAdd = postData.filter(
-					(p) => !p.deleted && !topicDeleted,
+					(p) => !p.deleted && !topicDeleted
 				);
 				const timestamps = postsToReAdd.map((p) => p && p.timestamp);
 				await Promise.all([
@@ -259,13 +259,13 @@ module.exports = function (Categories) {
 					db.sortedSetAdd(
 						`cid:${cid}:pids`,
 						timestamps,
-						postsToReAdd.map((p) => p.pid),
+						postsToReAdd.map((p) => p.pid)
 					),
 					db.sortedSetRemoveBulk(bulkRemove),
 					db.sortedSetAddBulk(bulkAdd),
 				]);
 			},
-			{ batch: 500 },
+			{ batch: 500 }
 		);
 	};
 };

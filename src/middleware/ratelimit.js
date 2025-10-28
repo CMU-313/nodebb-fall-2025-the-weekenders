@@ -1,6 +1,6 @@
-"use strict";
+'use strict';
 
-const winston = require("winston");
+const winston = require('winston');
 
 const ratelimit = module.exports;
 
@@ -19,7 +19,7 @@ ratelimit.isFlooding = function (socket) {
 
 	if (socket.callsPerSecond > allowedCalls && socket.elapsedTime < timeframe) {
 		winston.warn(
-			`Flooding detected! Calls : ${socket.callsPerSecond}, Duration : ${socket.elapsedTime}`,
+			`Flooding detected! Calls : ${socket.callsPerSecond}, Duration : ${socket.elapsedTime}`
 		);
 		return true;
 	}

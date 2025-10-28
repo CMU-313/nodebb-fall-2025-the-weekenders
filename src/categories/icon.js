@@ -1,41 +1,41 @@
-"use strict";
+'use strict';
 
-const path = require("path");
-const fs = require("fs/promises");
-const nconf = require("nconf");
-const winston = require("winston");
-const { default: satori } = require("satori");
-const sharp = require("sharp");
+const path = require('path');
+const fs = require('fs/promises');
+const nconf = require('nconf');
+const winston = require('winston');
+const { default: satori } = require('satori');
+const sharp = require('sharp');
 
-const utils = require("../utils");
+const utils = require('../utils');
 
 const categories = module.parent.exports;
 const Icons = module.exports;
 
 Icons._constants = Object.freeze({
-	extensions: ["svg", "png"],
+	extensions: ['svg', 'png'],
 });
 
 Icons.get = async (cid) => {
 	try {
 		const paths = Icons._constants.extensions.map((extension) =>
 			path.resolve(
-				nconf.get("upload_path"),
-				"category",
-				`category-${cid}-icon.${extension}`,
-			),
+				nconf.get('upload_path'),
+				'category',
+				`category-${cid}-icon.${extension}`
+			)
 		);
 		await Promise.all(
 			paths.map(async (path) => {
 				await fs.access(path);
-			}),
+			})
 		);
 
 		return new Map(
 			Object.entries({
-				svg: `${nconf.get("upload_url")}/category/category-${cid}-icon.svg`,
-				png: `${nconf.get("upload_url")}/category/category-${cid}-icon.png`,
-			}),
+				svg: `${nconf.get('upload_url')}/category/category-${cid}-icon.svg`,
+				png: `${nconf.get('upload_url')}/category/category-${cid}-icon.png`,
+			})
 		);
 	} catch (e) {
 		return await Icons.regenerate(cid);
@@ -46,14 +46,14 @@ Icons.flush = async (cid) => {
 	winston.verbose(`[categories/icons] Flushing ${cid}.`);
 	const paths = Icons._constants.extensions.map((extension) =>
 		path.resolve(
-			nconf.get("upload_path"),
-			"category",
-			`category-${cid}-icon.${extension}`,
-		),
+			nconf.get('upload_path'),
+			'category',
+			`category-${cid}-icon.${extension}`
+		)
 	);
 
 	await Promise.all(
-		paths.map(async (path) => await fs.rm(path, { force: true })),
+		paths.map(async (path) => await fs.rm(path, { force: true }))
 	);
 };
 
@@ -65,46 +65,46 @@ Icons.regenerate = async (cid) => {
 		Object.entries({
 			regular: path.join(
 				utils.getFontawesomePath(),
-				"webfonts/fa-regular-400.ttf",
+				'webfonts/fa-regular-400.ttf'
 			),
-			solid: path.join(utils.getFontawesomePath(), "webfonts/fa-solid-900.ttf"),
-		}),
+			solid: path.join(utils.getFontawesomePath(), 'webfonts/fa-solid-900.ttf'),
+		})
 	);
 	const fontBuffers = new Map(
 		Object.entries({
-			regular: await fs.readFile(fontPaths.get("regular")),
-			solid: await fs.readFile(fontPaths.get("solid")),
-		}),
+			regular: await fs.readFile(fontPaths.get('regular')),
+			solid: await fs.readFile(fontPaths.get('solid')),
+		})
 	);
 
 	// Retrieve unicode codepoint (hex) and weight
 	let metadata = await fs.readFile(
-		path.join(utils.getFontawesomePath(), "metadata/icon-families.json"),
-		"utf-8",
+		path.join(utils.getFontawesomePath(), 'metadata/icon-families.json'),
+		'utf-8'
 	);
 	metadata = JSON.parse(metadata); // needs try..catch wrapper
 	let iconString = icon.slice(3);
-	iconString = iconString.split(" ").shift(); // sometimes multiple classes saved; use first
-	const fontWeight = iconString.endsWith("-o") ? 400 : 900;
-	iconString = iconString.endsWith("-o") ? iconString.slice(0, -2) : iconString;
+	iconString = iconString.split(' ').shift(); // sometimes multiple classes saved; use first
+	const fontWeight = iconString.endsWith('-o') ? 400 : 900;
+	iconString = iconString.endsWith('-o') ? iconString.slice(0, -2) : iconString;
 	const { unicode } = metadata[iconString] || metadata.comments; // fall back to fa-comments
 
 	// Generate and save SVG
 	const svg = await satori(
 		{
-			type: "div",
+			type: 'div',
 			props: {
 				children: String.fromCodePoint(`0x${unicode}`),
 				style: {
-					width: "128px",
-					height: "128px",
+					width: '128px',
+					height: '128px',
 					color,
 					background: bgColor,
-					fontSize: "64px",
+					fontSize: '64px',
 					fontWeight,
-					display: "flex",
-					alignItems: "center",
-					justifyContent: "center",
+					display: 'flex',
+					alignItems: 'center',
+					justifyContent: 'center',
 				},
 			},
 		},
@@ -113,27 +113,27 @@ Icons.regenerate = async (cid) => {
 			height: 128,
 			fonts: [
 				{
-					name: "Font Awesome 6 Free",
-					data: fontBuffers.get("regular"),
+					name: 'Font Awesome 6 Free',
+					data: fontBuffers.get('regular'),
 					weight: 400,
-					style: "normal",
+					style: 'normal',
 				},
 				{
-					name: "Font Awesome 6 Free",
-					data: fontBuffers.get("solid"),
+					name: 'Font Awesome 6 Free',
+					data: fontBuffers.get('solid'),
 					weight: 900,
-					style: "normal",
+					style: 'normal',
 				},
 			],
-		},
+		}
 	);
 	await fs.writeFile(
 		path.resolve(
-			nconf.get("upload_path"),
-			"category",
-			`category-${cid}-icon.svg`,
+			nconf.get('upload_path'),
+			'category',
+			`category-${cid}-icon.svg`
 		),
-		svg,
+		svg
 	);
 
 	// Generate and save PNG
@@ -141,17 +141,17 @@ Icons.regenerate = async (cid) => {
 
 	await fs.writeFile(
 		path.resolve(
-			nconf.get("upload_path"),
-			"category",
-			`category-${cid}-icon.png`,
+			nconf.get('upload_path'),
+			'category',
+			`category-${cid}-icon.png`
 		),
-		pngBuffer,
+		pngBuffer
 	);
 
 	return new Map(
 		Object.entries({
-			svg: `${nconf.get("upload_url")}/category/category-${cid}-icon.svg`,
-			png: `${nconf.get("upload_url")}/category/category-${cid}-icon.png`,
-		}),
+			svg: `${nconf.get('upload_url')}/category/category-${cid}-icon.svg`,
+			png: `${nconf.get('upload_url')}/category/category-${cid}-icon.png`,
+		})
 	);
 };

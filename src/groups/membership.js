@@ -1,17 +1,17 @@
-"use strict";
+'use strict';
 
-const _ = require("lodash");
+const _ = require('lodash');
 
-const db = require("../database");
-const user = require("../user");
-const cache = require("../cache");
+const db = require('../database');
+const user = require('../user');
+const cache = require('../cache');
 
 module.exports = function (Groups) {
 	Groups.getMembers = async function (groupName, start, stop) {
 		return await db.getSortedSetRevRange(
 			`group:${groupName}:members`,
 			start,
-			stop,
+			stop
 		);
 	};
 
@@ -19,10 +19,10 @@ module.exports = function (Groups) {
 		async function get(groupName) {
 			const uids = await Groups.getMembers(groupName, start, stop);
 			return await user.getUsersFields(uids, [
-				"uid",
-				"username",
-				"picture",
-				"userslug",
+				'uid',
+				'username',
+				'picture',
+				'userslug',
 			]);
 		}
 		return await Promise.all(groupNames.map((name) => get(name)));
@@ -30,7 +30,7 @@ module.exports = function (Groups) {
 
 	Groups.getMembersOfGroups = async function (groupNames) {
 		return await db.getSortedSetsMembers(
-			groupNames.map((name) => `group:${name}:members`),
+			groupNames.map((name) => `group:${name}:members`)
 		);
 	};
 
@@ -54,13 +54,13 @@ module.exports = function (Groups) {
 			return uids.map(() => false);
 		}
 
-		if (groupName === "guests" || groupName === "spiders") {
+		if (groupName === 'guests' || groupName === 'spiders') {
 			return uids.map((uid) => isMemberOfEphemeralGroup(uid, groupName));
 		}
 
 		const cachedData = {};
 		const nonCachedUids = uids.filter((uid) =>
-			filterNonCached(cachedData, uid, groupName),
+			filterNonCached(cachedData, uid, groupName)
 		);
 
 		if (!nonCachedUids.length) {
@@ -69,7 +69,7 @@ module.exports = function (Groups) {
 
 		const isMembers = await db.isSortedSetMembers(
 			`group:${groupName}:members`,
-			nonCachedUids,
+			nonCachedUids
 		);
 		nonCachedUids.forEach((uid, index) => {
 			cachedData[`${uid}:${groupName}`] = isMembers[index];
@@ -81,23 +81,23 @@ module.exports = function (Groups) {
 	Groups.isMemberOfGroups = async function (uid, groups) {
 		if (!uid || parseInt(uid, 10) <= 0 || !groups.length) {
 			return groups.map((groupName) =>
-				isMemberOfEphemeralGroup(uid, groupName),
+				isMemberOfEphemeralGroup(uid, groupName)
 			);
 		}
 		const cachedData = {};
 		const nonCachedGroups = groups.filter((groupName) =>
-			filterNonCached(cachedData, uid, groupName),
+			filterNonCached(cachedData, uid, groupName)
 		);
 
 		if (!nonCachedGroups.length) {
 			return groups.map((groupName) => cachedData[`${uid}:${groupName}`]);
 		}
 		const nonCachedGroupsMemberSets = nonCachedGroups.map(
-			(groupName) => `group:${groupName}:members`,
+			(groupName) => `group:${groupName}:members`
 		);
 		const isMembers = await db.isMemberOfSortedSets(
 			nonCachedGroupsMemberSets,
-			uid,
+			uid
 		);
 		nonCachedGroups.forEach((groupName, index) => {
 			cachedData[`${uid}:${groupName}`] = isMembers[index];
@@ -109,8 +109,8 @@ module.exports = function (Groups) {
 
 	function isMemberOfEphemeralGroup(uid, groupName) {
 		return (
-			(groupName === "guests" && parseInt(uid, 10) === 0) ||
-			(groupName === "spiders" && parseInt(uid, 10) === -1)
+			(groupName === 'guests' && parseInt(uid, 10) === 0) ||
+			(groupName === 'spiders' && parseInt(uid, 10) === -1)
 		);
 	}
 
@@ -132,7 +132,7 @@ module.exports = function (Groups) {
 	};
 
 	Groups.getMemberCount = async function (groupName) {
-		const count = await db.getObjectField(`group:${groupName}`, "memberCount");
+		const count = await db.getObjectField(`group:${groupName}`, 'memberCount');
 		return parseInt(count, 10);
 	};
 
@@ -157,7 +157,7 @@ module.exports = function (Groups) {
 		const isGroupMember = _.zipObject(uniqueGroups, isMembers);
 
 		return members.map(
-			(groupNames) => !!groupNames.find((name) => isGroupMember[name]),
+			(groupNames) => !!groupNames.find((name) => isGroupMember[name])
 		);
 	};
 
@@ -170,7 +170,7 @@ module.exports = function (Groups) {
 			return results;
 		}
 		const isGroupMembers = await Promise.all(
-			groupNames.map((name) => Groups.isMembers(uids, name)),
+			groupNames.map((name) => Groups.isMembers(uids, name))
 		);
 
 		isGroupMembers.forEach((isMembers) => {
@@ -203,7 +203,7 @@ module.exports = function (Groups) {
 				: cachedData[keys[0]];
 		}
 		const groupMembers = await db.getSortedSetsMembers(
-			nonCachedKeys.map((name) => `group:${name}:members`),
+			nonCachedKeys.map((name) => `group:${name}:members`)
 		);
 
 		nonCachedKeys.forEach((groupName, index) => {

@@ -1,26 +1,26 @@
-"use strict";
+'use strict';
 
-const path = require("path");
-const validator = require("validator");
-const nconf = require("nconf");
-const toobusy = require("toobusy-js");
-const util = require("util");
-const multipart = require("connect-multiparty");
-const { csrfSynchronisedProtection } = require("./csrf");
+const path = require('path');
+const validator = require('validator');
+const nconf = require('nconf');
+const toobusy = require('toobusy-js');
+const util = require('util');
+const multipart = require('connect-multiparty');
+const { csrfSynchronisedProtection } = require('./csrf');
 
-const plugins = require("../plugins");
-const meta = require("../meta");
-const user = require("../user");
-const groups = require("../groups");
-const analytics = require("../analytics");
-const privileges = require("../privileges");
-const cacheCreate = require("../cache/lru");
-const helpers = require("./helpers");
-const api = require("../api");
+const plugins = require('../plugins');
+const meta = require('../meta');
+const user = require('../user');
+const groups = require('../groups');
+const analytics = require('../analytics');
+const privileges = require('../privileges');
+const cacheCreate = require('../cache/lru');
+const helpers = require('./helpers');
+const api = require('../api');
 
 const controllers = {
-	api: require("../controllers/api"),
-	helpers: require("../controllers/helpers"),
+	api: require('../controllers/api'),
+	helpers: require('../controllers/helpers'),
 };
 
 const delayCache = cacheCreate({
@@ -31,7 +31,7 @@ const multipartMiddleware = multipart();
 
 const middleware = module.exports;
 
-const relative_path = nconf.get("relative_path");
+const relative_path = nconf.get('relative_path');
 
 middleware.regexes = {
 	timestampedUpload: /^\d+-.+$/,
@@ -57,22 +57,22 @@ middleware.ensureLoggedIn = (req, res, next) => {
 };
 
 Object.assign(middleware, {
-	admin: require("./admin"),
-	...require("./header"),
+	admin: require('./admin'),
+	...require('./header'),
 });
-require("./render")(middleware);
-require("./maintenance")(middleware);
-require("./user")(middleware);
-middleware.uploads = require("./uploads");
-require("./headers")(middleware);
-require("./expose")(middleware);
-middleware.assert = require("./assert");
-middleware.activitypub = require("./activitypub");
+require('./render')(middleware);
+require('./maintenance')(middleware);
+require('./user')(middleware);
+middleware.uploads = require('./uploads');
+require('./headers')(middleware);
+require('./expose')(middleware);
+middleware.assert = require('./assert');
+middleware.activitypub = require('./activitypub');
 
 middleware.stripLeadingSlashes = function stripLeadingSlashes(req, res, next) {
-	const target = req.originalUrl.replace(relative_path, "");
-	if (target.startsWith("//")) {
-		return res.redirect(relative_path + target.replace(/^\/+/, "/"));
+	const target = req.originalUrl.replace(relative_path, '');
+	if (target.startsWith('//')) {
+		return res.redirect(relative_path + target.replace(/^\/+/, '/'));
 	}
 	next();
 };
@@ -86,11 +86,11 @@ middleware.pageView = helpers.try(async (req, res, next) => {
 	}
 	next();
 	await analytics.pageView({ ip: req.ip, uid: req.uid });
-	plugins.hooks.fire("action:middleware.pageView", { req: req });
+	plugins.hooks.fire('action:middleware.pageView', { req: req });
 });
 
 middleware.pluginHooks = helpers.try(async (req, res, next) => {
-	await plugins.hooks.fire("response:router.page", {
+	await plugins.hooks.fire('response:router.page', {
 		req: req,
 		res: res,
 	});
@@ -102,19 +102,19 @@ middleware.pluginHooks = helpers.try(async (req, res, next) => {
 
 middleware.validateFiles = function validateFiles(req, res, next) {
 	if (!req.files.files) {
-		return next(new Error(["[[error:invalid-files]]"]));
+		return next(new Error(['[[error:invalid-files]]']));
 	}
 
 	if (Array.isArray(req.files.files) && req.files.files.length) {
 		return next();
 	}
 
-	if (typeof req.files.files === "object") {
+	if (typeof req.files.files === 'object') {
 		req.files.files = [req.files.files];
 		return next();
 	}
 
-	return next(new Error(["[[error:invalid-files]]"]));
+	return next(new Error(['[[error:invalid-files]]']));
 };
 
 middleware.prepareAPI = function prepareAPI(req, res, next) {
@@ -123,8 +123,8 @@ middleware.prepareAPI = function prepareAPI(req, res, next) {
 };
 
 middleware.logApiUsage = async function logApiUsage(req, res, next) {
-	if (req.headers.hasOwnProperty("authorization")) {
-		const [, token] = req.headers.authorization.split(" ");
+	if (req.headers.hasOwnProperty('authorization')) {
+		const [, token] = req.headers.authorization.split(' ');
 		await api.utils.tokens.log(token);
 	}
 
@@ -133,28 +133,28 @@ middleware.logApiUsage = async function logApiUsage(req, res, next) {
 
 middleware.routeTouchIcon = function routeTouchIcon(req, res) {
 	if (
-		meta.config["brand:touchIcon"] &&
-		validator.isURL(meta.config["brand:touchIcon"])
+		meta.config['brand:touchIcon'] &&
+		validator.isURL(meta.config['brand:touchIcon'])
 	) {
-		return res.redirect(meta.config["brand:touchIcon"]);
+		return res.redirect(meta.config['brand:touchIcon']);
 	}
-	let iconPath = "";
-	if (meta.config["brand:touchIcon"]) {
+	let iconPath = '';
+	if (meta.config['brand:touchIcon']) {
 		iconPath = path.join(
-			nconf.get("upload_path"),
-			meta.config["brand:touchIcon"].replace(/assets\/uploads/, ""),
+			nconf.get('upload_path'),
+			meta.config['brand:touchIcon'].replace(/assets\/uploads/, '')
 		);
 	} else {
-		iconPath = path.join(nconf.get("base_dir"), "public/images/touch/512.png");
+		iconPath = path.join(nconf.get('base_dir'), 'public/images/touch/512.png');
 	}
 
 	return res.sendFile(iconPath, {
-		maxAge: req.app.enabled("cache") ? 5184000000 : 0,
+		maxAge: req.app.enabled('cache') ? 5184000000 : 0,
 	});
 };
 
 middleware.privateTagListing = helpers.try(async (req, res, next) => {
-	const canView = await privileges.global.can("view:tags", req.uid);
+	const canView = await privileges.global.can('view:tags', req.uid);
 	if (!canView) {
 		return controllers.helpers.notAllowed(req, res);
 	}
@@ -163,17 +163,17 @@ middleware.privateTagListing = helpers.try(async (req, res, next) => {
 
 middleware.exposeGroupName = helpers.try(async (req, res, next) => {
 	await expose(
-		"groupName",
+		'groupName',
 		groups.getGroupNameByGroupSlug,
-		"slug",
+		'slug',
 		req,
 		res,
-		next,
+		next
 	);
 });
 
 middleware.exposeUid = helpers.try(async (req, res, next) => {
-	await expose("uid", user.getUidByUserslug, "userslug", req, res, next);
+	await expose('uid', user.getUidByUserslug, 'userslug', req, res, next);
 });
 
 async function expose(exposedField, method, field, req, res, next) {
@@ -183,14 +183,14 @@ async function expose(exposedField, method, field, req, res, next) {
 	const param = String(req.params[field]).toLowerCase();
 
 	// potential hostname — ActivityPub
-	if (param.indexOf("@") !== -1) {
+	if (param.indexOf('@') !== -1) {
 		res.locals[exposedField] = -2;
 		return next();
 	}
 
 	const value = await method(param);
 	if (!value) {
-		next("route");
+		next('route');
 		return;
 	}
 
@@ -204,15 +204,15 @@ middleware.privateUploads = function privateUploads(req, res, next) {
 	}
 
 	if (
-		req.path.startsWith(`${nconf.get("relative_path")}/assets/uploads/files`)
+		req.path.startsWith(`${nconf.get('relative_path')}/assets/uploads/files`)
 	) {
-		const extensions = (meta.config.privateUploadsExtensions || "")
-			.split(",")
+		const extensions = (meta.config.privateUploadsExtensions || '')
+			.split(',')
 			.filter(Boolean);
 		let ext = path.extname(req.path);
-		ext = ext ? ext.replace(/^\./, "") : ext;
+		ext = ext ? ext.replace(/^\./, '') : ext;
 		if (!extensions.length || extensions.includes(ext)) {
-			return res.status(403).json("not-allowed");
+			return res.status(403).json('not-allowed');
 		}
 	}
 	next();
@@ -220,15 +220,15 @@ middleware.privateUploads = function privateUploads(req, res, next) {
 
 middleware.busyCheck = function busyCheck(req, res, next) {
 	if (
-		global.env === "production" &&
+		global.env === 'production' &&
 		meta.config.eventLoopCheckEnabled &&
 		toobusy()
 	) {
-		analytics.increment("errors:503");
+		analytics.increment('errors:503');
 		res
 			.status(503)
-			.type("text/html")
-			.sendFile(path.join(__dirname, "../../public/503.html"));
+			.type('text/html')
+			.sendFile(path.join(__dirname, '../../public/503.html'));
 	} else {
 		setImmediate(next);
 	}
@@ -260,8 +260,8 @@ middleware.buildSkinAsset = helpers.try(async (req, res, next) => {
 	// If this middleware is reached, a skin was requested, so it is built on-demand
 	const targetSkin = path
 		.basename(req.originalUrl)
-		.split(".css")[0]
-		.replace(/-rtl$/, "");
+		.split('.css')[0]
+		.replace(/-rtl$/, '');
 	if (!targetSkin) {
 		return next();
 	}
@@ -274,13 +274,13 @@ middleware.buildSkinAsset = helpers.try(async (req, res, next) => {
 		return next();
 	}
 
-	await plugins.prepareForBuild(["client side styles"]);
+	await plugins.prepareForBuild(['client side styles']);
 	const [ltr, rtl] = await meta.css.buildBundle(targetSkin, true);
-	require("../meta/minifier").killAll();
+	require('../meta/minifier').killAll();
 	res
 		.status(200)
-		.type("text/css")
-		.send(req.originalUrl.includes("-rtl") ? rtl : ltr);
+		.type('text/css')
+		.send(req.originalUrl.includes('-rtl') ? rtl : ltr);
 });
 
 middleware.addUploadHeaders = function addUploadHeaders(req, res, next) {
@@ -288,13 +288,13 @@ middleware.addUploadHeaders = function addUploadHeaders(req, res, next) {
 	let basename = path.basename(req.path);
 	const extname = path.extname(req.path);
 	if (
-		req.path.startsWith("/uploads/files/") &&
+		req.path.startsWith('/uploads/files/') &&
 		middleware.regexes.timestampedUpload.test(basename)
 	) {
 		basename = basename.slice(14);
 		res.header(
-			"Content-Disposition",
-			`${extname.startsWith(".htm") ? "attachment" : "inline"}; filename="${basename}"`,
+			'Content-Disposition',
+			`${extname.startsWith('.htm') ? 'attachment' : 'inline'}; filename="${basename}"`
 		);
 	}
 
@@ -303,14 +303,14 @@ middleware.addUploadHeaders = function addUploadHeaders(req, res, next) {
 
 middleware.validateAuth = helpers.try(async (req, res, next) => {
 	try {
-		await plugins.hooks.fire("static:auth.validate", {
+		await plugins.hooks.fire('static:auth.validate', {
 			user: res.locals.user,
 			strategy: res.locals.strategy,
 		});
 		next();
 	} catch (err) {
 		const regenerateSession = util.promisify((cb) =>
-			req.session.regenerate(cb),
+			req.session.regenerate(cb)
 		);
 		await regenerateSession();
 		req.uid = 0;
@@ -325,7 +325,7 @@ middleware.checkRequired = function (fields, req, res, next) {
 		(field) =>
 			req.body &&
 			!req.body.hasOwnProperty(field) &&
-			!req.query.hasOwnProperty(field),
+			!req.query.hasOwnProperty(field)
 	);
 
 	if (!missing.length) {
@@ -335,15 +335,15 @@ middleware.checkRequired = function (fields, req, res, next) {
 	controllers.helpers.formatApiResponse(
 		400,
 		res,
-		new Error(`[[error:required-parameters-missing, ${missing.join(" ")}]]`),
+		new Error(`[[error:required-parameters-missing, ${missing.join(' ')}]]`)
 	);
 };
 
 middleware.handleMultipart = (req, res, next) => {
 	// Applies multipart handler on applicable content-type
-	const { "content-type": contentType } = req.headers;
+	const { 'content-type': contentType } = req.headers;
 
-	if (contentType && !contentType.startsWith("multipart/form-data")) {
+	if (contentType && !contentType.startsWith('multipart/form-data')) {
 		return next();
 	}
 

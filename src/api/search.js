@@ -1,16 +1,16 @@
-"use strict";
+'use strict';
 
-const _ = require("lodash");
+const _ = require('lodash');
 
-const db = require("../database");
-const user = require("../user");
-const categories = require("../categories");
-const messaging = require("../messaging");
-const privileges = require("../privileges");
-const meta = require("../meta");
-const plugins = require("../plugins");
+const db = require('../database');
+const user = require('../user');
+const categories = require('../categories');
+const messaging = require('../messaging');
+const privileges = require('../privileges');
+const meta = require('../meta');
+const plugins = require('../plugins');
 
-const controllersHelpers = require("../controllers/helpers");
+const controllersHelpers = require('../controllers/helpers');
 
 const searchApi = module.exports;
 
@@ -19,9 +19,9 @@ searchApi.categories = async (caller, data) => {
 
 	let cids = [];
 	let matchedCids = [];
-	const privilege = data.privilege || "topics:read";
+	const privilege = data.privilege || 'topics:read';
 	data.states = (
-		data.states || ["watching", "tracking", "notwatching", "ignoring"]
+		data.states || ['watching', 'tracking', 'notwatching', 'ignoring']
 	).map((state) => categories.watchStates[state]);
 	data.parentCid = parseInt(data.parentCid || 0, 10);
 
@@ -49,8 +49,8 @@ searchApi.categories = async (caller, data) => {
 
 	let categoriesData = categories.buildForSelectCategories(
 		visibleCategories,
-		["disabledClass"],
-		data.parentCid,
+		['disabledClass'],
+		data.parentCid
 	);
 	categoriesData = categoriesData.slice(0, 200);
 
@@ -62,7 +62,7 @@ searchApi.categories = async (caller, data) => {
 			category.match = true;
 		}
 	});
-	const result = await plugins.hooks.fire("filter:categories.categorySearch", {
+	const result = await plugins.hooks.fire('filter:categories.categorySearch', {
 		categories: categoriesData,
 		...data,
 		uid: caller.uid,
@@ -82,21 +82,21 @@ async function findMatchedCids(uid, data) {
 	let matchedCids = result.categories.map((c) => c.cid);
 	// no need to filter if all 3 states are used
 	const filterByWatchState = !Object.values(categories.watchStates).every(
-		(state) => data.states.includes(state),
+		(state) => data.states.includes(state)
 	);
 
 	if (filterByWatchState) {
 		const states = await categories.getWatchState(matchedCids, uid);
 		matchedCids = matchedCids.filter((cid, index) =>
-			data.states.includes(states[index]),
+			data.states.includes(states[index])
 		);
 	}
 
 	const rootCids = _.uniq(
-		_.flatten(await Promise.all(matchedCids.map(categories.getParentCids))),
+		_.flatten(await Promise.all(matchedCids.map(categories.getParentCids)))
 	);
 	const allChildCids = _.uniq(
-		_.flatten(await Promise.all(matchedCids.map(categories.getChildrenCids))),
+		_.flatten(await Promise.all(matchedCids.map(categories.getChildrenCids)))
 	);
 
 	return {
@@ -109,36 +109,36 @@ async function loadCids(uid, parentCid) {
 	let resultCids = [];
 	async function getCidsRecursive(cids) {
 		const categoryData = await categories.getCategoriesFields(cids, [
-			"subCategoriesPerPage",
+			'subCategoriesPerPage',
 		]);
 		const cidToData = _.zipObject(cids, categoryData);
 		await Promise.all(
 			cids.map(async (cid) => {
 				const allChildCids = await categories.getAllCidsFromSet(
-					`cid:${cid}:children`,
+					`cid:${cid}:children`
 				);
 				if (allChildCids.length) {
 					const childCids = await privileges.categories.filterCids(
-						"find",
+						'find',
 						allChildCids,
-						uid,
+						uid
 					);
 					resultCids.push(
-						...childCids.slice(0, cidToData[cid].subCategoriesPerPage),
+						...childCids.slice(0, cidToData[cid].subCategoriesPerPage)
 					);
 					await getCidsRecursive(childCids);
 				}
-			}),
+			})
 		);
 	}
 
 	const allRootCids = await categories.getAllCidsFromSet(
-		`cid:${parentCid}:children`,
+		`cid:${parentCid}:children`
 	);
 	const rootCids = await privileges.categories.filterCids(
-		"find",
+		'find',
 		allRootCids,
-		uid,
+		uid
 	);
 	const pageCids = rootCids.slice(0, meta.config.categoriesPerPage);
 	resultCids = pageCids;
@@ -154,7 +154,7 @@ searchApi.roomUsers = async (caller, { query, roomId }) => {
 	]);
 
 	if (!isAdmin && !inRoom) {
-		throw new Error("[[error:no-privileges]]");
+		throw new Error('[[error:no-privileges]]');
 	}
 
 	const results = await user.search({
@@ -168,13 +168,13 @@ searchApi.roomUsers = async (caller, { query, roomId }) => {
 	const foundUids = users.map((user) => user && user.uid);
 	const isUidInRoom = _.zipObject(
 		foundUids,
-		await messaging.isUsersInRoom(foundUids, roomId),
+		await messaging.isUsersInRoom(foundUids, roomId)
 	);
 
 	const roomUsers = users.filter((user) => isUidInRoom[user.uid]);
 	const isOwners = await messaging.isRoomOwner(
 		roomUsers.map((u) => u.uid),
-		roomId,
+		roomId
 	);
 
 	roomUsers.forEach((user, index) => {
@@ -204,16 +204,16 @@ searchApi.roomMessages = async (caller, { query, roomId, uid }) => {
 	]);
 
 	if (!roomData) {
-		throw new Error("[[error:no-room]]");
+		throw new Error('[[error:no-room]]');
 	}
 	if (!inRoom) {
-		throw new Error("[[error:no-privileges]]");
+		throw new Error('[[error:no-privileges]]');
 	}
-	const { ids } = await plugins.hooks.fire("filter:messaging.searchMessages", {
+	const { ids } = await plugins.hooks.fire('filter:messaging.searchMessages', {
 		content: query,
 		roomId: [roomId],
 		uid: [uid],
-		matchWords: "any",
+		matchWords: 'any',
 		ids: [],
 	});
 
@@ -221,14 +221,14 @@ searchApi.roomMessages = async (caller, { query, roomId, uid }) => {
 	if (!roomData.public) {
 		userjoinTimestamp = await db.sortedSetScore(
 			`chat:room:${roomId}:uids`,
-			caller.uid,
+			caller.uid
 		);
 	}
 	let messageData = await messaging.getMessagesData(
 		ids,
 		caller.uid,
 		roomId,
-		false,
+		false
 	);
 	messageData = messageData
 		.map((msg) => {

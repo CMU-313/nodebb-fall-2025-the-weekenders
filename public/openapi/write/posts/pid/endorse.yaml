@@ -12,9 +12,9 @@ put:
         type: string
       required: true
       description: Post ID to endorse
-      example: "1"
+      example: '1'
   responses:
-    "200":
+    '200':
       description: Post successfully endorsed
       content:
         application/json:
@@ -38,7 +38,7 @@ put:
                   endorsed_rank:
                     type: number
                     description: Rank/order of endorsement
-    "403":
+    '403':
       description: Forbidden - User does not have permission to endorse posts
       content:
         application/json:
@@ -52,7 +52,7 @@ put:
                     type: string
                   message:
                     type: string
-    "404":
+    '404':
       description: Not Found - Post does not exist
       content:
         application/json:
@@ -80,9 +80,9 @@ delete:
         type: string
       required: true
       description: Post ID to unendorse
-      example: "1"
+      example: '1'
   responses:
-    "200":
+    '200':
       description: Post endorsement successfully removed
       content:
         application/json:
@@ -108,7 +108,7 @@ delete:
                     type: number
                     nullable: true
                     description: Rank/order of endorsement
-    "403":
+    '403':
       description: Forbidden - User does not have permission to unendorse posts
       content:
         application/json:
@@ -122,7 +122,7 @@ delete:
                     type: string
                   message:
                     type: string
-    "404":
+    '404':
       description: Not Found - Post does not exist
       content:
         application/json:

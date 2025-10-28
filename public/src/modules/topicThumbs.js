@@ -1,13 +1,13 @@
-"use strict";
+'use strict';
 
-define("topicThumbs", [
-	"api",
-	"bootbox",
-	"alerts",
-	"uploader",
-	"benchpress",
-	"translator",
-	"jquery-ui/widgets/sortable",
+define('topicThumbs', [
+	'api',
+	'bootbox',
+	'alerts',
+	'uploader',
+	'benchpress',
+	'translator',
+	'jquery-ui/widgets/sortable',
 ], function (api, bootbox, alerts, uploader, Benchpress, translator) {
 	const Thumbs = {};
 
@@ -33,13 +33,13 @@ define("topicThumbs", [
 		new Promise((resolve) => {
 			uploader.show(
 				{
-					title: "[[topic:composer.thumb-title]]",
-					method: "put",
+					title: '[[topic:composer.thumb-title]]',
+					method: 'put',
 					route: config.relative_path + `/api/v3/topics/${id}/thumbs`,
 				},
 				function (url) {
 					resolve(url);
-				},
+				}
 			);
 		});
 
@@ -59,18 +59,18 @@ define("topicThumbs", [
 							numThumbs = thumbs.length;
 
 							resolve(thumbs);
-						}),
+						})
 				)
-				.then((thumbs) => Benchpress.render("modals/topic-thumbs", { thumbs }))
+				.then((thumbs) => Benchpress.render('modals/topic-thumbs', { thumbs }))
 				.then((html) => {
 					if (modal) {
 						translator.translate(html, function (translated) {
-							modal.find(".bootbox-body").html(translated);
+							modal.find('.bootbox-body').html(translated);
 							Thumbs.modal.handleSort({ modal, numThumbs });
 						});
 					} else {
 						modal = bootbox.dialog({
-							title: "[[modules:thumbs.modal.title]]",
+							title: '[[modules:thumbs.modal.title]]',
 							message: html,
 							onEscape: true,
 							backdrop: true,
@@ -78,14 +78,14 @@ define("topicThumbs", [
 								add: {
 									label:
 										'<i class="fa fa-plus"></i> [[modules:thumbs.modal.add]]',
-									className: "btn-success",
+									className: 'btn-success',
 									callback: () => {
 										Thumbs.upload(id).then(() => {
 											Thumbs.modal.open({ ...payload, modal });
-											require(["composer"], (composer) => {
+											require(['composer'], (composer) => {
 												composer.updateThumbCount(
 													id,
-													$(`[component="composer"][data-uuid="${id}"]`),
+													$(`[component="composer"][data-uuid="${id}"]`)
 												);
 												resolve();
 											});
@@ -94,8 +94,8 @@ define("topicThumbs", [
 									},
 								},
 								close: {
-									label: "[[global:close]]",
-									className: "btn-primary",
+									label: '[[global:close]]',
+									className: 'btn-primary',
 								},
 							},
 						});
@@ -109,27 +109,27 @@ define("topicThumbs", [
 	Thumbs.modal.handleDelete = (payload) => {
 		const modalEl = payload.modal.get(0);
 		const { id: uuid } = payload;
-		modalEl.addEventListener("click", (ev) => {
+		modalEl.addEventListener('click', (ev) => {
 			if (ev.target.closest('button[data-action="remove"]')) {
-				bootbox.confirm("[[modules:thumbs.modal.confirm-remove]]", (ok) => {
+				bootbox.confirm('[[modules:thumbs.modal.confirm-remove]]', (ok) => {
 					if (!ok) {
 						return;
 					}
 
-					const id = ev.target.closest("[data-id]").getAttribute("data-id");
+					const id = ev.target.closest('[data-id]').getAttribute('data-id');
 					const path = ev.target
-						.closest("[data-path]")
-						.getAttribute("data-path");
+						.closest('[data-path]')
+						.getAttribute('data-path');
 					api
 						.del(`/topics/${id}/thumbs`, {
 							path: path,
 						})
 						.then(() => {
 							Thumbs.modal.open(payload);
-							require(["composer"], (composer) => {
+							require(['composer'], (composer) => {
 								composer.updateThumbCount(
 									uuid,
-									$(`[component="composer"][data-uuid="${uuid}"]`),
+									$(`[component="composer"][data-uuid="${uuid}"]`)
 								);
 							});
 						})
@@ -141,20 +141,20 @@ define("topicThumbs", [
 
 	Thumbs.modal.handleSort = ({ modal, numThumbs }) => {
 		if (numThumbs > 1) {
-			const selectorEl = modal.find(".topic-thumbs-modal");
+			const selectorEl = modal.find('.topic-thumbs-modal');
 			selectorEl.sortable({
-				items: "[data-id]",
+				items: '[data-id]',
 			});
-			selectorEl.on("sortupdate", Thumbs.modal.handleSortChange);
+			selectorEl.on('sortupdate', Thumbs.modal.handleSortChange);
 		}
 	};
 
 	Thumbs.modal.handleSortChange = (ev, ui) => {
-		const items = ui.item.get(0).parentNode.querySelectorAll("[data-id]");
+		const items = ui.item.get(0).parentNode.querySelectorAll('[data-id]');
 		Array.from(items).forEach((el, order) => {
-			const id = el.getAttribute("data-id");
-			let path = el.getAttribute("data-path");
-			path = path.replace(new RegExp(`^${config.upload_url}`), "");
+			const id = el.getAttribute('data-id');
+			let path = el.getAttribute('data-path');
+			path = path.replace(new RegExp(`^${config.upload_url}`), '');
 
 			api
 				.put(`/topics/${id}/thumbs/order`, { path, order })

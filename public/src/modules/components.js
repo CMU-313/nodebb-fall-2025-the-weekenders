@@ -1,15 +1,15 @@
-"use strict";
+'use strict';
 
-define("components", function () {
+define('components', function () {
 	const components = {};
 
 	components.core = {
-		"topic/teaser": function (tid) {
+		'topic/teaser': function (tid) {
 			if (tid) {
 				return $(
 					'[component="category/topic"][data-tid="' +
 						tid +
-						'"] [component="topic/teaser"]',
+						'"] [component="topic/teaser"]'
 				);
 			}
 			return $('[component="topic/teaser"]');
@@ -20,70 +20,70 @@ define("components", function () {
 		post: function (name, value) {
 			return $('[component="post"][data-' + name + '="' + value + '"]');
 		},
-		"post/content": function (pid) {
+		'post/content': function (pid) {
 			return $(
-				'[component="post"][data-pid="' + pid + '"] [component="post/content"]',
+				'[component="post"][data-pid="' + pid + '"] [component="post/content"]'
 			);
 		},
-		"post/header": function (pid) {
+		'post/header': function (pid) {
 			return $(
-				'[component="post"][data-pid="' + pid + '"] [component="post/header"]',
+				'[component="post"][data-pid="' + pid + '"] [component="post/header"]'
 			);
 		},
-		"post/anchor": function (index) {
+		'post/anchor': function (index) {
 			return $(
 				'[component="post"][data-index="' +
 					index +
-					'"] [component="post/anchor"]',
+					'"] [component="post/anchor"]'
 			);
 		},
-		"post/vote-count": function (pid) {
+		'post/vote-count': function (pid) {
 			return $(
 				'[component="post"][data-pid="' +
 					pid +
-					'"] [component="post/vote-count"]',
+					'"] [component="post/vote-count"]'
 			);
 		},
-		"post/bookmark-count": function (pid) {
+		'post/bookmark-count': function (pid) {
 			return $(
 				'[component="post"][data-pid="' +
 					pid +
-					'"] [component="post/bookmark-count"]',
+					'"] [component="post/bookmark-count"]'
 			);
 		},
 
-		"user/postcount": function (uid) {
+		'user/postcount': function (uid) {
 			return $('[component="user/postcount"][data-uid="' + uid + '"]');
 		},
-		"user/reputation": function (uid) {
+		'user/reputation': function (uid) {
 			return $('[component="user/reputation"][data-uid="' + uid + '"]');
 		},
 
-		"category/topic": function (name, value) {
+		'category/topic': function (name, value) {
 			return $(
-				'[component="category/topic"][data-' + name + '="' + value + '"]',
+				'[component="category/topic"][data-' + name + '="' + value + '"]'
 			);
 		},
 
-		"categories/category": function (name, value) {
+		'categories/category': function (name, value) {
 			return $(
-				'[component="categories/category"][data-' + name + '="' + value + '"]',
+				'[component="categories/category"][data-' + name + '="' + value + '"]'
 			);
 		},
 
-		"chat/message": function (messageId) {
+		'chat/message': function (messageId) {
 			return $('[component="chat/message"][data-mid="' + messageId + '"]');
 		},
 
-		"chat/message/body": function (messageId) {
+		'chat/message/body': function (messageId) {
 			return $(
 				'[component="chat/message"][data-mid="' +
 					messageId +
-					'"] [component="chat/message/body"]',
+					'"] [component="chat/message/body"]'
 			);
 		},
 
-		"chat/recent/room": function (roomid) {
+		'chat/recent/room': function (roomid) {
 			return $('[component="chat/recent/room"][data-roomid="' + roomid + '"]');
 		},
 	};

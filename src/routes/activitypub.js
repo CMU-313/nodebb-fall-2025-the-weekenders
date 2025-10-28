@@ -1,19 +1,19 @@
-"use strict";
+'use strict';
 
-const helpers = require("./helpers");
+const helpers = require('./helpers');
 
 module.exports = function (app, middleware, controllers) {
 	helpers.setupPageRoute(
 		app,
-		"/world",
+		'/world',
 		[middleware.activitypub.enabled],
-		controllers.activitypub.topics.list,
+		controllers.activitypub.topics.list
 	);
 	helpers.setupPageRoute(
 		app,
-		"/ap",
+		'/ap',
 		[middleware.activitypub.enabled],
-		controllers.activitypub.fetch,
+		controllers.activitypub.fetch
 	);
 
 	/**
@@ -36,103 +36,103 @@ module.exports = function (app, middleware, controllers) {
 	];
 
 	app.get(
-		"/actor",
+		'/actor',
 		middlewares,
-		helpers.tryRoute(controllers.activitypub.actors.application),
+		helpers.tryRoute(controllers.activitypub.actors.application)
 	);
 	app.post(
-		"/inbox",
+		'/inbox',
 		[...middlewares, ...inboxMiddlewares],
-		helpers.tryRoute(controllers.activitypub.postInbox),
+		helpers.tryRoute(controllers.activitypub.postInbox)
 	);
 
 	app.get(
-		"/uid/:uid",
+		'/uid/:uid',
 		[...middlewares, middleware.assert.user],
-		helpers.tryRoute(controllers.activitypub.actors.user),
+		helpers.tryRoute(controllers.activitypub.actors.user)
 	);
 	app.get(
-		"/user/:userslug",
+		'/user/:userslug',
 		[...middlewares, middleware.exposeUid, middleware.assert.user],
-		helpers.tryRoute(controllers.activitypub.actors.userBySlug),
+		helpers.tryRoute(controllers.activitypub.actors.userBySlug)
 	);
 	app.get(
-		"/uid/:uid/inbox",
+		'/uid/:uid/inbox',
 		[...middlewares, middleware.assert.user],
-		helpers.tryRoute(controllers.activitypub.getInbox),
+		helpers.tryRoute(controllers.activitypub.getInbox)
 	);
 	app.post(
-		"/uid/:uid/inbox",
+		'/uid/:uid/inbox',
 		[...middlewares, middleware.assert.user, ...inboxMiddlewares],
-		helpers.tryRoute(controllers.activitypub.postInbox),
+		helpers.tryRoute(controllers.activitypub.postInbox)
 	);
 	app.get(
-		"/uid/:uid/outbox",
+		'/uid/:uid/outbox',
 		[...middlewares, middleware.assert.user],
-		helpers.tryRoute(controllers.activitypub.getOutbox),
+		helpers.tryRoute(controllers.activitypub.getOutbox)
 	);
 	app.post(
-		"/uid/:uid/outbox",
+		'/uid/:uid/outbox',
 		[...middlewares, middleware.assert.user],
-		helpers.tryRoute(controllers.activitypub.postOutbox),
+		helpers.tryRoute(controllers.activitypub.postOutbox)
 	);
 	app.get(
-		"/uid/:uid/following",
+		'/uid/:uid/following',
 		[...middlewares, middleware.assert.user],
-		helpers.tryRoute(controllers.activitypub.getFollowing),
+		helpers.tryRoute(controllers.activitypub.getFollowing)
 	);
 	app.get(
-		"/uid/:uid/followers",
+		'/uid/:uid/followers',
 		[...middlewares, middleware.assert.user],
-		helpers.tryRoute(controllers.activitypub.getFollowers),
+		helpers.tryRoute(controllers.activitypub.getFollowers)
 	);
 
 	app.get(
-		"/post/:pid",
+		'/post/:pid',
 		[...middlewares, middleware.assert.post],
-		helpers.tryRoute(controllers.activitypub.actors.note),
+		helpers.tryRoute(controllers.activitypub.actors.note)
 	);
 	app.get(
-		"/post/:pid/replies",
+		'/post/:pid/replies',
 		[...middlewares, middleware.assert.post],
-		helpers.tryRoute(controllers.activitypub.actors.replies),
+		helpers.tryRoute(controllers.activitypub.actors.replies)
 	);
 
 	app.get(
-		"/topic/:tid/:slug?",
+		'/topic/:tid/:slug?',
 		[...middlewares, middleware.assert.topic],
-		helpers.tryRoute(controllers.activitypub.actors.topic),
+		helpers.tryRoute(controllers.activitypub.actors.topic)
 	);
 
 	app.get(
-		"/category/:cid/inbox",
+		'/category/:cid/inbox',
 		[...middlewares, middleware.assert.category],
-		helpers.tryRoute(controllers.activitypub.getInbox),
+		helpers.tryRoute(controllers.activitypub.getInbox)
 	);
 	app.post(
-		"/category/:cid/inbox",
+		'/category/:cid/inbox',
 		[...inboxMiddlewares, middleware.assert.category, ...inboxMiddlewares],
-		helpers.tryRoute(controllers.activitypub).postInbox,
+		helpers.tryRoute(controllers.activitypub).postInbox
 	);
 	app.get(
-		"/category/:cid/outbox",
+		'/category/:cid/outbox',
 		[...middlewares, middleware.assert.category],
-		helpers.tryRoute(controllers.activitypub.getCategoryOutbox),
+		helpers.tryRoute(controllers.activitypub.getCategoryOutbox)
 	);
 	app.post(
-		"/category/:cid/outbox",
+		'/category/:cid/outbox',
 		[...middlewares, middleware.assert.category],
-		helpers.tryRoute(controllers.activitypub.postOutbox),
+		helpers.tryRoute(controllers.activitypub.postOutbox)
 	);
 	app.get(
-		"/category/:cid/:slug?",
+		'/category/:cid/:slug?',
 		[...middlewares, middleware.assert.category],
-		helpers.tryRoute(controllers.activitypub.actors.category),
+		helpers.tryRoute(controllers.activitypub.actors.category)
 	);
 
 	app.get(
-		"/message/:mid",
+		'/message/:mid',
 		[...middlewares, middleware.assert.message],
-		helpers.tryRoute(controllers.activitypub.actors.message),
+		helpers.tryRoute(controllers.activitypub.actors.message)
 	);
 };

@@ -1,9 +1,9 @@
-"use strict";
+'use strict';
 
-const router = require("express").Router();
-const middleware = require("../../middleware");
-const controllers = require("../../controllers");
-const routeHelpers = require("../helpers");
+const router = require('express').Router();
+const middleware = require('../../middleware');
+const controllers = require('../../controllers');
+const routeHelpers = require('../helpers');
 
 const { setupApiRoute } = routeHelpers;
 
@@ -12,17 +12,17 @@ module.exports = function () {
 
 	setupApiRoute(
 		router,
-		"put",
-		"/:tag/follow",
+		'put',
+		'/:tag/follow',
 		[...middlewares],
-		controllers.write.tags.follow,
+		controllers.write.tags.follow
 	);
 	setupApiRoute(
 		router,
-		"delete",
-		"/:tag/follow",
+		'delete',
+		'/:tag/follow',
 		[...middlewares],
-		controllers.write.tags.unfollow,
+		controllers.write.tags.unfollow
 	);
 
 	return router;

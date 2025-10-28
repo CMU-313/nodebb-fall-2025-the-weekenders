@@ -9,7 +9,7 @@ get:
         type: integer
       example: 2
   responses:
-    "200":
+    '200':
       description: A user’s helpfulness score
       content:
         application/json:

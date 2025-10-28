@@ -1,11 +1,11 @@
-"use strict";
+'use strict';
 
 module.exports = function (module) {
 	module.sortedSetIntersectCard = async function (keys) {
 		if (!Array.isArray(keys) || !keys.length) {
 			return 0;
 		}
-		const objects = module.client.collection("objects");
+		const objects = module.client.collection('objects');
 		const counts = await countSets(keys, 50000);
 		if (counts.minCount === 0) {
 			return 0;
@@ -15,7 +15,7 @@ module.exports = function (module) {
 				{ _key: counts.smallestSet },
 				{
 					projection: { _id: 0, value: 1 },
-				},
+				}
 			)
 			.batchSize(counts.minCount + 1)
 			.toArray();
@@ -38,16 +38,16 @@ module.exports = function (module) {
 	};
 
 	async function countSets(sets, limit) {
-		const objects = module.client.collection("objects");
+		const objects = module.client.collection('objects');
 		const counts = await Promise.all(
 			sets.map((s) =>
 				objects.countDocuments(
 					{ _key: s },
 					{
 						limit: limit || 25000,
-					},
-				),
-			),
+					}
+				)
+			)
 		);
 		const minCount = Math.min(...counts);
 		const index = counts.indexOf(minCount);
@@ -69,8 +69,8 @@ module.exports = function (module) {
 	};
 
 	async function getSortedSetRevIntersect(params) {
-		params.start = params.hasOwnProperty("start") ? params.start : 0;
-		params.stop = params.hasOwnProperty("stop") ? params.stop : -1;
+		params.start = params.hasOwnProperty('start') ? params.start : 0;
+		params.stop = params.hasOwnProperty('stop') ? params.stop : -1;
 		params.weights = params.weights || [];
 
 		params.limit = params.stop - params.start + 1;
@@ -93,7 +93,7 @@ module.exports = function (module) {
 	}
 
 	async function intersectSingle(params) {
-		const objects = module.client.collection("objects");
+		const objects = module.client.collection('objects');
 		const sortSet = params.sets[params.weights.indexOf(1)];
 		if (sortSet === params.counts.smallestSet) {
 			return await intersectBatch(params);
@@ -103,7 +103,7 @@ module.exports = function (module) {
 			{ _key: params.counts.smallestSet },
 			{
 				projection: { _id: 0, value: 1 },
-			},
+			}
 		);
 		if (params.counts.minCount > 1) {
 			cursorSmall.batchSize(params.counts.minCount + 1);
@@ -114,7 +114,7 @@ module.exports = function (module) {
 			project.score = 1;
 		}
 		const otherSets = params.sets.filter(
-			(s) => s !== params.counts.smallestSet,
+			(s) => s !== params.counts.smallestSet
 		);
 		// move sortSet to the end of array
 		otherSets.push(otherSets.splice(otherSets.indexOf(sortSet), 1)[0]);
@@ -151,7 +151,7 @@ module.exports = function (module) {
 		const sortSet = params.sets[params.weights.indexOf(1)];
 		const batchSize = 10000;
 		const cursor = await module.client
-			.collection("objects")
+			.collection('objects')
 			.find({ _key: sortSet }, { projection: project })
 			.sort({ score: params.sort })
 			.batchSize(batchSize);
@@ -174,7 +174,7 @@ module.exports = function (module) {
 			const members = await Promise.all(
 				otherSets.map(async (s) => {
 					const data = await module.client
-						.collection("objects")
+						.collection('objects')
 						.find(
 							{
 								_key: s,
@@ -182,15 +182,15 @@ module.exports = function (module) {
 							},
 							{
 								projection: { _id: 0, value: 1 },
-							},
+							}
 						)
 						.batchSize(items.length + 1)
 						.toArray();
 					return new Set(data.map((i) => i.value));
-				}),
+				})
 			);
 			inters = inters.concat(
-				items.filter((item) => members.every((arr) => arr.has(item.value))),
+				items.filter((item) => members.every((arr) => arr.has(item.value)))
 			);
 			if (inters.length >= params.stop) {
 				done = true;
@@ -207,9 +207,9 @@ module.exports = function (module) {
 		const aggregate = {};
 
 		if (params.aggregate) {
-			aggregate[`$${params.aggregate.toLowerCase()}`] = "$score";
+			aggregate[`$${params.aggregate.toLowerCase()}`] = '$score';
 		} else {
-			aggregate.$sum = "$score";
+			aggregate.$sum = '$score';
 		}
 		const pipeline = [{ $match: { _key: { $in: params.sets } } }];
 
@@ -221,12 +221,12 @@ module.exports = function (module) {
 						score: {
 							$cond: {
 								if: {
-									$eq: ["$_key", params.sets[index]],
+									$eq: ['$_key', params.sets[index]],
 								},
 								then: {
-									$multiply: ["$score", weight],
+									$multiply: ['$score', weight],
 								},
-								else: "$score",
+								else: '$score',
 							},
 						},
 					},
@@ -236,7 +236,7 @@ module.exports = function (module) {
 
 		pipeline.push({
 			$group: {
-				_id: { value: "$value" },
+				_id: { value: '$value' },
 				totalScore: aggregate,
 				count: { $sum: 1 },
 			},
@@ -252,14 +252,14 @@ module.exports = function (module) {
 			pipeline.push({ $limit: params.limit });
 		}
 
-		const project = { _id: 0, value: "$_id.value" };
+		const project = { _id: 0, value: '$_id.value' };
 		if (params.withScores) {
-			project.score = "$totalScore";
+			project.score = '$totalScore';
 		}
 		pipeline.push({ $project: project });
 
 		let data = await module.client
-			.collection("objects")
+			.collection('objects')
 			.aggregate(pipeline)
 			.toArray();
 		if (!params.withScores) {

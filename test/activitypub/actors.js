@@ -1,28 +1,28 @@
-"use strict";
+'use strict';
 
-const assert = require("assert");
-const nconf = require("nconf");
+const assert = require('assert');
+const nconf = require('nconf');
 
-const db = require("../mocks/databasemock");
-const meta = require("../../src/meta");
-const install = require("../../src/install");
-const categories = require("../../src/categories");
-const user = require("../../src/user");
-const topics = require("../../src/topics");
-const activitypub = require("../../src/activitypub");
-const utils = require("../../src/utils");
-const request = require("../../src/request");
-const slugify = require("../../src/slugify");
+const db = require('../mocks/databasemock');
+const meta = require('../../src/meta');
+const install = require('../../src/install');
+const categories = require('../../src/categories');
+const user = require('../../src/user');
+const topics = require('../../src/topics');
+const activitypub = require('../../src/activitypub');
+const utils = require('../../src/utils');
+const request = require('../../src/request');
+const slugify = require('../../src/slugify');
 
-const helpers = require("./helpers");
+const helpers = require('./helpers');
 
-describe.skip("Actor asserton", () => {
+describe.skip('Actor asserton', () => {
 	before(async () => {
 		meta.config.activitypubEnabled = 1;
 		await install.giveWorldPrivileges();
 	});
 
-	describe("happy path", () => {
+	describe('happy path', () => {
 		let uid;
 		let actorUri;
 
@@ -30,33 +30,33 @@ describe.skip("Actor asserton", () => {
 			uid = utils.generateUUID().slice(0, 8);
 			actorUri = `https://example.org/user/${uid}`;
 			activitypub._cache.set(`0;${actorUri}`, {
-				"@context": "https://www.w3.org/ns/activitystreams",
+				'@context': 'https://www.w3.org/ns/activitystreams',
 				id: actorUri,
 				url: actorUri,
 
-				type: "Person",
-				name: "example",
-				preferredUsername: "example",
+				type: 'Person',
+				name: 'example',
+				preferredUsername: 'example',
 				inbox: `https://example.org/user/${uid}/inbox`,
 				outbox: `https://example.org/user/${uid}/outbox`,
 
 				publicKey: {
 					id: `${actorUri}#key`,
 					owner: actorUri,
-					publicKeyPem: "somekey",
+					publicKeyPem: 'somekey',
 				},
 			});
-			activitypub.helpers._webfingerCache.set("example@example.org", {
+			activitypub.helpers._webfingerCache.set('example@example.org', {
 				actorUri,
 			});
 		});
 
-		it("should return true if successfully asserted", async () => {
+		it('should return true if successfully asserted', async () => {
 			const result = await activitypub.actors.assert([actorUri]);
 			assert(result && result.length);
 		});
 
-		it("should contain a representation of that remote user in the database", async () => {
+		it('should contain a representation of that remote user in the database', async () => {
 			const exists = await db.exists(`userRemote:${actorUri}`);
 			assert(exists);
 
@@ -66,11 +66,11 @@ describe.skip("Actor asserton", () => {
 		});
 
 		it("should save the actor's publicly accessible URL in the hash as well", async () => {
-			const url = await user.getUserField(actorUri, "url");
+			const url = await user.getUserField(actorUri, 'url');
 			assert.strictEqual(url, actorUri);
 		});
 
-		it("should assert group actors by calling actors.assertGroup", async () => {
+		it('should assert group actors by calling actors.assertGroup', async () => {
 			const { id, actor } = helpers.mocks.group();
 			const assertion = await activitypub.actors.assert([id]);
 
@@ -79,8 +79,8 @@ describe.skip("Actor asserton", () => {
 			assert.strictEqual(assertion[0].cid, actor.id);
 		});
 
-		describe("remote user to remote category migration", () => {
-			it("should not migrate a user to a category if .assert is called", async () => {
+		describe('remote user to remote category migration', () => {
+			it('should not migrate a user to a category if .assert is called', async () => {
 				// ... because the user isn't due for an update and so is filtered out during qualification
 				const { id } = helpers.mocks.person();
 				await activitypub.actors.assert([id]);
@@ -94,7 +94,7 @@ describe.skip("Actor asserton", () => {
 				assert.strictEqual(exists, false);
 			});
 
-			it("should migrate a user to a category if on re-assertion it identifies as an as:Group", async () => {
+			it('should migrate a user to a category if on re-assertion it identifies as an as:Group', async () => {
 				// This is to handle previous behaviour that saved all as:Group actors as NodeBB users.
 				const { id } = helpers.mocks.person();
 				await activitypub.actors.assert([id]);
@@ -108,7 +108,7 @@ describe.skip("Actor asserton", () => {
 				assert.strictEqual(exists, false);
 			});
 
-			it("should migrate any shares by that user, into topics in the category", async () => {
+			it('should migrate any shares by that user, into topics in the category', async () => {
 				const { id } = helpers.mocks.person();
 				await activitypub.actors.assert([id]);
 
@@ -132,7 +132,7 @@ describe.skip("Actor asserton", () => {
 				assert.strictEqual(post_count, 2);
 			});
 
-			it("should not migrate shares by that user that already belong to a local category", async () => {
+			it('should not migrate shares by that user that already belong to a local category', async () => {
 				const { id } = helpers.mocks.person();
 				await activitypub.actors.assert([id]);
 
@@ -152,7 +152,7 @@ describe.skip("Actor asserton", () => {
 						// eslint-disable-next-line no-await-in-loop
 						await topics.tools.move(tid, {
 							cid,
-							uid: "system",
+							uid: 'system',
 						});
 					}
 				}
@@ -166,7 +166,7 @@ describe.skip("Actor asserton", () => {
 				assert.strictEqual(post_count, 1);
 			});
 
-			it("should migrate any local followers into category watches", async () => {
+			it('should migrate any local followers into category watches', async () => {
 				const { id } = helpers.mocks.person();
 				await activitypub.actors.assert([id]);
 
@@ -187,47 +187,47 @@ describe.skip("Actor asserton", () => {
 		});
 	});
 
-	describe("less happy paths", () => {
-		describe("actor with `preferredUsername` that is not all lowercase", () => {
-			it("should save a handle-to-uid association", async () => {
-				const preferredUsername = "nameWITHCAPS";
+	describe('less happy paths', () => {
+		describe('actor with `preferredUsername` that is not all lowercase', () => {
+			it('should save a handle-to-uid association', async () => {
+				const preferredUsername = 'nameWITHCAPS';
 				const { id } = helpers.mocks.person({ preferredUsername });
 				await activitypub.actors.assert([id]);
 
 				const uid = await db.getObjectField(
-					"handle:uid",
-					`${preferredUsername.toLowerCase()}@example.org`,
+					'handle:uid',
+					`${preferredUsername.toLowerCase()}@example.org`
 				);
 				assert.strictEqual(uid, id);
 			});
 
-			it("should preserve that association when re-asserted", async () => {
-				const preferredUsername = "nameWITHCAPS";
+			it('should preserve that association when re-asserted', async () => {
+				const preferredUsername = 'nameWITHCAPS';
 				const { id } = helpers.mocks.person({ preferredUsername });
 				await activitypub.actors.assert([id]);
 				await activitypub.actors.assert([id], { update: true });
 
 				const uid = await db.getObjectField(
-					"handle:uid",
-					`${preferredUsername.toLowerCase()}@example.org`,
+					'handle:uid',
+					`${preferredUsername.toLowerCase()}@example.org`
 				);
 				assert.strictEqual(uid, id);
 			});
 
 			it("should fail to assert if a passed-in ID's webfinger query does not respond with the same ID (gh#13352)", async () => {
 				const { id } = helpers.mocks.person({
-					preferredUsername: "foobar",
+					preferredUsername: 'foobar',
 				});
 
 				const actorUri = `https://example.org/${utils.generateUUID()}`;
-				activitypub.helpers._webfingerCache.set("foobar@example.org", {
-					username: "foobar",
-					hostname: "example.org",
+				activitypub.helpers._webfingerCache.set('foobar@example.org', {
+					username: 'foobar',
+					hostname: 'example.org',
 					actorUri,
 				});
 
 				const { actorUri: confirm } =
-					await activitypub.helpers.query("foobar@example.org");
+					await activitypub.helpers.query('foobar@example.org');
 				assert.strictEqual(confirm, actorUri);
 
 				const response = await activitypub.actors.assert([id]);
@@ -236,29 +236,29 @@ describe.skip("Actor asserton", () => {
 		});
 	});
 
-	describe("edge cases: loopback handles and uris", () => {
+	describe('edge cases: loopback handles and uris', () => {
 		let uid;
 		const userslug = utils.generateUUID().slice(0, 8);
 		before(async () => {
 			uid = await user.create({ username: userslug });
 		});
 
-		it("should return true but not actually assert the handle into the database", async () => {
-			const handle = `${userslug}@${nconf.get("url_parsed").host}`;
+		it('should return true but not actually assert the handle into the database', async () => {
+			const handle = `${userslug}@${nconf.get('url_parsed').host}`;
 			const result = await activitypub.actors.assert([handle]);
 			assert(result);
 
-			const handleExists = await db.isObjectField("handle:uid", handle);
+			const handleExists = await db.isObjectField('handle:uid', handle);
 			assert.strictEqual(handleExists, false);
 
 			const userRemoteHashExists = await db.exists(
-				`userRemote:${nconf.get("url")}/uid/${uid}`,
+				`userRemote:${nconf.get('url')}/uid/${uid}`
 			);
 			assert.strictEqual(userRemoteHashExists, false);
 		});
 
-		it("should return true but not actually assert the uri into the database", async () => {
-			const uri = `${nconf.get("url")}/uid/${uid}`;
+		it('should return true but not actually assert the uri into the database', async () => {
+			const uri = `${nconf.get('url')}/uid/${uid}`;
 			const result = await activitypub.actors.assert([uri]);
 			assert(result);
 
@@ -268,8 +268,8 @@ describe.skip("Actor asserton", () => {
 	});
 });
 
-describe.skip("as:Group", () => {
-	describe("assertion", () => {
+describe.skip('as:Group', () => {
+	describe('assertion', () => {
 		let actorUri;
 		let actorData;
 
@@ -289,36 +289,36 @@ describe.skip("as:Group", () => {
 			assert.strictEqual(category.cid, actorUri);
 		});
 
-		it("should be considered existing when checked", async () => {
+		it('should be considered existing when checked', async () => {
 			const exists = await categories.exists(actorUri);
 
 			assert(exists);
 		});
 
-		it("should contain an entry in categories search zset", async () => {
+		it('should contain an entry in categories search zset', async () => {
 			const exists = await db.isSortedSetMember(
-				"categories:name",
-				`${actorData.name.toLowerCase()}:${actorUri}`,
+				'categories:name',
+				`${actorData.name.toLowerCase()}:${actorUri}`
 			);
 
 			assert(exists);
 		});
 
-		it("should return category data when getter methods are called", async () => {
+		it('should return category data when getter methods are called', async () => {
 			const category = await categories.getCategoryData(actorUri);
 			assert(category);
 			assert.strictEqual(category.cid, actorUri);
 		});
 
-		it("should not assert non-group users when called", async () => {
+		it('should not assert non-group users when called', async () => {
 			const { id } = helpers.mocks.person();
 			const assertion = await activitypub.actors.assertGroup([id]);
 
 			assert(Array.isArray(assertion) && !assertion.length);
 		});
 
-		describe("deletion", () => {
-			it("should delete a remote category when Categories.purge is called", async () => {
+		describe('deletion', () => {
+			it('should delete a remote category when Categories.purge is called', async () => {
 				const { id } = helpers.mocks.group();
 				await activitypub.actors.assertGroup([id]);
 
@@ -334,17 +334,17 @@ describe.skip("as:Group", () => {
 				assert(!exists);
 			});
 
-			it("should also delete AP-specific keys that were added by assertGroup", async () => {
+			it('should also delete AP-specific keys that were added by assertGroup', async () => {
 				const { id } = helpers.mocks.group();
 				const assertion = await activitypub.actors.assertGroup([id]);
 				const [{ handle, slug }] = assertion;
 
 				await categories.purge(id, 0);
 
-				const isMember = await db.isObjectField("handle:cid", handle);
+				const isMember = await db.isObjectField('handle:cid', handle);
 				const inSearch = await db.isSortedSetMember(
-					"categories:name",
-					`${slug}:${id}`,
+					'categories:name',
+					`${slug}:${id}`
 				);
 				assert(!isMember);
 				assert(!inSearch);
@@ -352,7 +352,7 @@ describe.skip("as:Group", () => {
 		});
 	});
 
-	describe("following", () => {
+	describe('following', () => {
 		let uid;
 		let cid;
 
@@ -366,18 +366,18 @@ describe.skip("as:Group", () => {
 			activitypub._sent.clear();
 		});
 
-		describe("user not already following", () => {
-			it("should report a watch state consistent with not following", async () => {
+		describe('user not already following', () => {
+			it('should report a watch state consistent with not following', async () => {
 				const states = await categories.getWatchState([cid], uid);
 				assert(states[0] <= categories.watchStates.notwatching);
 			});
 
-			it("should do nothing when category is a local category", async () => {
+			it('should do nothing when category is a local category', async () => {
 				const { cid } = await categories.create({ name: utils.generateUUID() });
 				await user.setCategoryWatchState(
 					uid,
 					cid,
-					categories.watchStates.tracking,
+					categories.watchStates.tracking
 				);
 				assert.strictEqual(activitypub._sent.size, 0);
 			});
@@ -386,7 +386,7 @@ describe.skip("as:Group", () => {
 				await user.setCategoryWatchState(
 					uid,
 					cid,
-					categories.watchStates.ignoring,
+					categories.watchStates.ignoring
 				);
 				assert.strictEqual(activitypub._sent.size, 0);
 			});
@@ -395,13 +395,13 @@ describe.skip("as:Group", () => {
 				await user.setCategoryWatchState(
 					uid,
 					cid,
-					categories.watchStates.tracking,
+					categories.watchStates.tracking
 				);
 
 				assert.strictEqual(activitypub._sent.size, 1);
 
 				const activity = Array.from(activitypub._sent.values()).pop();
-				assert.strictEqual(activity.type, "Follow");
+				assert.strictEqual(activity.type, 'Follow');
 				assert.strictEqual(activity.object, cid);
 			});
 
@@ -409,16 +409,16 @@ describe.skip("as:Group", () => {
 				await user.setCategoryWatchState(
 					uid,
 					cid,
-					categories.watchStates.watching,
+					categories.watchStates.watching
 				);
 
 				assert.strictEqual(activitypub._sent.size, 1);
 
 				const activity = Array.from(activitypub._sent.values()).pop();
 				assert(
-					activity && activity.object && typeof activity.object === "string",
+					activity && activity.object && typeof activity.object === 'string'
 				);
-				assert.strictEqual(activity.type, "Follow");
+				assert.strictEqual(activity.type, 'Follow');
 				assert.strictEqual(activity.object, cid);
 			});
 
@@ -426,13 +426,13 @@ describe.skip("as:Group", () => {
 				await user.setCategoryWatchState(
 					uid,
 					cid,
-					categories.watchStates.watching,
+					categories.watchStates.watching
 				);
 
 				// Trigger inbox accept
 				const { activity: body } = helpers.mocks.accept(cid, {
-					type: "Follow",
-					actor: `${nconf.get("url")}/uid/${uid}`,
+					type: 'Follow',
+					actor: `${nconf.get('url')}/uid/${uid}`,
 				});
 				await activitypub.inbox.accept({ body });
 
@@ -442,7 +442,7 @@ describe.skip("as:Group", () => {
 			});
 		});
 
-		describe("user already following", () => {
+		describe('user already following', () => {
 			beforeEach(async () => {
 				await Promise.all([
 					user.setCategoryWatchState(uid, cid, categories.watchStates.tracking),
@@ -452,17 +452,17 @@ describe.skip("as:Group", () => {
 				activitypub._sent.clear();
 			});
 
-			it("should report a watch state consistent with following", async () => {
+			it('should report a watch state consistent with following', async () => {
 				const states = await categories.getWatchState([cid], uid);
 				assert(states[0] >= categories.watchStates.tracking);
 			});
 
-			it("should do nothing when category is a local category", async () => {
+			it('should do nothing when category is a local category', async () => {
 				const { cid } = await categories.create({ name: utils.generateUUID() });
 				await user.setCategoryWatchState(
 					uid,
 					cid,
-					categories.watchStates.ignoring,
+					categories.watchStates.ignoring
 				);
 				assert.strictEqual(activitypub._sent.size, 0);
 			});
@@ -471,7 +471,7 @@ describe.skip("as:Group", () => {
 				await user.setCategoryWatchState(
 					uid,
 					cid,
-					categories.watchStates.tracking,
+					categories.watchStates.tracking
 				);
 				assert.strictEqual(activitypub._sent.size, 0);
 			});
@@ -480,7 +480,7 @@ describe.skip("as:Group", () => {
 				await user.setCategoryWatchState(
 					uid,
 					cid,
-					categories.watchStates.watching,
+					categories.watchStates.watching
 				);
 				assert.strictEqual(activitypub._sent.size, 0);
 			});
@@ -489,20 +489,20 @@ describe.skip("as:Group", () => {
 				await user.setCategoryWatchState(
 					uid,
 					cid,
-					categories.watchStates.ignoring,
+					categories.watchStates.ignoring
 				);
 
 				assert.strictEqual(activitypub._sent.size, 1);
 
 				const activity = Array.from(activitypub._sent.values()).pop();
 				assert(
-					activity && activity.object && typeof activity.object === "object",
+					activity && activity.object && typeof activity.object === 'object'
 				);
-				assert.strictEqual(activity.type, "Undo");
-				assert.strictEqual(activity.object.type, "Follow");
+				assert.strictEqual(activity.type, 'Undo');
+				assert.strictEqual(activity.object.type, 'Follow');
 				assert.strictEqual(
 					activity.object.actor,
-					`${nconf.get("url")}/uid/${uid}`,
+					`${nconf.get('url')}/uid/${uid}`
 				);
 				assert.strictEqual(activity.object.object, cid);
 			});
@@ -510,9 +510,9 @@ describe.skip("as:Group", () => {
 	});
 });
 
-describe.skip("Inbox resolution", () => {
-	describe("remote users", () => {
-		it("should return an inbox if present", async () => {
+describe.skip('Inbox resolution', () => {
+	describe('remote users', () => {
+		it('should return an inbox if present', async () => {
 			const { id, actor } = helpers.mocks.person();
 			await activitypub.actors.assert(id);
 
@@ -523,10 +523,10 @@ describe.skip("Inbox resolution", () => {
 			assert.strictEqual(inboxes[0], actor.inbox);
 		});
 
-		it("should return a shared inbox if present", async () => {
+		it('should return a shared inbox if present', async () => {
 			const { id, actor } = helpers.mocks.person({
 				endpoints: {
-					sharedInbox: "https://example.org/inbox",
+					sharedInbox: 'https://example.org/inbox',
 				},
 			});
 			await activitypub.actors.assert(id);
@@ -535,12 +535,12 @@ describe.skip("Inbox resolution", () => {
 
 			assert(inboxes && Array.isArray(inboxes));
 			assert.strictEqual(inboxes.length, 1);
-			assert.strictEqual(inboxes[0], "https://example.org/inbox");
+			assert.strictEqual(inboxes[0], 'https://example.org/inbox');
 		});
 	});
 
-	describe("remote categories", () => {
-		it("should return an inbox if present", async () => {
+	describe('remote categories', () => {
+		it('should return an inbox if present', async () => {
 			const { id, actor } = helpers.mocks.group();
 			await activitypub.actors.assertGroup(id);
 
@@ -551,10 +551,10 @@ describe.skip("Inbox resolution", () => {
 			assert.strictEqual(inboxes[0], actor.inbox);
 		});
 
-		it("should return a shared inbox if present", async () => {
+		it('should return a shared inbox if present', async () => {
 			const { id, actor } = helpers.mocks.group({
 				endpoints: {
-					sharedInbox: "https://example.org/inbox",
+					sharedInbox: 'https://example.org/inbox',
 				},
 			});
 			await activitypub.actors.assertGroup(id);
@@ -563,13 +563,13 @@ describe.skip("Inbox resolution", () => {
 
 			assert(inboxes && Array.isArray(inboxes));
 			assert.strictEqual(inboxes.length, 1);
-			assert.strictEqual(inboxes[0], "https://example.org/inbox");
+			assert.strictEqual(inboxes[0], 'https://example.org/inbox');
 		});
 	});
 });
 
-describe.skip("Controllers", () => {
-	describe("User Actor endpoint", () => {
+describe.skip('Controllers', () => {
+	describe('User Actor endpoint', () => {
 		let uid;
 		let slug;
 
@@ -578,56 +578,56 @@ describe.skip("Controllers", () => {
 			uid = await user.create({ username: slug });
 		});
 
-		it("should return a valid ActivityPub Actor JSON-LD payload", async () => {
+		it('should return a valid ActivityPub Actor JSON-LD payload', async () => {
 			const { response, body } = await request.get(
-				`${nconf.get("url")}/uid/${uid}`,
+				`${nconf.get('url')}/uid/${uid}`,
 				{
 					headers: {
 						Accept:
 							'application/ld+json; profile="https://www.w3.org/ns/activitystreams"',
 					},
-				},
+				}
 			);
 
 			assert(response);
 			assert.strictEqual(response.statusCode, 200);
-			assert(body.hasOwnProperty("@context"));
+			assert(body.hasOwnProperty('@context'));
 			assert(
-				body["@context"].includes("https://www.w3.org/ns/activitystreams"),
+				body['@context'].includes('https://www.w3.org/ns/activitystreams')
 			);
 
-			["id", "url", "followers", "following", "inbox", "outbox"].forEach(
+			['id', 'url', 'followers', 'following', 'inbox', 'outbox'].forEach(
 				(prop) => {
 					assert(body.hasOwnProperty(prop));
 					assert(body[prop]);
-				},
+				}
 			);
 
-			assert.strictEqual(body.id, `${nconf.get("url")}/uid/${uid}`);
-			assert.strictEqual(body.type, "Person");
+			assert.strictEqual(body.id, `${nconf.get('url')}/uid/${uid}`);
+			assert.strictEqual(body.type, 'Person');
 		});
 
-		it("should contain a `publicKey` property with a public key", async () => {
+		it('should contain a `publicKey` property with a public key', async () => {
 			const { response, body } = await request.get(
-				`${nconf.get("url")}/uid/${uid}`,
+				`${nconf.get('url')}/uid/${uid}`,
 				{
 					headers: {
 						Accept:
 							'application/ld+json; profile="https://www.w3.org/ns/activitystreams"',
 					},
-				},
+				}
 			);
 
-			assert(body.hasOwnProperty("publicKey"));
+			assert(body.hasOwnProperty('publicKey'));
 			assert(
-				["id", "owner", "publicKeyPem"].every((prop) =>
-					body.publicKey.hasOwnProperty(prop),
-				),
+				['id', 'owner', 'publicKeyPem'].every((prop) =>
+					body.publicKey.hasOwnProperty(prop)
+				)
 			);
 		});
 	});
 
-	describe("Category Actor endpoint", () => {
+	describe('Category Actor endpoint', () => {
 		let cid;
 		let slug;
 		let description;
@@ -641,61 +641,61 @@ describe.skip("Controllers", () => {
 			}));
 		});
 
-		it("should return a valid ActivityPub Actor JSON-LD payload", async () => {
+		it('should return a valid ActivityPub Actor JSON-LD payload', async () => {
 			const { response, body } = await request.get(
-				`${nconf.get("url")}/category/${cid}`,
+				`${nconf.get('url')}/category/${cid}`,
 				{
 					headers: {
 						Accept:
 							'application/ld+json; profile="https://www.w3.org/ns/activitystreams"',
 					},
-				},
+				}
 			);
 
 			assert(response);
 			assert.strictEqual(response.statusCode, 200);
-			assert(body.hasOwnProperty("@context"));
+			assert(body.hasOwnProperty('@context'));
 			assert(
-				body["@context"].includes("https://www.w3.org/ns/activitystreams"),
+				body['@context'].includes('https://www.w3.org/ns/activitystreams')
 			);
 
-			["id", "url", /* 'followers', 'following', */ "inbox", "outbox"].forEach(
+			['id', 'url', /* 'followers', 'following', */ 'inbox', 'outbox'].forEach(
 				(prop) => {
 					assert(body.hasOwnProperty(prop));
 					assert(body[prop]);
-				},
+				}
 			);
 
-			assert.strictEqual(body.id, `${nconf.get("url")}/category/${cid}`);
-			assert.strictEqual(body.type, "Group");
+			assert.strictEqual(body.id, `${nconf.get('url')}/category/${cid}`);
+			assert.strictEqual(body.type, 'Group');
 			assert(body.summary.startsWith(description));
 			assert.deepStrictEqual(body.icon, {
-				type: "Image",
-				mediaType: "image/png",
-				url: `${nconf.get("url")}/assets/uploads/category/category-${cid}-icon.png`,
+				type: 'Image',
+				mediaType: 'image/png',
+				url: `${nconf.get('url')}/assets/uploads/category/category-${cid}-icon.png`,
 			});
 		});
 
-		it("should contain a `publicKey` property with a public key", async () => {
+		it('should contain a `publicKey` property with a public key', async () => {
 			const { body } = await request.get(
-				`${nconf.get("url")}/category/${cid}`,
+				`${nconf.get('url')}/category/${cid}`,
 				{
 					headers: {
 						Accept:
 							'application/ld+json; profile="https://www.w3.org/ns/activitystreams"',
 					},
-				},
+				}
 			);
 
-			assert(body.hasOwnProperty("publicKey"));
+			assert(body.hasOwnProperty('publicKey'));
 			assert(
-				["id", "owner", "publicKeyPem"].every((prop) =>
-					body.publicKey.hasOwnProperty(prop),
-				),
+				['id', 'owner', 'publicKeyPem'].every((prop) =>
+					body.publicKey.hasOwnProperty(prop)
+				)
 			);
 		});
 
-		it("should serve the the backgroundImage in `icon` if set", async () => {
+		it('should serve the the backgroundImage in `icon` if set', async () => {
 			const payload = {};
 			payload[cid] = {
 				backgroundImage: `/assets/uploads/files/test.png`,
@@ -703,29 +703,29 @@ describe.skip("Controllers", () => {
 			await categories.update(payload);
 
 			const { body } = await request.get(
-				`${nconf.get("url")}/category/${cid}`,
+				`${nconf.get('url')}/category/${cid}`,
 				{
 					headers: {
 						Accept:
 							'application/ld+json; profile="https://www.w3.org/ns/activitystreams"',
 					},
-				},
+				}
 			);
 
 			assert.deepStrictEqual(body.icon, {
-				type: "Image",
-				mediaType: "image/png",
-				url: `${nconf.get("url")}/assets/uploads/files/test.png`,
+				type: 'Image',
+				mediaType: 'image/png',
+				url: `${nconf.get('url')}/assets/uploads/files/test.png`,
 			});
 		});
 	});
 
-	describe("Instance Actor endpoint", () => {
+	describe('Instance Actor endpoint', () => {
 		let response;
 		let body;
 
 		before(async () => {
-			({ response, body } = await request.get(`${nconf.get("url")}/actor`, {
+			({ response, body } = await request.get(`${nconf.get('url')}/actor`, {
 				headers: {
 					Accept:
 						'application/ld+json; profile="https://www.w3.org/ns/activitystreams"',
@@ -733,62 +733,62 @@ describe.skip("Controllers", () => {
 			}));
 		});
 
-		it("should respond properly", async () => {
+		it('should respond properly', async () => {
 			assert(response);
 			assert.strictEqual(response.statusCode, 200);
 		});
 
-		it("should return a valid ActivityPub Actor JSON-LD payload", async () => {
-			assert(body.hasOwnProperty("@context"));
+		it('should return a valid ActivityPub Actor JSON-LD payload', async () => {
+			assert(body.hasOwnProperty('@context'));
 			assert(
-				body["@context"].includes("https://www.w3.org/ns/activitystreams"),
+				body['@context'].includes('https://www.w3.org/ns/activitystreams')
 			);
 
-			["id", "url", "inbox", "outbox", "name", "preferredUsername"].forEach(
+			['id', 'url', 'inbox', 'outbox', 'name', 'preferredUsername'].forEach(
 				(prop) => {
 					assert(body.hasOwnProperty(prop));
 					assert(body[prop]);
-				},
+				}
 			);
 
 			assert.strictEqual(body.id, body.url);
-			assert.strictEqual(body.type, "Application");
-			assert.strictEqual(body.name, meta.config.site_title || "NodeBB");
+			assert.strictEqual(body.type, 'Application');
+			assert.strictEqual(body.name, meta.config.site_title || 'NodeBB');
 			assert.strictEqual(
 				body.preferredUsername,
-				nconf.get("url_parsed").hostname,
+				nconf.get('url_parsed').hostname
 			);
 		});
 
-		it("should contain a `publicKey` property with a public key", async () => {
-			assert(body.hasOwnProperty("publicKey"));
+		it('should contain a `publicKey` property with a public key', async () => {
+			assert(body.hasOwnProperty('publicKey'));
 			assert(
-				["id", "owner", "publicKeyPem"].every((prop) =>
-					body.publicKey.hasOwnProperty(prop),
-				),
+				['id', 'owner', 'publicKeyPem'].every((prop) =>
+					body.publicKey.hasOwnProperty(prop)
+				)
 			);
 		});
 
-		it("should also have a valid WebFinger response tied to `preferredUsername`", async () => {
+		it('should also have a valid WebFinger response tied to `preferredUsername`', async () => {
 			const { response, body: body2 } = await request.get(
-				`${nconf.get("url")}/.well-known/webfinger?resource=acct%3a${body.preferredUsername}@${nconf.get("url_parsed").host}`,
+				`${nconf.get('url')}/.well-known/webfinger?resource=acct%3a${body.preferredUsername}@${nconf.get('url_parsed').host}`
 			);
 
 			assert.strictEqual(response.statusCode, 200);
 			assert(body2 && body2.aliases && body2.links);
-			assert(body2.aliases.includes(nconf.get("url")));
+			assert(body2.aliases.includes(nconf.get('url')));
 			assert(
 				body2.links.some(
 					(item) =>
-						item.rel === "self" &&
-						item.type === "application/activity+json" &&
-						item.href === `${nconf.get("url")}/actor`,
-				),
+						item.rel === 'self' &&
+						item.type === 'application/activity+json' &&
+						item.href === `${nconf.get('url')}/actor`
+				)
 			);
 		});
 	});
 
-	describe("Topic Collection endpoint", () => {
+	describe('Topic Collection endpoint', () => {
 		let cid;
 		let uid;
 
@@ -800,7 +800,7 @@ describe.skip("Controllers", () => {
 			uid = await user.create({ username: slug });
 		});
 
-		describe("Live", () => {
+		describe('Live', () => {
 			let topicData;
 			let response;
 			let body;
@@ -810,37 +810,37 @@ describe.skip("Controllers", () => {
 					uid,
 					cid,
 					title: 'Lorem "Lipsum" Ipsum',
-					content: "Lorem ipsum dolor sit amet",
+					content: 'Lorem ipsum dolor sit amet',
 				}));
 
 				({ response, body } = await request.get(
-					`${nconf.get("url")}/topic/${topicData.slug}`,
+					`${nconf.get('url')}/topic/${topicData.slug}`,
 					{
 						headers: {
 							Accept:
 								'application/ld+json; profile="https://www.w3.org/ns/activitystreams"',
 						},
-					},
+					}
 				));
 			});
 
-			it("should respond properly", async () => {
+			it('should respond properly', async () => {
 				assert(response);
 				assert.strictEqual(response.statusCode, 200);
 			});
 
-			it("should return an OrderedCollection with one item", () => {
-				assert.strictEqual(body.type, "OrderedCollection");
+			it('should return an OrderedCollection with one item', () => {
+				assert.strictEqual(body.type, 'OrderedCollection');
 				assert.strictEqual(body.totalItems, 1);
 				assert(Array.isArray(body.orderedItems));
 				assert.strictEqual(
 					body.orderedItems[0],
-					`${nconf.get("url")}/post/${topicData.mainPid}`,
+					`${nconf.get('url')}/post/${topicData.mainPid}`
 				);
 			});
 		});
 
-		describe("Scheduled", () => {
+		describe('Scheduled', () => {
 			let topicData;
 			let response;
 			let body;
@@ -850,29 +850,29 @@ describe.skip("Controllers", () => {
 					uid,
 					cid,
 					title: 'Lorem "Lipsum" Ipsum',
-					content: "Lorem ipsum dolor sit amet",
+					content: 'Lorem ipsum dolor sit amet',
 					timestamp: Date.now() + 1000 * 60 * 60, // 1 hour in the future
 				}));
 
 				({ response, body } = await request.get(
-					`${nconf.get("url")}/topic/${topicData.slug}`,
+					`${nconf.get('url')}/topic/${topicData.slug}`,
 					{
 						headers: {
 							Accept:
 								'application/ld+json; profile="https://www.w3.org/ns/activitystreams"',
 						},
-					},
+					}
 				));
 			});
 
-			it("should respond with a 404 Not Found", async () => {
+			it('should respond with a 404 Not Found', async () => {
 				assert(response);
 				assert.strictEqual(response.statusCode, 404);
 			});
 		});
 	});
 
-	describe("Post Object endpoint", () => {
+	describe('Post Object endpoint', () => {
 		let cid;
 		let uid;
 
@@ -884,7 +884,7 @@ describe.skip("Controllers", () => {
 			uid = await user.create({ username: slug });
 		});
 
-		describe("Live", () => {
+		describe('Live', () => {
 			let postData;
 			let response;
 			let body;
@@ -894,31 +894,31 @@ describe.skip("Controllers", () => {
 					uid,
 					cid,
 					title: 'Lorem "Lipsum" Ipsum',
-					content: "Lorem ipsum dolor sit amet",
+					content: 'Lorem ipsum dolor sit amet',
 				}));
 
 				({ response, body } = await request.get(
-					`${nconf.get("url")}/post/${postData.pid}`,
+					`${nconf.get('url')}/post/${postData.pid}`,
 					{
 						headers: {
 							Accept:
 								'application/ld+json; profile="https://www.w3.org/ns/activitystreams"',
 						},
-					},
+					}
 				));
 			});
 
-			it("should respond properly", async () => {
+			it('should respond properly', async () => {
 				assert(response);
 				assert.strictEqual(response.statusCode, 200);
 			});
 
-			it("should return a Article type object", () => {
-				assert.strictEqual(body.type, "Article");
+			it('should return a Article type object', () => {
+				assert.strictEqual(body.type, 'Article');
 			});
 		});
 
-		describe("Scheduled", () => {
+		describe('Scheduled', () => {
 			let topicData;
 			let postData;
 			let response;
@@ -929,22 +929,22 @@ describe.skip("Controllers", () => {
 					uid,
 					cid,
 					title: 'Lorem "Lipsum" Ipsum',
-					content: "Lorem ipsum dolor sit amet",
+					content: 'Lorem ipsum dolor sit amet',
 					timestamp: Date.now() + 1000 * 60 * 60, // 1 hour in the future
 				}));
 
 				({ response, body } = await request.get(
-					`${nconf.get("url")}/post/${postData.pid}`,
+					`${nconf.get('url')}/post/${postData.pid}`,
 					{
 						headers: {
 							Accept:
 								'application/ld+json; profile="https://www.w3.org/ns/activitystreams"',
 						},
-					},
+					}
 				));
 			});
 
-			it("should respond with a 404 Not Found", async () => {
+			it('should respond with a 404 Not Found', async () => {
 				assert(response);
 				assert.strictEqual(response.statusCode, 404);
 			});
@@ -952,7 +952,7 @@ describe.skip("Controllers", () => {
 	});
 });
 
-describe.skip("Pruning", () => {
+describe.skip('Pruning', () => {
 	before(async () => {
 		meta.config.activitypubEnabled = 1;
 		await install.giveWorldPrivileges();
@@ -964,8 +964,8 @@ describe.skip("Pruning", () => {
 		meta.config.activitypubUserPruneDays = 7;
 	});
 
-	describe.skip("Users", () => {
-		it("should do nothing if the user is newer than the prune cutoff", async () => {
+	describe.skip('Users', () => {
+		it('should do nothing if the user is newer than the prune cutoff', async () => {
 			const { id: uid } = helpers.mocks.person();
 			await activitypub.actors.assert([uid]);
 
@@ -980,22 +980,22 @@ describe.skip("Pruning", () => {
 			user.deleteAccount(uid);
 		});
 
-		it("should purge the user if they have no content (posts, likes, etc.)", async () => {
+		it('should purge the user if they have no content (posts, likes, etc.)', async () => {
 			const { id: uid } = helpers.mocks.person();
 			await activitypub.actors.assert([uid]);
 
-			const total = await db.sortedSetCard("usersRemote:lastCrawled");
+			const total = await db.sortedSetCard('usersRemote:lastCrawled');
 			const result = await activitypub.actors.prune();
 
 			assert(result.counts.deleted >= 1);
 		});
 
-		it("should do nothing if the user has some content (e.g. a topic)", async () => {
+		it('should do nothing if the user has some content (e.g. a topic)', async () => {
 			const { cid } = await categories.create({ name: utils.generateUUID() });
 			const { id: uid } = helpers.mocks.person();
 			const { id, note } = helpers.mocks.note({
 				attributedTo: uid,
-				cc: [`${nconf.get("url")}/category/${cid}`],
+				cc: [`${nconf.get('url')}/category/${cid}`],
 			});
 
 			const assertion = await activitypub.notes.assert(0, id);
@@ -1009,8 +1009,8 @@ describe.skip("Pruning", () => {
 		});
 	});
 
-	describe("Categories", () => {
-		it("should do nothing if the category is newer than the prune cutoff", async () => {
+	describe('Categories', () => {
+		it('should do nothing if the category is newer than the prune cutoff', async () => {
 			const { id: cid } = helpers.mocks.group();
 			await activitypub.actors.assertGroup([cid]);
 
@@ -1025,18 +1025,18 @@ describe.skip("Pruning", () => {
 			await categories.purge(cid, 0);
 		});
 
-		it("should purge the category if it has no topics in it", async () => {
+		it('should purge the category if it has no topics in it', async () => {
 			const { id: cid } = helpers.mocks.group();
 			await activitypub.actors.assertGroup([cid]);
 
-			const total = await db.sortedSetCard("usersRemote:lastCrawled");
+			const total = await db.sortedSetCard('usersRemote:lastCrawled');
 			const result = await activitypub.actors.prune();
 
 			assert.strictEqual(result.counts.deleted, 1);
 			assert.strictEqual(result.counts.preserved, total - 1);
 		});
 
-		it("should do nothing if the category has topics in it", async () => {
+		it('should do nothing if the category has topics in it', async () => {
 			const { id: cid } = helpers.mocks.group();
 			await activitypub.actors.assertGroup([cid]);
 
@@ -1045,7 +1045,7 @@ describe.skip("Pruning", () => {
 			});
 			await activitypub.notes.assert(0, id, { cid });
 
-			const total = await db.sortedSetCard("usersRemote:lastCrawled");
+			const total = await db.sortedSetCard('usersRemote:lastCrawled');
 			const result = await activitypub.actors.prune();
 
 			assert.strictEqual(result.counts.deleted, 0);

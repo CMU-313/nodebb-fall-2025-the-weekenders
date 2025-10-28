@@ -1,9 +1,9 @@
-"use strict";
+'use strict';
 
 module.exports = function (module) {
-	const helpers = require("./helpers");
+	const helpers = require('./helpers');
 
-	const cache = require("../cache").create("mongo");
+	const cache = require('../cache').create('mongo');
 
 	module.objectCache = cache;
 
@@ -20,20 +20,20 @@ module.exports = function (module) {
 		try {
 			if (isArray) {
 				const bulk = module.client
-					.collection("objects")
+					.collection('objects')
 					.initializeUnorderedBulkOp();
 				key.forEach((key) =>
-					bulk.find({ _key: key }).upsert().updateOne({ $set: writeData }),
+					bulk.find({ _key: key }).upsert().updateOne({ $set: writeData })
 				);
 				await bulk.execute();
 			} else {
 				await module.client
-					.collection("objects")
+					.collection('objects')
 					.updateOne({ _key: key }, { $set: writeData }, { upsert: true });
 			}
 		} catch (err) {
-			if (err && err.message.includes("E11000 duplicate key error")) {
-				console.log(new Error("e11000").stack, key, data);
+			if (err && err.message.includes('E11000 duplicate key error')) {
+				console.log(new Error('e11000').stack, key, data);
 				return await module.setObject(key, data);
 			}
 			throw err;
@@ -49,7 +49,7 @@ module.exports = function (module) {
 		}
 		if (Array.isArray(args[1])) {
 			console.warn(
-				"[deprecated] db.setObjectBulk(keys, data) usage is deprecated, please use db.setObjectBulk(data)",
+				'[deprecated] db.setObjectBulk(keys, data) usage is deprecated, please use db.setObjectBulk(data)'
 			);
 			// conver old format to new format for backwards compatibility
 			data = args[0].map((key, i) => [key, args[1][i]]);
@@ -62,7 +62,7 @@ module.exports = function (module) {
 				if (Object.keys(writeData).length) {
 					if (!bulk) {
 						bulk = module.client
-							.collection("objects")
+							.collection('objects')
 							.initializeUnorderedBulkOp();
 					}
 					bulk.find({ _key: item[0] }).upsert().updateOne({ $set: writeData });
@@ -72,8 +72,8 @@ module.exports = function (module) {
 				await bulk.execute();
 			}
 		} catch (err) {
-			if (err && err.message.includes("E11000 duplicate key error")) {
-				console.log(new Error("e11000").stack, data);
+			if (err && err.message.includes('E11000 duplicate key error')) {
+				console.log(new Error('e11000').stack, data);
 				return await module.setObjectBulk(data);
 			}
 			throw err;
@@ -117,7 +117,7 @@ module.exports = function (module) {
 		}
 		field = helpers.fieldToString(field);
 		const item = await module.client
-			.collection("objects")
+			.collection('objects')
 			.findOne({ _key: key }, { projection: { _id: 0, [field]: 1 } });
 		if (!item) {
 			return null;
@@ -142,7 +142,7 @@ module.exports = function (module) {
 
 		if (unCachedKeys.length >= 1) {
 			let data = await module.client
-				.collection("objects")
+				.collection('objects')
 				.find(
 					{
 						_key:
@@ -150,7 +150,7 @@ module.exports = function (module) {
 								? unCachedKeys[0]
 								: { $in: unCachedKeys },
 					},
-					{ projection: { _id: 0 } },
+					{ projection: { _id: 0 } }
 				)
 				.toArray();
 			data = data.map(helpers.deserializeData);
@@ -164,7 +164,7 @@ module.exports = function (module) {
 
 		if (!Array.isArray(fields) || !fields.length) {
 			return keys.map((key) =>
-				cachedData[key] ? { ...cachedData[key] } : null,
+				cachedData[key] ? { ...cachedData[key] } : null
 			);
 		}
 		return keys.map((key) => {
@@ -207,10 +207,10 @@ module.exports = function (module) {
 		});
 
 		const item = await module.client
-			.collection("objects")
+			.collection('objects')
 			.findOne({ _key: key }, { projection: data });
 		const results = fields.map(
-			(f) => !!item && item[f] !== undefined && item[f] !== null,
+			(f) => !!item && item[f] !== undefined && item[f] !== null
 		);
 		return results;
 	};
@@ -218,7 +218,7 @@ module.exports = function (module) {
 	module.deleteObjectField = async function (key, field) {
 		await module.deleteObjectFields(
 			key,
-			Array.isArray(field) ? field : [field],
+			Array.isArray(field) ? field : [field]
 		);
 	};
 
@@ -238,15 +238,15 @@ module.exports = function (module) {
 
 		const data = {};
 		fields.forEach((field) => {
-			data[field] = "";
+			data[field] = '';
 		});
 		if (Array.isArray(key)) {
 			await module.client
-				.collection("objects")
+				.collection('objects')
 				.updateMany({ _key: { $in: key } }, { $unset: data });
 		} else {
 			await module.client
-				.collection("objects")
+				.collection('objects')
 				.updateOne({ _key: key }, { $unset: data });
 		}
 
@@ -273,7 +273,7 @@ module.exports = function (module) {
 
 		if (Array.isArray(key)) {
 			const bulk = module.client
-				.collection("objects")
+				.collection('objects')
 				.initializeUnorderedBulkOp();
 			key.forEach((key) => {
 				bulk.find({ _key: key }).upsert().update({ $inc: increment });
@@ -284,7 +284,7 @@ module.exports = function (module) {
 			return result.map((data) => data && data[field]);
 		}
 		try {
-			const result = await module.client.collection("objects").findOneAndUpdate(
+			const result = await module.client.collection('objects').findOneAndUpdate(
 				{
 					_key: key,
 				},
@@ -292,10 +292,10 @@ module.exports = function (module) {
 					$inc: increment,
 				},
 				{
-					returnDocument: "after",
+					returnDocument: 'after',
 					includeResultMetadata: true,
 					upsert: true,
-				},
+				}
 			);
 			cache.del(key);
 			return result && result.value ? result.value[field] : null;
@@ -304,8 +304,8 @@ module.exports = function (module) {
 			// https://github.com/NodeBB/NodeBB/issues/4467
 			// https://jira.mongodb.org/browse/SERVER-14322
 			// https://docs.mongodb.org/manual/reference/command/findAndModify/#upsert-and-unique-index
-			if (err && err.message.includes("E11000 duplicate key error")) {
-				console.log(new Error("e11000").stack, key, field, value);
+			if (err && err.message.includes('E11000 duplicate key error')) {
+				console.log(new Error('e11000').stack, key, field, value);
 				return await module.incrObjectFieldBy(key, field, value);
 			}
 			throw err;
@@ -318,7 +318,7 @@ module.exports = function (module) {
 		}
 
 		const bulk = module.client
-			.collection("objects")
+			.collection('objects')
 			.initializeUnorderedBulkOp();
 
 		data.forEach((item) => {

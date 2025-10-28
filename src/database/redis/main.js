@@ -1,10 +1,10 @@
-"use strict";
+'use strict';
 
 module.exports = function (module) {
-	const helpers = require("./helpers");
+	const helpers = require('./helpers');
 
 	module.flushdb = async function () {
-		await module.client.send_command("flushdb", []);
+		await module.client.send_command('flushdb', []);
 	};
 
 	module.emptydb = async function () {
@@ -27,17 +27,17 @@ module.exports = function (module) {
 	};
 
 	module.scan = async function (params) {
-		let cursor = "0";
+		let cursor = '0';
 		let returnData = [];
 		const seen = Object.create(null);
 		do {
 			/* eslint-disable no-await-in-loop */
 			const res = await module.client.scan(
 				cursor,
-				"MATCH",
+				'MATCH',
 				params.match,
-				"COUNT",
-				10000,
+				'COUNT',
+				10000
 			);
 			cursor = res[0];
 			const values = res[1].filter((value) => {
@@ -48,7 +48,7 @@ module.exports = function (module) {
 				return !isSeen;
 			});
 			returnData = returnData.concat(values);
-		} while (cursor !== "0");
+		} while (cursor !== '0');
 		return returnData;
 	};
 
@@ -88,7 +88,7 @@ module.exports = function (module) {
 		try {
 			await module.client.rename(oldKey, newKey);
 		} catch (err) {
-			if (err && err.message !== "ERR no such key") {
+			if (err && err.message !== 'ERR no such key') {
 				throw err;
 			}
 		}
@@ -98,7 +98,7 @@ module.exports = function (module) {
 
 	module.type = async function (key) {
 		const type = await module.client.type(key);
-		return type !== "none" ? type : null;
+		return type !== 'none' ? type : null;
 	};
 
 	module.expire = async function (key, seconds) {

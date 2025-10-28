@@ -22,8 +22,8 @@ get:
         type: string
       example: 1
   responses:
-    "200":
-      description: ""
+    '200':
+      description: ''
       content:
         application/json:
           schema:
@@ -124,7 +124,7 @@ get:
                                 value is used in conjunction with
                                 `icon:text` for the user's auto-generated
                                 icon
-                              example: "#f44336"
+                              example: '#f44336'
                             banned_until_readable:
                               type: string
                             deleted:
@@ -175,7 +175,7 @@ get:
                             A six-character hexadecimal colour code assigned to the user. This
                             value is used in conjunction with `icon:text`
                             for the user's auto-generated icon
-                          example: "#f44336"
+                          example: '#f44336'
                         isOwner:
                           type: boolean
                         index:
@@ -260,7 +260,7 @@ get:
                                   value is used in conjunction with
                                   `icon:text` for the user's auto-generated
                                   icon
-                                example: "#f44336"
+                                example: '#f44336'
                               lastonlineISO:
                                 type: string
                         groupChat:
@@ -321,7 +321,7 @@ get:
                                     value is used in conjunction with
                                     `icon:text` for the user's
                                     auto-generated icon
-                                  example: "#f44336"
+                                  example: '#f44336'
                                 lastonlineISO:
                                   type: string
                           nullable: true
@@ -365,7 +365,7 @@ get:
                                 value is used in conjunction with
                                 `icon:text` for the user's auto-generated
                                 icon
-                              example: "#f44336"
+                              example: '#f44336'
                             lastonlineISO:
                               type: string
                         usernames:
@@ -431,7 +431,7 @@ get:
                                   value is used in conjunction with
                                   `icon:text` for the user's auto-generated
                                   icon
-                                example: "#f44336"
+                                example: '#f44336'
                               lastonlineISO:
                                 type: string
                         groupChat:
@@ -490,7 +490,7 @@ get:
                                     value is used in conjunction with
                                     `icon:text` for the user's
                                     auto-generated icon
-                                  example: "#f44336"
+                                  example: '#f44336'
                                 lastonlineISO:
                                   type: string
                           nullable: true
@@ -534,7 +534,7 @@ get:
                                 value is used in conjunction with
                                 `icon:text` for the user's auto-generated
                                 icon
-                              example: "#f44336"
+                              example: '#f44336'
                             lastonlineISO:
                               type: string
                         usernames:

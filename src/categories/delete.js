@@ -1,15 +1,15 @@
-"use strict";
+'use strict';
 
-const async = require("async");
-const db = require("../database");
-const batch = require("../batch");
-const plugins = require("../plugins");
-const topics = require("../topics");
-const groups = require("../groups");
-const privileges = require("../privileges");
-const activitypub = require("../activitypub");
-const cache = require("../cache");
-const utils = require("../utils");
+const async = require('async');
+const db = require('../database');
+const batch = require('../batch');
+const plugins = require('../plugins');
+const topics = require('../topics');
+const groups = require('../groups');
+const privileges = require('../privileges');
+const activitypub = require('../activitypub');
+const cache = require('../cache');
+const utils = require('../utils');
 
 module.exports = function (Categories) {
 	Categories.purge = async function (cid, uid) {
@@ -20,20 +20,20 @@ module.exports = function (Categories) {
 					await topics.purgePostsAndTopic(tid, uid);
 				});
 			},
-			{ alwaysStartAt: 0 },
+			{ alwaysStartAt: 0 }
 		);
 
 		const pinnedTids = await db.getSortedSetRevRange(
 			`cid:${cid}:tids:pinned`,
 			0,
-			-1,
+			-1
 		);
 		await async.eachLimit(pinnedTids, 10, async (tid) => {
 			await topics.purgePostsAndTopic(tid, uid);
 		});
 		const categoryData = await Categories.getCategoryData(cid);
 		await purgeCategory(cid, categoryData);
-		plugins.hooks.fire("action:category.delete", {
+		plugins.hooks.fire('action:category.delete', {
 			cid: cid,
 			uid: uid,
 			category: categoryData,
@@ -41,15 +41,15 @@ module.exports = function (Categories) {
 	};
 
 	async function purgeCategory(cid, categoryData) {
-		const bulkRemove = [["categories:cid", cid]];
+		const bulkRemove = [['categories:cid', cid]];
 		if (categoryData && categoryData.name) {
 			bulkRemove.push([
-				"categories:name",
+				'categories:name',
 				`${categoryData.name.slice(0, 200).toLowerCase()}:${cid}`,
 			]);
 		}
 		if (categoryData && categoryData.handle) {
-			bulkRemove.push(["categoryhandle:cid", categoryData.handle]);
+			bulkRemove.push(['categoryhandle:cid', categoryData.handle]);
 		}
 		await db.sortedSetRemoveBulk(bulkRemove);
 
@@ -69,35 +69,35 @@ module.exports = function (Categories) {
 			`cid:${cid}:uid:watch:state`,
 			`cid:${cid}:children`,
 			`cid:${cid}:tag:whitelist`,
-			`${utils.isNumber(cid) ? "category" : "categoryRemote"}:${cid}`,
+			`${utils.isNumber(cid) ? 'category' : 'categoryRemote'}:${cid}`,
 		]);
 		const privilegeList = await privileges.categories.getPrivilegeList();
 		await groups.destroy(
-			privilegeList.map((privilege) => `cid:${cid}:privileges:${privilege}`),
+			privilegeList.map((privilege) => `cid:${cid}:privileges:${privilege}`)
 		);
 	}
 
 	async function removeFromParent(cid) {
 		const [parentCid, children] = await Promise.all([
-			Categories.getCategoryField(cid, "parentCid"),
+			Categories.getCategoryField(cid, 'parentCid'),
 			db.getSortedSetRange(`cid:${cid}:children`, 0, -1),
 		]);
 
 		const bulkAdd = [];
 		const childrenKeys = children.map((cid) => {
-			bulkAdd.push(["cid:0:children", cid, cid]);
+			bulkAdd.push(['cid:0:children', cid, cid]);
 			return `category:${cid}`;
 		});
 
 		await Promise.all([
 			db.sortedSetRemove(`cid:${parentCid}:children`, cid),
-			db.setObjectField(childrenKeys, "parentCid", 0),
+			db.setObjectField(childrenKeys, 'parentCid', 0),
 			db.sortedSetAddBulk(bulkAdd),
 		]);
 
 		cache.del([
-			"categories:cid",
-			"cid:0:children",
+			'categories:cid',
+			'cid:0:children',
 			`cid:${parentCid}:children`,
 			`cid:${parentCid}:children:all`,
 			`cid:${cid}:children`,

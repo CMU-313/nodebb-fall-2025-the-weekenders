@@ -1,14 +1,14 @@
-"use strict";
+'use strict';
 
-const _ = require("lodash");
+const _ = require('lodash');
 
-const db = require("../database");
-const meta = require("../meta");
-const user = require("../user");
-const posts = require("../posts");
-const plugins = require("../plugins");
-const utils = require("../utils");
-const { applyAnonymousMask } = require("./anonymous");
+const db = require('../database');
+const meta = require('../meta');
+const user = require('../user');
+const posts = require('../posts');
+const plugins = require('../plugins');
+const utils = require('../utils');
+const { applyAnonymousMask } = require('./anonymous');
 
 module.exports = function (Topics) {
 	Topics.getTeasers = async function (topics, options) {
@@ -17,7 +17,7 @@ module.exports = function (Topics) {
 		}
 		let uid = options;
 		let { teaserPost } = meta.config;
-		if (typeof options === "object") {
+		if (typeof options === 'object') {
 			uid = options.uid;
 			teaserPost = options.teaserPost || meta.config.teaserPost;
 		}
@@ -29,12 +29,12 @@ module.exports = function (Topics) {
 		topics.forEach((topic) => {
 			counts.push(topic && topic.postcount);
 			if (topic) {
-				if (topic.teaserPid === "null") {
+				if (topic.teaserPid === 'null') {
 					delete topic.teaserPid;
 				}
-				if (teaserPost === "first") {
+				if (teaserPost === 'first') {
 					teaserPids.push(topic.mainPid);
-				} else if (teaserPost === "last-post") {
+				} else if (teaserPost === 'last-post') {
 					teaserPids.push(topic.teaserPid || topic.mainPid);
 				} else {
 					// last-reply and everything else uses teaserPid like `last` that was used before
@@ -45,13 +45,13 @@ module.exports = function (Topics) {
 
 		const [allPostData, callerSettings, isStaffViewer] = await Promise.all([
 			posts.getPostsFields(teaserPids, [
-				"pid",
-				"uid",
-				"timestamp",
-				"tid",
-				"content",
-				"sourceContent",
-				"isAnonymous",
+				'pid',
+				'uid',
+				'timestamp',
+				'tid',
+				'content',
+				'sourceContent',
+				'isAnonymous',
 			]),
 			user.getSettings(uid),
 			uid ? user.isPrivileged(uid) : false,
@@ -60,14 +60,14 @@ module.exports = function (Topics) {
 		postData = await handleBlocks(uid, postData);
 		postData = postData.filter(Boolean);
 		const uids = _.uniq(postData.map((post) => post.uid));
-		const sortNewToOld = callerSettings.topicPostSort === "newest_to_oldest";
+		const sortNewToOld = callerSettings.topicPostSort === 'newest_to_oldest';
 		const usersData = await user.getUsersFields(uids, [
-			"uid",
-			"username",
-			"userslug",
-			"picture",
-			"icon:bgColor",
-			"icon:text",
+			'uid',
+			'username',
+			'userslug',
+			'picture',
+			'icon:bgColor',
+			'icon:text',
 		]);
 
 		const users = {};
@@ -89,7 +89,7 @@ module.exports = function (Topics) {
 			post.timestampISO = utils.toISOString(post.timestamp);
 			tidToPost[post.tid] = post;
 		});
-		await Promise.all(postData.map((p) => posts.parsePost(p, "plaintext")));
+		await Promise.all(postData.map((p) => posts.parsePost(p, 'plaintext')));
 
 		const teasers = topics.map((topic, index) => {
 			if (!topic) {
@@ -99,13 +99,13 @@ module.exports = function (Topics) {
 				tidToPost[topic.tid].index = calcTeaserIndex(
 					teaserPost,
 					counts[index],
-					sortNewToOld,
+					sortNewToOld
 				);
 			}
 			return tidToPost[topic.tid];
 		});
 
-		const result = await plugins.hooks.fire("filter:teasers.get", {
+		const result = await plugins.hooks.fire('filter:teasers.get', {
 			teasers: teasers,
 			uid: uid,
 		});
@@ -113,7 +113,7 @@ module.exports = function (Topics) {
 	};
 
 	function calcTeaserIndex(teaserPost, postCountInTopic, sortNewToOld) {
-		if (teaserPost === "first") {
+		if (teaserPost === 'first') {
 			return 1;
 		}
 
@@ -135,7 +135,7 @@ module.exports = function (Topics) {
 					return await getPreviousNonBlockedPost(postData, blockedUids);
 				}
 				return postData;
-			}),
+			})
 		);
 	}
 
@@ -158,19 +158,19 @@ module.exports = function (Topics) {
 			let pids = await db.getSortedSetRevRange(
 				`tid:${postData.tid}:posts`,
 				start,
-				stop,
+				stop
 			);
 			if (!pids.length) {
 				checkedAllReplies = true;
-				const mainPid = await Topics.getTopicField(postData.tid, "mainPid");
+				const mainPid = await Topics.getTopicField(postData.tid, 'mainPid');
 				pids = [mainPid];
 			}
 			const prevPosts = await posts.getPostsFields(pids, [
-				"pid",
-				"uid",
-				"timestamp",
-				"tid",
-				"content",
+				'pid',
+				'uid',
+				'timestamp',
+				'tid',
+				'content',
 			]);
 			isBlocked = prevPosts.every(checkBlocked);
 			start += postsPerIteration;
@@ -185,10 +185,10 @@ module.exports = function (Topics) {
 			return [];
 		}
 		const topics = await Topics.getTopicsFields(tids, [
-			"tid",
-			"postcount",
-			"teaserPid",
-			"mainPid",
+			'tid',
+			'postcount',
+			'teaserPid',
+			'mainPid',
 		]);
 		return await Topics.getTeasers(topics, uid);
 	};
@@ -202,9 +202,9 @@ module.exports = function (Topics) {
 		let pid = await Topics.getLatestUndeletedReply(tid);
 		pid = pid || null;
 		if (pid) {
-			await Topics.setTopicField(tid, "teaserPid", pid);
+			await Topics.setTopicField(tid, 'teaserPid', pid);
 		} else {
-			await Topics.deleteTopicField(tid, "teaserPid");
+			await Topics.deleteTopicField(tid, 'teaserPid');
 		}
 	};
 };

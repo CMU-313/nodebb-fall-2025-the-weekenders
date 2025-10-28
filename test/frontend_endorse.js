@@ -1,6 +1,6 @@
-"use strict";
+'use strict';
 
-const assert = require("assert");
+const assert = require('assert');
 
 /**
  * Small front-end ordering helper kept inside the test file so we don't add
@@ -24,25 +24,25 @@ function toEndorsedOrder(posts) {
 		const br = Number.isFinite(b.endorsed_rank) ? b.endorsed_rank : Infinity;
 		if (ar !== br) return ar - br;
 
-		const at = typeof a.endorsed_at === "number" ? a.endorsed_at : 0;
-		const bt = typeof b.endorsed_at === "number" ? b.endorsed_at : 0;
+		const at = typeof a.endorsed_at === 'number' ? a.endorsed_at : 0;
+		const bt = typeof b.endorsed_at === 'number' ? b.endorsed_at : 0;
 		return bt - at; // newer first within same rank
 	});
 
 	return [main, ...endorsed, ...normal];
 }
 
-describe("frontend endorse ordering (unit)", function () {
-	it("keeps main first and no-ops when nothing endorsed", function () {
+describe('frontend endorse ordering (unit)', function () {
+	it('keeps main first and no-ops when nothing endorsed', function () {
 		const posts = [{ pid: 1 }, { pid: 2 }, { pid: 3 }];
 		const ordered = toEndorsedOrder(posts);
 		assert.deepStrictEqual(
 			ordered.map((p) => p.pid),
-			[1, 2, 3],
+			[1, 2, 3]
 		);
 	});
 
-	it("groups endorsed replies after main", function () {
+	it('groups endorsed replies after main', function () {
 		const t = Date.now();
 		const posts = [
 			{ pid: 1 },
@@ -53,11 +53,11 @@ describe("frontend endorse ordering (unit)", function () {
 		const ordered = toEndorsedOrder(posts);
 		assert.deepStrictEqual(
 			ordered.map((p) => p.pid),
-			[1, 4, 2, 3],
+			[1, 4, 2, 3]
 		);
 	});
 
-	it("sorts endorsed by rank asc, then time desc", function () {
+	it('sorts endorsed by rank asc, then time desc', function () {
 		const t = Date.now();
 		const posts = [
 			{ pid: 1 },
@@ -69,11 +69,11 @@ describe("frontend endorse ordering (unit)", function () {
 		const ordered = toEndorsedOrder(posts);
 		assert.deepStrictEqual(
 			ordered.map((p) => p.pid),
-			[1, 3, 2, 4, 5],
+			[1, 3, 2, 4, 5]
 		);
 	});
 
-	it("treats missing rank as Infinity and keeps non-endorsed stable", function () {
+	it('treats missing rank as Infinity and keeps non-endorsed stable', function () {
 		const t = Date.now();
 		const posts = [
 			{ pid: 1 },

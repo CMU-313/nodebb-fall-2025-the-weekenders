@@ -19,18 +19,18 @@
 //  });
 // };
 
-"use strict";
+'use strict';
 
-const validator = require("validator");
-const winston = require("winston");
-const meta = require("../../meta");
+const validator = require('validator');
+const winston = require('winston');
+const meta = require('../../meta');
 
 const logsController = module.exports;
 
 logsController.get = async function (req, res, next) {
 	try {
 		const logs = await meta.logs.get(); // '' if file missing
-		return res.render("admin/advanced/logs", {
+		return res.render('admin/advanced/logs', {
 			data: validator.escape(logs),
 		});
 	} catch (err) {

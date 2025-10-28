@@ -1,14 +1,14 @@
-"use strict";
+'use strict';
 
-const nconf = require("nconf");
-const Redis = require("ioredis");
-const winston = require("winston");
+const nconf = require('nconf');
+const Redis = require('ioredis');
+const winston = require('winston');
 
 const connection = module.exports;
 
 connection.connect = async function (options) {
 	return new Promise((resolve, reject) => {
-		options = options || nconf.get("redis");
+		options = options || nconf.get('redis');
 		const redis_socket_or_host = options.host;
 
 		let cxn;
@@ -21,7 +21,7 @@ connection.connect = async function (options) {
 			});
 		} else if (
 			redis_socket_or_host &&
-			String(redis_socket_or_host).indexOf("/") >= 0
+			String(redis_socket_or_host).indexOf('/') >= 0
 		) {
 			// If redis.host contains a path name character, use the unix dom sock connection. ie, /tmp/redis.sock
 			cxn = new Redis({
@@ -43,14 +43,14 @@ connection.connect = async function (options) {
 
 		const dbIdx = parseInt(options.database, 10);
 		if (!(dbIdx >= 0)) {
-			throw new Error("[[error:no-database-selected]]");
+			throw new Error('[[error:no-database-selected]]');
 		}
 
-		cxn.on("error", (err) => {
+		cxn.on('error', (err) => {
 			winston.error(err.stack);
 			reject(err);
 		});
-		cxn.on("ready", () => {
+		cxn.on('ready', () => {
 			// back-compat with node_redis
 			cxn.batch = cxn.pipeline;
 			resolve(cxn);
@@ -62,4 +62,4 @@ connection.connect = async function (options) {
 	});
 };
 
-require("../../promisify")(connection);
+require('../../promisify')(connection);

@@ -1,41 +1,41 @@
-"use strict";
+'use strict';
 
-const winston = require("winston");
-const nconf = require("nconf");
+const winston = require('winston');
+const nconf = require('nconf');
 
-const db = require("../database");
-const batch = require("../batch");
-const meta = require("../meta");
-const privileges = require("../privileges");
-const categories = require("../categories");
-const messaging = require("../messaging");
-const notifications = require("../notifications");
-const user = require("../user");
-const topics = require("../topics");
-const posts = require("../posts");
-const utils = require("../utils");
+const db = require('../database');
+const batch = require('../batch');
+const meta = require('../meta');
+const privileges = require('../privileges');
+const categories = require('../categories');
+const messaging = require('../messaging');
+const notifications = require('../notifications');
+const user = require('../user');
+const topics = require('../topics');
+const posts = require('../posts');
+const utils = require('../utils');
 
 const activitypub = module.parent.exports;
 const Notes = module.exports;
 
 async function lock(value) {
-	const count = await db.incrObjectField("locks", value);
+	const count = await db.incrObjectField('locks', value);
 	return count <= 1;
 }
 
 async function unlock(value) {
-	await db.deleteObjectField("locks", value);
+	await db.deleteObjectField('locks', value);
 }
 
 Notes._normalizeTags = async (tag, cid) => {
-	const systemTags = (meta.config.systemTags || "").split(",");
-	const maxTags = await categories.getCategoryField(cid, "maxTags");
+	const systemTags = (meta.config.systemTags || '').split(',');
+	const maxTags = await categories.getCategoryField(cid, 'maxTags');
 	const tags = (tag || [])
 		.map((tag) => {
-			tag.name = tag.name.startsWith("#") ? tag.name.slice(1) : tag.name;
+			tag.name = tag.name.startsWith('#') ? tag.name.slice(1) : tag.name;
 			return tag;
 		})
-		.filter((o) => o.type === "Hashtag" && !systemTags.includes(o.name))
+		.filter((o) => o.type === 'Hashtag' && !systemTags.includes(o.name))
 		.map((t) => t.name);
 
 	if (tags.length > maxTags) {
@@ -56,7 +56,7 @@ Notes.assert = async (uid, input, options = { skipChecks: false }) => {
 	}
 
 	const id = !activitypub.helpers.isUri(input) ? input.id : input;
-	const lockStatus = await lock(id, "[[error:activitypub.already-asserting]]");
+	const lockStatus = await lock(id, '[[error:activitypub.already-asserting]]');
 	if (!lockStatus) {
 		// unable to achieve lock, stop processing.
 		return null;
@@ -70,7 +70,7 @@ Notes.assert = async (uid, input, options = { skipChecks: false }) => {
 		return { tid, count: 0 };
 	} else if (context.context) {
 		chain = Array.from(
-			await activitypub.contexts.getItems(uid, context.context, { input }),
+			await activitypub.contexts.getItems(uid, context.context, { input })
 		);
 		if (chain && chain.length) {
 			// Context resolves, use in later topic creation
@@ -109,46 +109,46 @@ Notes.assert = async (uid, input, options = { skipChecks: false }) => {
 	const hasTid = !!tid;
 
 	const cid = hasTid
-		? await topics.getTopicField(tid, "cid")
+		? await topics.getTopicField(tid, 'cid')
 		: options.cid || -1;
 
 	if (options.cid && cid === -1) {
 		// Move topic if currently uncategorized
-		await topics.tools.move(tid, { cid: options.cid, uid: "system" });
+		await topics.tools.move(tid, { cid: options.cid, uid: 'system' });
 	}
 
 	const members = await db.isSortedSetMembers(
 		`tid:${tid}:posts`,
-		chain.slice(1).map((p) => p.pid),
+		chain.slice(1).map((p) => p.pid)
 	);
 	members.unshift(await posts.exists(mainPid));
 	if (tid && members.every(Boolean)) {
 		// All cached, return early.
-		activitypub.helpers.log("[notes/assert] No new notes to process.");
+		activitypub.helpers.log('[notes/assert] No new notes to process.');
 		unlock(id);
 		return { tid, count: 0 };
 	}
 
 	if (hasTid) {
-		mainPid = await topics.getTopicField(tid, "mainPid");
+		mainPid = await topics.getTopicField(tid, 'mainPid');
 	} else {
 		// Check recipients/audience for category (local or remote)
 		const set = activitypub.helpers.makeSet(_activitypub, [
-			"to",
-			"cc",
-			"audience",
+			'to',
+			'cc',
+			'audience',
 		]);
 		await activitypub.actors.assert(Array.from(set));
 
 		// Local
 		const resolved = await Promise.all(
 			Array.from(set).map(
-				async (id) => await activitypub.helpers.resolveLocalId(id),
-			),
+				async (id) => await activitypub.helpers.resolveLocalId(id)
+			)
 		);
 		const recipientCids = resolved
 			.filter(Boolean)
-			.filter(({ type }) => type === "category")
+			.filter(({ type }) => type === 'category')
 			.map((obj) => obj.id);
 
 		// Remote
@@ -175,15 +175,15 @@ Notes.assert = async (uid, input, options = { skipChecks: false }) => {
 		title =
 			title ||
 			activitypub.helpers.generateTitle(
-				utils.decodeHTMLEntities(content || sourceContent),
+				utils.decodeHTMLEntities(content || sourceContent)
 			);
 
 		// Remove any custom emoji from title
 		if (_activitypub && _activitypub.tag && Array.isArray(_activitypub.tag)) {
 			_activitypub.tag
-				.filter((tag) => tag.type === "Emoji")
+				.filter((tag) => tag.type === 'Emoji')
 				.forEach((tag) => {
-					title = title.replace(new RegExp(tag.name, "g"), "");
+					title = title.replace(new RegExp(tag.name, 'g'), '');
 				});
 		}
 	}
@@ -197,16 +197,16 @@ Notes.assert = async (uid, input, options = { skipChecks: false }) => {
 		options.skipChecks ||
 		options.cid ||
 		(await assertRelation(chain[inputIndex !== -1 ? inputIndex : 0]));
-	const privilege = `topics:${tid ? "reply" : "create"}`;
+	const privilege = `topics:${tid ? 'reply' : 'create'}`;
 	const allowed = await privileges.categories.can(
 		privilege,
 		options.cid || cid,
-		activitypub._constants.uid,
+		activitypub._constants.uid
 	);
 	if (!hasRelation || !allowed) {
 		if (!hasRelation) {
 			activitypub.helpers.log(
-				`[activitypub/notes.assert] Not asserting ${id} as it has no relation to existing tracked content.`,
+				`[activitypub/notes.assert] Not asserting ${id} as it has no relation to existing tracked content.`
 			);
 		}
 
@@ -219,7 +219,7 @@ Notes.assert = async (uid, input, options = { skipChecks: false }) => {
 
 	const urlMap = chain.reduce(
 		(map, post) => (post.url ? map.set(post.url, post.id) : map),
-		new Map(),
+		new Map()
 	);
 	const unprocessed = chain
 		.map((post) => {
@@ -256,7 +256,7 @@ Notes.assert = async (uid, input, options = { skipChecks: false }) => {
 			unprocessed.shift();
 		} catch (e) {
 			activitypub.helpers.log(
-				`[activitypub/notes.assert] Could not post topic (${mainPost.pid}): ${e.message}`,
+				`[activitypub/notes.assert] Could not post topic (${mainPost.pid}): ${e.message}`
 			);
 			return null;
 		}
@@ -275,9 +275,9 @@ Notes.assert = async (uid, input, options = { skipChecks: false }) => {
 
 		if (context) {
 			activitypub.helpers.log(
-				`[activitypub/notes.assert] Associating tid ${tid} with context ${context}`,
+				`[activitypub/notes.assert] Associating tid ${tid} with context ${context}`
 			);
-			await topics.setTopicField(tid, "context", context);
+			await topics.setTopicField(tid, 'context', context);
 		}
 	}
 
@@ -294,7 +294,7 @@ Notes.assert = async (uid, input, options = { skipChecks: false }) => {
 			]);
 		} catch (e) {
 			activitypub.helpers.log(
-				`[activitypub/notes.assert] Could not add reply (${post.pid}): ${e.message}`,
+				`[activitypub/notes.assert] Could not add reply (${post.pid}): ${e.message}`
 			);
 		}
 	}
@@ -317,12 +317,12 @@ Notes.assertPrivate = async (object) => {
 	await Promise.all(
 		Array.from(recipients).map(async (value) => {
 			const { type, id } = await activitypub.helpers.resolveLocalId(value);
-			if (type === "user") {
+			if (type === 'user') {
 				localUids.push(id);
 				recipients.delete(value);
 				recipients.add(parseInt(id, 10));
 			}
-		}),
+		})
 	);
 
 	// Trim recipient list down to asserted actors (and local users) only
@@ -337,14 +337,14 @@ Notes.assertPrivate = async (object) => {
 	// Locate the roomId based on `inReplyTo`
 	let roomId;
 	const resolved = await activitypub.helpers.resolveLocalId(object.inReplyTo);
-	let toMid = resolved.type === "message" && resolved.id;
+	let toMid = resolved.type === 'message' && resolved.id;
 	if (
 		object.inReplyTo &&
 		(await messaging.messageExists(toMid || object.inReplyTo))
 	) {
 		roomId = await messaging.getMessageField(
 			toMid || object.inReplyTo,
-			"roomId",
+			'roomId'
 		);
 	}
 
@@ -375,8 +375,8 @@ Notes.assertPrivate = async (object) => {
 		await messaging.checkContent(payload.content, false);
 	} catch (e) {
 		const { displayname, userslug } = await user.getUserFields(payload.uid, [
-			"displayname",
-			"userslug",
+			'displayname',
+			'userslug',
 		]);
 		const notification = await notifications.create({
 			bodyShort: `[[error:remote-chat-received-too-long, ${displayname}]]`,
@@ -386,7 +386,7 @@ Notes.assertPrivate = async (object) => {
 		});
 		notifications.push(
 			notification,
-			Array.from(recipients).filter((uid) => utils.isNumber(uid)),
+			Array.from(recipients).filter((uid) => utils.isNumber(uid))
 		);
 		return null;
 	}
@@ -397,7 +397,7 @@ Notes.assertPrivate = async (object) => {
 
 	// Add any new members to the chat
 	const added = Array.from(recipients).filter(
-		(uid) => !participantUids.includes(uid),
+		(uid) => !participantUids.includes(uid)
 	);
 	const assertion = await activitypub.actors.assert(added);
 	if (assertion) {
@@ -414,7 +414,7 @@ Notes.assertPrivate = async (object) => {
 	messaging.notifyUsersInRoom(payload.uid, roomId, message);
 
 	// Set real timestamp back so that the message shows even though it predates room joining
-	await messaging.setMessageField(payload.mid, "timestamp", timestamp);
+	await messaging.setMessageField(payload.mid, 'timestamp', timestamp);
 
 	return { roomId };
 };
@@ -433,16 +433,16 @@ async function assertRelation(post) {
 	let uids = [];
 	if (tag && tag.length) {
 		const slugs = tag.reduce((slugs, tag) => {
-			if (tag.type === "Mention") {
-				const [slug, hostname] = tag.name.slice(1).split("@");
-				if (hostname === nconf.get("url_parsed").hostname) {
+			if (tag.type === 'Mention') {
+				const [slug, hostname] = tag.name.slice(1).split('@');
+				if (hostname === nconf.get('url_parsed').hostname) {
 					slugs.push(slug);
 				}
 			}
 			return slugs;
 		}, []);
 
-		uids = slugs.length ? await db.sortedSetScores("userslug:uid", slugs) : [];
+		uids = slugs.length ? await db.sortedSetScores('userslug:uid', slugs) : [];
 		uids = uids.filter(Boolean);
 	}
 
@@ -455,14 +455,14 @@ Notes.updateLocalRecipients = async (id, { to, cc }) => {
 	await Promise.all(
 		Array.from(recipients).map(async (recipient) => {
 			const { type, id } = await activitypub.helpers.resolveLocalId(recipient);
-			if (type === "user" && (await user.exists(id))) {
+			if (type === 'user' && (await user.exists(id))) {
 				uids.add(parseInt(id, 10));
 				return;
 			}
 
 			const followedUid = await db.getObjectField(
-				"followersUrl:uid",
-				recipient,
+				'followersUrl:uid',
+				recipient
 			);
 			if (followedUid) {
 				const { uids: followers } =
@@ -473,7 +473,7 @@ Notes.updateLocalRecipients = async (id, { to, cc }) => {
 					});
 				}
 			}
-		}),
+		})
 	);
 
 	if (uids.size > 0) {
@@ -489,7 +489,7 @@ Notes.getParentChain = async (uid, input) => {
 	const traverse = async (uid, id) => {
 		// Handle remote reference to local post
 		const { type, id: localId } = await activitypub.helpers.resolveLocalId(id);
-		if (type === "post" && localId) {
+		if (type === 'post' && localId) {
 			return await traverse(uid, localId);
 		}
 
@@ -500,7 +500,7 @@ Notes.getParentChain = async (uid, input) => {
 				await traverse(uid, postData.toPid);
 			} else if (utils.isNumber(id)) {
 				// local pid without toPid, could be OP or reply to OP
-				const mainPid = await topics.getTopicField(postData.tid, "mainPid");
+				const mainPid = await topics.getTopicField(postData.tid, 'mainPid');
 				if (mainPid !== parseInt(id, 10)) {
 					await traverse(uid, mainPid);
 				}
@@ -511,7 +511,7 @@ Notes.getParentChain = async (uid, input) => {
 					? input
 					: undefined;
 			try {
-				object = object || (await activitypub.get("uid", uid, id));
+				object = object || (await activitypub.get('uid', uid, id));
 
 				// Handle incorrect id passed in
 				if (id !== object.id) {
@@ -527,7 +527,7 @@ Notes.getParentChain = async (uid, input) => {
 				}
 			} catch (e) {
 				winston.verbose(
-					`[activitypub/notes/getParentChain] Cannot retrieve ${id}, terminating here.`,
+					`[activitypub/notes/getParentChain] Cannot retrieve ${id}, terminating here.`
 				);
 			}
 		}
@@ -540,16 +540,16 @@ Notes.getParentChain = async (uid, input) => {
 Notes.syncUserInboxes = async function (tid, uid) {
 	const [pids, { cid, mainPid, tags }] = await Promise.all([
 		db.getSortedSetMembers(`tid:${tid}:posts`),
-		topics.getTopicFields(tid, ["tid", "cid", "mainPid", "tags"]),
+		topics.getTopicFields(tid, ['tid', 'cid', 'mainPid', 'tags']),
 	]);
 	pids.unshift(mainPid);
 
 	const recipients = await db.getSetsMembers(
-		pids.map((id) => `post:${id}:recipients`),
+		pids.map((id) => `post:${id}:recipients`)
 	);
 	const uids = recipients.reduce(
 		(set, uids) => new Set([...set, ...uids.map((u) => parseInt(u, 10))]),
-		new Set(),
+		new Set()
 	);
 	if (uid) {
 		uids.add(parseInt(uid, 10));
@@ -557,7 +557,7 @@ Notes.syncUserInboxes = async function (tid, uid) {
 
 	// Tag followers
 	const tagsFollowers = await topics.getTagsFollowers(
-		tags.map((tag) => tag.value),
+		tags.map((tag) => tag.value)
 	);
 	new Set(tagsFollowers.flat()).forEach((uid) => {
 		uids.add(uid);
@@ -577,14 +577,14 @@ Notes.syncUserInboxes = async function (tid, uid) {
 		.map((uid) => `uid:${uid}:inbox`);
 
 	activitypub.helpers.log(
-		`[activitypub/syncUserInboxes] Syncing tid ${tid} with ${uids.size} inboxes`,
+		`[activitypub/syncUserInboxes] Syncing tid ${tid} with ${uids.size} inboxes`
 	);
 	await Promise.all([
 		db.sortedSetsRemove(removeKeys, tid),
 		db.sortedSetsAdd(
 			keys,
 			keys.map(() => score || Date.now()),
-			tid,
+			tid
 		),
 		db.setAdd(`tid:${tid}:recipients`, Array.from(uids)),
 	]);
@@ -597,7 +597,7 @@ Notes.getCategoryFollowers = async (cid) => {
 		0,
 		-1,
 		categories.watchStates.tracking,
-		categories.watchStates.tracking,
+		categories.watchStates.tracking
 	);
 	uids = uids.filter((uid) => !utils.isNumber(uid));
 
@@ -614,7 +614,7 @@ Notes.announce.list = async ({ pid, tid }) => {
 		let mainPid;
 		[pids, mainPid] = await Promise.all([
 			db.getSortedSetMembers(`tid:${tid}:posts`),
-			topics.getTopicField(tid, "mainPid"),
+			topics.getTopicField(tid, 'mainPid'),
 		]);
 		pids.unshift(mainPid);
 	}
@@ -640,14 +640,14 @@ Notes.announce.list = async ({ pid, tid }) => {
 
 Notes.announce.add = async (pid, actor, timestamp = Date.now()) => {
 	const [tid] = await Promise.all([
-		posts.getPostField(pid, "tid"),
+		posts.getPostField(pid, 'tid'),
 		db.sortedSetAdd(`pid:${pid}:announces`, timestamp, actor),
 	]);
 	await Promise.all([
 		posts.setPostField(
 			pid,
-			"announces",
-			await db.sortedSetCard(`pid:${pid}:announces`),
+			'announces',
+			await db.sortedSetCard(`pid:${pid}:announces`)
 		),
 		topics.tools.share(tid, actor, timestamp),
 	]);
@@ -657,16 +657,16 @@ Notes.announce.remove = async (pid, actor) => {
 	await db.sortedSetRemove(`pid:${pid}:announces`, actor);
 	const count = await db.sortedSetCard(`pid:${pid}:announces`);
 	if (count > 0) {
-		await posts.setPostField(pid, "announces", count);
+		await posts.setPostField(pid, 'announces', count);
 	} else {
-		await db.deleteObjectField(`post:${pid}`, "announces");
+		await db.deleteObjectField(`post:${pid}`, 'announces');
 	}
 };
 
 Notes.announce.removeAll = async (pid) => {
 	await Promise.all([
 		db.delete(`pid:${pid}:announces`),
-		db.deleteObjectField(`post:${pid}`, "announces"),
+		db.deleteObjectField(`post:${pid}`, 'announces'),
 	]);
 };
 
@@ -678,7 +678,7 @@ Notes.delete = async (pids) => {
 	const exists = await posts.exists(pids);
 	pids = pids.filter((_, idx) => exists[idx]);
 
-	let tids = await posts.getPostsFields(pids, ["tid"]);
+	let tids = await posts.getPostsFields(pids, ['tid']);
 	tids = new Set(tids.map((obj) => obj.tid));
 
 	const recipientSets = pids.map((id) => `post:${id}:recipients`);
@@ -686,7 +686,7 @@ Notes.delete = async (pids) => {
 
 	await db.deleteAll([...recipientSets, ...announcerSets]);
 	await Promise.all(
-		Array.from(tids).map(async (tid) => Notes.syncUserInboxes(tid)),
+		Array.from(tids).map(async (tid) => Notes.syncUserInboxes(tid))
 	);
 };
 
@@ -697,28 +697,28 @@ Notes.prune = async () => {
 	 *   - Replied to (contains a local reply)
 	 *   - Post within is liked
 	 */
-	winston.info("[notes/prune] Starting scheduled pruning of topics");
-	const start = "-inf";
+	winston.info('[notes/prune] Starting scheduled pruning of topics');
+	const start = '-inf';
 	const stop =
 		Date.now() - 1000 * 60 * 60 * 24 * meta.config.activitypubContentPruneDays;
 	let tids = await db.getSortedSetRangeByScore(
-		"cid:-1:tids",
+		'cid:-1:tids',
 		0,
 		-1,
 		start,
-		stop,
+		stop
 	);
 
 	winston.info(
-		`[notes/prune] Found ${tids.length} topics older than 30 days (since last activity).`,
+		`[notes/prune] Found ${tids.length} topics older than 30 days (since last activity).`
 	);
 
 	const posters = await db.getSortedSetsMembers(
-		tids.map((tid) => `tid:${tid}:posters`),
+		tids.map((tid) => `tid:${tid}:posters`)
 	);
 	const hasLocalVoter = await Promise.all(
 		tids.map(async (tid) => {
-			const mainPid = await db.getObjectField(`topic:${tid}`, "mainPid");
+			const mainPid = await db.getObjectField(`topic:${tid}`, 'mainPid');
 			const pids = await db.getSortedSetMembers(`tid:${tid}:posts`);
 			pids.unshift(mainPid);
 
@@ -732,11 +732,11 @@ Notes.prune = async () => {
 					]);
 					upvoters.forEach((uid) => voters.add(uid));
 					downvoters.forEach((uid) => voters.add(uid));
-				}),
+				})
 			);
 
 			return Array.from(voters).some((uid) => utils.isNumber(uid));
-		}),
+		})
 	);
 
 	tids = tids.filter((_, idx) => {
@@ -752,11 +752,11 @@ Notes.prune = async () => {
 		tids,
 		async (tids) => {
 			await Promise.all(
-				tids.map(async (tid) => await topics.purgePostsAndTopic(tid, 0)),
+				tids.map(async (tid) => await topics.purgePostsAndTopic(tid, 0))
 			);
 		},
-		{ batch: 100 },
+		{ batch: 100 }
 	);
 
-	winston.info("[notes/prune] Scheduled pruning of topics complete.");
+	winston.info('[notes/prune] Scheduled pruning of topics complete.');
 };
