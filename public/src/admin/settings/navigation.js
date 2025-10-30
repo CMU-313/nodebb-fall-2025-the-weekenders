@@ -1,6 +1,5 @@
 'use strict';
 
-
 define('admin/settings/navigation', [
 	'translator',
 	'iconSelect',
@@ -23,32 +22,39 @@ define('admin/settings/navigation', [
 			stop: drop,
 		});
 
-		$('#active-navigation').sortable().droppable({
-			accept: $('#available li .drag-item'),
-		});
+		$('#active-navigation')
+			.sortable()
+			.droppable({
+				accept: $('#available li .drag-item'),
+			});
 
 		$('#enabled').on('click', '.iconPicker', function () {
 			const iconEl = $(this).find('i');
 			iconSelect.init(iconEl, function (el) {
 				const newIconClass = el.attr('value');
 				const index = iconEl.parents('[data-index]').attr('data-index');
-				$('#active-navigation [data-index="' + index + '"] i.nav-icon').attr('class', 'fa fa-fw ' + newIconClass);
+				$('#active-navigation [data-index="' + index + '"] i.nav-icon').attr(
+					'class',
+					'fa fa-fw ' + newIconClass
+				);
 				iconEl.siblings('[name="iconClass"]').val(newIconClass);
-				iconEl.siblings('.change-icon-link').toggleClass('hidden', !!newIconClass);
+				iconEl
+					.siblings('.change-icon-link')
+					.toggleClass('hidden', !!newIconClass);
 			});
 		});
 
 		$('#enabled').on('click', '[name="dropdown"]', function () {
 			const el = $(this);
 			const index = el.parents('[data-index]').attr('data-index');
-			$('#active-navigation [data-index="' + index + '"] i.dropdown-icon').toggleClass('hidden', !el.is(':checked'));
+			$(
+				'#active-navigation [data-index="' + index + '"] i.dropdown-icon'
+			).toggleClass('hidden', !el.is(':checked'));
 		});
 
 		$('#active-navigation').on('click', 'li', onSelect);
 
-		$('#enabled')
-			.on('click', '.delete', remove)
-			.on('click', '.toggle', toggle);
+		$('#enabled').on('click', '.delete', remove).on('click', '.toggle', toggle);
 
 		$('#save').on('click', save);
 	};
@@ -74,41 +80,53 @@ define('admin/settings/navigation', [
 	function drop(ev, ui) {
 		const id = ui.helper.attr('data-id');
 		const el = $('#active-navigation [data-id="' + id + '"]');
-		const data = id === 'custom' ? {
-			iconClass: 'fa-navicon',
-			groups: available[0].groups,
-			enabled: true,
-		} : available[id];
+		const data =
+			id === 'custom'
+				? {
+						iconClass: 'fa-navicon',
+						groups: available[0].groups,
+						enabled: true,
+					}
+				: available[id];
 
-		data.index = (parseInt($('#enabled').children().last().attr('data-index'), 10) || 0) + 1;
+		data.index =
+			(parseInt($('#enabled').children().last().attr('data-index'), 10) || 0) +
+			1;
 		data.title = translator.escape(data.title);
 		data.text = translator.escape(data.text);
 		data.groups = ajaxify.data.groups;
 
-		const renderNav = new Promise((resolve) => {
-			Benchpress.parse('admin/settings/navigation', 'navigation', { navigation: [data] }, function (li) {
-				translator.translate(li, function (li) {
-					li = $(translator.unescape(li));
-					el.after(li);
-					el.remove();
-					resolve();
-				});
-			});
+		const renderNav = new Promise(resolve => {
+			Benchpress.parse(
+				'admin/settings/navigation',
+				'navigation',
+				{ navigation: [data] },
+				function (li) {
+					translator.translate(li, function (li) {
+						li = $(translator.unescape(li));
+						el.after(li);
+						el.remove();
+						resolve();
+					});
+				}
+			);
 		});
-		const renderForm = new Promise((resolve) => {
-			Benchpress.parse('admin/settings/navigation', 'enabled', { enabled: [data] }, function (li) {
-				translator.translate(li, function (li) {
-					li = $(translator.unescape(li));
-					$('#enabled').append(li);
-					resolve();
-				});
-			});
+		const renderForm = new Promise(resolve => {
+			Benchpress.parse(
+				'admin/settings/navigation',
+				'enabled',
+				{ enabled: [data] },
+				function (li) {
+					translator.translate(li, function (li) {
+						li = $(translator.unescape(li));
+						$('#enabled').append(li);
+						resolve();
+					});
+				}
+			);
 		});
 
-		Promise.all([
-			renderNav,
-			renderForm,
-		]).then(() => selectIndex(data.index));
+		Promise.all([renderNav, renderForm]).then(() => selectIndex(data.index));
 	}
 
 	function save() {
@@ -127,9 +145,7 @@ define('admin/settings/navigation', [
 			form.forEach(function (input) {
 				if (data[input.name]) {
 					if (!Array.isArray(data[input.name])) {
-						data[input.name] = [
-							data[input.name],
-						];
+						data[input.name] = [data[input.name]];
 					}
 					data[input.name].push(input.value);
 				} else {
@@ -166,8 +182,14 @@ define('admin/settings/navigation', [
 		const index = btn.parents('[data-index]').attr('data-index');
 		btn.siblings('.toggle').removeClass('hidden');
 		btn.addClass('hidden');
-		btn.parents('li').find('[name="enabled"]').val(disabled ? 'on' : '');
-		$('#active-navigation [data-index="' + index + '"] a').toggleClass('text-muted', !disabled);
+		btn
+			.parents('li')
+			.find('[name="enabled"]')
+			.val(disabled ? 'on' : '');
+		$('#active-navigation [data-index="' + index + '"] a').toggleClass(
+			'text-muted',
+			!disabled
+		);
 		return false;
 	}
 

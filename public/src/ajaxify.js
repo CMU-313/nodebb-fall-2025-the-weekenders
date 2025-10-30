@@ -24,7 +24,7 @@ ajaxify.widgets = { render: render };
 		history.scrollRestoration = 'manual';
 	}
 
-	ajaxify.check = (item) => {
+	ajaxify.check = item => {
 		/**
 		 * returns:
 		 *   true  (ajaxify OK)
@@ -32,9 +32,13 @@ ajaxify.widgets = { render: render };
 		 *   null  (no action)
 		 */
 		let urlObj;
-		let pathname = item instanceof Element ? item.getAttribute('href') : undefined;
+		let pathname =
+			item instanceof Element ? item.getAttribute('href') : undefined;
 		try {
-			urlObj = new URL(item, `${document.location.origin}${config.relative_path}`);
+			urlObj = new URL(
+				item,
+				`${document.location.origin}${config.relative_path}`
+			);
 			if (!pathname) {
 				({ pathname } = urlObj);
 			}
@@ -43,9 +47,14 @@ ajaxify.widgets = { render: render };
 			return false;
 		}
 
-		const internalLink = utils.isInternalURI(urlObj, window.location, config.relative_path);
+		const internalLink = utils.isInternalURI(
+			urlObj,
+			window.location,
+			config.relative_path
+		);
 
-		const hrefEmpty = href => href === undefined || href === '' || href === 'javascript:;';
+		const hrefEmpty = href =>
+			href === undefined || href === '' || href === 'javascript:;';
 
 		if (item instanceof Element) {
 			if (item.getAttribute('data-ajaxify') === 'false') {
@@ -56,7 +65,12 @@ ajaxify.widgets = { render: render };
 				return null;
 			}
 
-			if (hrefEmpty(urlObj.href) || urlObj.protocol === 'javascript:' || pathname === '#' || pathname === '') {
+			if (
+				hrefEmpty(urlObj.href) ||
+				urlObj.protocol === 'javascript:' ||
+				pathname === '#' ||
+				pathname === ''
+			) {
 				return null;
 			}
 		}
@@ -68,14 +82,19 @@ ajaxify.widgets = { render: render };
 			}
 
 			// Default behaviour for sitemap
-			if (String(pathname).startsWith(config.relative_path + '/sitemap') && pathname.endsWith('.xml')) {
+			if (
+				String(pathname).startsWith(config.relative_path + '/sitemap') &&
+				pathname.endsWith('.xml')
+			) {
 				return false;
 			}
 
 			// Default behaviour for uploads and direct links to API urls
-			if (['/uploads', '/assets/', '/api/'].some(function (prefix) {
-				return String(pathname).startsWith(config.relative_path + prefix);
-			})) {
+			if (
+				['/uploads', '/assets/', '/api/'].some(function (prefix) {
+					return String(pathname).startsWith(config.relative_path + prefix);
+				})
+			) {
 				return false;
 			}
 		}
@@ -99,7 +118,11 @@ ajaxify.widgets = { render: render };
 		}
 
 		// Abort subsequent requests if clicked multiple times within a short window of time
-		if (ajaxify.requestedPage === url && ajaxifyTimer && (Date.now() - ajaxifyTimer) < 500) {
+		if (
+			ajaxify.requestedPage === url &&
+			ajaxifyTimer &&
+			Date.now() - ajaxifyTimer < 500
+		) {
 			return true;
 		}
 		ajaxifyTimer = Date.now();
@@ -109,7 +132,11 @@ ajaxify.widgets = { render: render };
 			return true;
 		}
 
-		if (!quiet && url === ajaxify.currentPage + window.location.search + window.location.hash) {
+		if (
+			!quiet &&
+			url ===
+				ajaxify.currentPage + window.location.search + window.location.hash
+		) {
 			quiet = true;
 		}
 
@@ -119,15 +146,20 @@ ajaxify.widgets = { render: render };
 			apiXHR.abort();
 		}
 
-		app.previousUrl = !['reset'].includes(ajaxify.currentPage) ?
-			window.location.pathname.slice(config.relative_path.length) + window.location.search :
-			app.previousUrl;
+		app.previousUrl = !['reset'].includes(ajaxify.currentPage)
+			? window.location.pathname.slice(config.relative_path.length) +
+				window.location.search
+			: app.previousUrl;
 
 		url = ajaxify.start(url);
 
 		// If any listeners alter url and set it to an empty string, abort the ajaxification
 		if (url === null) {
-			hooks.fire('action:ajaxify.end', { url: url, tpl_url: ajaxify.data.template.name, title: ajaxify.data.title });
+			hooks.fire('action:ajaxify.end', {
+				url: url,
+				tpl_url: ajaxify.data.template.name,
+				title: ajaxify.data.title,
+			});
 			return false;
 		}
 
@@ -135,11 +167,13 @@ ajaxify.widgets = { render: render };
 		$('#footer, #content').removeClass('hide').addClass('ajaxifying');
 
 		ajaxify.loadData(url, function (err, data) {
-			if (!err || (
-				err &&
-				err.data &&
-				(parseInt(err.data.status, 10) !== 302 && parseInt(err.data.status, 10) !== 308)
-			)) {
+			if (
+				!err ||
+				(err &&
+					err.data &&
+					parseInt(err.data.status, 10) !== 302 &&
+					parseInt(err.data.status, 10) !== 308)
+			) {
 				ajaxify.updateHistory(url, quiet);
 			}
 
@@ -149,7 +183,12 @@ ajaxify.widgets = { render: render };
 
 			retry = true;
 
-			renderTemplate(url, data.templateToRender || data.template.name, data, callback);
+			renderTemplate(
+				url,
+				data.templateToRender || data.template.name,
+				data,
+				callback
+			);
 		});
 
 		return true;
@@ -157,7 +196,11 @@ ajaxify.widgets = { render: render };
 
 	// this function is called just once from footer on page load
 	ajaxify.coldLoad = function () {
-		const url = ajaxify.start(window.location.pathname.slice(1) + window.location.search + window.location.hash);
+		const url = ajaxify.start(
+			window.location.pathname.slice(1) +
+				window.location.search +
+				window.location.hash
+		);
 		ajaxify.updateHistory(url, true);
 		ajaxify.end(url, ajaxify.data.template.name);
 		hooks.fire('action:ajaxify.coldLoad');
@@ -169,8 +212,12 @@ ajaxify.widgets = { render: render };
 
 	ajaxify.handleRedirects = function (url) {
 		url = ajaxify.removeRelativePath(url.replace(/^\/|\/$/g, '')).toLowerCase();
-		const isClientToAdmin = url.startsWith('admin') && window.location.pathname.indexOf(config.relative_path + '/admin') !== 0;
-		const isAdminToClient = !url.startsWith('admin') && window.location.pathname.indexOf(config.relative_path + '/admin') === 0;
+		const isClientToAdmin =
+			url.startsWith('admin') &&
+			window.location.pathname.indexOf(config.relative_path + '/admin') !== 0;
+		const isAdminToClient =
+			!url.startsWith('admin') &&
+			window.location.pathname.indexOf(config.relative_path + '/admin') === 0;
 
 		if (isClientToAdmin || isAdminToClient) {
 			window.open(config.relative_path + '/' + url, '_top');
@@ -198,9 +245,13 @@ ajaxify.widgets = { render: render };
 		ajaxify.currentPage = url.split(/[?#]/)[0];
 		ajaxify.requestedPage = null;
 		if (window.history && window.history.pushState) {
-			window.history[!quiet ? 'pushState' : 'replaceState']({
-				url: url,
-			}, url, config.relative_path + '/' + url);
+			window.history[!quiet ? 'pushState' : 'replaceState'](
+				{
+					url: url,
+				},
+				url,
+				config.relative_path + '/' + url
+			);
 		}
 	};
 
@@ -225,7 +276,12 @@ ajaxify.widgets = { render: render };
 				}
 
 				$('#footer, #content').removeClass('hide').addClass('ajaxifying');
-				return renderTemplate(url, status.toString(), data.responseJSON || {}, callback);
+				return renderTemplate(
+					url,
+					status.toString(),
+					data.responseJSON || {},
+					callback
+				);
 			} else if (status === 401) {
 				alerts.error('[[global:please-log-in]]');
 				app.previousUrl = url;
@@ -237,7 +293,10 @@ ajaxify.widgets = { render: render };
 					window.location.href = data.responseJSON.external;
 				} else if (typeof data.responseJSON === 'string') {
 					ajaxifyTimer = undefined;
-					if (data.responseJSON.startsWith('http://') || data.responseJSON.startsWith('https://')) {
+					if (
+						data.responseJSON.startsWith('http://') ||
+						data.responseJSON.startsWith('https://')
+					) {
 						window.location.href = data.responseJSON;
 					} else {
 						ajaxify.go(data.responseJSON.slice(1), callback, quiet);
@@ -251,7 +310,8 @@ ajaxify.widgets = { render: render };
 
 	function renderTemplate(url, tpl_url, data, callback) {
 		hooks.fire('action:ajaxify.loadingTemplates', {});
-		benchpress.render(tpl_url, data)
+		benchpress
+			.render(tpl_url, data)
 			.then(rendered => translator.translate(rendered))
 			.then(function (translated) {
 				translated = translator.unescape(translated);
@@ -277,9 +337,15 @@ ajaxify.widgets = { render: render };
 			return;
 		}
 
-		title = config.titleLayout.replace(/&#123;/g, '{').replace(/&#125;/g, '}')
-			.replace('{pageTitle}', function () { return title; })
-			.replace('{browserTitle}', function () { return config.browserTitle; });
+		title = config.titleLayout
+			.replace(/&#123;/g, '{')
+			.replace(/&#125;/g, '}')
+			.replace('{pageTitle}', function () {
+				return title;
+			})
+			.replace('{browserTitle}', function () {
+				return config.browserTitle;
+			});
 
 		// Allow translation strings in title on ajaxify (#5927)
 		title = translator.unescape(title);
@@ -292,7 +358,13 @@ ajaxify.widgets = { render: render };
 	ajaxify.updateTitle = updateTitle;
 
 	function updateTags() {
-		const metaWhitelist = ['title', 'description', /og:.+/, /article:.+/, 'robots'].map(function (val) {
+		const metaWhitelist = [
+			'title',
+			'description',
+			/og:.+/,
+			/article:.+/,
+			'robots',
+		].map(function (val) {
 			return new RegExp(val);
 		});
 		const linkWhitelist = ['canonical', 'alternate', 'up'];
@@ -317,7 +389,8 @@ ajaxify.widgets = { render: render };
 				return metaWhitelist.some(function (exp) {
 					return !!exp.test(name);
 				});
-			}).forEach(async function (tagObj) {
+			})
+			.forEach(async function (tagObj) {
 				if (tagObj.content) {
 					tagObj.content = await translator.translate(tagObj.content);
 				}
@@ -327,7 +400,6 @@ ajaxify.widgets = { render: render };
 				});
 				document.head.appendChild(metaEl);
 			});
-
 
 		// Delete the old link tags
 		Array.prototype.slice
@@ -371,7 +443,11 @@ ajaxify.widgets = { render: render };
 			});
 		}
 		ajaxify.loadScript(tpl_url, function done() {
-			hooks.fire('action:ajaxify.end', { url: url, tpl_url: tpl_url, title: ajaxify.data.title });
+			hooks.fire('action:ajaxify.end', {
+				url: url,
+				tpl_url: tpl_url,
+				title: ajaxify.data.title,
+			});
 			hooks.logs.flush();
 		});
 		ajaxify.widgets.render(tpl_url);
@@ -403,7 +479,11 @@ ajaxify.widgets = { render: render };
 	};
 
 	ajaxify.refresh = function (callback) {
-		ajaxify.go(ajaxify.currentPage + window.location.search + window.location.hash, callback, true);
+		ajaxify.go(
+			ajaxify.currentPage + window.location.search + window.location.hash,
+			callback,
+			true
+		);
 	};
 
 	ajaxify.loadScript = function (tpl_url, callback) {
@@ -419,32 +499,36 @@ ajaxify.widgets = { render: render };
 
 		// Hint: useful if you want to load a module on a specific page (append module name to `scripts`)
 		hooks.fire('action:script.load', data);
-		hooks.fire('filter:script.load', data).then((data) => {
+		hooks.fire('filter:script.load', data).then(data => {
 			// Require and parse modules
 			let outstanding = data.scripts.length;
 
-			const scripts = data.scripts.map(function (script) {
-				if (typeof script === 'function') {
-					return function (next) {
-						script();
-						next();
-					};
-				}
-				if (typeof script === 'string') {
-					return async function (next) {
-						const module = await app.require(script);
-						// Hint: useful if you want to override a loaded library (e.g. replace core client-side logic),
-						// or call a method other than .init()
-						hooks.fire('static:script.init', { tpl_url, name: script, module }).then(() => {
-							if (module && module.init) {
-								module.init();
-							}
+			const scripts = data.scripts
+				.map(function (script) {
+					if (typeof script === 'function') {
+						return function (next) {
+							script();
 							next();
-						});
-					};
-				}
-				return null;
-			}).filter(Boolean);
+						};
+					}
+					if (typeof script === 'string') {
+						return async function (next) {
+							const module = await app.require(script);
+							// Hint: useful if you want to override a loaded library (e.g. replace core client-side logic),
+							// or call a method other than .init()
+							hooks
+								.fire('static:script.init', { tpl_url, name: script, module })
+								.then(() => {
+									if (module && module.init) {
+										module.init();
+									}
+									next();
+								});
+						};
+					}
+					return null;
+				})
+				.filter(Boolean);
 
 			if (scripts.length) {
 				scripts.forEach(function (fn) {
@@ -534,12 +618,21 @@ ajaxify.widgets = { render: render };
 	ajaxify.handleTransientElements = () => {
 		// todo: modals?
 
-		const elements = ['[component="notifications"]', '[component="chat/dropdown"]', '[component="sidebar/drafts"]', '[component="header/avatar"]']
-			.map(el => document.querySelector(`${el} .dropdown-menu.show`) || document.querySelector(`${el} + .dropdown-menu.show`))
+		const elements = [
+			'[component="notifications"]',
+			'[component="chat/dropdown"]',
+			'[component="sidebar/drafts"]',
+			'[component="header/avatar"]',
+		]
+			.map(
+				el =>
+					document.querySelector(`${el} .dropdown-menu.show`) ||
+					document.querySelector(`${el} + .dropdown-menu.show`)
+			)
 			.filter(Boolean);
 
 		if (elements.length) {
-			elements.forEach((el) => {
+			elements.forEach(el => {
 				el.classList.remove('show');
 			});
 		}
@@ -552,37 +645,56 @@ ajaxify.widgets = { render: render };
 	benchpress.setGlobal('config', config);
 	benchpress.render('500', {}); // loads and caches 500.tpl
 	benchpress.render('partials/toast'); // loads and caches partials/toast
-}());
+})();
 
 $(document).ready(function () {
-	window.addEventListener('popstate', (ev) => {
+	window.addEventListener('popstate', ev => {
 		if (ev !== null && ev.state) {
 			if (ev.state.url === null && ev.state.returnPath !== undefined) {
-				window.history.replaceState({
-					url: ev.state.returnPath,
-				}, ev.state.returnPath, config.relative_path + '/' + ev.state.returnPath);
+				window.history.replaceState(
+					{
+						url: ev.state.returnPath,
+					},
+					ev.state.returnPath,
+					config.relative_path + '/' + ev.state.returnPath
+				);
 			} else if (ev.state.url !== undefined) {
 				ajaxify.handleTransientElements();
-				ajaxify.go(ev.state.url, function () {
-					hooks.fire('action:popstate', { url: ev.state.url });
-				}, true);
+				ajaxify.go(
+					ev.state.url,
+					function () {
+						hooks.fire('action:popstate', { url: ev.state.url });
+					},
+					true
+				);
 			}
 		}
 	});
 
 	function ajaxifyAnchors() {
 		const location = document.location || window.location;
-		const rootUrl = location.protocol + '//' + (location.hostname || location.host) + (location.port ? ':' + location.port : '');
+		const rootUrl =
+			location.protocol +
+			'//' +
+			(location.hostname || location.host) +
+			(location.port ? ':' + location.port : '');
 		const contentEl = document.getElementById('content');
 
 		// Enhancing all anchors to ajaxify...
 		$(document.body).on('click', 'a', function (e) {
 			const _self = this;
-			if (this.target !== '' || (this.protocol !== 'http:' && this.protocol !== 'https:')) {
+			if (
+				this.target !== '' ||
+				(this.protocol !== 'http:' && this.protocol !== 'https:')
+			) {
 				return;
 			}
 
-			const internalLink = utils.isInternalURI(this, window.location, config.relative_path);
+			const internalLink = utils.isInternalURI(
+				this,
+				window.location,
+				config.relative_path
+			);
 			const rootAndPath = new RegExp(`^${rootUrl}${config.relative_path}/?`);
 			const process = function () {
 				if (!e.ctrlKey && !e.shiftKey && !e.metaKey && e.which === 1) {
@@ -590,21 +702,38 @@ $(document).ready(function () {
 						const pathname = this.href.replace(rootAndPath, '');
 
 						// Special handling for urls with hashes
-						if (window.location.pathname === this.pathname && this.hash.length) {
+						if (
+							window.location.pathname === this.pathname &&
+							this.hash.length
+						) {
 							window.location.hash = this.hash;
 						} else if (ajaxify.go(pathname)) {
 							e.preventDefault();
 						}
-					} else if (window.location.pathname !== config.relative_path + '/outgoing') {
-						if (config.openOutgoingLinksInNewTab && $.contains(contentEl, this)) {
+					} else if (
+						window.location.pathname !==
+						config.relative_path + '/outgoing'
+					) {
+						if (
+							config.openOutgoingLinksInNewTab &&
+							$.contains(contentEl, this)
+						) {
 							const externalTab = window.open();
 							externalTab.opener = null;
 							externalTab.location = this.href;
 							e.preventDefault();
 						} else if (config.useOutgoingLinksPage) {
-							const safeUrls = config.outgoingLinksWhitelist.trim().split(/[\s,]+/g).filter(Boolean);
+							const safeUrls = config.outgoingLinksWhitelist
+								.trim()
+								.split(/[\s,]+/g)
+								.filter(Boolean);
 							const href = this.href;
-							if (!safeUrls.length || !safeUrls.some(function (url) { return href.indexOf(url) !== -1; })) {
+							if (
+								!safeUrls.length ||
+								!safeUrls.some(function (url) {
+									return href.indexOf(url) !== -1;
+								})
+							) {
 								ajaxify.go('outgoing?url=' + encodeURIComponent(href));
 								e.preventDefault();
 							}
@@ -619,18 +748,25 @@ $(document).ready(function () {
 			const check = ajaxify.check(this);
 			switch (check) {
 				case true: {
-					if (app.flags && app.flags.hasOwnProperty('_unsaved') && app.flags._unsaved === true) {
+					if (
+						app.flags &&
+						app.flags.hasOwnProperty('_unsaved') &&
+						app.flags._unsaved === true
+					) {
 						if (e.ctrlKey) {
 							return;
 						}
 
 						require(['bootbox'], function (bootbox) {
-							bootbox.confirm('[[global:unsaved-changes]]', function (navigate) {
-								if (navigate) {
-									app.flags._unsaved = false;
-									process.call(_self);
+							bootbox.confirm(
+								'[[global:unsaved-changes]]',
+								function (navigate) {
+									if (navigate) {
+										app.flags._unsaved = false;
+										process.call(_self);
+									}
 								}
-							});
+							);
 						});
 						return e.preventDefault();
 					}

@@ -1,6 +1,10 @@
 'use strict';
 
-define('tagFilter', ['hooks', 'alerts', 'bootstrap'], function (hooks, alerts, bootstrap) {
+define('tagFilter', ['hooks', 'alerts', 'bootstrap'], function (
+	hooks,
+	alerts,
+	bootstrap
+) {
 	const tagFilter = {};
 
 	tagFilter.init = function (el, options) {
@@ -14,7 +18,8 @@ define('tagFilter', ['hooks', 'alerts', 'bootstrap'], function (hooks, alerts, b
 
 		const searchEl = el.find('[component="tag/filter/search"]');
 
-		options.selectedTags = options.selectedTags || ajaxify.data.selectedTags || [];
+		options.selectedTags =
+			options.selectedTags || ajaxify.data.selectedTags || [];
 
 		let tagList = null;
 
@@ -27,7 +32,8 @@ define('tagFilter', ['hooks', 'alerts', 'bootstrap'], function (hooks, alerts, b
 		}
 		initialTags = selectedTags.slice();
 
-		const toggleSearchVisibilty = searchEl.parents('[component="tag/filter"]').length &&
+		const toggleSearchVisibilty =
+			searchEl.parents('[component="tag/filter"]').length &&
 			app.user.privileges['search:tags'];
 
 		el.on('show.bs.dropdown', function () {
@@ -69,7 +75,6 @@ define('tagFilter', ['hooks', 'alerts', 'bootstrap'], function (hooks, alerts, b
 			searchEl.off('click');
 			searchEl.find('input').off('keyup');
 
-
 			let changed = initialTags.length !== selectedTags.length;
 			initialTags.forEach(function (tag, index) {
 				if (tag !== selectedTags[index]) {
@@ -79,13 +84,20 @@ define('tagFilter', ['hooks', 'alerts', 'bootstrap'], function (hooks, alerts, b
 			initialTags = selectedTags.slice();
 			if (changed) {
 				if (options.updateButton) {
-					options.updateButton({ el, changed: changed, selectedTags: selectedTags.slice() });
+					options.updateButton({
+						el,
+						changed: changed,
+						selectedTags: selectedTags.slice(),
+					});
 				} else if (options.updateButton !== false) {
 					updateFilterButton(el, selectedTags);
 				}
 			}
 			if (options.onHidden) {
-				options.onHidden({ changed: changed, selectedTags: selectedTags.slice() });
+				options.onHidden({
+					changed: changed,
+					selectedTags: selectedTags.slice(),
+				});
 				return;
 			}
 			if (changed) {
@@ -129,7 +141,9 @@ define('tagFilter', ['hooks', 'alerts', 'bootstrap'], function (hooks, alerts, b
 				selectedTags = [];
 			}
 
-			listEl.find('[data-tag=""] i').toggleClass('invisible', !!selectedTags.length);
+			listEl
+				.find('[data-tag=""] i')
+				.toggleClass('invisible', !!selectedTags.length);
 			options.selectedTags = selectedTags;
 			if (options.onSelect) {
 				options.onSelect({ tag: tag, selectedTags: selectedTags.slice() });
@@ -141,19 +155,26 @@ define('tagFilter', ['hooks', 'alerts', 'bootstrap'], function (hooks, alerts, b
 			let cids = null;
 			if (ajaxify.data.template.category || ajaxify.data.template.world) {
 				cids = [ajaxify.data.cid];
-			// selectedCids is avaiable on /recent, /unread, /popular etc.
-			} else if (Array.isArray(ajaxify.data.selectedCids) && ajaxify.data.selectedCids.length) {
+				// selectedCids is avaiable on /recent, /unread, /popular etc.
+			} else if (
+				Array.isArray(ajaxify.data.selectedCids) &&
+				ajaxify.data.selectedCids.length
+			) {
 				cids = ajaxify.data.selectedCids;
 			}
-			socket.emit('topics.tagFilterSearch', {
-				query: query,
-				cids: cids,
-			}, function (err, data) {
-				if (err) {
-					return alerts.error(err);
+			socket.emit(
+				'topics.tagFilterSearch',
+				{
+					query: query,
+					cids: cids,
+				},
+				function (err, data) {
+					if (err) {
+						return alerts.error(err);
+					}
+					callback(data);
 				}
-				callback(data);
-			});
+			);
 		}
 
 		function renderList(tags) {
@@ -162,18 +183,25 @@ define('tagFilter', ['hooks', 'alerts', 'bootstrap'], function (hooks, alerts, b
 				tag.selected = selectedTags.includes(tag.value);
 			});
 
-			app.parseAndTranslate(options.template, {
-				tagItems: tags.slice(0, 200),
-				selectedTag: ajaxify.data.selectedTag,
-			}, function (html) {
-				el.find('[component="tag/filter/list"]')
-					.html(html.find('[component="tag/filter/list"]').html());
+			app.parseAndTranslate(
+				options.template,
+				{
+					tagItems: tags.slice(0, 200),
+					selectedTag: ajaxify.data.selectedTag,
+				},
+				function (html) {
+					el.find('[component="tag/filter/list"]').html(
+						html.find('[component="tag/filter/list"]').html()
+					);
 
-				const bsDropdown = bootstrap.Dropdown.getInstance(el.find('.dropdown-toggle').get(0));
-				if (bsDropdown) {
-					bsDropdown.update();
+					const bsDropdown = bootstrap.Dropdown.getInstance(
+						el.find('.dropdown-toggle').get(0)
+					);
+					if (bsDropdown) {
+						bsDropdown.update();
+					}
 				}
-			});
+			);
 		}
 	};
 
@@ -186,11 +214,15 @@ define('tagFilter', ['hooks', 'alerts', 'bootstrap'], function (hooks, alerts, b
 			renderButton();
 		}
 		function renderButton(selectedTag) {
-			app.parseAndTranslate('partials/tags/filter-dropdown-content', {
-				selectedTag: selectedTag,
-			}, function (html) {
-				el.find('button').replaceWith($('<div/>').html(html).find('button'));
-			});
+			app.parseAndTranslate(
+				'partials/tags/filter-dropdown-content',
+				{
+					selectedTag: selectedTag,
+				},
+				function (html) {
+					el.find('button').replaceWith($('<div/>').html(html).find('button'));
+				}
+			);
 		}
 	}
 

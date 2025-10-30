@@ -12,24 +12,33 @@ define('handleBack', [
 	handleBack.init = function (_loadTopicsMethod) {
 		loadTopicsMethod = _loadTopicsMethod;
 		saveClickedIndex();
-		$(window).off('action:popstate', onBackClicked).on('action:popstate', onBackClicked);
+		$(window)
+			.off('action:popstate', onBackClicked)
+			.on('action:popstate', onBackClicked);
 	};
 
 	handleBack.onBackClicked = onBackClicked;
 
 	function saveClickedIndex() {
-		$('[component="category"]').on('click', '[component="topic/header"]', function () {
-			const clickedIndex = $(this).parents('[data-index]').attr('data-index');
-			const windowScrollTop = $(window).scrollTop();
-			$('[component="category/topic"]').each(function (index, el) {
-				if ($(el).offset().top - windowScrollTop > 0) {
-					storage.setItem('category:bookmark', $(el).attr('data-index'));
-					storage.setItem('category:bookmark:clicked', clickedIndex);
-					storage.setItem('category:bookmark:offset', $(el).offset().top - windowScrollTop);
-					return false;
-				}
-			});
-		});
+		$('[component="category"]').on(
+			'click',
+			'[component="topic/header"]',
+			function () {
+				const clickedIndex = $(this).parents('[data-index]').attr('data-index');
+				const windowScrollTop = $(window).scrollTop();
+				$('[component="category/topic"]').each(function (index, el) {
+					if ($(el).offset().top - windowScrollTop > 0) {
+						storage.setItem('category:bookmark', $(el).attr('data-index'));
+						storage.setItem('category:bookmark:clicked', clickedIndex);
+						storage.setItem(
+							'category:bookmark:offset',
+							$(el).offset().top - windowScrollTop
+						);
+						return false;
+					}
+				});
+			}
+		);
 	}
 
 	function onBackClicked(isMarkedUnread) {
@@ -53,7 +62,9 @@ define('handleBack', [
 			clickedIndex = Math.max(0, parseInt(clickedIndex, 10) || 0);
 
 			if (config.usePagination) {
-				const page = Math.ceil((parseInt(bookmarkIndex, 10) + 1) / config.topicsPerPage);
+				const page = Math.ceil(
+					(parseInt(bookmarkIndex, 10) + 1) / config.topicsPerPage
+				);
 				if (parseInt(page, 10) !== ajaxify.data.pagination.currentPage) {
 					pagination.loadPage(page, function () {
 						handleBack.scrollToTopic(bookmarkIndex, clickedIndex);

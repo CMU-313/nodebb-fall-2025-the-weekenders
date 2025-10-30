@@ -6,7 +6,9 @@ import * as categorySelector from '../../modules/categorySelector';
 export function init() {
 	categorySelector.init($('[component="category-selector"]'), {
 		onSelect: function (selectedCategory) {
-			ajaxify.go('admin/manage/categories/' + selectedCategory.cid + '/federation');
+			ajaxify.go(
+				'admin/manage/categories/' + selectedCategory.cid + '/federation'
+			);
 		},
 		showLinks: true,
 		template: 'admin/partials/category/selector-dropdown-right',
@@ -43,4 +45,3 @@ export function init() {
 		}
 	});
 }
-

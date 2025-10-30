@@ -1,6 +1,5 @@
 'use strict';
 
-
 define('sort', ['components'], function (components) {
 	const module = {};
 
@@ -8,7 +7,9 @@ define('sort', ['components'], function (components) {
 		const threadSort = components.get('thread/sort');
 		threadSort.find('i').removeClass('fa-check');
 		const currentSort = utils.params().sort || config[field];
-		const currentSetting = threadSort.find('a[data-sort="' + currentSort + '"]');
+		const currentSetting = threadSort.find(
+			'a[data-sort="' + currentSort + '"]'
+		);
 		currentSetting.find('i').addClass('fa-check');
 
 		$('body')

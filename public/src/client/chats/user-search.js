@@ -1,9 +1,10 @@
 'use strict';
 
-
-define('forum/chats/user-search', [
-	'components', 'api', 'alerts',
-], function (components, api, alerts) {
+define('forum/chats/user-search', ['components', 'api', 'alerts'], function (
+	components,
+	api,
+	alerts
+) {
 	const userSearch = {};
 	let users = [];
 
@@ -26,7 +27,9 @@ define('forum/chats/user-search', [
 		components.get('chat/search').val('');
 		removeResults(chatsListEl);
 		chatsListEl.find('[component="chat/search/no-users"]').addClass('hidden');
-		chatsListEl.find('[component="chat/search/start-typing"]').removeClass('hidden');
+		chatsListEl
+			.find('[component="chat/search/start-typing"]')
+			.removeClass('hidden');
 	}
 
 	function doSearch() {
@@ -35,12 +38,16 @@ define('forum/chats/user-search', [
 		if (!username) {
 			return clearInputAndResults(chatsListEl);
 		}
-		chatsListEl.find('[component="chat/search/start-typing"]').addClass('hidden');
-		api.get('/api/users', {
-			query: username,
-			searchBy: 'username',
-			paginate: false,
-		}).then(displayResults)
+		chatsListEl
+			.find('[component="chat/search/start-typing"]')
+			.addClass('hidden');
+		api
+			.get('/api/users', {
+				query: username,
+				searchBy: 'username',
+				paginate: false,
+			})
+			.then(displayResults)
 			.catch(alerts.error);
 	}
 
@@ -57,10 +64,16 @@ define('forum/chats/user-search', [
 		});
 		users = data.users;
 		if (!data.users.length) {
-			return chatsListEl.find('[component="chat/search/no-users"]').removeClass('hidden');
+			return chatsListEl
+				.find('[component="chat/search/no-users"]')
+				.removeClass('hidden');
 		}
 		chatsListEl.find('[component="chat/search/no-users"]').addClass('hidden');
-		const html = await app.parseAndTranslate('modals/create-room', 'searchUsers', { searchUsers: data.users });
+		const html = await app.parseAndTranslate(
+			'modals/create-room',
+			'searchUsers',
+			{ searchUsers: data.users }
+		);
 		chatsListEl.append(html);
 		chatsListEl.parent().toggleClass('show', true);
 	}

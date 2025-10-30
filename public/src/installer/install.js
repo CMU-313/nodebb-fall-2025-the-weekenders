@@ -29,7 +29,8 @@ $('document').ready(function () {
 				if (res.success) {
 					$('#database-success').removeClass('hidden');
 					if (res.dbfull) {
-						$('#database-full').removeClass('hidden')
+						$('#database-full')
+							.removeClass('hidden')
 							.text('Found existing install in this database!');
 					}
 				} else if (res.error) {
@@ -120,10 +121,15 @@ $('document').ready(function () {
 			if (!utils.isPasswordValid(field)) {
 				parent.addClass('error');
 				help.html('Invalid Password.');
-			} else if (field.length < $('[name="admin:password"]').attr('data-minimum-length')) {
+			} else if (
+				field.length < $('[name="admin:password"]').attr('data-minimum-length')
+			) {
 				parent.addClass('error');
 				help.html('Password is too short.');
-			} else if (zxcvbn(field).score < parseInt($('[name="admin:password"]').attr('data-minimum-strength'), 10)) {
+			} else if (
+				zxcvbn(field).score <
+				parseInt($('[name="admin:password"]').attr('data-minimum-strength'), 10)
+			) {
 				parent.addClass('error');
 				help.html('Password is too weak.');
 			} else {
@@ -132,7 +138,10 @@ $('document').ready(function () {
 		}
 
 		function validateConfirmPassword() {
-			if ($('[name="admin:password"]').val() !== $('[name="admin:passwordConfirm"]').val()) {
+			if (
+				$('[name="admin:password"]').val() !==
+				$('[name="admin:passwordConfirm"]').val()
+			) {
 				parent.addClass('error');
 				help.html('Passwords do not match.');
 			} else {

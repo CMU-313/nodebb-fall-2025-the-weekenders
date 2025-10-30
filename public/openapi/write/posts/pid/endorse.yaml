@@ -12,7 +12,7 @@ put:
         type: string
       required: true
       description: Post ID to endorse
-      example: "1"
+      example: '1'
   responses:
     '200':
       description: Post successfully endorsed
@@ -80,7 +80,7 @@ delete:
         type: string
       required: true
       description: Post ID to unendorse
-      example: "1"
+      example: '1'
   responses:
     '200':
       description: Post endorsement successfully removed

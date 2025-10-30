@@ -1,7 +1,10 @@
 'use strict';
 
 define('categorySelector', [
-	'categorySearch', 'bootbox', 'hooks', 'translator',
+	'categorySearch',
+	'bootbox',
+	'hooks',
+	'translator',
 ], function (categorySearch, bootbox, hooks, translator) {
 	const categorySelector = {};
 
@@ -12,9 +15,18 @@ define('categorySelector', [
 		options = options || {};
 		const onSelect = options.onSelect || function () {};
 
-		options.states = options.states || ['watching', 'tracking', 'notwatching', 'ignoring'];
-		options.template = options.template || 'partials/category/selector-dropdown-left';
-		hooks.fire('action:category.selector.options', { el: el, options: options });
+		options.states = options.states || [
+			'watching',
+			'tracking',
+			'notwatching',
+			'ignoring',
+		];
+		options.template =
+			options.template || 'partials/category/selector-dropdown-left';
+		hooks.fire('action:category.selector.options', {
+			el: el,
+			options: options,
+		});
 
 		categorySearch.init(el, options);
 
@@ -32,9 +44,11 @@ define('categorySelector', [
 			return onSelect(selector.selectedCategory);
 		});
 
-		let defaultSelectHtml = selector.el.find('[component="category-selector-selected"]').html();
+		let defaultSelectHtml = selector.el
+			.find('[component="category-selector-selected"]')
+			.html();
 
-		translator.translate(defaultSelectHtml, (translated) => {
+		translator.translate(defaultSelectHtml, translated => {
 			defaultSelectHtml = translated;
 		});
 		selector.selectCategory = function (cid) {
@@ -45,13 +59,13 @@ define('categorySelector', [
 			};
 
 			if (categoryEl.length) {
-				selector.el.find('[component="category-selector-selected"]').html(
-					categoryEl.find('[component="category-markup"]').html()
-				);
+				selector.el
+					.find('[component="category-selector-selected"]')
+					.html(categoryEl.find('[component="category-markup"]').html());
 			} else {
-				selector.el.find('[component="category-selector-selected"]').html(
-					defaultSelectHtml
-				);
+				selector.el
+					.find('[component="category-selector-selected"]')
+					.html(defaultSelectHtml);
 			}
 		};
 		selector.getSelectedCategory = function () {
@@ -62,11 +76,15 @@ define('categorySelector', [
 		};
 
 		if (options.hasOwnProperty('selectedCategory')) {
-			app.parseAndTranslate(options.template, { selectedCategory: options.selectedCategory }, function (html) {
-				selector.el.find('[component="category-selector-selected"]').html(
-					html.find('[component="category-selector-selected"]').html()
-				);
-			});
+			app.parseAndTranslate(
+				options.template,
+				{ selectedCategory: options.selectedCategory },
+				function (html) {
+					selector.el
+						.find('[component="category-selector-selected"]')
+						.html(html.find('[component="category-selector-selected"]').html());
+				}
+			);
 		}
 		return selector;
 	};
@@ -75,35 +93,42 @@ define('categorySelector', [
 		options = options || {};
 		options.onSelect = options.onSelect || function () {};
 		options.onSubmit = options.onSubmit || function () {};
-		app.parseAndTranslate('admin/partials/categories/select-category', { message: options.message }, function (html) {
-			const modal = bootbox.dialog({
-				title: options.title || '[[modules:composer.select-category]]',
-				message: html,
-				buttons: {
-					save: {
-						label: '[[global:select]]',
-						className: 'btn-primary',
-						callback: submit,
+		app.parseAndTranslate(
+			'admin/partials/categories/select-category',
+			{ message: options.message },
+			function (html) {
+				const modal = bootbox.dialog({
+					title: options.title || '[[modules:composer.select-category]]',
+					message: html,
+					buttons: {
+						save: {
+							label: '[[global:select]]',
+							className: 'btn-primary',
+							callback: submit,
+						},
 					},
-				},
-			});
-
-			const selector = categorySelector.init(modal.find('[component="category-selector"]'), options);
-			function submit(ev) {
-				ev.preventDefault();
-				if (selector.selectedCategory) {
-					options.onSubmit(selector.selectedCategory);
-					modal.modal('hide');
-				}
-				return false;
-			}
-			if (options.openOnLoad) {
-				modal.on('shown.bs.modal', function () {
-					modal.find('.dropdown-toggle').dropdown('toggle');
 				});
+
+				const selector = categorySelector.init(
+					modal.find('[component="category-selector"]'),
+					options
+				);
+				function submit(ev) {
+					ev.preventDefault();
+					if (selector.selectedCategory) {
+						options.onSubmit(selector.selectedCategory);
+						modal.modal('hide');
+					}
+					return false;
+				}
+				if (options.openOnLoad) {
+					modal.on('shown.bs.modal', function () {
+						modal.find('.dropdown-toggle').dropdown('toggle');
+					});
+				}
+				modal.find('form').on('submit', submit);
 			}
-			modal.find('form').on('submit', submit);
-		});
+		);
 	};
 
 	return categorySelector;

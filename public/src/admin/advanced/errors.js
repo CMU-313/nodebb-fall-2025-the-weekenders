@@ -22,7 +22,6 @@ Chart.register(
 	Filler
 );
 
-
 export function init() {
 	setupCharts();
 

@@ -7,7 +7,12 @@ describe('integration: anonymous post masking flow', function () {
 
 	it('masks for non-staff and not for author/staff', async () => {
 		const anon = require('../../src/topics/anonymous');
-		const post = { uid: 101, isAnonymous: 1, user: { username: 'Alice' }, userslug: 'alice' };
+		const post = {
+			uid: 101,
+			isAnonymous: 1,
+			user: { username: 'Alice' },
+			userslug: 'alice',
+		};
 
 		const other = JSON.parse(JSON.stringify(post));
 		anon.applyAnonymousMask(other, 999, false);

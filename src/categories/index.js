@@ -1,4 +1,3 @@
-
 'use strict';
 
 const _ = require('lodash');
@@ -30,7 +29,9 @@ Categories.icons = require('./icon');
 Categories.exists = async function (cids) {
 	let keys;
 	if (Array.isArray(cids)) {
-		keys = cids.map(cid => (utils.isNumber(cid) ? `category:${cid}` : `categoryRemote:${cid}`));
+		keys = cids.map(cid =>
+			utils.isNumber(cid) ? `category:${cid}` : `categoryRemote:${cid}`
+		);
 	} else {
 		keys = utils.isNumber(cids) ? `category:${cids}` : `categoryRemote:${cids}`;
 	}
@@ -58,13 +59,16 @@ Categories.getCategoryById = async function (data) {
 		Categories.getTopicCount(data),
 		Categories.getWatchState([data.cid], data.uid),
 		getChildrenTree(category, data.uid),
-		!utils.isNumber(data.cid) ? activitypub.actors.getLocalFollowers(data.cid) : null,
+		!utils.isNumber(data.cid)
+			? activitypub.actors.getLocalFollowers(data.cid)
+			: null,
 	];
 
 	if (category.parentCid) {
 		promises.push(Categories.getCategoryData(category.parentCid));
 	}
-	const [topics, topicCount, watchState, , localFollowers, parent] = await Promise.all(promises);
+	const [topics, topicCount, watchState, , localFollowers, parent] =
+		await Promise.all(promises);
 
 	category.topics = topics.topics;
 	category.nextStart = topics.nextStart;
@@ -73,7 +77,9 @@ Categories.getCategoryById = async function (data) {
 	category.isTracked = watchState[0] === Categories.watchStates.tracking;
 	category.isNotWatched = watchState[0] === Categories.watchStates.notwatching;
 	category.isIgnored = watchState[0] === Categories.watchStates.ignoring;
-	category.hasFollowers = localFollowers ? (localFollowers.uids.size + localFollowers.cids.size) > 0 : localFollowers;
+	category.hasFollowers = localFollowers
+		? localFollowers.uids.size + localFollowers.cids.size > 0
+		: localFollowers;
 	category.parent = parent;
 
 	calculateTopicPostCount(category);
@@ -127,7 +133,12 @@ Categories.getCategoriesByPrivilege = async function (set, uid, privilege) {
 
 Categories.getModerators = async function (cid) {
 	const uids = await Categories.getModeratorUids([cid]);
-	return await user.getUsersFields(uids[0], ['uid', 'username', 'userslug', 'picture']);
+	return await user.getUsersFields(uids[0], [
+		'uid',
+		'username',
+		'userslug',
+		'picture',
+	]);
 };
 
 Categories.getModeratorUids = async function (cids) {
@@ -185,7 +196,7 @@ Categories.setUnread = async function (tree, cids, uid) {
 Categories.getTagWhitelist = async function (cids) {
 	const cachedData = {};
 
-	const nonCachedCids = cids.filter((cid) => {
+	const nonCachedCids = cids.filter(cid => {
 		const data = cache.get(`cid:${cid}:tag:whitelist`);
 		const isInCache = data !== undefined;
 		if (isInCache) {
@@ -225,7 +236,7 @@ function calculateTopicPostCount(category) {
 	let postCount = category.post_count;
 	let topicCount = category.topic_count;
 	if (Array.isArray(category.children)) {
-		category.children.forEach((child) => {
+		category.children.forEach(child => {
 			calculateTopicPostCount(child);
 			postCount += parseInt(child.totalPostCount, 10) || 0;
 			topicCount += parseInt(child.totalTopicCount, 10) || 0;
@@ -238,8 +249,12 @@ function calculateTopicPostCount(category) {
 Categories.calculateTopicPostCount = calculateTopicPostCount;
 
 Categories.getParents = async function (cids) {
-	const categoriesData = await Categories.getCategoriesFields(cids, ['parentCid']);
-	const parentCids = categoriesData.filter(c => c && c.parentCid).map(c => c.parentCid);
+	const categoriesData = await Categories.getCategoriesFields(cids, [
+		'parentCid',
+	]);
+	const parentCids = categoriesData
+		.filter(c => c && c.parentCid)
+		.map(c => c.parentCid);
 	if (!parentCids.length) {
 		return cids.map(() => null);
 	}
@@ -249,16 +264,27 @@ Categories.getParents = async function (cids) {
 };
 
 Categories.getChildren = async function (cids, uid) {
-	const categoryData = await Categories.getCategoriesFields(cids, ['parentCid']);
-	const categories = categoryData.map((category, index) => ({ cid: cids[index], parentCid: category.parentCid }));
+	const categoryData = await Categories.getCategoriesFields(cids, [
+		'parentCid',
+	]);
+	const categories = categoryData.map((category, index) => ({
+		cid: cids[index],
+		parentCid: category.parentCid,
+	}));
 	await Promise.all(categories.map(c => getChildrenTree(c, uid)));
 	return categories.map(c => c && c.children);
 };
 
 async function getChildrenTree(category, uid) {
 	let childrenCids = await Categories.getChildrenCids(category.cid);
-	childrenCids = await privileges.categories.filterCids('find', childrenCids, uid);
-	childrenCids = childrenCids.filter(cid => parseInt(category.cid, 10) !== parseInt(cid, 10));
+	childrenCids = await privileges.categories.filterCids(
+		'find',
+		childrenCids,
+		uid
+	);
+	childrenCids = childrenCids.filter(
+		cid => parseInt(category.cid, 10) !== parseInt(cid, 10)
+	);
 	if (!childrenCids.length) {
 		category.children = [];
 		return;
@@ -289,7 +315,9 @@ Categories.getChildrenCids = async function (rootCid) {
 	async function recursive(keys) {
 		let childrenCids = await db.getSortedSetRange(keys, 0, -1);
 
-		childrenCids = childrenCids.filter(cid => !allCids.includes(parseInt(cid, 10)));
+		childrenCids = childrenCids.filter(
+			cid => !allCids.includes(parseInt(cid, 10))
+		);
 		if (!childrenCids.length) {
 			return;
 		}
@@ -311,7 +339,7 @@ Categories.getChildrenCids = async function (rootCid) {
 };
 
 Categories.flattenCategories = function (allCategories, categoryData) {
-	categoryData.forEach((category) => {
+	categoryData.forEach(category => {
 		if (category) {
 			allCategories.push(category);
 
@@ -343,13 +371,16 @@ Categories.getTree = function (categories, parentCid) {
 
 	const tree = [];
 
-	categories.forEach((category) => {
+	categories.forEach(category => {
 		if (category) {
 			category.children = category.children || [];
 			if (!category.cid) {
 				return;
 			}
-			if (!category.hasOwnProperty('parentCid') || category.parentCid === null) {
+			if (
+				!category.hasOwnProperty('parentCid') ||
+				category.parentCid === null
+			) {
 				category.parentCid = 0;
 			}
 			if (category.parentCid === parentCid) {
@@ -372,7 +403,7 @@ Categories.getTree = function (categories, parentCid) {
 			}
 			return a.cid - b.cid;
 		});
-		tree.forEach((category) => {
+		tree.forEach(category => {
 			if (category && Array.isArray(category.children)) {
 				sortTree(category.children);
 			}
@@ -385,7 +416,11 @@ Categories.getTree = function (categories, parentCid) {
 };
 
 Categories.buildForSelect = async function (uid, privilege, fields) {
-	const cids = await Categories.getCidsByPrivilege('categories:cid', uid, privilege);
+	const cids = await Categories.getCidsByPrivilege(
+		'categories:cid',
+		uid,
+		privilege
+	);
 	return await getSelectData(cids, fields);
 };
 
@@ -409,13 +444,22 @@ Categories.buildForSelectCategories = function (categories, fields, parentCid) {
 		category.depth = depth;
 		categoriesData.push(category);
 		if (Array.isArray(category.children)) {
-			category.children.forEach(child => recursive(child, categoriesData, `&nbsp;&nbsp;&nbsp;&nbsp;${level}`, depth + 1));
+			category.children.forEach(child =>
+				recursive(
+					child,
+					categoriesData,
+					`&nbsp;&nbsp;&nbsp;&nbsp;${level}`,
+					depth + 1
+				)
+			);
 		}
 	}
 	parentCid = parentCid || 0;
 	const categoriesData = [];
 
-	const rootCategories = categories.filter(category => category && category.parentCid === parentCid);
+	const rootCategories = categories.filter(
+		category => category && category.parentCid === parentCid
+	);
 
 	rootCategories.sort((a, b) => {
 		if (a.order !== b.order) {
@@ -424,11 +468,20 @@ Categories.buildForSelectCategories = function (categories, fields, parentCid) {
 		return a.cid - b.cid;
 	});
 
-	rootCategories.forEach(category => recursive(category, categoriesData, '', 0));
+	rootCategories.forEach(category =>
+		recursive(category, categoriesData, '', 0)
+	);
 
 	const pickFields = [
-		'cid', 'name', 'level', 'icon', 'parentCid',
-		'color', 'bgColor', 'backgroundImage', 'imageClass',
+		'cid',
+		'name',
+		'level',
+		'icon',
+		'parentCid',
+		'color',
+		'bgColor',
+		'backgroundImage',
+		'imageClass',
 	];
 	fields = fields || [];
 	if (fields.includes('text') && fields.includes('value')) {

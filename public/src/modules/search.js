@@ -1,7 +1,11 @@
 'use strict';
 
 define('search', [
-	'translator', 'storage', 'hooks', 'alerts', 'bootstrap',
+	'translator',
+	'storage',
+	'hooks',
+	'alerts',
+	'bootstrap',
 ], function (translator, storage, hooks, alerts, bootstrap) {
 	const Search = {
 		current: {},
@@ -12,7 +16,9 @@ define('search', [
 			return;
 		}
 
-		searchOptions = searchOptions || { in: config.searchDefaultInQuick || 'titles' };
+		searchOptions = searchOptions || {
+			in: config.searchDefaultInQuick || 'titles',
+		};
 		const searchForm = $('[component="search/form"]');
 		searchForm.each((index, form) => {
 			init($(form), searchOptions);
@@ -95,7 +101,10 @@ define('search', [
 			return;
 		}
 
-		const searchOptions = Object.assign({ in: config.searchDefaultInQuick || 'titles' }, options.searchOptions);
+		const searchOptions = Object.assign(
+			{ in: config.searchDefaultInQuick || 'titles' },
+			options.searchOptions
+		);
 		const quickSearchResults = options.searchElements.resultEl;
 		const inputEl = options.searchElements.inputEl;
 		let oldValue = inputEl.val();
@@ -103,12 +112,18 @@ define('search', [
 
 		function updateCategoryFilterName() {
 			if (ajaxify.data.template.category && ajaxify.data.cid) {
-				translator.translate('[[search:search-in-category, ' + ajaxify.data.name + ']]', function (translated) {
-					const name = $('<div></div>').html(translated).text();
-					filterCategoryEl.find('.name').text(name);
-				});
+				translator.translate(
+					'[[search:search-in-category, ' + ajaxify.data.name + ']]',
+					function (translated) {
+						const name = $('<div></div>').html(translated).text();
+						filterCategoryEl.find('.name').text(name);
+					}
+				);
 			}
-			filterCategoryEl.toggleClass('hidden', !(ajaxify.data.template.category && ajaxify.data.cid));
+			filterCategoryEl.toggleClass(
+				'hidden',
+				!(ajaxify.data.template.category && ajaxify.data.cid)
+			);
 		}
 
 		function doSearch() {
@@ -124,7 +139,10 @@ define('search', [
 			}
 
 			if (!options.hideDuringSearch) {
-				quickSearchResults.removeClass('hidden').find('.quick-search-results-container').html('');
+				quickSearchResults
+					.removeClass('hidden')
+					.find('.quick-search-results-container')
+					.html('');
 				quickSearchResults.find('.loading-indicator').removeClass('hidden');
 			}
 
@@ -134,83 +152,124 @@ define('search', [
 				quickSearchResults.find('.loading-indicator').addClass('hidden');
 
 				if (options.searchOptions.in === 'categories') {
-					if (!data.categories || (options.hideOnNoMatches && !data.categories.length)) {
-						return quickSearchResults.addClass('hidden').find('.quick-search-results-container').html('');
+					if (
+						!data.categories ||
+						(options.hideOnNoMatches && !data.categories.length)
+					) {
+						return quickSearchResults
+							.addClass('hidden')
+							.find('.quick-search-results-container')
+							.html('');
 					}
 
-					data.dropdown = { maxWidth: '400px', maxHeight: '500px', ...options.dropdown };
-					app.parseAndTranslate('partials/quick-category-search-results', data, (html) => {
-						if (html.length) {
-							html.find('.timeago').timeago();
-						}
-						quickSearchResults.toggleClass('hidden', !html.length || !inputEl.is(':focus'))
-							.find('.quick-search-results-container')
-							.html(html.length ? html : '');
+					data.dropdown = {
+						maxWidth: '400px',
+						maxHeight: '500px',
+						...options.dropdown,
+					};
+					app.parseAndTranslate(
+						'partials/quick-category-search-results',
+						data,
+						html => {
+							if (html.length) {
+								html.find('.timeago').timeago();
+							}
+							quickSearchResults
+								.toggleClass('hidden', !html.length || !inputEl.is(':focus'))
+								.find('.quick-search-results-container')
+								.html(html.length ? html : '');
 
-						hooks.fire('action:search.quick.complete', {
-							data: data,
-							options: options,
-						});
-					});
+							hooks.fire('action:search.quick.complete', {
+								data: data,
+								options: options,
+							});
+						}
+					);
 				} else {
 					if (!data.posts || (options.hideOnNoMatches && !data.posts.length)) {
-						return quickSearchResults.addClass('hidden').find('.quick-search-results-container').html('');
+						return quickSearchResults
+							.addClass('hidden')
+							.find('.quick-search-results-container')
+							.html('');
 					}
 					data.posts.forEach(function (p) {
 						const text = $('<div>' + p.content + '</div>').text();
-						const query = inputEl.val().toLowerCase().replace(/^in:topic-\d+/, '');
+						const query = inputEl
+							.val()
+							.toLowerCase()
+							.replace(/^in:topic-\d+/, '');
 						const start = Math.max(0, text.toLowerCase().indexOf(query) - 40);
-						p.snippet = utils.escapeHTML((start > 0 ? '...' : '') +
-							text.slice(start, start + 80) +
-							(text.length - start > 80 ? '...' : ''));
-					});
-					data.dropdown = { maxWidth: '400px', maxHeight: '500px', ...options.dropdown };
-					app.parseAndTranslate('partials/quick-search-results', data, function (html) {
-						if (html.length) {
-							html.find('.timeago').timeago();
-						}
-						quickSearchResults.toggleClass('hidden', !html.length || !inputEl.is(':focus'))
-							.find('.quick-search-results-container')
-							.html(html.length ? html : '');
-						const highlightEls = quickSearchResults.find(
-							'.quick-search-results .quick-search-title, .quick-search-results .snippet'
+						p.snippet = utils.escapeHTML(
+							(start > 0 ? '...' : '') +
+								text.slice(start, start + 80) +
+								(text.length - start > 80 ? '...' : '')
 						);
-						Search.highlightMatches(options.searchOptions.term, highlightEls);
-						hooks.fire('action:search.quick.complete', {
-							data: data,
-							options: options,
-						});
 					});
+					data.dropdown = {
+						maxWidth: '400px',
+						maxHeight: '500px',
+						...options.dropdown,
+					};
+					app.parseAndTranslate(
+						'partials/quick-search-results',
+						data,
+						function (html) {
+							if (html.length) {
+								html.find('.timeago').timeago();
+							}
+							quickSearchResults
+								.toggleClass('hidden', !html.length || !inputEl.is(':focus'))
+								.find('.quick-search-results-container')
+								.html(html.length ? html : '');
+							const highlightEls = quickSearchResults.find(
+								'.quick-search-results .quick-search-title, .quick-search-results .snippet'
+							);
+							Search.highlightMatches(options.searchOptions.term, highlightEls);
+							hooks.fire('action:search.quick.complete', {
+								data: data,
+								options: options,
+							});
+						}
+					);
 				}
 			});
 		}
 
-		quickSearchResults.find('.filter-category input[type="checkbox"]').on('change', function () {
-			inputEl.focus();
-			doSearch();
-		});
-
-		inputEl.off('keyup').on('keyup', utils.debounce(function () {
-			if (inputEl.val().length < 3) {
-				quickSearchResults.addClass('hidden');
-				oldValue = inputEl.val();
-				return;
-			}
-			if (inputEl.val() === oldValue) {
-				return;
-			}
-			oldValue = inputEl.val();
-			if (!inputEl.is(':focus')) {
-				return quickSearchResults.addClass('hidden');
-			}
-			doSearch();
-		}, 500));
-
-		quickSearchResults.on('mousedown', '.quick-search-results > *', function () {
-			$(window).one('mouseup', function () {
-				quickSearchResults.addClass('hidden');
+		quickSearchResults
+			.find('.filter-category input[type="checkbox"]')
+			.on('change', function () {
+				inputEl.focus();
+				doSearch();
 			});
-		});
+
+		inputEl.off('keyup').on(
+			'keyup',
+			utils.debounce(function () {
+				if (inputEl.val().length < 3) {
+					quickSearchResults.addClass('hidden');
+					oldValue = inputEl.val();
+					return;
+				}
+				if (inputEl.val() === oldValue) {
+					return;
+				}
+				oldValue = inputEl.val();
+				if (!inputEl.is(':focus')) {
+					return quickSearchResults.addClass('hidden');
+				}
+				doSearch();
+			}, 500)
+		);
+
+		quickSearchResults.on(
+			'mousedown',
+			'.quick-search-results > *',
+			function () {
+				$(window).one('mouseup', function () {
+					quickSearchResults.addClass('hidden');
+				});
+			}
+		);
 
 		const inputParent = inputEl.parent();
 		const resultParent = quickSearchResults.parent();
@@ -218,7 +277,11 @@ define('search', [
 		resultParent.on('focusout', hideResults);
 		function hideResults() {
 			setTimeout(function () {
-				if (!inputParent.find(':focus').length && !resultParent.find(':focus').length && !quickSearchResults.hasClass('hidden')) {
+				if (
+					!inputParent.find(':focus').length &&
+					!resultParent.find(':focus').length &&
+					!quickSearchResults.hasClass('hidden')
+				) {
 					quickSearchResults.addClass('hidden');
 				}
 			}, 200);
@@ -235,7 +298,10 @@ define('search', [
 		inputEl.on('focus', function () {
 			const query = inputEl.val();
 			oldValue = query;
-			if (query && quickSearchResults.find('#quick-search-results').children().length) {
+			if (
+				query &&
+				quickSearchResults.find('#quick-search-results').children().length
+			) {
 				updateCategoryFilterName();
 				if (ajaxified) {
 					doSearch();
@@ -257,16 +323,20 @@ define('search', [
 
 	Search.showAndFocusInput = function (form) {
 		const parentDropdown = form.parents('.dropdown-menu');
-		if (parentDropdown.length) { // handle if form is inside a dropdown aka harmony
+		if (parentDropdown.length) {
+			// handle if form is inside a dropdown aka harmony
 			const toggle = parentDropdown.siblings('[data-bs-toggle]');
 			const dropdownEl = bootstrap.Dropdown.getOrCreateInstance(toggle[0]);
 			if (dropdownEl) {
 				dropdownEl.show();
 			}
-		} else { // persona and others
+		} else {
+			// persona and others
 			form.find('[component="search/fields"]').removeClass('hidden');
 			form.find('[component="search/button"]').addClass('hidden');
-			form.find('[component="search/fields"] input[name="query"]').trigger('focus');
+			form
+				.find('[component="search/fields"] input[name="query"]')
+				.trigger('focus');
 		}
 	};
 
@@ -276,11 +346,13 @@ define('search', [
 	};
 
 	Search.api = function (data, callback) {
-		const apiURL = config.relative_path + '/api/search?' + createQueryString(data);
+		const apiURL =
+			config.relative_path + '/api/search?' + createQueryString(data);
 		if (data.hasOwnProperty('searchOnly')) {
 			delete data.searchOnly;
 		}
-		const searchURL = config.relative_path + '/search?' + createQueryString(data);
+		const searchURL =
+			config.relative_path + '/search?' + createQueryString(data);
 		$.get(apiURL, function (result) {
 			result.url = searchURL;
 			callback(result);
@@ -318,10 +390,15 @@ define('search', [
 		if (!searchQuery || !els.length) {
 			return;
 		}
-		searchQuery = utils.escapeHTML(searchQuery.replace(/^"/, '').replace(/"$/, '').trim());
-		const regexStr = searchQuery.split(' ')
+		searchQuery = utils.escapeHTML(
+			searchQuery.replace(/^"/, '').replace(/"$/, '').trim()
+		);
+		const regexStr = searchQuery
+			.split(' ')
 			.filter(word => word.length > 1)
-			.map(function (word) { return utils.escapeRegexChars(word); })
+			.map(function (word) {
+				return utils.escapeRegexChars(word);
+			})
 			.join('|');
 		const regex = new RegExp('(' + regexStr + ')', 'gi');
 
@@ -334,18 +411,28 @@ define('search', [
 				nested.push($('<div></div>').append($(this)));
 			});
 
-			result.html(result.html().replace(regex, function (match, p1) {
-				return '<strong class="search-match fw-bold text-decoration-underline">' + p1 + '</strong>';
-			}));
+			result.html(
+				result.html().replace(regex, function (match, p1) {
+					return (
+						'<strong class="search-match fw-bold text-decoration-underline">' +
+						p1 +
+						'</strong>'
+					);
+				})
+			);
 
 			nested.forEach(function (nestedEl, i) {
-				result.html(result.html().replace('<!-- ' + i + ' -->', function () {
-					return nestedEl.html();
-				}));
+				result.html(
+					result.html().replace('<!-- ' + i + ' -->', function () {
+						return nestedEl.html();
+					})
+				);
 			});
 		});
 
-		$('.search-results .content').find('img:not(.not-responsive)').addClass('img-fluid');
+		$('.search-results .content')
+			.find('img:not(.not-responsive)')
+			.addClass('img-fluid');
 	};
 
 	return Search;

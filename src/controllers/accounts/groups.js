@@ -11,7 +11,10 @@ const groupsController = module.exports;
 const url = nconf.get('url');
 
 groupsController.get = async function (req, res) {
-	const { username, userslug } = await user.getUserFields(res.locals.uid, ['username', 'userslug']);
+	const { username, userslug } = await user.getUserFields(res.locals.uid, [
+		'username',
+		'userslug',
+	]);
 
 	const payload = res.locals.userData;
 
@@ -24,7 +27,10 @@ groupsController.get = async function (req, res) {
 	});
 	payload.groups = groupsData;
 	payload.title = `[[pages:account/groups, ${username}]]`;
-	payload.breadcrumbs = helpers.buildBreadcrumbs([{ text: username, url: `/user/${userslug}` }, { text: '[[global:header.groups]]' }]);
+	payload.breadcrumbs = helpers.buildBreadcrumbs([
+		{ text: username, url: `/user/${userslug}` },
+		{ text: '[[global:header.groups]]' },
+	]);
 	res.locals.linkTags = [
 		{
 			rel: 'canonical',

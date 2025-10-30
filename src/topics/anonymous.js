@@ -29,7 +29,10 @@ function applyAnonymousMask(post, viewerUid, isStaff) {
 		return;
 	}
 	const numericViewer = parseInt(viewerUid, 10);
-	const isSelf = Number.isInteger(numericViewer) && numericViewer > 0 && numericViewer === parseInt(post.uid, 10);
+	const isSelf =
+		Number.isInteger(numericViewer) &&
+		numericViewer > 0 &&
+		numericViewer === parseInt(post.uid, 10);
 	if (isStaff || isSelf) {
 		return;
 	}

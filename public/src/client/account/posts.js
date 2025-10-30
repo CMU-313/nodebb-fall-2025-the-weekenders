@@ -1,7 +1,10 @@
 'use strict';
 
-
-define('forum/account/posts', ['forum/account/header', 'forum/infinitescroll', 'hooks'], function (header, infinitescroll, hooks) {
+define('forum/account/posts', [
+	'forum/account/header',
+	'forum/infinitescroll',
+	'hooks',
+], function (header, infinitescroll, hooks) {
 	const AccountPosts = {};
 
 	let template;
@@ -10,7 +13,9 @@ define('forum/account/posts', ['forum/account/header', 'forum/infinitescroll', '
 	AccountPosts.init = function () {
 		header.init();
 
-		$('[component="post/content"] img:not(.not-responsive)').addClass('img-fluid');
+		$('[component="post/content"] img:not(.not-responsive)').addClass(
+			'img-fluid'
+		);
 
 		AccountPosts.handleInfiniteScroll('account/posts');
 	};

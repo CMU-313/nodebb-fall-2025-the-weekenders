@@ -21,7 +21,12 @@ describe('topics/anonymous helper', () => {
 	});
 
 	it('applyAnonymousMask leaves non-anonymous posts unchanged', () => {
-		const post = { uid: 5, isAnonymous: 0, user: { username: 'Alice' }, userslug: 'alice' };
+		const post = {
+			uid: 5,
+			isAnonymous: 0,
+			user: { username: 'Alice' },
+			userslug: 'alice',
+		};
 		anon.applyAnonymousMask(post, 2, false);
 		assert.strictEqual(post.uid, 5);
 		assert.strictEqual(post.user.username, 'Alice');
@@ -29,7 +34,12 @@ describe('topics/anonymous helper', () => {
 	});
 
 	it('applyAnonymousMask hides identity from other regular viewers', () => {
-		const post = { uid: 7, isAnonymous: 1, user: { username: 'Bob' }, userslug: 'bob' };
+		const post = {
+			uid: 7,
+			isAnonymous: 1,
+			user: { username: 'Bob' },
+			userslug: 'bob',
+		};
 		anon.applyAnonymousMask(post, 99, false);
 		assert.strictEqual(post.uid, 0);
 		assert.strictEqual(post.user.username, 'Anonymous');
@@ -37,14 +47,24 @@ describe('topics/anonymous helper', () => {
 	});
 
 	it('applyAnonymousMask does not mask for staff viewers', () => {
-		const post = { uid: 7, isAnonymous: 1, user: { username: 'Bob' }, userslug: 'bob' };
+		const post = {
+			uid: 7,
+			isAnonymous: 1,
+			user: { username: 'Bob' },
+			userslug: 'bob',
+		};
 		anon.applyAnonymousMask(post, 42, true);
 		assert.strictEqual(post.uid, 7);
 		assert.strictEqual(post.user.username, 'Bob');
 	});
 
 	it('applyAnonymousMask does not mask for the author (self)', () => {
-		const post = { uid: 10, isAnonymous: 1, user: { username: 'Carol' }, userslug: 'carol' };
+		const post = {
+			uid: 10,
+			isAnonymous: 1,
+			user: { username: 'Carol' },
+			userslug: 'carol',
+		};
 		anon.applyAnonymousMask(post, 10, false);
 		assert.strictEqual(post.uid, 10);
 		assert.strictEqual(post.user.username, 'Carol');

@@ -1,8 +1,13 @@
 'use strict';
 
-
 define('forum/register', [
-	'translator', 'slugify', 'api', 'bootbox', 'forum/login', 'zxcvbn', 'jquery-form',
+	'translator',
+	'slugify',
+	'api',
+	'bootbox',
+	'forum/login',
+	'zxcvbn',
+	'jquery-form',
 ], function (translator, slugify, api, bootbox, Login, zxcvbn) {
 	const Register = {};
 	let validationError = false;
@@ -25,7 +30,9 @@ define('forum/register', [
 
 		// Update the "others can mention you via" text
 		username.on('keyup', function () {
-			$('#yourUsername').text(this.value.length > 0 ? slugify(this.value) : 'username');
+			$('#yourUsername').text(
+				this.value.length > 0 ? slugify(this.value) : 'username'
+			);
 		});
 
 		username.on('blur', function () {
@@ -56,7 +63,10 @@ define('forum/register', [
 		}
 
 		// Guard against caps lock
-		Login.capsLockCheck(document.querySelector('#password'), document.querySelector('#caps-lock-warning'));
+		Login.capsLockCheck(
+			document.querySelector('#password'),
+			document.querySelector('#caps-lock-warning')
+		);
 
 		register.on('click', function (e) {
 			const registerBtn = $(this);
@@ -96,15 +106,20 @@ define('forum/register', [
 						}
 					},
 					error: function (data) {
-						translator.translate(data.responseText, config.defaultLang, function (translated) {
-							if (data.status === 403 && data.responseText === 'Forbidden') {
-								window.location.href = config.relative_path + '/register?error=csrf-invalid';
-							} else {
-								errorEl.find('p').text(translated);
-								errorEl.removeClass('hidden');
-								registerBtn.removeClass('disabled');
+						translator.translate(
+							data.responseText,
+							config.defaultLang,
+							function (translated) {
+								if (data.status === 403 && data.responseText === 'Forbidden') {
+									window.location.href =
+										config.relative_path + '/register?error=csrf-invalid';
+								} else {
+									errorEl.find('p').text(translated);
+									errorEl.removeClass('hidden');
+									registerBtn.removeClass('disabled');
+								}
 							}
-						});
+						);
 					},
 				});
 			});
@@ -121,7 +136,10 @@ define('forum/register', [
 		username_notify.text('');
 		const usernameInput = $('#username');
 		const userslug = slugify(username);
-		if (username.length < ajaxify.data.minimumUsernameLength || userslug.length < ajaxify.data.minimumUsernameLength) {
+		if (
+			username.length < ajaxify.data.minimumUsernameLength ||
+			userslug.length < ajaxify.data.minimumUsernameLength
+		) {
 			showError(usernameInput, username_notify, '[[error:username-too-short]]');
 		} else if (username.length > ajaxify.data.maximumUsernameLength) {
 			showError(usernameInput, username_notify, '[[error:username-too-long]]');
@@ -131,7 +149,7 @@ define('forum/register', [
 			Promise.allSettled([
 				api.head(`/users/bySlug/${userslug}`, {}),
 				api.head(`/groups/${username}`, {}),
-			]).then((results) => {
+			]).then(results => {
 				if (results.every(obj => obj.status === 'rejected')) {
 					showSuccess(usernameInput, username_notify, successIcon);
 				} else {
@@ -162,7 +180,11 @@ define('forum/register', [
 		}
 
 		if (password !== password_confirm && password_confirm !== '') {
-			showError(passwordInput, password_confirm_notify, '[[user:change-password-error-match]]');
+			showError(
+				passwordInput,
+				password_confirm_notify,
+				'[[user:change-password-error-match]]'
+			);
 		}
 	}
 
@@ -176,7 +198,11 @@ define('forum/register', [
 		}
 
 		if (password !== password_confirm) {
-			showError(passwordConfirmInput, password_confirm_notify, '[[user:change-password-error-match]]');
+			showError(
+				passwordConfirmInput,
+				password_confirm_notify,
+				'[[user:change-password-error-match]]'
+			);
 		} else {
 			showSuccess(passwordConfirmInput, password_confirm_notify, successIcon);
 		}
@@ -186,7 +212,8 @@ define('forum/register', [
 		translator.translate(msg, function (msg) {
 			input.attr('aria-invalid', 'true');
 			element.html(msg);
-			element.parent()
+			element
+				.parent()
 				.removeClass('register-success')
 				.addClass('register-danger');
 			element.show();
@@ -198,7 +225,8 @@ define('forum/register', [
 		translator.translate(msg, function (msg) {
 			input.removeAttr('aria-invalid');
 			element.html(msg);
-			element.parent()
+			element
+				.parent()
 				.removeClass('register-danger')
 				.addClass('register-success');
 			element.show();
@@ -208,7 +236,11 @@ define('forum/register', [
 	function handleLanguageOverride() {
 		if (!app.user.uid && config.defaultLang !== config.userLang) {
 			const formEl = $('[component="register/local"]');
-			const langEl = $('<input type="hidden" name="userLang" value="' + config.userLang + '" />');
+			const langEl = $(
+				'<input type="hidden" name="userLang" value="' +
+					config.userLang +
+					'" />'
+			);
 
 			formEl.append(langEl);
 		}

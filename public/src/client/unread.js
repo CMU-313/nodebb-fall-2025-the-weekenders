@@ -1,9 +1,22 @@
 'use strict';
 
-
 define('forum/unread', [
-	'forum/header/unread', 'topicSelect', 'components', 'topicList', 'categorySelector', 'alerts', 'api',
-], function (headerUnread, topicSelect, components, topicList, categorySelector, alerts, api) {
+	'forum/header/unread',
+	'topicSelect',
+	'components',
+	'topicList',
+	'categorySelector',
+	'alerts',
+	'api',
+], function (
+	headerUnread,
+	topicSelect,
+	components,
+	topicList,
+	categorySelector,
+	alerts,
+	api
+) {
 	const Unread = {};
 
 	Unread.init = function () {
@@ -13,7 +26,10 @@ define('forum/unread', [
 
 		topicList.init('unread');
 
-		headerUnread.updateUnreadTopicCount('/' + ajaxify.data.selectedFilter.url, ajaxify.data.topicCount);
+		headerUnread.updateUnreadTopicCount(
+			'/' + ajaxify.data.selectedFilter.url,
+			ajaxify.data.topicCount
+		);
 	};
 
 	function handleMarkRead() {
@@ -38,9 +54,11 @@ define('forum/unread', [
 				return;
 			}
 
-			Promise.all(tids.map(async tid => api.put(`/topics/${tid}/read`))).then(() => {
-				doneRemovingTids(tids);
-			});
+			Promise.all(tids.map(async tid => api.put(`/topics/${tid}/read`))).then(
+				() => {
+					doneRemovingTids(tids);
+				}
+			);
 		}
 
 		function markCategoryRead(cid) {
@@ -72,32 +90,36 @@ define('forum/unread', [
 		}, new Map());
 		defaultCategories = Array.from(defaultCategories.values());
 
-		const selector = categorySelector.init($('[component="category-selector"]'), {
-			onSelect: function (category) {
-				selector.selectCategory(0);
-				if (category.cid === 'all') {
-					markAllRead();
-				} else if (category.cid === 'selected') {
-					markSelectedRead();
-				} else if (category.cid) {
-					markCategoryRead(category.cid);
-				}
-			},
-			selectCategoryLabel: ajaxify.data.selectCategoryLabel || '[[unread:mark-as-read]]',
-			localCategories: [
-				{
-					cid: 'selected',
-					name: '[[unread:selected]]',
-					icon: '',
+		const selector = categorySelector.init(
+			$('[component="category-selector"]'),
+			{
+				onSelect: function (category) {
+					selector.selectCategory(0);
+					if (category.cid === 'all') {
+						markAllRead();
+					} else if (category.cid === 'selected') {
+						markSelectedRead();
+					} else if (category.cid) {
+						markCategoryRead(category.cid);
+					}
 				},
-				{
-					cid: 'all',
-					name: '[[unread:all]]',
-					icon: '',
-				},
-			],
-			defaultCategories,
-		});
+				selectCategoryLabel:
+					ajaxify.data.selectCategoryLabel || '[[unread:mark-as-read]]',
+				localCategories: [
+					{
+						cid: 'selected',
+						name: '[[unread:selected]]',
+						icon: '',
+					},
+					{
+						cid: 'all',
+						name: '[[unread:all]]',
+						icon: '',
+					},
+				],
+				defaultCategories,
+			}
+		);
 	}
 
 	function doneRemovingTids(tids) {

@@ -78,7 +78,10 @@ module.exports = function (Posts) {
 		if (parseInt(uid, 10) <= 0) {
 			return { upvoted: false, downvoted: false };
 		}
-		const hasVoted = await db.isMemberOfSets([`pid:${pid}:upvote`, `pid:${pid}:downvote`], uid);
+		const hasVoted = await db.isMemberOfSets(
+			[`pid:${pid}:upvote`, `pid:${pid}:downvote`],
+			uid
+		);
 		return { upvoted: hasVoted[0], downvoted: hasVoted[1] };
 	};
 
@@ -101,7 +104,10 @@ module.exports = function (Posts) {
 	};
 
 	function voteInProgress(pid, uid) {
-		return Array.isArray(votesInProgress[uid]) && votesInProgress[uid].includes(String(pid));
+		return (
+			Array.isArray(votesInProgress[uid]) &&
+			votesInProgress[uid].includes(String(pid))
+		);
 	}
 
 	function putVoteInProgress(pid, uid) {
@@ -138,25 +144,38 @@ module.exports = function (Posts) {
 			return;
 		}
 
-		return await vote(voteStatus.upvoted ? 'downvote' : 'upvote', true, pid, uid, voteStatus);
+		return await vote(
+			voteStatus.upvoted ? 'downvote' : 'upvote',
+			true,
+			pid,
+			uid,
+			voteStatus
+		);
 	}
 
 	async function checkVoteLimitation(pid, uid, type) {
 		// type = 'upvote' or 'downvote'
 		const oneDay = 86400000;
-		const [reputation, isPrivileged, targetUid, votedPidsToday] = await Promise.all([
-			user.getUserField(uid, 'reputation'),
-			user.isPrivileged(uid),
-			Posts.getPostField(pid, 'uid'),
-			db.getSortedSetRevRangeByScore(
-				`uid:${uid}:${type}`, 0, -1, '+inf', Date.now() - oneDay
-			),
-		]);
+		const [reputation, isPrivileged, targetUid, votedPidsToday] =
+			await Promise.all([
+				user.getUserField(uid, 'reputation'),
+				user.isPrivileged(uid),
+				Posts.getPostField(pid, 'uid'),
+				db.getSortedSetRevRangeByScore(
+					`uid:${uid}:${type}`,
+					0,
+					-1,
+					'+inf',
+					Date.now() - oneDay
+				),
+			]);
 		if (isPrivileged) {
 			return;
 		}
 		if (reputation < meta.config[`min:rep:${type}`]) {
-			throw new Error(`[[error:not-enough-reputation-to-${type}, ${meta.config[`min:rep:${type}`]}]]`);
+			throw new Error(
+				`[[error:not-enough-reputation-to-${type}, ${meta.config[`min:rep:${type}`]}]]`
+			);
 		}
 		const votesToday = meta.config[`${type}sPerDay`];
 		if (votesToday && votedPidsToday.length >= votesToday) {
@@ -167,7 +186,9 @@ module.exports = function (Posts) {
 			const postData = await Posts.getPostsFields(votedPidsToday, ['uid']);
 			const targetUpVotes = postData.filter(p => p.uid === targetUid).length;
 			if (targetUpVotes >= voterPerUserToday) {
-				throw new Error(`[[error:too-many-${type}s-today-user, ${voterPerUserToday}]]`);
+				throw new Error(
+					`[[error:too-many-${type}s-today-user, ${voterPerUserToday}]]`
+				);
 			}
 		}
 	}
@@ -192,10 +213,10 @@ module.exports = function (Posts) {
 		}
 
 		const postData = await Posts.getPostFields(pid, ['pid', 'uid', 'tid']);
-		const newReputation = await user.incrementUserReputationBy(postData.uid, type === 'upvote' ? 1 : -1);
-
-
-
+		const newReputation = await user.incrementUserReputationBy(
+			postData.uid,
+			type === 'upvote' ? 1 : -1
+		);
 
 		await fireVoteHook(postData, uid, type, unvote, voteStatus);
 		await adjustPostVotes(postData, uid, type, unvote);
@@ -222,9 +243,11 @@ module.exports = function (Posts) {
 	async function fireVoteHook(postData, uid, type, unvote, voteStatus) {
 		let hook = type;
 		let current = voteStatus.upvoted ? 'upvote' : 'downvote';
-		if (unvote) { // e.g. unvoting, removing a upvote or downvote
+		if (unvote) {
+			// e.g. unvoting, removing a upvote or downvote
 			hook = 'unvote';
-		} else { // e.g. User *has not* voted, clicks upvote or downvote
+		} else {
+			// e.g. User *has not* voted, clicks upvote or downvote
 			current = 'unvote';
 		}
 		// action:post.upvote
@@ -239,7 +262,7 @@ module.exports = function (Posts) {
 	}
 
 	async function adjustPostVotes(postData, uid, type, unvote) {
-		const notType = (type === 'upvote' ? 'downvote' : 'upvote');
+		const notType = type === 'upvote' ? 'downvote' : 'upvote';
 		if (unvote) {
 			await db.setRemove(`pid:${postData.pid}:${type}`, uid);
 		} else {
@@ -262,10 +285,19 @@ module.exports = function (Posts) {
 			return;
 		}
 		const threshold = meta.config['flags:autoFlagOnDownvoteThreshold'];
-		if (threshold && postData.votes <= (-threshold)) {
+		if (threshold && postData.votes <= -threshold) {
 			const adminUid = await user.getFirstAdminUid();
-			const reportMsg = await translator.translate(`[[flags:auto-flagged, ${-postData.votes}]]`);
-			const flagObj = await flags.create('post', postData.pid, adminUid, reportMsg, null, true);
+			const reportMsg = await translator.translate(
+				`[[flags:auto-flagged, ${-postData.votes}]]`
+			);
+			const flagObj = await flags.create(
+				'post',
+				postData.pid,
+				adminUid,
+				reportMsg,
+				null,
+				true
+			);
 			await flags.notify(flagObj, adminUid, true);
 		}
 		await Promise.all([
@@ -280,18 +312,33 @@ module.exports = function (Posts) {
 	};
 
 	async function updateTopicVoteCount(postData) {
-		const topicData = await topics.getTopicFields(postData.tid, ['mainPid', 'cid', 'pinned']);
+		const topicData = await topics.getTopicFields(postData.tid, [
+			'mainPid',
+			'cid',
+			'pinned',
+		]);
 
 		if (postData.uid) {
 			if (postData.votes !== 0) {
-				await db.sortedSetAdd(`cid:${topicData.cid}:uid:${postData.uid}:pids:votes`, postData.votes, postData.pid);
+				await db.sortedSetAdd(
+					`cid:${topicData.cid}:uid:${postData.uid}:pids:votes`,
+					postData.votes,
+					postData.pid
+				);
 			} else {
-				await db.sortedSetRemove(`cid:${topicData.cid}:uid:${postData.uid}:pids:votes`, postData.pid);
+				await db.sortedSetRemove(
+					`cid:${topicData.cid}:uid:${postData.uid}:pids:votes`,
+					postData.pid
+				);
 			}
 		}
 
 		if (String(topicData.mainPid) !== String(postData.pid)) {
-			return await db.sortedSetAdd(`tid:${postData.tid}:posts:votes`, postData.votes, postData.pid);
+			return await db.sortedSetAdd(
+				`tid:${postData.tid}:posts:votes`,
+				postData.votes,
+				postData.pid
+			);
 		}
 		const promises = [
 			topics.setTopicFields(postData.tid, {
@@ -301,7 +348,13 @@ module.exports = function (Posts) {
 			db.sortedSetAdd('topics:votes', postData.votes, postData.tid),
 		];
 		if (!topicData.pinned) {
-			promises.push(db.sortedSetAdd(`cid:${topicData.cid}:tids:votes`, postData.votes, postData.tid));
+			promises.push(
+				db.sortedSetAdd(
+					`cid:${topicData.cid}:tids:votes`,
+					postData.votes,
+					postData.tid
+				)
+			);
 		}
 		await Promise.all(promises);
 	}

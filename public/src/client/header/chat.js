@@ -1,20 +1,28 @@
 'use strict';
 
-define('forum/header/chat', [
-	'components', 'hooks', 'api',
-], function (components, hooks, api) {
+define('forum/header/chat', ['components', 'hooks', 'api'], function (
+	components,
+	hooks,
+	api
+) {
 	const chat = {};
 
 	chat.prepareDOM = function () {
 		const chatsToggleEl = $('[component="chat/dropdown"]');
-		chatsToggleEl.on('show.bs.dropdown', (ev) => {
-			requireAndCall('loadChatsDropdown', $(ev.target).parent().find('[component="chat/list"]'));
+		chatsToggleEl.on('show.bs.dropdown', ev => {
+			requireAndCall(
+				'loadChatsDropdown',
+				$(ev.target).parent().find('[component="chat/list"]')
+			);
 		});
 
 		chatsToggleEl.each((index, el) => {
 			const dropdownEl = $(el).parent().find('.dropdown-menu');
 			if (dropdownEl.hasClass('show')) {
-				requireAndCall('loadChatsDropdown', dropdownEl.find('[component="chat/list"]'));
+				requireAndCall(
+					'loadChatsDropdown',
+					dropdownEl.find('[component="chat/list"]')
+				);
 			}
 		});
 
@@ -29,7 +37,10 @@ define('forum/header/chat', [
 
 		socket.on('event:unread.updateChatCount', async function (data) {
 			if (data) {
-				const [chatModule, chatPage] = await app.require(['chat', 'forum/chats']);
+				const [chatModule, chatPage] = await app.require([
+					'chat',
+					'forum/chats',
+				]);
 				if (
 					chatModule.isFromBlockedUser(data.fromUid) ||
 					chatModule.isLookingAtRoom(data.roomId) ||
@@ -44,14 +55,19 @@ define('forum/header/chat', [
 			let { count } = await api.get('/chats/unread');
 			const chatIcon = components.get('chat/icon');
 			count = Math.max(0, count);
-			chatIcon.toggleClass('fa-comment', count > 0)
+			chatIcon
+				.toggleClass('fa-comment', count > 0)
 				.toggleClass('fa-comment-o', count <= 0);
 
 			const countText = count > 99 ? '99+' : count;
-			components.get('chat/icon')
+			components
+				.get('chat/icon')
 				.toggleClass('unread-count', count > 0)
 				.attr('data-content', countText);
-			components.get('chat/count').toggleClass('hidden', count <= 0).text(countText);
+			components
+				.get('chat/count')
+				.toggleClass('hidden', count <= 0)
+				.text(countText);
 			hooks.fire('action:chat.updateCount', { count });
 		});
 	};

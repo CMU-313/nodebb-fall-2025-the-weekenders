@@ -1,6 +1,4 @@
-
 'use strict';
-
 
 define('forum/category/tools', [
 	'topicSelect',
@@ -68,7 +66,9 @@ define('forum/category/tools', [
 				}
 				alerts.success('[[topic:markAsUnreadForAll.success]]');
 				tids.forEach(function (tid) {
-					$('[component="category/topic"][data-tid="' + tid + '"]').addClass('unread');
+					$('[component="category/topic"][data-tid="' + tid + '"]').addClass(
+						'unread'
+					);
 				});
 				onCommandComplete();
 			});
@@ -122,7 +122,9 @@ define('forum/category/tools', [
 			if (!tids.length) {
 				return alerts.error('[[error:no-topics-selected]]');
 			}
-			const topics = await Promise.all(tids.map(tid => api.get(`/topics/${tid}`)));
+			const topics = await Promise.all(
+				tids.map(tid => api.get(`/topics/${tid}`))
+			);
 			require(['forum/topic/tag'], function (tag) {
 				tag.init(topics, ajaxify.data.tagWhitelist, onCommandComplete);
 			});
@@ -215,14 +217,22 @@ define('forum/category/tools', [
 		const areAllScheduled = areAll(isTopicScheduled, tids);
 
 		components.get('topic/delete').toggleClass('hidden', isAnyDeleted);
-		components.get('topic/restore').toggleClass('hidden', isAnyScheduled || !isAnyDeleted);
-		components.get('topic/purge').toggleClass('hidden', !areAllDeleted || !tids.length);
+		components
+			.get('topic/restore')
+			.toggleClass('hidden', isAnyScheduled || !isAnyDeleted);
+		components
+			.get('topic/purge')
+			.toggleClass('hidden', !areAllDeleted || !tids.length);
 
 		components.get('topic/lock').toggleClass('hidden', isAnyLocked);
 		components.get('topic/unlock').toggleClass('hidden', !isAnyLocked);
 
-		components.get('topic/pin').toggleClass('hidden', areAllScheduled || isAnyPinned);
-		components.get('topic/unpin').toggleClass('hidden', areAllScheduled || !isAnyPinned);
+		components
+			.get('topic/pin')
+			.toggleClass('hidden', areAllScheduled || isAnyPinned);
+		components
+			.get('topic/unpin')
+			.toggleClass('hidden', areAllScheduled || !isAnyPinned);
 
 		components.get('topic/merge').toggleClass('hidden', isAnyScheduled);
 	}
@@ -268,20 +278,26 @@ define('forum/category/tools', [
 	function setDeleteState(data) {
 		const topic = getTopicEl(data.tid);
 		topic.toggleClass('deleted', data.isDeleted);
-		topic.find('[component="topic/locked"]').toggleClass('hidden', !data.isDeleted);
+		topic
+			.find('[component="topic/locked"]')
+			.toggleClass('hidden', !data.isDeleted);
 	}
 
 	function setPinnedState(data) {
 		const topic = getTopicEl(data.tid);
 		topic.toggleClass('pinned', data.isPinned);
-		topic.find('[component="topic/pinned"]').toggleClass('hidden', !data.isPinned);
+		topic
+			.find('[component="topic/pinned"]')
+			.toggleClass('hidden', !data.isPinned);
 		ajaxify.refresh();
 	}
 
 	function setLockedState(data) {
 		const topic = getTopicEl(data.tid);
 		topic.toggleClass('locked', data.isLocked);
-		topic.find('[component="topic/locked"]').toggleClass('hidden', !data.isLocked);
+		topic
+			.find('[component="topic/locked"]')
+			.toggleClass('hidden', !data.isLocked);
 	}
 
 	function onTopicMoved(data) {
@@ -311,11 +327,19 @@ define('forum/category/tools', [
 				handle: '[component="topic/pinned"]',
 				items: '[component="category/topic"].pinned',
 				start: function () {
-					baseIndex = parseInt(topicListEl.find('[component="category/topic"].pinned').first().attr('data-index'), 10);
+					baseIndex = parseInt(
+						topicListEl
+							.find('[component="category/topic"].pinned')
+							.first()
+							.attr('data-index'),
+						10
+					);
 				},
 				update: function (ev, ui) {
 					const tid = ui.item.attr('data-tid');
-					const pinnedTopicEls = topicListEl.find('[component="category/topic"].pinned');
+					const pinnedTopicEls = topicListEl.find(
+						'[component="category/topic"].pinned'
+					);
 					let newIndex = 0;
 					pinnedTopicEls.each((index, el) => {
 						if ($(el).attr('data-tid') === tid) {
@@ -324,17 +348,21 @@ define('forum/category/tools', [
 						}
 					});
 
-					socket.emit('topics.orderPinnedTopics', {
-						tid: tid,
-						order: baseIndex + newIndex,
-					}, function (err) {
-						if (err) {
-							return alerts.error(err);
+					socket.emit(
+						'topics.orderPinnedTopics',
+						{
+							tid: tid,
+							order: baseIndex + newIndex,
+						},
+						function (err) {
+							if (err) {
+								return alerts.error(err);
+							}
+							pinnedTopicEls.each((index, el) => {
+								$(el).attr('data-index', baseIndex + index);
+							});
 						}
-						pinnedTopicEls.each((index, el) => {
-							$(el).attr('data-index', baseIndex + index);
-						});
-					});
+					);
 				},
 			});
 		});

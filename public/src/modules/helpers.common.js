@@ -49,15 +49,27 @@ module.exports = function (utils, Benchpress, relative_path) {
 			return false;
 		}
 
-		if (item.route.match('/users') && data.user && !data.user.privileges['view:users']) {
+		if (
+			item.route.match('/users') &&
+			data.user &&
+			!data.user.privileges['view:users']
+		) {
 			return false;
 		}
 
-		if (item.route.match('/tags') && data.user && !data.user.privileges['view:tags']) {
+		if (
+			item.route.match('/tags') &&
+			data.user &&
+			!data.user.privileges['view:tags']
+		) {
 			return false;
 		}
 
-		if (item.route.match('/groups') && data.user && !data.user.privileges['view:groups']) {
+		if (
+			item.route.match('/groups') &&
+			data.user &&
+			!data.user.privileges['view:groups']
+		) {
 			return false;
 		}
 
@@ -67,21 +79,47 @@ module.exports = function (utils, Benchpress, relative_path) {
 	function buildMetaTag(tag) {
 		const name = tag.name ? 'name="' + tag.name + '" ' : '';
 		const property = tag.property ? 'property="' + tag.property + '" ' : '';
-		const content = tag.content ? 'content="' + tag.content.replace(/\n/g, ' ') + '" ' : '';
+		const content = tag.content
+			? 'content="' + tag.content.replace(/\n/g, ' ') + '" '
+			: '';
 
 		return '<meta ' + name + property + content + '/>\n\t';
 	}
 
 	function buildLinkTag(tag) {
-		const attributes = ['link', 'rel', 'as', 'type', 'href', 'sizes', 'title', 'crossorigin'];
-		const [link, rel, as, type, href, sizes, title, crossorigin] = attributes.map(attr => (tag[attr] ? `${attr}="${tag[attr]}" ` : ''));
+		const attributes = [
+			'link',
+			'rel',
+			'as',
+			'type',
+			'href',
+			'sizes',
+			'title',
+			'crossorigin',
+		];
+		const [link, rel, as, type, href, sizes, title, crossorigin] =
+			attributes.map(attr => (tag[attr] ? `${attr}="${tag[attr]}" ` : ''));
 
-		return '<link ' + link + rel + as + type + sizes + title + href + crossorigin + '/>\n\t';
+		return (
+			'<link ' +
+			link +
+			rel +
+			as +
+			type +
+			sizes +
+			title +
+			href +
+			crossorigin +
+			'/>\n\t'
+		);
 	}
 
 	function stringify(obj) {
 		// Turns the incoming object into a JSON string
-		return JSON.stringify(obj).replace(/&/gm, '&amp;').replace(/</gm, '&lt;').replace(/>/gm, '&gt;')
+		return JSON.stringify(obj)
+			.replace(/&/gm, '&amp;')
+			.replace(/</gm, '&lt;')
+			.replace(/>/gm, '&gt;')
 			.replace(/"/g, '&quot;');
 	}
 
@@ -106,7 +144,8 @@ module.exports = function (utils, Benchpress, relative_path) {
 			return '';
 		}
 
-		const href = tag === 'a' ? `href="${relative_path}/category/${category.slug}"` : '';
+		const href =
+			tag === 'a' ? `href="${relative_path}/category/${category.slug}"` : '';
 		return `<${tag} ${href} class="badge px-1 text-truncate text-decoration-none ${className}" style="color: ${category.color};background-color: ${category.bgColor};border-color: ${category.bgColor}!important; max-width: 70vw;">
 			${category.icon && category.icon !== 'fa-nbb-none' ? `<i class="fa fa-fw ${category.icon}"></i>` : ''}
 			${category.name}
@@ -145,15 +184,26 @@ module.exports = function (utils, Benchpress, relative_path) {
 		}
 		category.children.forEach(function (child) {
 			if (child && !child.isSection) {
-				const link = child.link ? child.link : (relative_path + '/category/' + child.slug);
-				html += '<span class="category-children-item float-start">' +
-					'<div role="presentation" class="icon float-start" style="' + generateCategoryBackground(child) + '">' +
-					'<i class="fa fa-fw ' + child.icon + '"></i>' +
+				const link = child.link
+					? child.link
+					: relative_path + '/category/' + child.slug;
+				html +=
+					'<span class="category-children-item float-start">' +
+					'<div role="presentation" class="icon float-start" style="' +
+					generateCategoryBackground(child) +
+					'">' +
+					'<i class="fa fa-fw ' +
+					child.icon +
+					'"></i>' +
 					'</div>' +
-					'<a href="' + link + '"><small>' + child.name + '</small></a></span>';
+					'<a href="' +
+					link +
+					'"><small>' +
+					child.name +
+					'</small></a></span>';
 			}
 		});
-		html = html ? ('<span class="category-children">' + html + '</span>') : html;
+		html = html ? '<span class="category-children">' + html + '</span>' : html;
 		return html;
 	}
 
@@ -165,14 +215,17 @@ module.exports = function (utils, Benchpress, relative_path) {
 	// Groups helpers
 	function membershipBtn(groupObj, btnClass = '') {
 		if (groupObj.isMember && groupObj.name !== 'administrators') {
-			return `<button class="btn btn-danger ${btnClass}" data-action="leave" data-group="${groupObj.displayName}" ${(groupObj.disableLeave ? ' disabled' : '')}><i class="fa fa-times"></i> [[groups:membership.leave-group]]</button>`;
+			return `<button class="btn btn-danger ${btnClass}" data-action="leave" data-group="${groupObj.displayName}" ${groupObj.disableLeave ? ' disabled' : ''}><i class="fa fa-times"></i> [[groups:membership.leave-group]]</button>`;
 		}
 
 		if (groupObj.isPending && groupObj.name !== 'administrators') {
 			return `<button class="btn btn-warning disabled ${btnClass}"><i class="fa fa-clock-o"></i> [[groups:membership.invitation-pending]]</button>`;
 		} else if (groupObj.isInvited) {
 			return `<button class="btn btn-warning" data-action="rejectInvite" data-group="${groupObj.displayName}">[[groups:membership.reject]]</button><button class="btn btn-success" data-action="acceptInvite" data-group="${groupObj.name}"><i class="fa fa-plus"></i> [[groups:membership.accept-invitation]]</button>`;
-		} else if (!groupObj.disableJoinRequests && groupObj.name !== 'administrators') {
+		} else if (
+			!groupObj.disableJoinRequests &&
+			groupObj.name !== 'administrators'
+		) {
 			return `<button class="btn btn-success ${btnClass}" data-action="join" data-group="${groupObj.displayName}"><i class="fa fa-plus"></i> [[groups:membership.join-group]]</button>`;
 		}
 		return '';
@@ -187,28 +240,60 @@ module.exports = function (utils, Benchpress, relative_path) {
 				type: types[priv],
 			});
 		}
-		return states.map(function (priv) {
-			const guestDisabled = ['groups:moderate', 'groups:posts:upvote', 'groups:posts:downvote', 'groups:local:login', 'groups:group:create'];
-			const spidersEnabled = ['groups:find', 'groups:read', 'groups:topics:read', 'groups:view:users', 'groups:view:tags', 'groups:view:groups'];
-			const globalModDisabled = ['groups:moderate'];
-			let fediverseEnabled = ['groups:view:users', 'groups:find', 'groups:read', 'groups:topics:read', 'groups:topics:create', 'groups:topics:reply', 'groups:topics:tag', 'groups:posts:edit', 'groups:posts:history', 'groups:posts:delete', 'groups:posts:upvote', 'groups:posts:downvote', 'groups:topics:delete'];
-			if (cid === -1) {
-				fediverseEnabled = fediverseEnabled.slice(3);
-			}
-			const disabled =
-				(member === 'guests' && (guestDisabled.includes(priv.name) || priv.name.startsWith('groups:admin:'))) ||
-				(member === 'spiders' && !spidersEnabled.includes(priv.name)) ||
-				(member === 'fediverse' && !fediverseEnabled.includes(priv.name)) ||
-				(member === 'Global Moderators' && globalModDisabled.includes(priv.name));
+		return states
+			.map(function (priv) {
+				const guestDisabled = [
+					'groups:moderate',
+					'groups:posts:upvote',
+					'groups:posts:downvote',
+					'groups:local:login',
+					'groups:group:create',
+				];
+				const spidersEnabled = [
+					'groups:find',
+					'groups:read',
+					'groups:topics:read',
+					'groups:view:users',
+					'groups:view:tags',
+					'groups:view:groups',
+				];
+				const globalModDisabled = ['groups:moderate'];
+				let fediverseEnabled = [
+					'groups:view:users',
+					'groups:find',
+					'groups:read',
+					'groups:topics:read',
+					'groups:topics:create',
+					'groups:topics:reply',
+					'groups:topics:tag',
+					'groups:posts:edit',
+					'groups:posts:history',
+					'groups:posts:delete',
+					'groups:posts:upvote',
+					'groups:posts:downvote',
+					'groups:topics:delete',
+				];
+				if (cid === -1) {
+					fediverseEnabled = fediverseEnabled.slice(3);
+				}
+				const disabled =
+					(member === 'guests' &&
+						(guestDisabled.includes(priv.name) ||
+							priv.name.startsWith('groups:admin:'))) ||
+					(member === 'spiders' && !spidersEnabled.includes(priv.name)) ||
+					(member === 'fediverse' && !fediverseEnabled.includes(priv.name)) ||
+					(member === 'Global Moderators' &&
+						globalModDisabled.includes(priv.name));
 
-			return `
+				return `
 				<td data-privilege="${priv.name}" data-value="${priv.state}" data-type="${priv.type}">
 					<div class="form-check text-center">
-						<input class="form-check-input float-none${(disabled ? ' d-none"' : '')}" autocomplete="off" type="checkbox"${(priv.state ? ' checked' : '')}${(disabled ? ' disabled="disabled" aria-diabled="true"' : '')} />
+						<input class="form-check-input float-none${disabled ? ' d-none"' : ''}" autocomplete="off" type="checkbox"${priv.state ? ' checked' : ''}${disabled ? ' disabled="disabled" aria-diabled="true"' : ''} />
 					</div>
 				</td>
 			`;
-		}).join('');
+			})
+			.join('');
 	}
 
 	function localeToHTML(locale, fallback) {
@@ -218,22 +303,60 @@ module.exports = function (utils, Benchpress, relative_path) {
 
 	function renderTopicImage(topicObj) {
 		if (topicObj.thumb) {
-			return '<img src="' + topicObj.thumb + '" class="img-circle user-img" title="' + topicObj.user.displayname + '" />';
+			return (
+				'<img src="' +
+				topicObj.thumb +
+				'" class="img-circle user-img" title="' +
+				topicObj.user.displayname +
+				'" />'
+			);
 		}
-		return '<img component="user/picture" data-uid="' + topicObj.user.uid + '" src="' + topicObj.user.picture + '" class="user-img" title="' + topicObj.user.displayname + '" />';
+		return (
+			'<img component="user/picture" data-uid="' +
+			topicObj.user.uid +
+			'" src="' +
+			topicObj.user.picture +
+			'" class="user-img" title="' +
+			topicObj.user.displayname +
+			'" />'
+		);
 	}
 
 	function renderDigestAvatar(block) {
 		if (block.teaser) {
 			if (block.teaser.user.picture) {
-				return '<img style="vertical-align: middle; width: 32px; height: 32px; border-radius: 50%;" src="' + block.teaser.user.picture + '" title="' + block.teaser.user.username + '" />';
+				return (
+					'<img style="vertical-align: middle; width: 32px; height: 32px; border-radius: 50%;" src="' +
+					block.teaser.user.picture +
+					'" title="' +
+					block.teaser.user.username +
+					'" />'
+				);
 			}
-			return '<div style="vertical-align: middle; width: 32px; height: 32px; line-height: 32px; font-size: 16px; background-color: ' + block.teaser.user['icon:bgColor'] + '; color: white; text-align: center; display: inline-block; border-radius: 50%;">' + block.teaser.user['icon:text'] + '</div>';
+			return (
+				'<div style="vertical-align: middle; width: 32px; height: 32px; line-height: 32px; font-size: 16px; background-color: ' +
+				block.teaser.user['icon:bgColor'] +
+				'; color: white; text-align: center; display: inline-block; border-radius: 50%;">' +
+				block.teaser.user['icon:text'] +
+				'</div>'
+			);
 		}
 		if (block.user.picture) {
-			return '<img style="vertical-align: middle; width: 32px; height: 32px; border-radius: 50%;" src="' + block.user.picture + '" title="' + block.user.username + '" />';
+			return (
+				'<img style="vertical-align: middle; width: 32px; height: 32px; border-radius: 50%;" src="' +
+				block.user.picture +
+				'" title="' +
+				block.user.username +
+				'" />'
+			);
 		}
-		return '<div style="vertical-align: middle; width: 32px; height: 32px; line-height: 32px; font-size: 16px; background-color: ' + block.user['icon:bgColor'] + '; color: white; text-align: center; display: inline-block; border-radius: 50%;">' + block.user['icon:text'] + '</div>';
+		return (
+			'<div style="vertical-align: middle; width: 32px; height: 32px; line-height: 32px; font-size: 16px; background-color: ' +
+			block.user['icon:bgColor'] +
+			'; color: white; text-align: center; display: inline-block; border-radius: 50%;">' +
+			block.user['icon:text'] +
+			'</div>'
+		);
 	}
 
 	function userAgentIcons(data) {
@@ -309,10 +432,11 @@ module.exports = function (utils, Benchpress, relative_path) {
 			['class', `avatar ${classNames}${rounded ? ' avatar-rounded' : ''}`],
 		]);
 		const styles = [`--avatar-size: ${size};`];
-		const attr2String = attributes => Array.from(attributes).reduce((output, [prop, value]) => {
-			output += ` ${prop}="${value}"`;
-			return output;
-		}, '');
+		const attr2String = attributes =>
+			Array.from(attributes).reduce((output, [prop, value]) => {
+				output += ` ${prop}="${value}"`;
+				return output;
+			}, '');
 
 		let output = '';
 
@@ -335,15 +459,19 @@ module.exports = function (utils, Benchpress, relative_path) {
 	}
 
 	function generateRepliedTo(post, timeagoCutoff) {
-		const displayname = post.parent && post.parent.displayname ?
-			post.parent.displayname : '[[global:guest]]';
-		const isBeforeCutoff = post.timestamp < (Date.now() - (timeagoCutoff * oneDayInMs));
+		const displayname =
+			post.parent && post.parent.displayname
+				? post.parent.displayname
+				: '[[global:guest]]';
+		const isBeforeCutoff =
+			post.timestamp < Date.now() - timeagoCutoff * oneDayInMs;
 		const langSuffix = isBeforeCutoff ? 'on' : 'ago';
 		return `[[topic:replied-to-user-${langSuffix}, ${post.toPid}, ${relative_path}/post/${encodeURIComponent(post.toPid)}, ${displayname}, ${relative_path}/post/${encodeURIComponent(post.pid)}, ${post.timestampISO}]]`;
 	}
 
 	function generateWrote(post, timeagoCutoff) {
-		const isBeforeCutoff = post.timestamp < (Date.now() - (timeagoCutoff * oneDayInMs));
+		const isBeforeCutoff =
+			post.timestamp < Date.now() - timeagoCutoff * oneDayInMs;
 		const langSuffix = isBeforeCutoff ? 'on' : 'ago';
 		return `[[topic:wrote-${langSuffix}, ${relative_path}/post/${encodeURIComponent(post.pid)}, ${post.timestampISO}]]`;
 	}
@@ -353,10 +481,12 @@ module.exports = function (utils, Benchpress, relative_path) {
 	}
 
 	function isoTimeToLocaleString(isoTime, locale = 'en-GB') {
-		return new Date(isoTime).toLocaleString([locale], {
-			dateStyle: 'short',
-			timeStyle: 'short',
-		}).replace(/,/g, '&#44;');
+		return new Date(isoTime)
+			.toLocaleString([locale], {
+				dateStyle: 'short',
+				timeStyle: 'short',
+			})
+			.replace(/,/g, '&#44;');
 	}
 
 	function shouldHideReplyContainer(post) {
@@ -380,7 +510,7 @@ module.exports = function (utils, Benchpress, relative_path) {
 	}
 
 	function generatePlaceholderWave(items) {
-		const html = items.map((i) => {
+		const html = items.map(i => {
 			if (i === 'divider') {
 				return '<li class="dropdown-divider"></li>';
 			}

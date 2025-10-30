@@ -9,7 +9,7 @@ module.exports = function (Posts) {
 		const endorsedAt = Date.now();
 
 		await db.setObject(key, {
-			endorsed: 1,             
+			endorsed: 1,
 			endorsed_at: endorsedAt,
 			endorsed_rank: rank || 0,
 		});

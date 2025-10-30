@@ -16,7 +16,10 @@ describe('User Helpfulness', () => {
 
 	before(async () => {
 		// Create test user
-		testUid = await user.create({ username: 'helpfuluser', password: '123456' });
+		testUid = await user.create({
+			username: 'helpfuluser',
+			password: '123456',
+		});
 
 		// Create test category
 		category = await categories.create({ name: 'Test Category' });
@@ -32,28 +35,28 @@ describe('User Helpfulness', () => {
 		pid = result.postData.pid;
 	});
 
-	it('should get a user\'s helpfulness score', async () => {
+	it("should get a user's helpfulness score", async () => {
 		const score = await helpfulness.get(testUid);
 		assert.strictEqual(typeof score, 'number');
-		assert.strictEqual(score, 0); 
+		assert.strictEqual(score, 0);
 	});
 
-	it('should set a user\'s helpfulness score', async () => {
+	it("should set a user's helpfulness score", async () => {
 		const newScore = await helpfulness.set(testUid, 10);
 		assert.strictEqual(newScore, 10);
 		const retrieved = await helpfulness.get(testUid);
 		assert.strictEqual(retrieved, 10);
 	});
 
-	it('should increment a user\'s helpfulness score', async () => {
+	it("should increment a user's helpfulness score", async () => {
 		await helpfulness.set(testUid, 5);
 		const newScore = await helpfulness.increment(testUid, 3);
-		assert.strictEqual(newScore, 8); 
+		assert.strictEqual(newScore, 8);
 		const retrieved = await helpfulness.get(testUid);
 		assert.strictEqual(retrieved, 8);
 	});
 
-	it('should recompute helpfulness score from user\'s posts', async () => {
+	it("should recompute helpfulness score from user's posts", async () => {
 		// Create a second post with upvotes
 		const result2 = await topics.reply({
 			uid: testUid,
@@ -70,11 +73,17 @@ describe('User Helpfulness', () => {
 
 	it('should update helpfulness when post is upvoted', async () => {
 		// Create another user to upvote
-		const voterUid = await user.create({ username: 'voter', password: '123456' });
+		const voterUid = await user.create({
+			username: 'voter',
+			password: '123456',
+		});
 		await helpfulness.set(testUid, 0);
 		await posts.upvote(pid, voterUid);
 		const score = await helpfulness.get(testUid);
-		assert(score > 0, 'helpfulness score should be greater than 0 after upvote');
+		assert(
+			score > 0,
+			'helpfulness score should be greater than 0 after upvote'
+		);
 	});
 
 	it('should return 0 for invalid uid', async () => {
@@ -92,7 +101,10 @@ describe('User Helpfulness', () => {
 
 	it('should reset score to 0 for user with no posts', async () => {
 		// Create a new user with no posts
-		const newUid = await user.create({ username: 'nopostsuser', password: '123456' });
+		const newUid = await user.create({
+			username: 'nopostsuser',
+			password: '123456',
+		});
 		await helpfulness.set(newUid, 50);
 		const score = await helpfulness.recompute(newUid);
 		assert.strictEqual(score, 0);

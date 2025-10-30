@@ -47,4 +47,3 @@ Logs.clear = async function () {
 		throw err;
 	}
 };
-

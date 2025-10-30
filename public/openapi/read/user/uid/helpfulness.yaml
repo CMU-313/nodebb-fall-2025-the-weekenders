@@ -7,7 +7,7 @@ get:
       required: true
       schema:
         type: integer
-      example: 2         
+      example: 2
   responses:
     '200':
       description: A user’s helpfulness score
@@ -22,7 +22,7 @@ get:
               helpfulnessScore:
                 type: integer
                 example: 16
-          examples:        
+          examples:
             sample:
               value:
                 uid: 2

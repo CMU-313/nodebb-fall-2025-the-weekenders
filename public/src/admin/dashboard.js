@@ -67,7 +67,10 @@ $(window).on('action:ajaxify.start', function () {
 export function init() {
 	app.enterRoom('admin');
 
-	isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+	isMobile =
+		/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
+			navigator.userAgent
+		);
 
 	setupDarkModeButton();
 	setupRealtimeButton();
@@ -95,7 +98,9 @@ function updateRoomUsage(err, data) {
 
 	$('#active-users-loggedin').text(formattedNumber(data.onlineRegisteredCount));
 	$('#active-users-guests').text(formattedNumber(data.onlineGuestCount));
-	$('#active-users-total').text(formattedNumber(data.onlineRegisteredCount + data.onlineGuestCount));
+	$('#active-users-total').text(
+		formattedNumber(data.onlineRegisteredCount + data.onlineGuestCount)
+	);
 	$('#active-users-connections').text(formattedNumber(data.socketCount));
 }
 
@@ -107,9 +112,16 @@ const graphs = {
 };
 
 const topicColors = [
-	'#bf616a', '#5B90BF', '#d08770', '#ebcb8b',
-	'#a3be8c', '#96b5b4', '#8fa1b3', '#b48ead',
-	'#ab7967', '#46BFBD',
+	'#bf616a',
+	'#5B90BF',
+	'#d08770',
+	'#ebcb8b',
+	'#a3be8c',
+	'#96b5b4',
+	'#8fa1b3',
+	'#b48ead',
+	'#ab7967',
+	'#46BFBD',
 ];
 
 /* eslint-disable */
@@ -129,12 +141,12 @@ function lighten(col, amt) {
 	if (r > 255) r = 255;
 	else if (r < 0) r = 0;
 
-	let b = ((num >> 8) & 0x00FF) + amt;
+	let b = ((num >> 8) & 0x00ff) + amt;
 
 	if (b > 255) b = 255;
 	else if (b < 0) b = 0;
 
-	let g = (num & 0x0000FF) + amt;
+	let g = (num & 0x0000ff) + amt;
 
 	if (g > 255) g = 255;
 	else if (g < 0) g = 0;
@@ -188,7 +200,10 @@ function setupGraphs(callback) {
 					pointHoverBackgroundColor: '#fff',
 					pointBorderColor: '#fff',
 					pointHoverBorderColor: 'rgba(220,220,220,1)',
-					data: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+					data: [
+						0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+						0,
+					],
 				},
 				{
 					label: translations[1],
@@ -200,7 +215,10 @@ function setupGraphs(callback) {
 					pointHoverBackgroundColor: '#ab4642',
 					pointBorderColor: '#fff',
 					pointHoverBorderColor: '#ab4642',
-					data: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+					data: [
+						0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+						0,
+					],
 				},
 				{
 					label: translations[2],
@@ -212,7 +230,10 @@ function setupGraphs(callback) {
 					pointHoverBackgroundColor: '#ba8baf',
 					pointBorderColor: '#fff',
 					pointHoverBorderColor: '#ba8baf',
-					data: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+					data: [
+						0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+						0,
+					],
 				},
 				{
 					label: translations[3],
@@ -224,7 +245,10 @@ function setupGraphs(callback) {
 					pointHoverBackgroundColor: '#f7ca88',
 					pointBorderColor: '#fff',
 					pointHoverBorderColor: '#f7ca88',
-					data: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+					data: [
+						0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+						0,
+					],
 				},
 				{
 					label: translations[4],
@@ -236,7 +260,10 @@ function setupGraphs(callback) {
 					pointHoverBackgroundColor: 'rgba(151,187,205,1)',
 					pointBorderColor: '#fff',
 					pointHoverBorderColor: 'rgba(151,187,205,1)',
-					data: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+					data: [
+						0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+						0,
+					],
 				},
 			],
 		};
@@ -298,11 +325,13 @@ function setupGraphs(callback) {
 			type: 'doughnut',
 			data: {
 				labels: translations.slice(5, 7),
-				datasets: [{
-					data: [1, 1],
-					backgroundColor: ['#F7464A', '#46BFBD'],
-					hoverBackgroundColor: ['#FF5A5E', '#5AD3D1'],
-				}],
+				datasets: [
+					{
+						data: [1, 1],
+						backgroundColor: ['#F7464A', '#46BFBD'],
+						hoverBackgroundColor: ['#FF5A5E', '#5AD3D1'],
+					},
+				],
 			},
 			options: doughnutOpts,
 		});
@@ -311,11 +340,25 @@ function setupGraphs(callback) {
 			type: 'doughnut',
 			data: {
 				labels: translations.slice(7, 12),
-				datasets: [{
-					data: [1, 1, 1, 1, 1],
-					backgroundColor: ['#F7464A', '#46BFBD', '#FDB45C', '#949FB1', '#9FB194'],
-					hoverBackgroundColor: ['#FF5A5E', '#5AD3D1', '#FFC870', '#A8B3C5', '#A8B3C5'],
-				}],
+				datasets: [
+					{
+						data: [1, 1, 1, 1, 1],
+						backgroundColor: [
+							'#F7464A',
+							'#46BFBD',
+							'#FDB45C',
+							'#949FB1',
+							'#9FB194',
+						],
+						hoverBackgroundColor: [
+							'#FF5A5E',
+							'#5AD3D1',
+							'#FFC870',
+							'#A8B3C5',
+							'#A8B3C5',
+						],
+					},
+				],
 			},
 			options: doughnutOpts,
 		});
@@ -324,87 +367,115 @@ function setupGraphs(callback) {
 			type: 'doughnut',
 			data: {
 				labels: [],
-				datasets: [{
-					data: [],
-					backgroundColor: [],
-					hoverBackgroundColor: [],
-				}],
+				datasets: [
+					{
+						data: [],
+						backgroundColor: [],
+						hoverBackgroundColor: [],
+					},
+				],
 			},
 			options: doughnutOpts,
 		});
 
 		updateTrafficGraph();
 
-		$('[data-action="updateGraph"]:not([data-units="custom"])').on('click', function () {
-			let until = new Date();
-			const amount = $(this).attr('data-amount');
-			if ($(this).attr('data-units') === 'days') {
-				until.setHours(0, 0, 0, 0);
-			}
-			until = until.getTime();
-			updateTrafficGraph($(this).attr('data-units'), until, amount);
-
-			require(['translator'], function (translator) {
-				translator.translate('[[admin/dashboard:page-views-custom]]', function (translated) {
-					$('[data-action="updateGraph"][data-units="custom"]').text(translated);
-				});
-			});
-		});
-
-		$('[data-action="updateGraph"][data-units="custom"]').on('click', function () {
-			const targetEl = $(this);
-
-			Benchpress.render('admin/partials/pageviews-range-select', {}).then(function (html) {
-				const modal = bootbox.dialog({
-					title: '[[admin/dashboard:page-views-custom]]',
-					message: html,
-					buttons: {
-						submit: {
-							label: '[[global:search]]',
-							className: 'btn-primary',
-							callback: submit,
-						},
-					},
-				}).on('shown.bs.modal', function () {
-					const date = new Date();
-					const today = date.toISOString().slice(0, 10);
-					date.setDate(date.getDate() - 1);
-					const yesterday = date.toISOString().slice(0, 10);
-
-					modal.find('#startRange').val(targetEl.attr('data-startRange') || yesterday);
-					modal.find('#endRange').val(targetEl.attr('data-endRange') || today);
-				});
-
-				function submit() {
-					// NEED TO ADD VALIDATION HERE FOR YYYY-MM-DD
-					const formData = modal.find('form').serializeObject();
-					const validRegexp = /\d{4}-\d{2}-\d{2}/;
-
-					// Input validation
-					if (!formData.startRange && !formData.endRange) {
-						// No range? Assume last 30 days
-						updateTrafficGraph('days');
-						return;
-					} else if (!validRegexp.test(formData.startRange) || !validRegexp.test(formData.endRange)) {
-						// Invalid Input
-						modal.find('.alert-danger').removeClass('hidden');
-						return false;
-					}
-
-					let until = new Date(formData.endRange);
-					until.setDate(until.getDate() + 1);
-					until = until.getTime();
-					const amount = (until - new Date(formData.startRange).getTime()) / (1000 * 60 * 60 * 24);
-
-					updateTrafficGraph('days', until, amount);
-
-					// Update "custom range" label
-					targetEl.attr('data-startRange', formData.startRange);
-					targetEl.attr('data-endRange', formData.endRange);
-					targetEl.html(formData.startRange + ' &ndash; ' + formData.endRange);
+		$('[data-action="updateGraph"]:not([data-units="custom"])').on(
+			'click',
+			function () {
+				let until = new Date();
+				const amount = $(this).attr('data-amount');
+				if ($(this).attr('data-units') === 'days') {
+					until.setHours(0, 0, 0, 0);
 				}
-			});
-		});
+				until = until.getTime();
+				updateTrafficGraph($(this).attr('data-units'), until, amount);
+
+				require(['translator'], function (translator) {
+					translator.translate(
+						'[[admin/dashboard:page-views-custom]]',
+						function (translated) {
+							$('[data-action="updateGraph"][data-units="custom"]').text(
+								translated
+							);
+						}
+					);
+				});
+			}
+		);
+
+		$('[data-action="updateGraph"][data-units="custom"]').on(
+			'click',
+			function () {
+				const targetEl = $(this);
+
+				Benchpress.render('admin/partials/pageviews-range-select', {}).then(
+					function (html) {
+						const modal = bootbox
+							.dialog({
+								title: '[[admin/dashboard:page-views-custom]]',
+								message: html,
+								buttons: {
+									submit: {
+										label: '[[global:search]]',
+										className: 'btn-primary',
+										callback: submit,
+									},
+								},
+							})
+							.on('shown.bs.modal', function () {
+								const date = new Date();
+								const today = date.toISOString().slice(0, 10);
+								date.setDate(date.getDate() - 1);
+								const yesterday = date.toISOString().slice(0, 10);
+
+								modal
+									.find('#startRange')
+									.val(targetEl.attr('data-startRange') || yesterday);
+								modal
+									.find('#endRange')
+									.val(targetEl.attr('data-endRange') || today);
+							});
+
+						function submit() {
+							// NEED TO ADD VALIDATION HERE FOR YYYY-MM-DD
+							const formData = modal.find('form').serializeObject();
+							const validRegexp = /\d{4}-\d{2}-\d{2}/;
+
+							// Input validation
+							if (!formData.startRange && !formData.endRange) {
+								// No range? Assume last 30 days
+								updateTrafficGraph('days');
+								return;
+							} else if (
+								!validRegexp.test(formData.startRange) ||
+								!validRegexp.test(formData.endRange)
+							) {
+								// Invalid Input
+								modal.find('.alert-danger').removeClass('hidden');
+								return false;
+							}
+
+							let until = new Date(formData.endRange);
+							until.setDate(until.getDate() + 1);
+							until = until.getTime();
+							const amount =
+								(until - new Date(formData.startRange).getTime()) /
+								(1000 * 60 * 60 * 24);
+
+							updateTrafficGraph('days', until, amount);
+
+							// Update "custom range" label
+							targetEl.attr('data-startRange', formData.startRange);
+							targetEl.attr('data-endRange', formData.endRange);
+							targetEl.html(
+								formData.startRange + ' &ndash; ' + formData.endRange
+							);
+						}
+					}
+				);
+			}
+		);
 
 		callback();
 	});
@@ -417,52 +488,59 @@ function updateTrafficGraph(units, until, amount) {
 		return;
 	}
 
-	socket.emit('admin.analytics.get', {
-		graph: 'traffic',
-		units: units || 'hours',
-		until: until,
-		amount: amount,
-	}, function (err, data) {
-		if (err) {
-			return alerts.error(err);
-		}
-		if (JSON.stringify(graphData.traffic) === JSON.stringify(data)) {
-			return;
-		}
-
-		graphData.traffic = data;
-
-		if (units === 'days') {
-			graphs.traffic.data.xLabels = utils.getDaysArray(until, amount);
-		} else {
-			graphs.traffic.data.xLabels = utils.getHoursArray();
-
-			$('#pageViewsThirty').html(formattedNumber(data.summary.thirty));
-			$('#pageViewsSeven').html(formattedNumber(data.summary.seven));
-			$('#pageViewsPastDay').html(formattedNumber(data.pastDay));
-		}
-
-		graphs.traffic.data.datasets[0].data = data.pageviews;
-		graphs.traffic.data.datasets[1].data = data.pageviewsRegistered;
-		graphs.traffic.data.datasets[2].data = data.pageviewsGuest;
-		graphs.traffic.data.datasets[3].data = data.pageviewsBot;
-		graphs.traffic.data.datasets[4].data = data.uniqueVisitors;
-		graphs.traffic.data.labels = graphs.traffic.data.xLabels;
-
-		graphs.traffic.update();
-		currentGraph.units = units;
-		currentGraph.until = until;
-		currentGraph.amount = amount;
-
-		// Update the View as JSON button url
-		const apiEl = $('#view-as-json');
-		const newHref = $.param({
+	socket.emit(
+		'admin.analytics.get',
+		{
+			graph: 'traffic',
 			units: units || 'hours',
 			until: until,
-			count: amount,
-		});
-		apiEl.attr('href', config.relative_path + '/api/admin/analytics?' + newHref);
-	});
+			amount: amount,
+		},
+		function (err, data) {
+			if (err) {
+				return alerts.error(err);
+			}
+			if (JSON.stringify(graphData.traffic) === JSON.stringify(data)) {
+				return;
+			}
+
+			graphData.traffic = data;
+
+			if (units === 'days') {
+				graphs.traffic.data.xLabels = utils.getDaysArray(until, amount);
+			} else {
+				graphs.traffic.data.xLabels = utils.getHoursArray();
+
+				$('#pageViewsThirty').html(formattedNumber(data.summary.thirty));
+				$('#pageViewsSeven').html(formattedNumber(data.summary.seven));
+				$('#pageViewsPastDay').html(formattedNumber(data.pastDay));
+			}
+
+			graphs.traffic.data.datasets[0].data = data.pageviews;
+			graphs.traffic.data.datasets[1].data = data.pageviewsRegistered;
+			graphs.traffic.data.datasets[2].data = data.pageviewsGuest;
+			graphs.traffic.data.datasets[3].data = data.pageviewsBot;
+			graphs.traffic.data.datasets[4].data = data.uniqueVisitors;
+			graphs.traffic.data.labels = graphs.traffic.data.xLabels;
+
+			graphs.traffic.update();
+			currentGraph.units = units;
+			currentGraph.until = until;
+			currentGraph.amount = amount;
+
+			// Update the View as JSON button url
+			const apiEl = $('#view-as-json');
+			const newHref = $.param({
+				units: units || 'hours',
+				until: until,
+				count: amount,
+			});
+			apiEl.attr(
+				'href',
+				config.relative_path + '/api/admin/analytics?' + newHref
+			);
+		}
+	);
 }
 
 function updateRegisteredGraph(registered, guest) {
@@ -474,11 +552,26 @@ function updateRegisteredGraph(registered, guest) {
 }
 
 function updatePresenceGraph(users) {
-	$('#analytics-presence-legend .on-categories').parent().find('.count').text(users.categories);
-	$('#analytics-presence-legend .reading-posts').parent().find('.count').text(users.topics);
-	$('#analytics-presence-legend .browsing-topics').parent().find('.count').text(users.category);
-	$('#analytics-presence-legend .recent').parent().find('.count').text(users.recent);
-	$('#analytics-presence-legend .unread').parent().find('.count').text(users.unread);
+	$('#analytics-presence-legend .on-categories')
+		.parent()
+		.find('.count')
+		.text(users.categories);
+	$('#analytics-presence-legend .reading-posts')
+		.parent()
+		.find('.count')
+		.text(users.topics);
+	$('#analytics-presence-legend .browsing-topics')
+		.parent()
+		.find('.count')
+		.text(users.category);
+	$('#analytics-presence-legend .recent')
+		.parent()
+		.find('.count')
+		.text(users.recent);
+	$('#analytics-presence-legend .unread')
+		.parent()
+		.find('.count')
+		.text(users.unread);
 	graphs.presence.data.datasets[0].data[0] = users.categories;
 	graphs.presence.data.datasets[0].data[1] = users.topics;
 	graphs.presence.data.datasets[0].data[2] = users.category;
@@ -490,13 +583,18 @@ function updatePresenceGraph(users) {
 
 function updateTopicsGraph(topics) {
 	if (!topics.length) {
-		translator.translate('[[admin/dashboard:no-users-browsing]]', function (translated) {
-			topics = [{
-				title: translated,
-				count: 1,
-			}];
-			updateTopicsGraph(topics);
-		});
+		translator.translate(
+			'[[admin/dashboard:no-users-browsing]]',
+			function (translated) {
+				topics = [
+					{
+						title: translated,
+						count: 1,
+					},
+				];
+				updateTopicsGraph(topics);
+			}
+		);
 		return;
 	}
 
@@ -509,18 +607,37 @@ function updateTopicsGraph(topics) {
 		graphs.topics.data.labels.push(topic.title);
 		graphs.topics.data.datasets[0].data.push(topic.count);
 		graphs.topics.data.datasets[0].backgroundColor.push(topicColors[i]);
-		graphs.topics.data.datasets[0].hoverBackgroundColor.push(lighten(topicColors[i], 10));
+		graphs.topics.data.datasets[0].hoverBackgroundColor.push(
+			lighten(topicColors[i], 10)
+		);
 	});
 
 	function buildTopicsLegend() {
 		let html = '';
 		topics.forEach(function (t, i) {
-			const link = t.tid ? '<a title="' + t.title + '"href="' + config.relative_path + '/topic/' + t.tid + '" target="_blank"> ' + t.title + '</a>' : t.title;
+			const link = t.tid
+				? '<a title="' +
+					t.title +
+					'"href="' +
+					config.relative_path +
+					'/topic/' +
+					t.tid +
+					'" target="_blank"> ' +
+					t.title +
+					'</a>'
+				: t.title;
 			const label = t.count === '0' ? t.title : link;
 
-			html += '<li>' +
-				'<div style="background-color: ' + topicColors[i] + ';"></div>' +
-				'<span> (' + t.count + ') ' + label + '</span>' +
+			html +=
+				'<li>' +
+				'<div style="background-color: ' +
+				topicColors[i] +
+				';"></div>' +
+				'<span> (' +
+				t.count +
+				') ' +
+				label +
+				'</span>' +
 				'</li>';
 		});
 		$('#topics-legend').translateHtml(html);
@@ -532,7 +649,8 @@ function updateTopicsGraph(topics) {
 
 function setupDarkModeButton() {
 	let bsTheme = localStorage.getItem('data-bs-theme') || 'light';
-	$('#toggle-dark-mode').prop('checked', bsTheme === 'dark')
+	$('#toggle-dark-mode')
+		.prop('checked', bsTheme === 'dark')
 		.on('click', function () {
 			const isChecked = $(this).is(':checked');
 			bsTheme = isChecked ? 'dark' : 'light';
@@ -551,15 +669,25 @@ function initiateDashboard(realtime) {
 	clearInterval(intervals.rooms);
 	clearInterval(intervals.graphs);
 
-	intervals.rooms = setInterval(function () {
-		if (app.isFocused && socket.connected) {
-			socket.emit('admin.rooms.getAll', updateRoomUsage);
-		}
-	}, realtime ? DEFAULTS.realtimeInterval : DEFAULTS.roomInterval);
+	intervals.rooms = setInterval(
+		function () {
+			if (app.isFocused && socket.connected) {
+				socket.emit('admin.rooms.getAll', updateRoomUsage);
+			}
+		},
+		realtime ? DEFAULTS.realtimeInterval : DEFAULTS.roomInterval
+	);
 
-	intervals.graphs = setInterval(function () {
-		updateTrafficGraph(currentGraph.units, currentGraph.until, currentGraph.amount);
-	}, realtime ? DEFAULTS.realtimeInterval : DEFAULTS.graphInterval);
+	intervals.graphs = setInterval(
+		function () {
+			updateTrafficGraph(
+				currentGraph.units,
+				currentGraph.until,
+				currentGraph.amount
+			);
+		},
+		realtime ? DEFAULTS.realtimeInterval : DEFAULTS.graphInterval
+	);
 }
 
 function setupFullscreen() {

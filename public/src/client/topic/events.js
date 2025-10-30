@@ -1,6 +1,4 @@
-
 'use strict';
-
 
 define('forum/topic/events', [
 	'forum/topic/postTools',
@@ -11,7 +9,16 @@ define('forum/topic/events', [
 	'translator',
 	'hooks',
 	'helpers',
-], function (postTools, threadTools, posts, images, components, translator, hooks, helpers) {
+], function (
+	postTools,
+	threadTools,
+	posts,
+	images,
+	components,
+	translator,
+	hooks,
+	helpers
+) {
 	const Events = {};
 
 	const events = {
@@ -62,22 +69,38 @@ define('forum/topic/events', [
 	};
 
 	function onUserStatusChange(data) {
-		app.updateUserStatus($('[data-uid="' + data.uid + '"] [component="user/status"]'), data.status);
+		app.updateUserStatus(
+			$('[data-uid="' + data.uid + '"] [component="user/status"]'),
+			data.status
+		);
 	}
 
 	function updatePostVotesAndUserReputation(data) {
-		const votes = $('[data-pid="' + data.post.pid + '"] [component="post/vote-count"]').filter(function (index, el) {
-			return $(el).closest('[data-pid]').attr('data-pid') === String(data.post.pid);
+		const votes = $(
+			'[data-pid="' + data.post.pid + '"] [component="post/vote-count"]'
+		).filter(function (index, el) {
+			return (
+				$(el).closest('[data-pid]').attr('data-pid') === String(data.post.pid)
+			);
 		});
-		const reputationElements = $('.reputation[data-uid="' + data.post.uid + '"]');
+		const reputationElements = $(
+			'.reputation[data-uid="' + data.post.uid + '"]'
+		);
 		votes.html(data.post.votes).attr('data-votes', data.post.votes);
-		reputationElements.html(data.user.reputation).attr('data-reputation', data.user.reputation);
+		reputationElements
+			.html(data.user.reputation)
+			.attr('data-reputation', data.user.reputation);
 	}
 
 	function updateBookmarkCount(data) {
-		$('[data-pid="' + data.post.pid + '"] .bookmarkCount').filter(function (index, el) {
-			return $(el).closest('[data-pid]').attr('data-pid') === String(data.post.pid);
-		}).html(data.post.bookmarks).attr('data-bookmarks', data.post.bookmarks);
+		$('[data-pid="' + data.post.pid + '"] .bookmarkCount')
+			.filter(function (index, el) {
+				return (
+					$(el).closest('[data-pid]').attr('data-pid') === String(data.post.pid)
+				);
+			})
+			.html(data.post.bookmarks)
+			.attr('data-bookmarks', data.post.bookmarks);
 	}
 
 	function onTopicPurged(data) {
@@ -97,16 +120,30 @@ define('forum/topic/events', [
 	}
 
 	function onPostEdited(data) {
-		if (!data || !data.post || String(data.post.tid) !== String(ajaxify.data.tid)) {
+		if (
+			!data ||
+			!data.post ||
+			String(data.post.tid) !== String(ajaxify.data.tid)
+		) {
 			return;
 		}
-		const editedPostEl = components.get('post/content', data.post.pid).filter(function (index, el) {
-			return String($(el).closest('[data-pid]').attr('data-pid')) === String(data.post.pid);
-		});
+		const editedPostEl = components
+			.get('post/content', data.post.pid)
+			.filter(function (index, el) {
+				return (
+					String($(el).closest('[data-pid]').attr('data-pid')) ===
+					String(data.post.pid)
+				);
+			});
 		const postContainer = $(`[data-pid="${data.post.pid}"]`);
-		const editorEl = postContainer.find('[component="post/editor"]').filter(function (index, el) {
-			return String($(el).closest('[data-pid]').attr('data-pid')) === String(data.post.pid);
-		});
+		const editorEl = postContainer
+			.find('[component="post/editor"]')
+			.filter(function (index, el) {
+				return (
+					String($(el).closest('[data-pid]').attr('data-pid')) ===
+					String(data.post.pid)
+				);
+			});
 		const topicTitle = components.get('topic/title');
 		const navbarTitle = components.get('navbar/title').find('span');
 		const breadCrumb = components.get('breadcrumb/current');
@@ -117,8 +154,20 @@ define('forum/topic/events', [
 
 		if (topicTitle.length && data.topic.title && data.topic.renamed) {
 			ajaxify.data.title = data.topic.title;
-			const newUrl = 'topic/' + data.topic.slug + (window.location.search ? window.location.search : '');
-			history.replaceState({ url: newUrl }, null, window.location.protocol + '//' + window.location.host + config.relative_path + '/' + newUrl);
+			const newUrl =
+				'topic/' +
+				data.topic.slug +
+				(window.location.search ? window.location.search : '');
+			history.replaceState(
+				{ url: newUrl },
+				null,
+				window.location.protocol +
+					'//' +
+					window.location.host +
+					config.relative_path +
+					'/' +
+					newUrl
+			);
 
 			topicTitle.fadeOut(250, function () {
 				topicTitle.html(data.topic.title).fadeIn(250);
@@ -145,26 +194,40 @@ define('forum/topic/events', [
 						editedISO: utils.toISOString(data.post.edited),
 					};
 
-					app.parseAndTranslate('partials/topic/post-editor', editData, function (html) {
-						editorEl.replaceWith(html);
-						postContainer.find('[component="post/edit-indicator"]')
-							.removeClass('hidden')
-							.translateAttr('title', `[[global:edited-timestamp, ${helpers.isoTimeToLocaleString(editData.editedISO, config.userLang)}]]`);
-						postContainer.find('[component="post/editor"] .timeago').timeago();
-						hooks.fire('action:posts.edited', data);
-					});
+					app.parseAndTranslate(
+						'partials/topic/post-editor',
+						editData,
+						function (html) {
+							editorEl.replaceWith(html);
+							postContainer
+								.find('[component="post/edit-indicator"]')
+								.removeClass('hidden')
+								.translateAttr(
+									'title',
+									`[[global:edited-timestamp, ${helpers.isoTimeToLocaleString(editData.editedISO, config.userLang)}]]`
+								);
+							postContainer
+								.find('[component="post/editor"] .timeago')
+								.timeago();
+							hooks.fire('action:posts.edited', data);
+						}
+					);
 				}
 			});
 
-			const parentEl = $(`[component="post/parent"][data-parent-pid="${data.post.pid}"]`);
+			const parentEl = $(
+				`[component="post/parent"][data-parent-pid="${data.post.pid}"]`
+			);
 			if (parentEl.length) {
-				parentEl.find('[component="post/parent/content"]').html(
-					translator.unescape(data.post.content)
-				);
+				parentEl
+					.find('[component="post/parent/content"]')
+					.html(translator.unescape(data.post.content));
 				parentEl.find('img:not(.not-responsive)').addClass('img-fluid');
-				parentEl.find('[component="post/parent/content]" img:not(.emoji)').each(function () {
-					images.wrapImageInLink($(this));
-				});
+				parentEl
+					.find('[component="post/parent/content]" img:not(.emoji)')
+					.each(function () {
+						images.wrapImageInLink($(this));
+					});
 			}
 		} else {
 			hooks.fire('action:posts.edited', data);
@@ -206,31 +269,47 @@ define('forum/topic/events', [
 			postTools.toggle(data.pid, isDeleted);
 
 			if (!isAdminOrMod && !isSelfPost) {
-				postEl.find('[component="post/tools"]').toggleClass('hidden', isDeleted);
+				postEl
+					.find('[component="post/tools"]')
+					.toggleClass('hidden', isDeleted);
 				if (isDeleted) {
-					postEl.find('[component="post/content"]').translateHtml('[[topic:post-is-deleted]]');
+					postEl
+						.find('[component="post/content"]')
+						.translateHtml('[[topic:post-is-deleted]]');
 				} else {
-					postEl.find('[component="post/content"]').html(translator.unescape(data.content));
+					postEl
+						.find('[component="post/content"]')
+						.html(translator.unescape(data.content));
 				}
 			}
 		}
 
-		const parentEl = $(`[component="post/parent"][data-parent-pid="${data.pid}"]`);
+		const parentEl = $(
+			`[component="post/parent"][data-parent-pid="${data.pid}"]`
+		);
 		if (parentEl.length) {
 			parentEl.each((i, el) => {
 				const $parent = $(el);
 				if (isDeleted) {
-					$parent.find('[component="post/parent/content"]').translateHtml('[[topic:post-is-deleted]]');
+					$parent
+						.find('[component="post/parent/content"]')
+						.translateHtml('[[topic:post-is-deleted]]');
 				} else {
-					$parent.find('[component="post/parent/content"]').html(translator.unescape(data.content));
+					$parent
+						.find('[component="post/parent/content"]')
+						.html(translator.unescape(data.content));
 				}
 			});
 		}
 	}
 
 	function togglePostBookmark(data) {
-		const el = $('[data-pid="' + data.post.pid + '"] [component="post/bookmark"]').filter(function (index, el) {
-			return $(el).closest('[data-pid]').attr('data-pid') === String(data.post.pid);
+		const el = $(
+			'[data-pid="' + data.post.pid + '"] [component="post/bookmark"]'
+		).filter(function (index, el) {
+			return (
+				$(el).closest('[data-pid]').attr('data-pid') === String(data.post.pid)
+			);
 		});
 		if (!el.length) {
 			return;
@@ -238,18 +317,34 @@ define('forum/topic/events', [
 
 		el.attr('data-bookmarked', data.isBookmarked);
 
-		el.find('[component="post/bookmark/on"]').toggleClass('hidden', !data.isBookmarked);
-		el.find('[component="post/bookmark/off"]').toggleClass('hidden', data.isBookmarked);
+		el.find('[component="post/bookmark/on"]').toggleClass(
+			'hidden',
+			!data.isBookmarked
+		);
+		el.find('[component="post/bookmark/off"]').toggleClass(
+			'hidden',
+			data.isBookmarked
+		);
 	}
 
 	function togglePostVote(data) {
 		const post = $('[data-pid="' + data.post.pid + '"]');
-		post.find('[component="post/upvote"]').filter(function (index, el) {
-			return $(el).closest('[data-pid]').attr('data-pid') === String(data.post.pid);
-		}).toggleClass('upvoted', data.upvote);
-		post.find('[component="post/downvote"]').filter(function (index, el) {
-			return $(el).closest('[data-pid]').attr('data-pid') === String(data.post.pid);
-		}).toggleClass('downvoted', data.downvote);
+		post
+			.find('[component="post/upvote"]')
+			.filter(function (index, el) {
+				return (
+					$(el).closest('[data-pid]').attr('data-pid') === String(data.post.pid)
+				);
+			})
+			.toggleClass('upvoted', data.upvote);
+		post
+			.find('[component="post/downvote"]')
+			.filter(function (index, el) {
+				return (
+					$(el).closest('[data-pid]').attr('data-pid') === String(data.post.pid)
+				);
+			})
+			.toggleClass('downvoted', data.downvote);
 	}
 
 	function onNewNotification(data) {

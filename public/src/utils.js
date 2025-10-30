@@ -1,4 +1,3 @@
-
 'use strict';
 
 const $ = require('jquery');
@@ -8,17 +7,21 @@ const utils = { ...require('./utils.common') };
 utils.getLanguage = function () {
 	let lang = 'en-GB';
 	if (typeof window === 'object' && window.config) {
-		lang = utils.params().lang || window.config.userLang || window.config.defaultLang || 'en-GB';
+		lang =
+			utils.params().lang ||
+			window.config.userLang ||
+			window.config.defaultLang ||
+			'en-GB';
 	}
 	return lang;
 };
-
 
 utils.makeNumbersHumanReadable = function (elements) {
 	elements.each(function () {
 		const $this = $(this);
 		const toFixed = $this.attr('data-toFixed') || 1;
-		$this.html(utils.makeNumberHumanReadable($this.attr('title'), toFixed))
+		$this
+			.html(utils.makeNumberHumanReadable($this.attr('title'), toFixed))
 			.removeClass('hidden');
 	});
 };
@@ -26,9 +29,7 @@ utils.makeNumbersHumanReadable = function (elements) {
 utils.addCommasToNumbers = function (elements) {
 	elements.each(function (index, element) {
 		const $element = $(element);
-		$element
-			.html(utils.addCommas($element.html()))
-			.removeClass('hidden');
+		$element.html(utils.addCommas($element.html())).removeClass('hidden');
 	});
 };
 

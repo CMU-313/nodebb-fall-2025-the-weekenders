@@ -37,7 +37,10 @@ module.exports = function (Posts) {
 		} else {
 			await db.sortedSetRemove(`uid:${uid}:bookmarks`, pid);
 		}
-		await db[isBookmarking ? 'setAdd' : 'setRemove'](`pid:${pid}:users_bookmarked`, uid);
+		await db[isBookmarking ? 'setAdd' : 'setRemove'](
+			`pid:${pid}:users_bookmarked`,
+			uid
+		);
 		postData.bookmarks = await db.setCount(`pid:${pid}:users_bookmarked`);
 		await Posts.setPostField(pid, 'bookmarks', postData.bookmarks);
 

@@ -1,6 +1,5 @@
 'use strict';
 
-
 define('admin/extend/rewards', [
 	'alerts',
 	'jquery-ui/widgets/sortable',
@@ -84,14 +83,19 @@ define('admin/extend/rewards', [
 		let inputs;
 		let html = '';
 
-		const selectedReward = available.find(reward => reward.rid === el.attr('data-selected'));
+		const selectedReward = available.find(
+			reward => reward.rid === el.attr('data-selected')
+		);
 		if (selectedReward) {
 			inputs = selectedReward.inputs;
 			parent.attr('data-rid', selectedReward.rid);
 		}
 
 		if (!inputs) {
-			return alerts.error('[[admin/extend/rewards:alert.no-inputs-found]] ' + el.attr('data-selected'));
+			return alerts.error(
+				'[[admin/extend/rewards:alert.no-inputs-found]] ' +
+					el.attr('data-selected')
+			);
 		}
 
 		inputs.forEach(function (input) {
@@ -128,22 +132,29 @@ define('admin/extend/rewards', [
 		const ul = $('#active');
 
 		const data = {
-			active: [{
-				disabled: true,
-				value: '',
-				claimable: 1,
-				rid: null,
-				id: null,
-			}],
+			active: [
+				{
+					disabled: true,
+					value: '',
+					claimable: 1,
+					rid: null,
+					id: null,
+				},
+			],
 			conditions: conditions,
 			conditionals: conditionals,
 			rewards: available,
 		};
 
-		app.parseAndTranslate('admin/extend/rewards', 'active', data, function (li) {
-			ul.append(li);
-			li.find('select').val('');
-		});
+		app.parseAndTranslate(
+			'admin/extend/rewards',
+			'active',
+			data,
+			function (li) {
+				ul.append(li);
+				li.find('select').val('');
+			}
+		);
 	}
 
 	function saveRewards() {

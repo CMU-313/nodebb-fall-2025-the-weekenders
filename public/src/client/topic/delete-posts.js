@@ -1,8 +1,10 @@
 'use strict';
 
-define('forum/topic/delete-posts', [
-	'postSelect', 'alerts', 'api',
-], function (postSelect, alerts, api) {
+define('forum/topic/delete-posts', ['postSelect', 'alerts', 'api'], function (
+	postSelect,
+	alerts,
+	api
+) {
 	const DeletePosts = {};
 	let modal;
 	let deleteBtn;
@@ -12,7 +14,9 @@ define('forum/topic/delete-posts', [
 	DeletePosts.init = function () {
 		tid = ajaxify.data.tid;
 
-		$(window).off('action:ajaxify.end', onAjaxifyEnd).on('action:ajaxify.end', onAjaxifyEnd);
+		$(window)
+			.off('action:ajaxify.end', onAjaxifyEnd)
+			.on('action:ajaxify.end', onAjaxifyEnd);
 
 		if (modal) {
 			return;
@@ -28,16 +32,22 @@ define('forum/topic/delete-posts', [
 
 			modal.find('#delete_posts_cancel').on('click', closeModal);
 
-			postSelect.init(function () {
-				checkButtonEnable();
-				showPostsSelected();
-			}, {
-				allowMainPostSelect: true,
-			});
+			postSelect.init(
+				function () {
+					checkButtonEnable();
+					showPostsSelected();
+				},
+				{
+					allowMainPostSelect: true,
+				}
+			);
 			showPostsSelected();
 
 			deleteBtn.on('click', function () {
-				deletePosts(deleteBtn, pid => `/posts/${encodeURIComponent(pid)}/state`);
+				deletePosts(
+					deleteBtn,
+					pid => `/posts/${encodeURIComponent(pid)}/state`
+				);
 			});
 			purgeBtn.on('click', function () {
 				deletePosts(purgeBtn, pid => `/posts/${encodeURIComponent(pid)}`);
@@ -64,7 +74,11 @@ define('forum/topic/delete-posts', [
 
 	function showPostsSelected() {
 		if (postSelect.pids.length) {
-			modal.find('#pids').translateHtml('[[topic:fork-pid-count, ' + postSelect.pids.length + ']]');
+			modal
+				.find('#pids')
+				.translateHtml(
+					'[[topic:fork-pid-count, ' + postSelect.pids.length + ']]'
+				);
 		} else {
 			modal.find('#pids').translateHtml('[[topic:fork-no-pids]]');
 		}

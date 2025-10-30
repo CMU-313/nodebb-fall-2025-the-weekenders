@@ -36,7 +36,9 @@ groupsController.get = async function (req, res, next) {
 		if (res.locals.isAPI) {
 			req.params.slug = lowercaseSlug;
 		} else {
-			return res.redirect(`${nconf.get('relative_path')}/admin/manage/groups/${lowercaseSlug}`);
+			return res.redirect(
+				`${nconf.get('relative_path')}/admin/manage/groups/${lowercaseSlug}`
+			);
 		}
 	}
 
@@ -46,7 +48,11 @@ groupsController.get = async function (req, res, next) {
 	}
 	const [groupNames, group] = await Promise.all([
 		getGroupNames(),
-		groups.get(groupName, { uid: req.uid, truncateUserList: true, userListCount: 20 }),
+		groups.get(groupName, {
+			uid: req.uid,
+			truncateUserList: true,
+			userListCount: 20,
+		}),
 	]);
 
 	if (!group || groupName === groups.BANNED_USERS) {
@@ -72,18 +78,24 @@ groupsController.get = async function (req, res, next) {
 async function getGroupNames() {
 	let groupEntries = Object.entries(await db.getObject('groupslug:groupname'));
 	groupEntries = groupEntries.map(g => ({ slug: g[0], name: g[1] }));
-	return groupEntries.filter(g => (
-		g.name !== 'registered-users' &&
-		g.name !== 'verified-users' &&
-		g.name !== 'unverified-users' &&
-		g.name !== groups.BANNED_USERS
-	)).sort((a, b) => a.name.toLowerCase().localeCompare(b.name.toLowerCase()));
+	return groupEntries
+		.filter(
+			g =>
+				g.name !== 'registered-users' &&
+				g.name !== 'verified-users' &&
+				g.name !== 'unverified-users' &&
+				g.name !== groups.BANNED_USERS
+		)
+		.sort((a, b) => a.name.toLowerCase().localeCompare(b.name.toLowerCase()));
 }
 
 groupsController.getCSV = async function (req, res) {
 	const { referer } = req.headers;
 
-	if (!referer || !referer.replace(nconf.get('url'), '').startsWith('/admin/manage/groups')) {
+	if (
+		!referer ||
+		!referer.replace(nconf.get('url'), '').startsWith('/admin/manage/groups')
+	) {
 		return res.status(403).send('[[error:invalid-origin]]');
 	}
 	await events.log({

@@ -38,16 +38,22 @@ async function getAvailableWidgets() {
 		plugins.hooks.fire('filter:widgets.getWidgets', []),
 		renderAdminTemplate(),
 	]);
-	availableWidgets.forEach((w) => {
+	availableWidgets.forEach(w => {
 		w.content += adminTemplate;
 	});
 	return availableWidgets;
 }
 
 async function renderAdminTemplate() {
-	const groupsData = await groups.getNonPrivilegeGroups('groups:createtime', 0, -1);
+	const groupsData = await groups.getNonPrivilegeGroups(
+		'groups:createtime',
+		0,
+		-1
+	);
 	groupsData.sort((a, b) => b.system - a.system);
-	return await webserver.app.renderAsync('admin/partials/widget-settings', { groups: groupsData });
+	return await webserver.app.renderAsync('admin/partials/widget-settings', {
+		groups: groupsData,
+	});
 }
 
 function buildTemplatesFromAreas(areas) {
@@ -55,7 +61,7 @@ function buildTemplatesFromAreas(areas) {
 	const list = {};
 	let index = 0;
 
-	areas.forEach((area) => {
+	areas.forEach(area => {
 		if (typeof list[area.template] === 'undefined') {
 			list[area.template] = index;
 			templates.push({

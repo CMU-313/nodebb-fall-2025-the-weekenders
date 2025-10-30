@@ -1,7 +1,9 @@
 'use strict';
 
-
-define('forum/login', ['hooks', 'translator', 'jquery-form'], function (hooks, translator) {
+define('forum/login', ['hooks', 'translator', 'jquery-form'], function (
+	hooks,
+	translator
+) {
 	const Login = {
 		_capsState: false,
 	};
@@ -17,7 +19,9 @@ define('forum/login', ['hooks', 'translator', 'jquery-form'], function (hooks, t
 			const password = $('#password').val();
 			errorEl.addClass('hidden').find('p').text('');
 			if (!username || !password) {
-				errorEl.find('p').translateText('[[error:invalid-username-or-password]]');
+				errorEl
+					.find('p')
+					.translateText('[[error:invalid-username-or-password]]');
 				errorEl.removeClass('hidden');
 				return;
 			}
@@ -67,11 +71,16 @@ define('forum/login', ['hooks', 'translator', 'jquery-form'], function (hooks, t
 					let message = data.responseText;
 					const errInfo = data.responseJSON;
 					if (data.status === 403 && data.responseText === 'Forbidden') {
-						window.location.href = config.relative_path + '/login?error=csrf-invalid';
+						window.location.href =
+							config.relative_path + '/login?error=csrf-invalid';
 					} else if (errInfo && errInfo.hasOwnProperty('banned_until')) {
-						message = errInfo.banned_until ?
-							translator.compile('error:user-banned-reason-until', (new Date(errInfo.banned_until).toLocaleString()), errInfo.reason) :
-							'[[error:user-banned-reason, ' + errInfo.reason + ']]';
+						message = errInfo.banned_until
+							? translator.compile(
+									'error:user-banned-reason-until',
+									new Date(errInfo.banned_until).toLocaleString(),
+									errInfo.reason
+								)
+							: '[[error:user-banned-reason, ' + errInfo.reason + ']]';
 					}
 					errorEl.find('p').translateText(message);
 					errorEl.removeClass('hidden');
@@ -86,7 +95,10 @@ define('forum/login', ['hooks', 'translator', 'jquery-form'], function (hooks, t
 		});
 
 		// Guard against caps lock
-		Login.capsLockCheck(document.querySelector('#password'), document.querySelector('#caps-lock-warning'));
+		Login.capsLockCheck(
+			document.querySelector('#password'),
+			document.querySelector('#caps-lock-warning')
+		);
 
 		if ($('#content #username').val()) {
 			$('#content #password').val('').focus();
@@ -97,7 +109,7 @@ define('forum/login', ['hooks', 'translator', 'jquery-form'], function (hooks, t
 	};
 
 	Login.capsLockCheck = (inputEl, warningEl) => {
-		const toggle = (state) => {
+		const toggle = state => {
 			warningEl.classList[state ? 'remove' : 'add']('hidden');
 			warningEl.parentNode.classList[state ? 'add' : 'remove']('has-warning');
 		};

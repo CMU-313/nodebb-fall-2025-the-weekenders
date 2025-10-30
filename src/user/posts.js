@@ -20,12 +20,14 @@ module.exports = function (User) {
 		const now = Date.now();
 		const mutedUntil = await User.getUserField(uid, 'mutedUntil');
 		if (mutedUntil > now) {
-			let muteLeft = ((mutedUntil - now) / (1000 * 60));
+			let muteLeft = (mutedUntil - now) / (1000 * 60);
 			if (muteLeft > 60) {
 				muteLeft = (muteLeft / 60).toFixed(0);
 				throw new Error(`[[error:user-muted-for-hours, ${muteLeft}]]`);
 			} else {
-				throw new Error(`[[error:user-muted-for-minutes, ${muteLeft.toFixed(0)}]]`);
+				throw new Error(
+					`[[error:user-muted-for-minutes, ${muteLeft.toFixed(0)}]]`
+				);
 			}
 		}
 	};
@@ -35,9 +37,15 @@ module.exports = function (User) {
 			return;
 		}
 		const [userData, isAdminOrMod, isMemberOfExempt] = await Promise.all([
-			User.getUserFields(uid, ['uid', 'mutedUntil', 'joindate', 'email', 'reputation'].concat([field])),
+			User.getUserFields(
+				uid,
+				['uid', 'mutedUntil', 'joindate', 'email', 'reputation'].concat([field])
+			),
 			privileges.categories.isAdminOrMod(cid, uid),
-			groups.isMemberOfAny(uid, meta.config.groupsExemptFromNewUserRestrictions),
+			groups.isMemberOfAny(
+				uid,
+				meta.config.groupsExemptFromNewUserRestrictions
+			),
 		]);
 
 		if (!userData.uid) {
@@ -50,21 +58,26 @@ module.exports = function (User) {
 
 		await User.checkMuted(uid);
 
-		const { shouldIgnoreDelays } = await plugins.hooks.fire('filter:user.posts.isReady', {
-			shouldIgnoreDelays: false,
-			user: userData,
-			cid,
-			field,
-			isAdminOrMod,
-			isMemberOfExempt,
-		});
+		const { shouldIgnoreDelays } = await plugins.hooks.fire(
+			'filter:user.posts.isReady',
+			{
+				shouldIgnoreDelays: false,
+				user: userData,
+				cid,
+				field,
+				isAdminOrMod,
+				isMemberOfExempt,
+			}
+		);
 		if (shouldIgnoreDelays) {
 			return;
 		}
 
 		const now = Date.now();
 		if (now - userData.joindate < meta.config.initialPostDelay * 1000) {
-			throw new Error(`[[error:user-too-new, ${meta.config.initialPostDelay}]]`);
+			throw new Error(
+				`[[error:user-too-new, ${meta.config.initialPostDelay}]]`
+			);
 		}
 
 		const lasttime = userData[field] || 0;
@@ -76,29 +89,40 @@ module.exports = function (User) {
 		// now - lasttime < meta.config.newbiePostDelay * 1000
 		// ) {
 		// if (meta.config.newbiePostDelay % 60 === 0) {
-		// throw new Error(`[[error:too-many-posts-newbie-minutes, ${Math.floor(meta.config.newbiePostDelay / 60)}, 
+		// throw new Error(`[[error:too-many-posts-newbie-minutes, ${Math.floor(meta.config.newbiePostDelay / 60)},
 		// ${meta.config.newbieReputationThreshold}]]`);
 		// } else {
-		// throw new Error(`[[error:too-many-posts-newbie, ${meta.config.newbiePostDelay}, 
+		// throw new Error(`[[error:too-many-posts-newbie, ${meta.config.newbiePostDelay},
 		// ${meta.config.newbieReputationThreshold}]]`);
 		// }
 		// } else if (now - lasttime < meta.config.postDelay * 1000) {
 		// throw new Error(`[[error:too-many-posts, ${meta.config.postDelay}]]`);
 		// }
-		if (!isMemberOfExempt && meta.config.newbiePostDelay > 0 &&
-				meta.config.newbieReputationThreshold > userData.reputation) {
-			const remainingNewbie = Math.ceil(((meta.config.newbiePostDelay * 1000) - (now - lasttime)) / 1000);
+		if (
+			!isMemberOfExempt &&
+			meta.config.newbiePostDelay > 0 &&
+			meta.config.newbieReputationThreshold > userData.reputation
+		) {
+			const remainingNewbie = Math.ceil(
+				(meta.config.newbiePostDelay * 1000 - (now - lasttime)) / 1000
+			);
 			if (remainingNewbie > 0) {
 				if (meta.config.newbiePostDelay % 60 === 0) {
-					throw new Error(`[[error:too-many-posts-newbie-minutes, ${Math.floor(meta.config.newbiePostDelay / 60)}, ${meta.config.newbieReputationThreshold}]]`);
+					throw new Error(
+						`[[error:too-many-posts-newbie-minutes, ${Math.floor(meta.config.newbiePostDelay / 60)}, ${meta.config.newbieReputationThreshold}]]`
+					);
 				} else {
-					throw new Error(`[[error:too-many-posts-newbie, ${meta.config.newbiePostDelay}, ${meta.config.newbieReputationThreshold}]]`);
+					throw new Error(
+						`[[error:too-many-posts-newbie, ${meta.config.newbiePostDelay}, ${meta.config.newbieReputationThreshold}]]`
+					);
 				}
 			}
 		}
 
-		if(meta.config.postDelay > 0) {
-			const remaining = Math.ceil(((meta.config.postDelay * 1000) - (now - lasttime)) / 1000);
+		if (meta.config.postDelay > 0) {
+			const remaining = Math.ceil(
+				(meta.config.postDelay * 1000 - (now - lasttime)) / 1000
+			);
 			if (remaining > 0) {
 				throw new Error(`[[error:too-many-posts, ${remaining}]]`);
 			}
@@ -107,7 +131,8 @@ module.exports = function (User) {
 
 	User.onNewPostMade = async function (postData) {
 		// For scheduled posts, use "action" time. It'll be updated in related cron job when post is published
-		const lastposttime = postData.timestamp > Date.now() ? Date.now() : postData.timestamp;
+		const lastposttime =
+			postData.timestamp > Date.now() ? Date.now() : postData.timestamp;
 
 		await Promise.all([
 			User.addPostIdToUser(postData),
@@ -117,32 +142,53 @@ module.exports = function (User) {
 	};
 
 	User.addPostIdToUser = async function (postData) {
-		await db.sortedSetsAdd([
-			`uid:${postData.uid}:posts`,
-			`cid:${postData.cid}:uid:${postData.uid}:pids`,
-		], postData.timestamp, postData.pid);
+		await db.sortedSetsAdd(
+			[
+				`uid:${postData.uid}:posts`,
+				`cid:${postData.cid}:uid:${postData.uid}:pids`,
+			],
+			postData.timestamp,
+			postData.pid
+		);
 		await User.updatePostCount(postData.uid);
 	};
 
-	User.updatePostCount = async (uids) => {
+	User.updatePostCount = async uids => {
 		uids = Array.isArray(uids) ? uids : [uids];
 		const exists = await User.exists(uids);
 		uids = uids.filter((uid, index) => exists[index]);
 		if (uids.length) {
-			const counts = await db.sortedSetsCard(uids.map(uid => `uid:${uid}:posts`));
+			const counts = await db.sortedSetsCard(
+				uids.map(uid => `uid:${uid}:posts`)
+			);
 			await Promise.all([
-				db.setObjectBulk(uids.map((uid, index) => ([`user${activitypub.helpers.isUri(uid) ? 'Remote' : ''}:${uid}`, { postcount: counts[index] }]))),
+				db.setObjectBulk(
+					uids.map((uid, index) => [
+						`user${activitypub.helpers.isUri(uid) ? 'Remote' : ''}:${uid}`,
+						{ postcount: counts[index] },
+					])
+				),
 				db.sortedSetAdd('users:postcount', counts, uids),
 			]);
 		}
 	};
 
 	User.incrementUserPostCountBy = async function (uid, value) {
-		return await incrementUserFieldAndSetBy(uid, 'postcount', 'users:postcount', value);
+		return await incrementUserFieldAndSetBy(
+			uid,
+			'postcount',
+			'users:postcount',
+			value
+		);
 	};
 
 	User.incrementUserReputationBy = async function (uid, value) {
-		return await incrementUserFieldAndSetBy(uid, 'reputation', 'users:reputation', value);
+		return await incrementUserFieldAndSetBy(
+			uid,
+			'reputation',
+			'users:reputation',
+			value
+		);
 	};
 
 	User.incrementUserFlagsBy = async function (uid, value) {

@@ -28,12 +28,12 @@ topicsAPI._checkThumbPrivileges = async function ({ tid, uid }) {
 	const isUUID = validator.isUUID(tid);
 
 	// Sanity-check the tid if it's strictly not a uuid
-	if (!isUUID && (isNaN(parseInt(tid, 10)) || !await topics.exists(tid))) {
+	if (!isUUID && (isNaN(parseInt(tid, 10)) || !(await topics.exists(tid)))) {
 		throw new Error('[[error:no-topic]]');
 	}
 
 	// While drafts are not protected, tids are
-	if (!isUUID && !await privileges.topics.canEdit(tid, uid)) {
+	if (!isUUID && !(await privileges.topics.canEdit(tid, uid))) {
 		throw new Error('[[error:no-privileges]]');
 	}
 };
@@ -66,7 +66,9 @@ topicsAPI.create = async function (caller, data) {
 	apiHelpers.setDefaultPostData(caller, payload);
 	const isScheduling = parseInt(data.timestamp, 10) > payload.timestamp;
 	if (isScheduling) {
-		if (await privileges.categories.can('topics:schedule', data.cid, caller.uid)) {
+		if (
+			await privileges.categories.can('topics:schedule', data.cid, caller.uid)
+		) {
 			payload.timestamp = parseInt(data.timestamp, 10);
 		} else {
 			throw new Error('[[error:no-privileges]]');
@@ -83,15 +85,29 @@ topicsAPI.create = async function (caller, data) {
 	await topics.thumbs.migrate(data.uuid, result.topicData.tid);
 	// DEBUG: log the username returned by topics.post before emitting
 	try {
-		console.error('[DEBUG] api.topics.create - result.postData.user:', result && result.postData && result.postData.user);
-		console.error('[DEBUG] api.topics.create - result.topicData.user:', result && result.topicData && result.topicData.user);
+		console.error(
+			'[DEBUG] api.topics.create - result.postData.user:',
+			result && result.postData && result.postData.user
+		);
+		console.error(
+			'[DEBUG] api.topics.create - result.topicData.user:',
+			result && result.topicData && result.topicData.user
+		);
 	} catch (err) {
-		console.error('[DEBUG] api.topics.create - logging error', err && err.stack ? err.stack : err);
+		console.error(
+			'[DEBUG] api.topics.create - logging error',
+			err && err.stack ? err.stack : err
+		);
 	}
 
-	socketHelpers.emitToUids('event:new_post', { posts: [result.postData] }, [caller.uid]);
+	socketHelpers.emitToUids('event:new_post', { posts: [result.postData] }, [
+		caller.uid,
+	]);
 	socketHelpers.emitToUids('event:new_topic', result.topicData, [caller.uid]);
-	socketHelpers.notifyNew(caller.uid, 'newTopic', { posts: [result.postData], topic: result.topicData });
+	socketHelpers.notifyNew(caller.uid, 'newTopic', {
+		posts: [result.postData],
+		topic: result.topicData,
+	});
 
 	if (!isScheduling) {
 		await activitypubApi.create.note(caller, { pid: result.postData.pid });
@@ -101,7 +117,11 @@ topicsAPI.create = async function (caller, data) {
 };
 
 topicsAPI.reply = async function (caller, data) {
-	if (!data || !data.tid || (meta.config.minimumPostLength !== 0 && !data.content)) {
+	if (
+		!data ||
+		!data.tid ||
+		(meta.config.minimumPostLength !== 0 && !data.content)
+	) {
 		throw new Error('[[error:invalid-data]]');
 	}
 	const payload = { ...data };
@@ -159,7 +179,9 @@ topicsAPI.pin = async function (caller, { tids, expiry }) {
 	await doTopicAction('pin', 'event:topic_pinned', caller, { tids });
 
 	if (expiry) {
-		await Promise.all(tids.map(async tid => topics.tools.setPinExpiry(tid, expiry, caller.uid)));
+		await Promise.all(
+			tids.map(async tid => topics.tools.setPinExpiry(tid, expiry, caller.uid))
+		);
 	}
 };
 
@@ -194,7 +216,7 @@ topicsAPI.unfollow = async function (caller, data) {
 };
 
 topicsAPI.updateTags = async (caller, { tid, tags }) => {
-	if (!await privileges.topics.canEdit(tid, caller.uid)) {
+	if (!(await privileges.topics.canEdit(tid, caller.uid))) {
 		throw new Error('[[error:no-privileges]]');
 	}
 
@@ -205,7 +227,7 @@ topicsAPI.updateTags = async (caller, { tid, tags }) => {
 };
 
 topicsAPI.addTags = async (caller, { tid, tags }) => {
-	if (!await privileges.topics.canEdit(tid, caller.uid)) {
+	if (!(await privileges.topics.canEdit(tid, caller.uid))) {
 		throw new Error('[[error:no-privileges]]');
 	}
 
@@ -218,7 +240,7 @@ topicsAPI.addTags = async (caller, { tid, tags }) => {
 };
 
 topicsAPI.deleteTags = async (caller, { tid }) => {
-	if (!await privileges.topics.canEdit(tid, caller.uid)) {
+	if (!(await privileges.topics.canEdit(tid, caller.uid))) {
 		throw new Error('[[error:no-privileges]]');
 	}
 
@@ -226,7 +248,8 @@ topicsAPI.deleteTags = async (caller, { tid }) => {
 };
 
 topicsAPI.getThumbs = async (caller, { tid, thumbsOnly }) => {
-	if (isFinite(tid)) { // post_uuids can be passed in occasionally, in that case no checks are necessary
+	if (isFinite(tid)) {
+		// post_uuids can be passed in occasionally, in that case no checks are necessary
 		const [exists, canRead] = await Promise.all([
 			topics.exists(tid),
 			privileges.topics.can('topics:read', tid, caller.uid),
@@ -274,7 +297,7 @@ topicsAPI.reorderThumbs = async (caller, { tid, path, order }) => {
 };
 
 topicsAPI.getEvents = async (caller, { tid }) => {
-	if (!await privileges.topics.can('topics:read', tid, caller.uid)) {
+	if (!(await privileges.topics.can('topics:read', tid, caller.uid))) {
 		throw new Error('[[error:no-privileges]]');
 	}
 
@@ -282,7 +305,7 @@ topicsAPI.getEvents = async (caller, { tid }) => {
 };
 
 topicsAPI.deleteEvent = async (caller, { tid, eventId }) => {
-	if (!await privileges.topics.isAdminOrMod(tid, caller.uid)) {
+	if (!(await privileges.topics.isAdminOrMod(tid, caller.uid))) {
 		throw new Error('[[error:no-privileges]]');
 	}
 
@@ -329,40 +352,64 @@ topicsAPI.move = async (caller, { tid, cid }) => {
 	const uids = await user.getUidsFromSet('users:online', 0, -1);
 	const cids = [parseInt(cid, 10)];
 
-	await batch.processArray(tids, async (tids) => {
-		await Promise.all(tids.map(async (tid) => {
-			const canMove = await privileges.topics.isAdminOrMod(tid, caller.uid);
-			if (!canMove) {
-				throw new Error('[[error:no-privileges]]');
-			}
-			const topicData = await topics.getTopicFields(tid, ['tid', 'cid', 'mainPid', 'slug', 'deleted']);
-			if (!cids.includes(topicData.cid)) {
-				cids.push(topicData.cid);
-			}
-			await topics.tools.move(tid, {
-				cid,
-				uid: caller.uid,
-			});
+	await batch.processArray(
+		tids,
+		async tids => {
+			await Promise.all(
+				tids.map(async tid => {
+					const canMove = await privileges.topics.isAdminOrMod(tid, caller.uid);
+					if (!canMove) {
+						throw new Error('[[error:no-privileges]]');
+					}
+					const topicData = await topics.getTopicFields(tid, [
+						'tid',
+						'cid',
+						'mainPid',
+						'slug',
+						'deleted',
+					]);
+					if (!cids.includes(topicData.cid)) {
+						cids.push(topicData.cid);
+					}
+					await topics.tools.move(tid, {
+						cid,
+						uid: caller.uid,
+					});
 
-			const notifyUids = await privileges.categories.filterUids('topics:read', topicData.cid, uids);
-			socketHelpers.emitToUids('event:topic_moved', topicData, notifyUids);
-			if (!topicData.deleted) {
-				socketHelpers.sendNotificationToTopicOwner(tid, caller.uid, 'move', 'notifications:moved-your-topic');
-				activitypubApi.announce.note(caller, { tid });
-				const { activity } = await activitypub.mocks.activities.create(topicData.mainPid, caller.uid);
-				await activitypub.feps.announce(topicData.mainPid, activity);
-			}
+					const notifyUids = await privileges.categories.filterUids(
+						'topics:read',
+						topicData.cid,
+						uids
+					);
+					socketHelpers.emitToUids('event:topic_moved', topicData, notifyUids);
+					if (!topicData.deleted) {
+						socketHelpers.sendNotificationToTopicOwner(
+							tid,
+							caller.uid,
+							'move',
+							'notifications:moved-your-topic'
+						);
+						activitypubApi.announce.note(caller, { tid });
+						const { activity } = await activitypub.mocks.activities.create(
+							topicData.mainPid,
+							caller.uid
+						);
+						await activitypub.feps.announce(topicData.mainPid, activity);
+					}
 
-			await events.log({
-				type: `topic-move`,
-				uid: caller.uid,
-				ip: caller.ip,
-				tid: tid,
-				fromCid: topicData.cid,
-				toCid: cid,
-			});
-		}));
-	}, { batch: 10 });
+					await events.log({
+						type: `topic-move`,
+						uid: caller.uid,
+						ip: caller.ip,
+						tid: tid,
+						fromCid: topicData.cid,
+						toCid: cid,
+					});
+				})
+			);
+		},
+		{ batch: 10 }
+	);
 
 	await categories.onTopicsMoved(cids);
 };

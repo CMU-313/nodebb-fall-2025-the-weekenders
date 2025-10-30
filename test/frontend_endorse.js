@@ -36,7 +36,10 @@ describe('frontend endorse ordering (unit)', function () {
 	it('keeps main first and no-ops when nothing endorsed', function () {
 		const posts = [{ pid: 1 }, { pid: 2 }, { pid: 3 }];
 		const ordered = toEndorsedOrder(posts);
-		assert.deepStrictEqual(ordered.map(p => p.pid), [1, 2, 3]);
+		assert.deepStrictEqual(
+			ordered.map(p => p.pid),
+			[1, 2, 3]
+		);
 	});
 
 	it('groups endorsed replies after main', function () {
@@ -48,7 +51,10 @@ describe('frontend endorse ordering (unit)', function () {
 			{ pid: 4, endorsed: true, endorsed_at: t },
 		];
 		const ordered = toEndorsedOrder(posts);
-		assert.deepStrictEqual(ordered.map(p => p.pid), [1, 4, 2, 3]);
+		assert.deepStrictEqual(
+			ordered.map(p => p.pid),
+			[1, 4, 2, 3]
+		);
 	});
 
 	it('sorts endorsed by rank asc, then time desc', function () {
@@ -61,10 +67,11 @@ describe('frontend endorse ordering (unit)', function () {
 			{ pid: 5 },
 		];
 		const ordered = toEndorsedOrder(posts);
-		assert.deepStrictEqual(ordered.map(p => p.pid), [1, 3, 2, 4, 5]);
-
+		assert.deepStrictEqual(
+			ordered.map(p => p.pid),
+			[1, 3, 2, 4, 5]
+		);
 	});
-
 
 	it('treats missing rank as Infinity and keeps non-endorsed stable', function () {
 		const t = Date.now();

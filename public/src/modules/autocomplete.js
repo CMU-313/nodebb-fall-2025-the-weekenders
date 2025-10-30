@@ -1,15 +1,25 @@
 'use strict';
 
 define('autocomplete', [
-	'api', 'alerts', '@textcomplete/core', '@textcomplete/textarea', '@textcomplete/contenteditable',
-], function (api, alerts, { Textcomplete }, { TextareaEditor }, { ContenteditableEditor }) {
+	'api',
+	'alerts',
+	'@textcomplete/core',
+	'@textcomplete/textarea',
+	'@textcomplete/contenteditable',
+], function (
+	api,
+	alerts,
+	{ Textcomplete },
+	{ TextareaEditor },
+	{ ContenteditableEditor }
+) {
 	const autocomplete = {};
 	const _default = {
 		delay: 200,
 		appendTo: null,
 	};
 
-	autocomplete.init = (params) => {
+	autocomplete.init = params => {
 		const acParams = { ..._default, ...params };
 		const { input, onSelect } = acParams;
 		app.loadJQueryUI(function () {
@@ -46,22 +56,24 @@ define('autocomplete', [
 					if (result && result.users) {
 						const names = result.users.map(function (user) {
 							const username = $('<div></div>').html(user.username).text();
-							return user && {
-								label: username,
-								value: username,
-								user: {
-									uid: user.uid,
-									name: user.username,
-									slug: user.userslug,
-									username: user.username,
-									userslug: user.userslug,
-									displayname: user.displayname,
-									picture: user.picture,
-									banned: user.banned,
-									'icon:text': user['icon:text'],
-									'icon:bgColor': user['icon:bgColor'],
-								},
-							};
+							return (
+								user && {
+									label: username,
+									value: username,
+									user: {
+										uid: user.uid,
+										name: user.username,
+										slug: user.userslug,
+										username: user.username,
+										userslug: user.userslug,
+										displayname: user.displayname,
+										picture: user.picture,
+										banned: user.banned,
+										'icon:text': user['icon:text'],
+										'icon:bgColor': user['icon:bgColor'],
+									},
+								}
+							);
 						});
 						response(names);
 					}
@@ -77,24 +89,30 @@ define('autocomplete', [
 			input,
 			onSelect,
 			source: (request, response) => {
-				socket.emit('groups.search', {
-					query: request.term,
-				}, function (err, results) {
-					if (err) {
-						return alerts.error(err);
+				socket.emit(
+					'groups.search',
+					{
+						query: request.term,
+					},
+					function (err, results) {
+						if (err) {
+							return alerts.error(err);
+						}
+						if (results && results.length) {
+							const names = results.map(function (group) {
+								return (
+									group && {
+										label: group.name,
+										value: group.name,
+										group: group,
+									}
+								);
+							});
+							response(names);
+						}
+						$('.ui-autocomplete a').attr('data-ajaxify', 'false');
 					}
-					if (results && results.length) {
-						const names = results.map(function (group) {
-							return group && {
-								label: group.name,
-								value: group.name,
-								group: group,
-							};
-						});
-						response(names);
-					}
-					$('.ui-autocomplete a').attr('data-ajaxify', 'false');
-				});
+				);
 			},
 		});
 	};
@@ -105,24 +123,28 @@ define('autocomplete', [
 			onSelect,
 			delay: 100,
 			source: (request, response) => {
-				socket.emit('topics.autocompleteTags', {
-					query: request.term,
-					cid: ajaxify.data.cid || 0,
-				}, function (err, tags) {
-					if (err) {
-						return alerts.error(err);
+				socket.emit(
+					'topics.autocompleteTags',
+					{
+						query: request.term,
+						cid: ajaxify.data.cid || 0,
+					},
+					function (err, tags) {
+						if (err) {
+							return alerts.error(err);
+						}
+						if (tags) {
+							response(tags);
+						}
+						$('.ui-autocomplete a').attr('data-ajaxify', 'false');
 					}
-					if (tags) {
-						response(tags);
-					}
-					$('.ui-autocomplete a').attr('data-ajaxify', 'false');
-				});
+				);
 			},
 		});
 	};
 
 	function handleOnSelect(input, onselect, event, ui) {
-		onselect = onselect || function () { };
+		onselect = onselect || function () {};
 		const e = jQuery.Event('keypress');
 		e.which = 13;
 		e.keyCode = 13;
@@ -141,14 +163,20 @@ define('autocomplete', [
 		var editor;
 		if (targetEl.nodeName === 'TEXTAREA' || targetEl.nodeName === 'INPUT') {
 			editor = new TextareaEditor(targetEl);
-		} else if (targetEl.nodeName === 'DIV' && targetEl.getAttribute('contenteditable') === 'true') {
+		} else if (
+			targetEl.nodeName === 'DIV' &&
+			targetEl.getAttribute('contenteditable') === 'true'
+		) {
 			editor = new ContenteditableEditor(targetEl);
 		}
 		if (!editor) {
 			throw new Error('unknown target element type');
 		}
 		// yuku-t/textcomplete inherits directionality from target element itself
-		targetEl.setAttribute('dir', document.querySelector('html').getAttribute('data-dir'));
+		targetEl.setAttribute(
+			'dir',
+			document.querySelector('html').getAttribute('data-dir')
+		);
 
 		var textcomplete = new Textcomplete(editor, strategies, {
 			dropdown: options,
@@ -162,7 +190,6 @@ define('autocomplete', [
 
 		return textcomplete;
 	};
-
 
 	return autocomplete;
 });

@@ -1,7 +1,10 @@
 'use strict';
 
-
-define('forum/infinitescroll', ['hooks', 'alerts', 'api'], function (hooks, alerts, api) {
+define('forum/infinitescroll', ['hooks', 'alerts', 'api'], function (
+	hooks,
+	alerts,
+	api
+) {
 	const scroll = {};
 	let callback;
 	let previousScrollTop = 0;
@@ -19,10 +22,13 @@ define('forum/infinitescroll', ['hooks', 'alerts', 'api'], function (hooks, aler
 			container = el || $body;
 		}
 		previousScrollTop = $(window).scrollTop();
-		$(window).off('scroll', startScrollTimeout).on('scroll', startScrollTimeout);
-		if ($body.height() <= $(window).height() && (
-			!ajaxify.data.hasOwnProperty('pageCount') || ajaxify.data.pageCount > 1
-		)) {
+		$(window)
+			.off('scroll', startScrollTimeout)
+			.on('scroll', startScrollTimeout);
+		if (
+			$body.height() <= $(window).height() &&
+			(!ajaxify.data.hasOwnProperty('pageCount') || ajaxify.data.pageCount > 1)
+		) {
 			callback(1);
 		}
 	};
@@ -39,7 +45,8 @@ define('forum/infinitescroll', ['hooks', 'alerts', 'api'], function (hooks, aler
 
 	function onScroll() {
 		const bsEnv = utils.findBootstrapEnvironment();
-		const mobileComposerOpen = (bsEnv === 'xs' || bsEnv === 'sm') && $('html').hasClass('composing');
+		const mobileComposerOpen =
+			(bsEnv === 'xs' || bsEnv === 'sm') && $('html').hasClass('composing');
 		if (loadingMore || mobileComposerOpen || app.flags._glance) {
 			return;
 		}
@@ -47,7 +54,9 @@ define('forum/infinitescroll', ['hooks', 'alerts', 'api'], function (hooks, aler
 		const wh = $(window).height();
 		const viewportHeight = container.height() - wh;
 		const offsetTop = container.offset() ? container.offset().top : 0;
-		const scrollPercent = 100 * (currentScrollTop - offsetTop) / (viewportHeight <= 0 ? wh : viewportHeight);
+		const scrollPercent =
+			(100 * (currentScrollTop - offsetTop)) /
+			(viewportHeight <= 0 ? wh : viewportHeight);
 
 		const top = 15;
 		const bottom = 85;
@@ -91,7 +100,10 @@ define('forum/infinitescroll', ['hooks', 'alerts', 'api'], function (hooks, aler
 			return;
 		}
 		loadingMore = true;
-		const url = config.relative_path + '/api' + location.pathname.replace(new RegExp('^' + config.relative_path), '');
+		const url =
+			config.relative_path +
+			'/api' +
+			location.pathname.replace(new RegExp('^' + config.relative_path), '');
 		const hookData = { url: url, data: data };
 		hooks.fire('action:infinitescroll.loadmore.xhr', hookData);
 

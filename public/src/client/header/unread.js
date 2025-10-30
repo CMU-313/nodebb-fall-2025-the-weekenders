@@ -14,15 +14,21 @@ define('forum/header/unread', ['hooks'], function (hooks) {
 		function onNewPost(data) {
 			if (data && data.posts && data.posts.length && unreadTopics) {
 				const post = data.posts[0];
-				if (parseInt(post.uid, 10) === parseInt(app.user.uid, 10) ||
-					(!post.topic.isFollowing && post.categoryWatchState !== watchStates.watching)
+				if (
+					parseInt(post.uid, 10) === parseInt(app.user.uid, 10) ||
+					(!post.topic.isFollowing &&
+						post.categoryWatchState !== watchStates.watching)
 				) {
 					return;
 				}
 
 				const tid = post.topic.tid;
-				if (!unreadTopics[''][tid] || !unreadTopics.new[tid] ||
-					!unreadTopics.watched[tid] || !unreadTopics.unreplied[tid]) {
+				if (
+					!unreadTopics[''][tid] ||
+					!unreadTopics.new[tid] ||
+					!unreadTopics.watched[tid] ||
+					!unreadTopics.unreplied[tid]
+				) {
 					markTopicsUnread(tid);
 				}
 
@@ -30,7 +36,8 @@ define('forum/header/unread', ['hooks'], function (hooks) {
 					increaseUnreadCount('');
 					unreadTopics[''][tid] = true;
 				}
-				const isNewTopic = post.isMain && parseInt(post.uid, 10) !== parseInt(app.user.uid, 10);
+				const isNewTopic =
+					post.isMain && parseInt(post.uid, 10) !== parseInt(app.user.uid, 10);
 				if (isNewTopic && !unreadTopics.new[tid]) {
 					increaseUnreadCount('new');
 					unreadTopics.new[tid] = true;
@@ -50,7 +57,17 @@ define('forum/header/unread', ['hooks'], function (hooks) {
 
 		function increaseUnreadCount(filter) {
 			const unreadUrl = '/unread' + (filter ? '?filter=' + filter : '');
-			const newCount = 1 + parseInt($('a[href="' + config.relative_path + unreadUrl + '"].navigation-link i').attr('data-content'), 10);
+			const newCount =
+				1 +
+				parseInt(
+					$(
+						'a[href="' +
+							config.relative_path +
+							unreadUrl +
+							'"].navigation-link i'
+					).attr('data-content'),
+					10
+				);
 			updateUnreadTopicCount(unreadUrl, newCount);
 		}
 
@@ -75,8 +92,14 @@ define('forum/header/unread', ['hooks'], function (hooks) {
 	function updateUnreadCounters(data) {
 		updateUnreadTopicCount('/unread', data.unreadTopicCount);
 		updateUnreadTopicCount('/unread?filter=new', data.unreadNewTopicCount);
-		updateUnreadTopicCount('/unread?filter=watched', data.unreadWatchedTopicCount);
-		updateUnreadTopicCount('/unread?filter=unreplied', data.unreadUnrepliedTopicCount);
+		updateUnreadTopicCount(
+			'/unread?filter=watched',
+			data.unreadWatchedTopicCount
+		);
+		updateUnreadTopicCount(
+			'/unread?filter=unreplied',
+			data.unreadUnrepliedTopicCount
+		);
 	}
 
 	function updateUnreadTopicCount(url, count) {
@@ -86,21 +109,27 @@ define('forum/header/unread', ['hooks'], function (hooks) {
 		count = Math.max(0, count);
 		const countText = count > 99 ? '99+' : count;
 
-		const navLink = $('a[href="' + config.relative_path + url + '"].navigation-link');
+		const navLink = $(
+			'a[href="' + config.relative_path + url + '"].navigation-link'
+		);
 		// persona uses i with :after element
-		navLink.find('i')
+		navLink
+			.find('i')
 			.toggleClass('unread-count', count > 0)
 			.attr('data-content', countText);
 
 		// harmony uses BS5 absolute positioned element
-		navLink.find('[component="navigation/count"]')
+		navLink
+			.find('[component="navigation/count"]')
 			.toggleClass('hidden', count <= 0)
 			.text(count);
 
 		if (navLink.length) {
 			// persona mobile menu uses data-content
-			$('#mobile-menu [data-unread-url="' + url + '"]')
-				.attr('data-content', countText);
+			$('#mobile-menu [data-unread-url="' + url + '"]').attr(
+				'data-content',
+				countText
+			);
 
 			// harmony mobile unread badge, doesn't use data-content
 			$('[component="unread/count"][data-unread-url="' + url + '"]')

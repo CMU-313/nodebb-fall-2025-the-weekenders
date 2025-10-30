@@ -1,6 +1,5 @@
 'use strict';
 
-
 define('forum/topic/change-owner', [
 	'postSelect',
 	'autocomplete',
@@ -37,23 +36,36 @@ define('forum/topic/change-owner', [
 				changeOwner();
 			});
 
-			autocomplete.user(modal.find('#username'), { filters: ['notbanned'] }, function (ev, ui) {
-				toUid = ui.item.user.uid;
-				checkButtonEnable();
-			});
+			autocomplete.user(
+				modal.find('#username'),
+				{ filters: ['notbanned'] },
+				function (ev, ui) {
+					toUid = ui.item.user.uid;
+					checkButtonEnable();
+				}
+			);
 		});
 	};
 
 	function showPostsSelected() {
 		if (postSelect.pids.length) {
-			modal.find('#pids').translateHtml('[[topic:fork-pid-count, ' + postSelect.pids.length + ']]');
+			modal
+				.find('#pids')
+				.translateHtml(
+					'[[topic:fork-pid-count, ' + postSelect.pids.length + ']]'
+				);
 		} else {
 			modal.find('#pids').translateHtml('[[topic:fork-no-pids]]');
 		}
 	}
 
 	function checkButtonEnable() {
-		if (toUid && modal.find('#username').length && modal.find('#username').val().length && postSelect.pids.length) {
+		if (
+			toUid &&
+			modal.find('#username').length &&
+			modal.find('#username').val().length &&
+			postSelect.pids.length
+		) {
 			commit.removeAttr('disabled');
 		} else {
 			commit.attr('disabled', true);
@@ -69,14 +81,18 @@ define('forum/topic/change-owner', [
 		if (!toUid) {
 			return;
 		}
-		socket.emit('posts.changeOwner', { pids: postSelect.pids, toUid: toUid }, function (err) {
-			if (err) {
-				return alerts.error(err);
-			}
-			ajaxify.go(`/post/${postSelect.pids[0]}`);
+		socket.emit(
+			'posts.changeOwner',
+			{ pids: postSelect.pids, toUid: toUid },
+			function (err) {
+				if (err) {
+					return alerts.error(err);
+				}
+				ajaxify.go(`/post/${postSelect.pids[0]}`);
 
-			closeModal();
-		});
+				closeModal();
+			}
+		);
 	}
 
 	function closeModal() {

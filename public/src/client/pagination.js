@@ -1,6 +1,5 @@
 'use strict';
 
-
 define('forum/pagination', ['bootbox'], function (bootbox) {
 	const pagination = {};
 
@@ -16,7 +15,11 @@ define('forum/pagination', ['bootbox'], function (bootbox) {
 	pagination.loadPage = function (page, callback) {
 		callback = callback || function () {};
 		page = parseInt(page, 10);
-		if (!utils.isNumber(page) || page < 1 || page > ajaxify.data.pagination.pageCount) {
+		if (
+			!utils.isNumber(page) ||
+			page < 1 ||
+			page > ajaxify.data.pagination.pageCount
+		) {
 			return;
 		}
 

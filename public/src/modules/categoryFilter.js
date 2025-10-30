@@ -1,6 +1,10 @@
 'use strict';
 
-define('categoryFilter', ['categorySearch', 'api', 'hooks'], function (categorySearch, api, hooks) {
+define('categoryFilter', ['categorySearch', 'api', 'hooks'], function (
+	categorySearch,
+	api,
+	hooks
+) {
 	const categoryFilter = {};
 
 	categoryFilter.init = function (el, options) {
@@ -8,8 +12,14 @@ define('categoryFilter', ['categorySearch', 'api', 'hooks'], function (categoryS
 			return;
 		}
 		options = options || {};
-		options.states = options.states || ['watching', 'tracking', 'notwatching', 'ignoring'];
-		options.template = options.template || 'partials/category/filter-dropdown-left';
+		options.states = options.states || [
+			'watching',
+			'tracking',
+			'notwatching',
+			'ignoring',
+		];
+		options.template =
+			options.template || 'partials/category/filter-dropdown-left';
 
 		hooks.fire('action:category.filter.options', { el: el, options: options });
 
@@ -35,13 +45,20 @@ define('categoryFilter', ['categorySearch', 'api', 'hooks'], function (categoryS
 
 			if (changed) {
 				if (options.updateButton) {
-					options.updateButton({ el, changed: changed, selectedCids: selectedCids.slice() });
+					options.updateButton({
+						el,
+						changed: changed,
+						selectedCids: selectedCids.slice(),
+					});
 				} else if (options.updateButton !== false) {
 					updateFilterButton(el, selectedCids);
 				}
 			}
 			if (options.onHidden) {
-				options.onHidden({ changed: changed, selectedCids: selectedCids.slice() });
+				options.onHidden({
+					changed: changed,
+					selectedCids: selectedCids.slice(),
+				});
 				return;
 			}
 			if (changed) {
@@ -82,7 +99,9 @@ define('categoryFilter', ['categorySearch', 'api', 'hooks'], function (categoryS
 					return a - b;
 				});
 				icon.toggleClass('invisible');
-				listEl.find('[data-cid="all"] i').toggleClass('invisible', !!selectedCids.length);
+				listEl
+					.find('[data-cid="all"] i')
+					.toggleClass('invisible', !!selectedCids.length);
 			} else {
 				el.find('[component="category/select/icon"]').addClass('invisible');
 				listEl.find('[data-cid="all"] i').removeClass('invisible');
@@ -111,11 +130,15 @@ define('categoryFilter', ['categorySearch', 'api', 'hooks'], function (categoryS
 			renderButton();
 		}
 		function renderButton(category) {
-			app.parseAndTranslate('partials/category/filter-dropdown-content', {
-				selectedCategory: category,
-			}, function (html) {
-				el.find('button').replaceWith($('<div/>').html(html).find('button'));
-			});
+			app.parseAndTranslate(
+				'partials/category/filter-dropdown-content',
+				{
+					selectedCategory: category,
+				},
+				function (html) {
+					el.find('button').replaceWith($('<div/>').html(html).find('button'));
+				}
+			);
 		}
 	}
 
